@@ -7927,19 +7927,19 @@ SleepEffect:
 	ld a, [wMoveMissed]
 	and a
 	jr nz, .didntAffect
-.setSleepCounter
-; set target's sleep counter to a random number between 2 and 8 (1 = Current Turn)
 ;;;;;joenote: recharge hyper beam if fallen asleep
 	ld a, [bc]
 	res NEEDS_TO_RECHARGE, a ; target no longer needs to recharge
 	ld [bc], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.setSleepCounter
+; set target's sleep counter to a random number between 1 and 7
 	call BattleRandom
 	and $7
-	jr z, .setSleepCounter
-	dec a
-	jr z, .setSleepCounter
-	inc a
+	;joenote - sleep for at least +1 count since attacks can now happen on wakeup
+	;also made this more efficient
+	cp $2
+	jr c, .setSleepCounter
 	ld [de], a
 	call PlayCurrentMoveAnimation2
 	ld hl, FellAsleepText
