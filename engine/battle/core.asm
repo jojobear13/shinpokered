@@ -7937,6 +7937,8 @@ SleepEffect:
 	call BattleRandom
 	and $7
 	jr z, .setSleepCounter
+	dec a
+	jr z, .setSleepCounter
 	inc a
 	ld [de], a
 	call PlayCurrentMoveAnimation2
