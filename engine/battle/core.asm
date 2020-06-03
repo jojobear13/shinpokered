@@ -7928,7 +7928,7 @@ SleepEffect:
 	and a
 	jr nz, .didntAffect
 .setSleepCounter
-; set target's sleep counter to a random number between 1 and 7
+; set target's sleep counter to a random number between 2 and 8 (1 = Current Turn)
 ;;;;;joenote: recharge hyper beam if fallen asleep
 	ld a, [bc]
 	res NEEDS_TO_RECHARGE, a ; target no longer needs to recharge
@@ -7937,6 +7937,7 @@ SleepEffect:
 	call BattleRandom
 	and $7
 	jr z, .setSleepCounter
+	inc a
 	ld [de], a
 	call PlayCurrentMoveAnimation2
 	ld hl, FellAsleepText
