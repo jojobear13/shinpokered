@@ -7,8 +7,8 @@ CeladonMart3Object:
 	warp 1, 1, 0, CELADON_MART_ELEVATOR
 
 	db 12 ; signs
-	sign 2, 4, 20 ; CeladonMart3Text6	
-	sign 3, 4, 21 ; CeladonMart3Text7	
+	sign 2, 4, 6 ; CeladonMart3Text6	
+	sign 3, 4, 7 ; CeladonMart3Text7	
 	sign 5, 4, 8 ; CeladonMart3Text8
 	sign 6, 4, 9 ; CeladonMart3Text9
 	sign 2, 6, 10 ; CeladonMart3Text10
