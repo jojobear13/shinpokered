@@ -345,7 +345,7 @@ DivideExpDataByNumMonsGainingExp:
 	dec c
 	jr nz, .countSetBitsLoop
 	cp $2
-	ld[wUnusedD155], a	;joenote - make a backup of number of mons gaining exp
+	ld [wUnusedD155], a	;joenote - make a backup of number of mons gaining exp
 	ret c ; return if only one mon is gaining exp
 	ld [wd11e], a ; store number of mons gaining exp
 	ld hl, wEnemyMonBaseStats

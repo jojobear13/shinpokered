@@ -444,12 +444,10 @@ SetExpAllFlags:
 .gainExpFlagsLoop
 	ld a, [hli]
 	or [hl] ; is mon's HP 0?
-	jp z, .setzeroexpflag
+	jp z, .setnextexpflag
 	scf
-	rl b
-	jp .nextmonforexpall
-.setzeroexpflag
-	sla b
+.setnextexpflag
+	rr b
 .nextmonforexpall
 	dec c
 	jr z, .return
@@ -462,6 +460,8 @@ SetExpAllFlags:
 	pop bc
 	jr .gainExpFlagsLoop
 .return
+	rr b
+	rr b
 	ld a, b
 	ld [wPartyGainExpFlags], a
 	ret
