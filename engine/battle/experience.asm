@@ -19,8 +19,8 @@ GainExperience:
 .partyMonLoop ; loop over each mon and add gained exp
 	inc hl
 	ld a, [hli]
-	or [hl] ; is mon's HP 0?
-	jp z, .nextMon ; if so, go to next mon
+	; or [hl] ; is mon's HP 0? wispnote - We already handle this check separately, also makes debugging more difficult.
+	; jp z, .nextMon ; if so, go to next mon
 	push hl
 	ld hl, wPartyGainExpFlags
 	ld a, [wWhichPokemon]

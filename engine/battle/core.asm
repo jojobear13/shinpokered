@@ -977,6 +977,14 @@ FaintEnemyPokemon:
 
 ;joedebug - EXP ALL is handled here
 
+; wispnote - If all participated PKMN fainted, only apply Exp.All
+ld a, [wPartyGainExpFlags]
+or a
+jr nz, .noZeroParticipants
+pop af
+jp .expallfix_end
+.noZeroParticipants
+
 ; the player has exp all
 ; first, we halve the values that determine exp gain
 ; the enemy mon base stats are added to stat exp, so they are halved
