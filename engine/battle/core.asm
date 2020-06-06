@@ -977,13 +977,14 @@ FaintEnemyPokemon:
 
 ;joedebug - EXP ALL is handled here
 
-; wispnote - If all participated PKMN fainted, only apply Exp.All
-ld a, [wPartyGainExpFlags]
-or a
-jr nz, .noZeroParticipants
-pop af
-jp .expallfix_end
-.noZeroParticipants
+;wispnote - If all participated PKMN fainted, only apply the Exp.All effect
+;			- Half the exp will be split among all non-fainted party mons
+	ld a, [wPartyGainExpFlags]
+	or a
+	jr nz, .noZeroParticipants
+	pop af
+	jp .expallfix_end	;all your battle participants are toast. don't even bother giving them exp
+	.noZeroParticipants
 
 ; the player has exp all
 ; first, we halve the values that determine exp gain

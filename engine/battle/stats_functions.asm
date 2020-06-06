@@ -441,13 +441,17 @@ SetExpAllFlags:
 	ld c, a
 	ld b, 0
 	ld hl, wPartyMon1HP
-.gainExpFlagsLoop
+.gainExpFlagsLoop	
+;wisp92 found that bits need to be rotated in from the left and shifted to the right. 
+;Bit 0 of the flags represents the first mon in the party
+;Bit 5 of the flags represents the sixth mon in the party
 	ld a, [hli]
 	or [hl] ; is mon's HP 0?
-	jp z, .setnextexpflag
-	scf
-.setnextexpflag
-	rr b
+	jp z, .setnextexpflag	;the carry bit is cleared from the last OR, so 0 will be rotated in next
+	scf	;the carry bit is is set, so 1 will be rotated in next
+.setnextexpflag 
+	jp .do_rotations	
+.nextmonforexpall
 	dec c
 	jr z, .return
 	ld a, [wPartyCount]
@@ -459,23 +463,36 @@ SetExpAllFlags:
 	pop bc
 	jr .gainExpFlagsLoop
 .return
-	ld a, [wPartyCount]
-	ld c, a
-	ld a, 6
-	sub c
-.loopBitRotation
-	jp z, .finishVariableBitRotation
-	rr b
-	dec a
-	jr .loopBitRotation
-.finishVariableBitRotation
-	rr b
-	rr b
 	ld a, b
 	ld [wPartyGainExpFlags], a
 	ret
-
-
+.do_rotations
+;need to rotate the carry value into the proper flag bit position
+;a and hl are free to use
+;c is the counter that tells the party position
+;b holds the current flag values
+	push af	;save carry value
+	;the number of rotations needed to move the carry value to the proper flag place is 8 - [wPartyCount] + c
+	ld a, $08
+	ld hl, wPartyCount 
+	sub [hl] ;subtract 1 to 6
+	add c	; add the current count
+	ld h, a
+	pop af	;get the carry value back
+	ld a, h
+	;a now has the rotation count (8 to 3)
+	push bc
+	ld c, a	;make c hold the rotation count
+	ld a, $00
+.loop
+	rr a	;rotate the carry value 1 bit to the right per loop
+	dec c
+	jr nz, .loop
+	pop bc
+	or b	;append current flag values to a
+	ld b, a	; and save them back to b
+	jp .nextmonforexpall
+	
 	
 ;This function is for teleporting you home from the start menu if you get stuck
 SoftlockTeleport:

@@ -20,7 +20,7 @@ GainExperience:
 	inc hl
 	ld a, [hli]
 	; wispnote - We already handle this check separately, and also makes debugging more difficult.
-	; 	But it handles might handle unpredictabl on/off cases.
+	; 	But it might handle unpredictable on/off cases.
 	or [hl] ; is mon's HP 0? ; 
 	jp z, .nextMon ; if so, go to next mon
 	push hl
