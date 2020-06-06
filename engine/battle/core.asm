@@ -3389,12 +3389,17 @@ PlayerCalcMoveDamage:
 	call IsInArray
 ;;;;;;;;;;;;;;;;;;;;
 ;joenote - if there is a static damage effect like superfang or seismic toss, make it obey type immunities
+	ld a, [wUnusedC000] ; get ready to set or clear static damage flag
 	;jp c, .moveHitTest ; SetDamageEffects moves (e.g. Seismic Toss and Super Fang) skip damage calculation	;joenote - not needed anymore
 	jp nc, .not_static	;skip all this if not a static damage move
+	set 4, a
+	ld [wUnusedC000], a	;a static move, so set the flag
 	ld a, $1	;set wDamage to 1 point. just need a non-zero value otherwise it counts as a miss later on.
 	ld [wDamage], a
 	jr .static_skiphere		;skip the normal calculations for static damage moves
 .not_static
+	res 4, a
+	ld [wUnusedC000], a	;not a static move, so clear the flag
 ;;;;;;;;;;;;;;;;;;;;
 	call CriticalHitTest
 	call HandleCounterMove
@@ -5720,11 +5725,24 @@ AdjustDamageForMoveType:
 	push hl
 	push bc
 	inc hl
-	ld a, [wDamageMultipliers]
+	ld a, [wDamageMultipliers]	;this will be $0A or 8A on the first go around
 	and $80	;bug - this erases the first defensive type found, so the wrong message is displayed
 	ld b, a
-	ld a, [hl] ; a = damage multiplier
+	ld a, [hl] ; a = damage multiplier from type chart table (can be $00, $05, or $14)
 	ld [H_MULTIPLIER], a
+;;;;;;;;joenote - fixing the wrong effectiveness message for static damage moves
+	and a
+	jr z, .endmulti	;skip to end if the multiplier is zero
+	ld c, a
+	ld a, [wUnusedC000]
+	bit 4, a
+	ld a, c
+	jr z, .skip_static	;don't do anything if not a static move
+	ld a, [wDamageMultipliers]
+	and $7f	;keep the current multiplier if static move (will be either 00 or 0A)
+	jr .endmulti
+.skip_static
+;;;;;;;;
 ;;;;;;;;joenote - fixing the wrong effectiveness message 
 	cp $05	;multiplier is still in a, so see if it's half damage
 	jr nz, .nothalf	;skip ahead if not half
@@ -6185,12 +6203,17 @@ EnemyCalcMoveDamage:
 	call IsInArray	;set carry if a is found in array hl
 ;;;;;;;;;;;;;;;;;;;;
 ;joenote - if there is a static damage effect like superfang or seismic toss, make it obey type immunities
+	ld a, [wUnusedC000]	;get ready to set or reset static move flag
 ;	jp c, EnemyMoveHitTest	;joenote - don't need this anymore
 	jp nc, .not_static	;skip all this if not a static damage move
+	set 4, a
+	ld [wUnusedC000], a	;static move so set the flag
 	ld a, $1	;set wDamage to 1 point. just need a non-zero value otherwise it counts as a miss later on.
 	ld [wDamage], a
 	jr .static_skiphere		;skip the normal calculations for static damage moves
 .not_static
+	set 4, a
+	ld [wUnusedC000], a	;static move so set the flag
 ;;;;;;;;;;;;;;;;;;;;
 	call CriticalHitTest
 	call HandleCounterMove
@@ -7487,7 +7510,7 @@ PlayMoveAnimation:
 InitBattle:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	xor a
-	ld [wUnusedC000], a	;joenote - clear custom ai bits at battle start
+	ld [wUnusedC000], a	;joenote - clear custom ai bits and battle flags at battle start
 	ld [wUnusedD155], a	;joenote - clear backup location for how many pkmn recieve exp
 	ld [wUnusedD366], a ;joenote - clear ai switch tracker bits
 	;clear AI_Trainer switching bits

@@ -72,7 +72,7 @@ wUnusedC000:: ; c000
 ;bit 1 - if set, ai already acted by switching or using an item this turn
 ;bit 2 - if set, ai can swith or use item but not use a move (only run ai routine 4)
 ;bit 3 - used for AIGetTypeEffectiveness
-;bit 4 - unused 
+;bit 4 - if set, current move being handled is a static damaging move
 ;bit 5 - unused 
 ;bit 6 - if set, poison/burn damage algorithm is being called to handle leech seed
 ;bit 7 - if set, force Counter to miss (for an opponent hurting itself or its jump kick missing)
