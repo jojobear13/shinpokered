@@ -448,7 +448,6 @@ SetExpAllFlags:
 	scf
 .setnextexpflag
 	rr b
-.nextmonforexpall
 	dec c
 	jr z, .return
 	ld a, [wPartyCount]
@@ -460,6 +459,16 @@ SetExpAllFlags:
 	pop bc
 	jr .gainExpFlagsLoop
 .return
+	ld a, [wPartyCount]
+	ld c, a
+	ld a, 6
+	sub c
+.loopBitRotation
+	jp z, .finishVariableBitRotation
+	rr b
+	dec a
+	jr .loopBitRotation
+.finishVariableBitRotation
 	rr b
 	rr b
 	ld a, b
