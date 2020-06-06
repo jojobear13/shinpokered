@@ -6212,8 +6212,8 @@ EnemyCalcMoveDamage:
 	ld [wDamage], a
 	jr .static_skiphere		;skip the normal calculations for static damage moves
 .not_static
-	set 4, a
-	ld [wUnusedC000], a	;static move so set the flag
+	res 4, a
+	ld [wUnusedC000], a	;not a static move so reset the flag
 ;;;;;;;;;;;;;;;;;;;;
 	call CriticalHitTest
 	call HandleCounterMove
