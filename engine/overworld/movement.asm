@@ -127,7 +127,12 @@ UpdateNPCSprite:
 	and a
 	jp z, InitializeSpriteStatus
 	call CheckSpriteAvailability
-	ret c             ; if sprite is invisible, on tile >=$60, in grass or player is currently walking
+	; wispnote - Fixes the natural Amazing Man bugs (not the humanly provoked cases).
+	; Also, surprisingly, makes some previously invisble text appear, e.g., the rival's exclamation bubbles during the encounters in Route 22.
+	jp nc, .isAvailableSprite
+	call InitializeSpriteScreenPosition
+	ret; if sprite is invisible, on tile >=$60, in grass or player is currently walking
+.isAvailableSprite:
 	ld h, $c1
 	ld a, [H_CURRENTSPRITEOFFSET]
 	ld l, a
