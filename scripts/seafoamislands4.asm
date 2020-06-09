@@ -55,17 +55,33 @@ SeafoamIslands4ScriptPointers:
 	dw SeafoamIslands4Script2
 	dw SeafoamIslands4Script3
 
+; wispnote - Added a check for the righ bank size which executes
+; a different JoyPad sequence to simulate the current.
 SeafoamIslands4Script0:
 	CheckBothEventsSet EVENT_SEAFOAM3_BOULDER1_DOWN_HOLE, EVENT_SEAFOAM3_BOULDER2_DOWN_HOLE
 	ret z
 	ld a, [wYCoord]
 	cp $8
-	ret nz
+	jr nz, .checkEntryFromRightBank
 	ld a, [wXCoord]
 	cp $f
 	ret nz
-	ld hl, wSimulatedJoypadStatesEnd
+	jp .isEntryFromLeftBank
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - Right Bank Check
+.checkEntryFromRightBank
+	cp $a
+	ret nz
+	ld a, [wXCoord]
+	cp $17
+	ret nz
+	ld de, RLEMovementRightBank
+	jp .simJoyPadFromBanksSeafoamIslands4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.isEntryFromLeftBank
 	ld de, RLEMovement46632
+.simJoyPadFromBanksSeafoamIslands4
+	ld hl, wSimulatedJoypadStatesEnd
 	call DecodeRLEList
 	dec a
 	ld [wSimulatedJoypadStatesIndex], a
@@ -81,6 +97,15 @@ RLEMovement46632:
 	db D_RIGHT,5
 	db D_DOWN,3
 	db $ff
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - JoyPad Sequence for Entry from the Right Bank Side
+RLEMovementRightBank:
+	db D_DOWN,6
+	db D_LEFT,2
+	db D_DOWN,1
+	db $ff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SeafoamIslands4Script1:
 	ld a, [wSimulatedJoypadStatesIndex]
@@ -119,11 +144,11 @@ SeafoamIslands4Script2:
 	ld [wSeafoamIslands4CurScript], a
 	ret
 
+; wispnote - Correct strong current's path after falling through 2nd boulder's hole.
 RLEData_4667f:
 	db D_DOWN,$06
-	db D_RIGHT,$02
+	db D_RIGHT,$01
 	db D_DOWN,$04
-	db D_LEFT,$01
 	db $FF
 
 RLEData_46688:
