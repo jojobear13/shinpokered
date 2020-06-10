@@ -3,8 +3,9 @@ Route20Script:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; wispnote - These routines reset the boulders' positions if the a floor's puzzle
 ; is not completely solved but were neglecting to reset the individual events; an oversight.
-	CheckAndResetEvent EVENT_IN_SEAFOAM_ISLANDS
-	call nz, Route20Script_50cc6
+; Removed the routines since there is no practical reason of resetting anything in this puzzles.
+	; CheckAndResetEvent EVENT_IN_SEAFOAM_ISLANDS
+	; call nz, Route20Script_50cc6
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call EnableAutoTextBoxDrawing
 	ld hl, Route20TrainerHeader0
