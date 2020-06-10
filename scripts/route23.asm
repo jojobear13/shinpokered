@@ -1,19 +1,21 @@
 Route23Script:
-	call Route23Script_511e9
+	; wispnote - Due to various evidence I suspect that the puzzle
+	; wasn't ment to be reset and this instruction was left for debugging purposes.
+	; call Route23Script_511e9
 	call EnableAutoTextBoxDrawing
 	ld hl, Route23ScriptPointers
 	ld a, [wRoute23CurScript]
 	jp CallFunctionInTable
 
 Route23Script_511e9:
-	ld hl, wCurrentMapScriptFlags
-	bit 6, [hl]
-	res 6, [hl]
-	ret z
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; wispnote - Resetting Victory Road Puzzle
 	; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH was probably mentto be reset here
 	; along with the rest of the puzzle instead on Indigo Plateau Loby.
+	ld hl, wCurrentMapScriptFlags
+	bit 6, [hl]
+	res 6, [hl]
+	ret z
 	ResetEvent EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 	ResetEvents EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1, EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
 	ResetEvents EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1, EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2

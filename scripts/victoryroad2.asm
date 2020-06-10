@@ -1,8 +1,12 @@
 VictoryRoad2Script:
-	ld hl, wCurrentMapScriptFlags
-	bit 6, [hl]
-	res 6, [hl]
-	call nz, VictoryRoad2Script_517c4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - Due to various evidence I suspect that the puzzle
+; wasn't ment to be reset and this instruction was left for debugging purposes.
+	; ld hl, wCurrentMapScriptFlags
+	; bit 6, [hl]
+	; res 6, [hl]
+	; call nz, VictoryRoad2Script_517c4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, wCurrentMapScriptFlags
 	bit 5, [hl]
 	res 5, [hl]
@@ -22,6 +26,18 @@ VictoryRoad2Script_517c9:
 	CheckEvent EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
 	jr z, .asm_517da
 	push af
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - If the 1st switch is activated place the boulder in switch's coordinates.
+; Sprite11 indexes the 1st boulder, and ($01, $10) are the 1st swtich's coordinates.
+	ld hl, Sprite11MapY
+	ld a, $10
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+	ld hl, Sprite11MapX
+	ld a, $01
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, $15
 	lb bc, 4, 3
 	call VictoryRoad2Script_517e2
@@ -29,6 +45,20 @@ VictoryRoad2Script_517c9:
 .asm_517da
 	bit 7, a
 	ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - If the 2nd switch is activated place the boulder in switch's coordinates.
+; Sprite13 indexes the 2nd boulder, and ($09, $10) are the 2nd swtich's coordinates.
+; Not it should be impossible for a boulder to arrive there if Sprite13 is hidden;
+; therefore, there is no need to check.
+	ld hl, Sprite13MapY
+	ld a, $10
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+	ld hl, Sprite13MapX
+	ld a, $09
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, $1d
 	lb bc, 7, 11
 
@@ -49,7 +79,7 @@ VictoryRoad2Script0:
 	EventFlagAddress hl, EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
 	ld a, [wCoordIndex]
 	cp $2
-	jr z, .asm_5180b
+	jr z, .asm_5180b; wispnote - Jump if the boulder is on the second coordinates.
 	CheckEventReuseHL EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
 	SetEventReuseHL EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1
 	ret nz

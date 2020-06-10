@@ -401,7 +401,7 @@ MapHSC2:
 	db VICTORY_ROAD_2,$08,Show
 	db VICTORY_ROAD_2,$09,Show
 	db VICTORY_ROAD_2,$0A,Show
-	db VICTORY_ROAD_2,$0D,Show
+	db VICTORY_ROAD_2,$0D,Hide; wispnote - Set to Hide since the puzzle doesn't reset anymore.
 MapHS58:
 	db BILLS_HOUSE,$01,Show
 	db BILLS_HOUSE,$02,Hide

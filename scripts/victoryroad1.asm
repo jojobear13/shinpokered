@@ -13,6 +13,18 @@ VictoryRoad1Script:
 .next
 	CheckEvent EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 	ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - If the switch is activated place the boulder in switch's coordinates.
+; Sprite05 indexes the boulder, and ($11, $0D) are the swtich's coordinates.
+	ld hl, Sprite05MapY
+	ld a, $0D
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+	ld hl, Sprite05MapX
+	ld a, $11
+	add 4; wispnote - We need to offset coordinates by 4
+	ld [hl], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, $1d
 	ld [wNewTileBlockID], a
 	lb bc, 6, 4
