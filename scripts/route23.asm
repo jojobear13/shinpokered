@@ -6,10 +6,15 @@ Route23Script:
 	jp CallFunctionInTable
 
 Route23Script_511e9:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - Resetting Victory Road Puzzle
+	; EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH was probably mentto be reset here
+	; along with the rest of the puzzle instead on Indigo Plateau Loby.
 	ld hl, wCurrentMapScriptFlags
 	bit 6, [hl]
 	res 6, [hl]
 	ret z
+	ResetEvent EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 	ResetEvents EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1, EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH2
 	ResetEvents EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1, EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2
 	ld a, HS_VICTORY_ROAD_3_BOULDER
@@ -18,6 +23,8 @@ Route23Script_511e9:
 	ld a, HS_VICTORY_ROAD_2_BOULDER
 	ld [wMissableObjectIndex], a
 	predef_jump HideObject
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 Route23ScriptPointers:
 	dw Route23Script0

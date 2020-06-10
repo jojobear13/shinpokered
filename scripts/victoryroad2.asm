@@ -1,8 +1,12 @@
 VictoryRoad2Script:
-	ld hl, wCurrentMapScriptFlags
-	bit 6, [hl]
-	res 6, [hl]
-	call nz, VictoryRoad2Script_517c4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - Due to various evidence I suspect that the puzzle
+; wasn't ment to be reset and this instruction was left for debugging purposes.
+	; ld hl, wCurrentMapScriptFlags
+	; bit 6, [hl]
+	; res 6, [hl]
+	; call nz, VictoryRoad2Script_517c4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, wCurrentMapScriptFlags
 	bit 5, [hl]
 	res 5, [hl]
