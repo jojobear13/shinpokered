@@ -36,7 +36,6 @@ Route22Script_50ed6:
 	ret
 
 Route22MoveRivalSprite:
-	call SetSpriteMovementBytesToFF
 	ld de, Route22RivalMovementData
 	ld a, [wcf0d]
 	cp $1
