@@ -22,6 +22,11 @@ EvolutionAfterBattle:
 	push hl
 	push bc
 	push de
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - We keep a pointer to the current PKMN's Level at the Beginning of the Battle.
+	ld hl, wStartBattleLevels
+	push hl
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, wPartyCount
 	push hl
 
@@ -29,11 +34,20 @@ Evolution_PartyMonLoop: ; loop over party mons
 	ld hl, wWhichPokemon
 	inc [hl]
 	pop hl
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - We store current PKMN' Level at the Beginning of the Battle
+; to a chosen memory address in order to be compaired later with the evolution requirements.
+	pop de
+	ld a, [de]
+	ld [wTempCoins1], a
+	inc de
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	inc hl
 	ld a, [hl]
 	cp $ff ; have we reached the end of the party?
 	jp z, .done
 	ld [wEvoOldSpecies], a
+	push de; wispnote - If we are not done we need to push the pointer for the next iteration.
 	push hl
 	ld a, [wWhichPokemon]
 	ld c, a
@@ -119,8 +133,13 @@ Evolution_PartyMonLoop: ; loop over party mons
 ;			learning moves of the new evolution to be skipped.
 			;need to store the evo level requirement somewhere.
 	;wTempCoins1 was chosen because it's used only for slot machine and gets defaulted to 1 during the mini-game
+; wispnote - We compare with PKMN's level at the Beginning of the Battle and keep the highest value.
+	ld a, [wTempCoins1]
+	cp b
+	jp nc, .evoLevelRequirementSatisfied
 	ld a, b
-	ld [wTempCoins1], a	
+	ld [wTempCoins1], a
+.evoLevelRequirementSatisfied
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	push hl

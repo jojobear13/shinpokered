@@ -3278,7 +3278,13 @@ wBoxMonNicksEnd::
 
 wBoxDataEnd::
 
-; dee2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; wispnote - PKMN Levels at the Begining of a Battle.
+; Required to correctly execute the level-up procedure.
+wStartBattleLevels:: ds PARTY_LENGTH; dee2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; dee8; wispnote - Updated to account for the new variables.
 
 SECTION "Stack", WRAM0[$df00]
 	ds $ff
