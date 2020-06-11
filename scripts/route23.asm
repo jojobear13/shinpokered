@@ -1,7 +1,5 @@
 Route23Script:
-	; wispnote - Due to various evidence I suspect that the puzzle
-	; wasn't ment to be reset and this instruction was left for debugging purposes.
-	; call Route23Script_511e9
+	call Route23Script_511e9
 	call EnableAutoTextBoxDrawing
 	ld hl, Route23ScriptPointers
 	ld a, [wRoute23CurScript]
