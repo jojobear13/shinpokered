@@ -577,7 +577,8 @@ StorePKMNLevels:
 	push hl
 	jp .loopStorePKMNLevels
 .doneStorePKMNLevels
-	pop de	
+	pop de
+	ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
