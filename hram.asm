@@ -322,3 +322,4 @@ hDisableJoypadPolling EQU $FFF9
 
 hJoyInput EQU $FFF8
 
+hGBC EQU $FFFE ;gbcnote - 0 if DMG, != 0 if GBC

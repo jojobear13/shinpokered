@@ -18,6 +18,7 @@ AnimCut:
 	ld a, [rOBP1]
 	xor $64
 	ld [rOBP1], a
+	call UpdateGBCPal_OBP1
 	call DelayFrame
 	pop bc
 	dec c
@@ -68,6 +69,7 @@ AnimCutGrass_UpdateOAMEntries:
 	ld a, [rOBP1]
 	xor $64
 	ld [rOBP1], a
+	call UpdateGBCPal_OBP1
 	call DelayFrame
 	pop bc
 	dec c

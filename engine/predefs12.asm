@@ -4,11 +4,13 @@ ChangeBGPalColor0_4Frames:
 	ld a, [rBGP]
 	or b
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ld c, 4
 	call DelayFrames
 	ld a, [rBGP]
 	and %11111100
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ret
 
 PredefShakeScreenVertically:

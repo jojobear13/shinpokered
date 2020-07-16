@@ -20,6 +20,7 @@ HallOfFamePC:
 	call FillFourRowsWithBlack
 	ld a, %11000000
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	call EnableLCD
 	ld a, $ff
 	call PlaySoundWaitForCurrent
@@ -39,6 +40,7 @@ FadeInCreditsText:
 .loop
 	ld a, [hli]
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ld c, 5
 	call DelayFrames
 	dec b
@@ -78,7 +80,7 @@ DisplayCreditsMon:
 	call FillMiddleOfScreenWithWhite
 	ld a, %11111100 ; make the mon a black silhouette
 	ld [rBGP], a
-
+	call UpdateGBCPal_BGP
 ; scroll the mon left by one tile 7 times
 	ld bc, 7
 .scrollLoop1
@@ -102,6 +104,7 @@ DisplayCreditsMon:
 	ld [hWY], a
 	ld a, %11000000
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ret
 
 INCLUDE "data/credit_mons.asm"

@@ -107,9 +107,9 @@ Start::
 	xor a
 	jr .ok
 .gbc
-	ld a, 0
+	ld a, 1	;gbctest - set the marker for being in gbc mode
 .ok
-	ld [wGBC], a
+	ld [hGBC], a
 	jp Init
 
 
@@ -2198,6 +2198,75 @@ DisplayTextBoxID::
 	ld a, b
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
+	ret
+
+;gbcnote - new functions
+UpdateGBCPal_BGP::
+	push af
+	ld a, [hGBC]
+	and a
+	jr z, .notGBC
+	push bc
+	push de
+	push hl
+	ld a, [rBGP]
+	ld b, a
+	ld a, [wLastBGP]
+	cp b
+	jr z, .noChangeInBGP
+	callba _UpdateGBCPal_BGP
+.noChangeInBGP
+	pop hl
+	pop de
+	pop bc
+.notGBC
+	pop af
+	ret
+	
+UpdateGBCPal_OBP0::
+	push af
+	ld a, [hGBC]
+	and a
+	jr z, .notGBC
+	push bc
+	push de
+	push hl
+	ld a, [rOBP0]
+	ld b, a
+	ld a, [wLastOBP0]
+	cp b
+	jr z, .noChangeInOBP0
+	ld d, CONVERT_OBP0
+	callba _UpdateGBCPal_OBP
+.noChangeInOBP0
+	pop hl
+	pop de
+	pop bc
+.notGBC
+	pop af
+	ret
+	
+UpdateGBCPal_OBP1::
+	push af
+	ld a, [hGBC]
+	and a
+	jr z, .notGBC
+	push bc
+	push de
+	push hl
+	ld a, [rOBP1]
+	ld b, a
+	ld a, [wLastOBP1]
+	cp b
+	jr z, .noChangeInOBP1
+	ld d, CONVERT_OBP1
+	callba _UpdateGBCPal_OBP
+.noChangeInOBP1
+	pop hl
+	pop de
+	pop bc
+.notGBC
+	pop af
 	ret
 
 ; not zero if an NPC movement script is running, the player character is
@@ -4591,6 +4660,9 @@ GBPalNormal::
 	ld [rBGP], a
 	ld a, %11010000 ; 3100
 	ld [rOBP0], a
+	call UpdateGBCPal_BGP
+	call UpdateGBCPal_OBP0
+	call UpdateGBCPal_OBP1
 	ret
 
 GBPalWhiteOut::
@@ -4599,6 +4671,9 @@ GBPalWhiteOut::
 	ld [rBGP], a
 	ld [rOBP0], a
 	ld [rOBP1], a
+	call UpdateGBCPal_BGP
+	call UpdateGBCPal_OBP0
+	call UpdateGBCPal_OBP1
 	ret
 
 

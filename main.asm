@@ -1932,7 +1932,7 @@ Underground_Block: INCBIN "gfx/blocksets/underground.bst"
 
 SECTION "bank1C",ROMX,BANK[$1C]
 
-INCLUDE "engine/gamefreak.asm"
+;INCLUDE "engine/gamefreak.asm"	;gbcnote - moved to another bank to make space
 INCLUDE "engine/hall_of_fame.asm"
 INCLUDE "engine/overworld/healing_machine.asm"
 INCLUDE "engine/overworld/player_animations.asm"
@@ -2134,3 +2134,13 @@ RedPicFBack::           INCBIN "pic/trainer/redb_f.pic"
 RedPicFFront:: 			INCBIN "pic/trainer/red_f.pic"
 RedFSprite:            INCBIN "gfx/sprites/redf.2bpp"
 RedFCyclingSprite:     INCBIN "gfx/sprites/cyclingf.2bpp"
+
+
+SECTION "bank2E",ROMX,BANK[$2E]	
+;gbcnote - This bank with hold the bg map attributes for the gameboy color among other stuff
+
+;include the bgmap files from pokemon yellow
+INCLUDE "data/bg_map_attributes.asm"
+INCLUDE "engine/bg_map_attributes.asm"
+
+INCLUDE "engine/gamefreak.asm"	;gbcnote - moved here to make space

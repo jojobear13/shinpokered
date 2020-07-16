@@ -158,6 +158,9 @@ SlidePlayerAndEnemySilhouettesOnScreen:
 	ld [rBGP], a
 	ld [rOBP0], a
 	ld [rOBP1], a
+	call UpdateGBCPal_BGP
+	call UpdateGBCPal_OBP0
+	call UpdateGBCPal_OBP1
 .slideSilhouettesLoop ; slide silhouettes of the player's pic and the enemy's pic onto the screen
 	ld h, b
 	ld l, $40
@@ -184,10 +187,10 @@ SlidePlayerAndEnemySilhouettesOnScreen:
 	ld [rWY], a
 	inc a
 	ld [H_AUTOBGTRANSFERENABLED], a
+	call HideSprites
 	call Delay3
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
-	call HideSprites
 	jpab PrintBeginningBattleText
 
 ; when a battle is starting, silhouettes of the player's pic and the enemy's pic are slid onto the screen
@@ -1079,6 +1082,11 @@ ReplaceFaintedEnemyMon:
 	ld hl, wEnemyHPBarColor
 	ld e, $30
 	call GetBattleHealthBarColor
+	;ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
+	;ld [rOBP0], a
+	;ld [rOBP1], a
+	;call UpdateGBCPal_OBP0
+	;call UpdateGBCPal_OBP1
 	callab DrawEnemyPokeballs
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING

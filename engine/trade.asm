@@ -182,6 +182,7 @@ LoadTradingGFXAndMonNames:
 	ld a, $f0 ; SGB OBP0
 .next
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	call EnableLCD
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
@@ -199,6 +200,7 @@ LoadTradingGFXAndMonNames:
 Trade_LoadMonPartySpriteGfx:
 	ld a, %11010000
 	ld [rOBP1], a
+	call UpdateGBCPal_OBP1
 	jpba LoadMonPartySpriteGfx
 
 Trade_SwapNames:
@@ -303,6 +305,7 @@ Trade_AnimateBallEnteringLinkCable:
 	call DelayFrames
 	ld a, %11100100
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	xor a
 	ld [wLinkCableAnimBulgeToggle], a
 	lb bc, $20, $60
@@ -382,6 +385,7 @@ Trade_AnimLeftToRight:
 	ld [wTradedMonMovingRight], a
 	ld a, %11100100
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	ld a, $54
 	ld [wBaseCoordX], a
 	ld a, $1c
@@ -599,6 +603,7 @@ Trade_AnimCircledMon:
 	ld a, [rBGP]
 	xor $3c ; make link cable flash
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ld hl, wOAMBuffer + $02
 	ld de, $4
 	ld c, $14

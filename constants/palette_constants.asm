@@ -61,3 +61,7 @@ const_value = 0
 	const PAL_BADGE     ; $22
 	const PAL_CAVE      ; $23
 	const PAL_GAMEFREAK ; $24
+;gbcnote - added from yellow
+	const PAL_25        ; $25
+	const PAL_26        ; $26
+	const PAL_27        ; $27

@@ -245,11 +245,13 @@ PlayAnimation:
 	push af
 	ld a, [wAnimPalette]
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	call LoadAnimationTileset
 	call LoadSubanimation
 	call PlaySubanimation
 	pop af
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 .nextAnimationCommand
 	pop hl
 	jr .animationLoop
@@ -537,6 +539,8 @@ SetAnimationPalette:
 	ld [rOBP0], a
 	ld a, $6c
 	ld [rOBP1], a
+	call UpdateGBCPal_OBP0
+	call UpdateGBCPal_OBP1
 	ret
 .notSGB
 	ld a, $e4
@@ -544,6 +548,8 @@ SetAnimationPalette:
 	ld [rOBP0], a
 	ld a, $6c
 	ld [rOBP1], a
+	call UpdateGBCPal_OBP0
+	call UpdateGBCPal_OBP1
 	ret
 
 PlaySubanimation:
@@ -733,6 +739,7 @@ DoBallTossSpecialEffects:
 	ld a, [rOBP0]
 	xor %00111100 ; complement colors 1 and 2
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 .skipFlashingEffect
 	ld a, [wSubAnimCounter]
 	cp 11 ; is it the beginning of the subanimation?
@@ -1102,6 +1109,7 @@ AnimationFlashScreenLong:
 	cp $01 ; is it the end of the palettes?
 	jr z, .endOfPalettes
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	call FlashScreenLongDelay
 	jr .innerLoop
 .endOfPalettes
@@ -1164,14 +1172,17 @@ AnimationFlashScreen:
 	push af ; save initial palette
 	ld a, %00011011 ; 0, 1, 2, 3 (inverted colors)
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ld c, 2
 	call DelayFrames
 	xor a ; white out background
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ld c, 2
 	call DelayFrames
 	pop af
 	ld [rBGP], a ; restore initial palette
+	call UpdateGBCPal_BGP
 	ret
 
 AnimationDarkScreenPalette:
@@ -1217,6 +1228,7 @@ SetAnimationBGPalette:
 	ld a, c
 .next
 	ld [rBGP], a
+	call UpdateGBCPal_BGP
 	ret
 
 	ld b, $5
@@ -2692,12 +2704,14 @@ AnimationLeavesFalling:
 	push af
 	ld a, [wAnimPalette]
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	ld d, $37 ; leaf tile
 	ld a, 3 ; number of leaves
 	ld [wNumFallingObjects], a
 	call AnimationFallingObjects
 	pop af
 	ld [rOBP0], a
+	call UpdateGBCPal_OBP0
 	ret
 
 AnimationPetalsFalling:

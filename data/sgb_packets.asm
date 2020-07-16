@@ -198,6 +198,10 @@ BlkPacket_GameFreakIntro:
 	db $03,$0c,$0b,$0e,$0d,$03
 	db $00
 
+UnknownPacket_72751:	;gbcnote - packet from yellow
+	ATTR_BLK 1
+	ATTR_BLK_DATA %111, 1,1,0, 04,00, 15,05
+	ds 8
 
 PalPacket_Empty:          PAL_SET 0, 0, 0, 0
 PalPacket_PartyMenu:      PAL_SET PAL_MEWMON, PAL_GREENBAR, PAL_YELLOWBAR, PAL_REDBAR
@@ -210,6 +214,9 @@ PalPacket_TrainerCard:    PAL_SET PAL_MEWMON, PAL_BADGE, PAL_REDMON, PAL_YELLOWM
 PalPacket_Generic:        PAL_SET PAL_MEWMON, 0, 0, 0
 PalPacket_NidorinoIntro:  PAL_SET PAL_PURPLEMON, PAL_BLACK, 0, 0
 PalPacket_GameFreakIntro: PAL_SET PAL_GAMEFREAK, PAL_REDMON, PAL_VIRIDIAN, PAL_BLUEMON
+;gbctest - adding pal packets from yellow
+UnknownPalPacket_72811:   PAL_SET PAL_25, PAL_25, PAL_25, PAL_25
+UnknownPalPacket_72821:   PAL_SET PAL_25, PAL_27, PAL_25, PAL_25
 
 PalTrnPacket:  PAL_TRN
 MltReq1Packet: MLT_REQ 1
