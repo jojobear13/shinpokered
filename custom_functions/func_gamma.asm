@@ -56,18 +56,15 @@ GetRGB:
 	ld a, e
 	and %11100000
 	;a is now xxx00000
+	swap a
+	rrca
 	ld b, a
-	srl b
-	srl b
-	srl b
-	srl b
-	srl b
 	;b is now 00000xxx
 	ld a, d
 	and %00000011
-	sla a
-	sla a
-	sla a
+	add a
+	add a
+	add a
 	;a is now 000xx000
 	or b
 	;a is now 000xxxxx
@@ -119,12 +116,12 @@ WriteRGB:
 	or c
 	ld e, a
 ;writeBlue:
-	ld a, [hRGB + 2]
-	ld b, a	;blue bits are 00011111
+	ld a, [hRGB + 2]	;blue bits are 00011111
+	add a			;blue bits are 00111110
+	add a			;blue bits are 01111100
+	ld b, a
 	ld a, d
 	and %10000011
-	sla b	;blue bits are 00111110
-	sla b	;blue bits are 01111100
 	or b
 	ld d, a
 	ret
@@ -133,12 +130,12 @@ WriteRGB:
 GammaConv:
 	ld hl, hRGB
 	ld c, 3
+	ld b, 0
 .loop
 	ld a, [hl]
 	push hl
 	ld hl, GammaList
 	push bc
-	ld b, $00
 	ld c, a
 	add hl, bc
 	pop bc
@@ -186,144 +183,86 @@ GammaList:	;gamma=2 conversion
 ;Doing as few calculations as possible to increase speed because a matrix multiply causes lag
 MixColorMatrix:
 ;calculate red row and store it
-	ld hl, $0000
-	;multiply red value by 13 and add to hl
+	xor a
+	ld b, a	; b remains 0 for the entirety of this function
+	ld h, a
+	; multiply red value by 13 and add to hl
+	; uses shift and add
 	ld a, [hRGB + 0]
-	ld b, 0
-	ld c, a
-	push hl
-	ld hl, Table5Bx13
-	add hl, bc
-	add hl, bc
-	ld a, [hli]
-	ld c, a
-	ld a, [hl]
-	ld b, a
-	pop hl
-	add hl, bc
-	;multiply green value by 2 and add to hl
+	ld c, a		; bc = r * 1
+	add a		;  a = r * 2
+	add a		;  a = r * 4
+	ld l, a		; hl = a * 4
+	add c		;  a = r * 4 + r * 1 = r * 5
+	ld c, a		; bc = r * 5
+	add hl, hl	; hl = (r * 4) * 2 = r * 8
+	add hl, bc	; hl = r * 8 + r * 5 = r * 13
+	;multiply green value by 2, add to blue and hl
 	ld a, [hRGB + 1]
-	ld b, 0
+	add a
 	ld c, a
-	add hl, bc
-	add hl, bc
 	;multiply blue value by 1 and add to hl
 	ld a, [hRGB + 2]
-	ld b, 0
+	add c
 	ld c, a
 	add hl, bc
-	;shift 4 bits to the right
-	srl h
-	rr l
-	srl h
-	rr l
-	srl h
-	rr l
-	srl h
-	rr l
+	;shift 4 bits to the right, discarding upper bits
+	;actually does a nibble swap, mask, then bitwise or
+	swap h
+	swap l
 	ld a, l
-	push af
+	and $0F
+	ld l, a
+	ld a, h
+	and $F0
+	or l
+	;store now because red isn't used after this
+	ld [hRGB + 0]
 	
 ;calculate green row and store it
-	ld hl, $0000
-	;multiply red value by 0 and add to hl
+;this only needs 8-bit math: 31 * 3 + 31 * 1 == 124 < 255
+	;multiply red value by 0 and add to c
 	;no actions for this
-	;multiply green value by 3 and add to hl
+	;multiply green value by 3 and add to c
 	ld a, [hRGB + 1]
-	ld b, 0
 	ld c, a
-	add hl, bc
-	add hl, bc
-	add hl, bc
-	;multiply blue value by 1 and add to hl
+	add a
+	add c
+	ld c, a
+	;multiply blue value by 1 and add to c
 	ld a, [hRGB + 2]
-	ld b, 0
-	ld c, a
-	add hl, bc
+	add c
 	;shift 2 bits to the right
-	srl h
-	rr l
-	srl h
-	rr l
-	ld a, l
+	srl a
+	srl a
+	;save for later
 	push af
 	
 ;calculate blue row and store it
-	ld hl, $0000
-	;multiply red value by 0 and add to hl
-	;no actions for this
-	;multiply green value by 2 and add to hl
-	ld a, [hRGB + 1]
-	ld b, 0
-	ld c, a
-	add hl, bc
-	add hl, bc
-	;multiply blue value by 14 and add to hl
+;while the formula is (r * 0 + g * 2 + b * 14) / 16, this instead does (r * 0 + g * 1 + b * 7) / 8
+;which will not require a 16-bit register and will have the same result
+	;while the math is for 8 bit 
+	;multiply blue value by 7 and add to c
 	ld a, [hRGB + 2]
-	ld b, 0
+	ld c, a	; c = b * 1
+	add a	; a = b * 2
+	add a	; a = b * 4
+	add a	; a = b * 8
+	sub c	; a = (b * 8) - (b * 1) = b * 7
 	ld c, a
-	add hl, bc
-	push hl
-	ld hl, Table5Bx13
-	add hl, bc
-	add hl, bc
-	ld a, [hli]
-	ld c, a
-	ld a, [hl]
-	ld b, a
-	pop hl
-	add hl, bc
-	;shift 4 bits to the right
-	srl h
-	rr l
-	srl h
-	rr l
-	srl h
-	rr l
-	srl h
-	rr l
-	ld a, l
-	
+	;multiply red value by 0 and add to c
+	;no actions for this
+	;multiply green value by 1 and add to c
+	ld a, [hRGB + 1]
+	add c
+	;shift 3 bits to the right
+	rrca
+	rrca
+	rrca
+	and $1F
 ;now store the color-mixed values
-	ld [hRGB + 2], a
+	ld [hRGB + 2], a	; blue
 	pop af
-	ld [hRGB + 1], a
-	pop af
-	ld [hRGB + 0], a
-	
+	ld [hRGB + 1], a	; green
+	; red was stored earlier
 	ret
-
-;lookup table for multiplying a 5-bit number by 13
-Table5Bx13:
-	dw $0000
-	dw $000D
-	dw $001A
-	dw $0027
-	dw $0034
-	dw $0041
-	dw $004E
-	dw $005B
-	dw $0068
-	dw $0075
-	dw $0082
-	dw $008F
-	dw $009C
-	dw $00A9
-	dw $00B6
-	dw $00C3
-	dw $00D0
-	dw $00DD
-	dw $00EA
-	dw $00F7
-	dw $0104
-	dw $0111
-	dw $011E
-	dw $012B
-	dw $0138
-	dw $0145
-	dw $0152
-	dw $015F
-	dw $016C
-	dw $0179
-	dw $0186
-	dw $0193
