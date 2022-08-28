@@ -8,11 +8,11 @@ Music_SafariZone_Ch0::
 	octave 3
 	pitchbend 1, 4, a_
 	C_ 1
-	pitchbend 1, 4, a_
+	pitchbend 1, 4, d_
 	G_ 1
 	pitchbend 1, 4, a_
 	C_ 1
-	pitchbend 1, 4, a_
+	pitchbend 1, 4, d_
 	G_ 1
 	rest 4
 	duty 3
