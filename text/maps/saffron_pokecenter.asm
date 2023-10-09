@@ -2,7 +2,7 @@ _SaffronPokecenterText2::
 	text "#MON growth"
 	line "rates differ from"
 	cont "species to"
-  cont "species."
+	cont "species."
 	done
 
 _SaffronPokecenterText3::
