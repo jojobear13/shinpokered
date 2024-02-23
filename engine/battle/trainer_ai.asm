@@ -776,7 +776,7 @@ AIMoveChoiceModification3:
 	jr nz, .notpoisoneffect
 	ld a, [wActionResultOrTookBattleTurn]
 	cp $A
-	jp nz, .notpoisoneffect	;if player switched blind the AI to the player mon status
+	jp z, .notpoisoneffect	;if player switched, the AI does not get to know the typing of the 'mon switched-in
 	ld a, [wBattleMonType]
 	cp POISON
 	jp z, .heavydiscourage2
