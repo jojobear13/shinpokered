@@ -19,8 +19,6 @@
 *.2bpp
 *.1bpp
 *.pic
-*.jpg
-*.psd
 
 # swap files for vim
 .*.swp
