@@ -942,7 +942,16 @@ Diploma_TextBoxBorder:
 
 ; b = height
 ; c = width
+;joenote - use different tiles if called outside cable club maps
 CableClub_TextBoxBorder:
+	ld a, [wCurMap]
+	cp COLOSSEUM
+	jr z, .next
+	cp TRADE_CENTER
+	jr z, .next
+	jp CableClub_TextBoxBorder2
+.next	
+
 	push hl
 	ld a, $78 ; border upper left corner tile
 	ld [hli], a
@@ -970,6 +979,35 @@ CableClub_TextBoxBorder:
 	ld a, $76 ; border bottom horizontal line tile
 	call CableClub_DrawHorizontalLine
 	ld [hl], $7d ; border lower right corner tile
+	ret
+CableClub_TextBoxBorder2:
+	push hl
+	ld a, $79 ; border upper left corner tile
+	ld [hli], a
+	inc a ; border top horizontal line tile
+	call CableClub_DrawHorizontalLine
+	inc a ; border upper right corner tile
+	ld [hl], a
+	pop hl
+	ld de, 20
+	add hl, de
+.loop
+	push hl
+	ld a, $7c ; border left vertical line tile
+	ld [hli], a
+	ld a, " "
+	call CableClub_DrawHorizontalLine
+	ld [hl], $7c ; border right vertical line tile
+	pop hl
+	ld de, 20
+	add hl, de
+	dec b
+	jr nz, .loop
+	ld a, $7d ; border lower left corner tile
+	ld [hli], a
+	ld a, $7a ; border bottom horizontal line tile
+	call CableClub_DrawHorizontalLine
+	ld [hl], $7e ; border lower right corner tile
 	ret
 
 ; c = width
