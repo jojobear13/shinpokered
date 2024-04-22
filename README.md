@@ -69,6 +69,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 
 v1.24.5-X (experimental)
 - Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
+- Corrected the text in green & red-jp pokedex entries
   
 v1.24.5
 - Fix Psywave symmetry
