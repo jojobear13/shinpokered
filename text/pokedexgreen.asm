@@ -966,8 +966,8 @@ _DodrioDexEntry::
 	next "3-headed species."
 	next "Joy, sadness, and"
 	
-	page "anger are modeled"
-	next "in each head"
+	page "anger are embod-"
+	next "ied in each head"
 	next "respectively"
 	dex
 
@@ -1196,11 +1196,11 @@ _MarowakDexEntry::
 _HaunterDexEntry::
 	text "If you get the"
 	next "feeling of being"
-	next "watched at night"
+	next "watched in the"
 	
-	page "when nobody is"
-	next "around, a HAUNTER"
-	next "is there"
+	page "dark when nobody"
+	next "is around, a"
+	next "HAUNTER is there"
 	dex
 
 _AbraDexEntry::
