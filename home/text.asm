@@ -319,8 +319,11 @@ Char4B::
 	pop de
 	ld a, " "
 	Coorda 18, 16
-	;fall through
-Char4C::
+	jr Char4C.nodelay
+Char4C::	;auto-continue
+	ld c, 30			;joenote - added a frame delay when just doing auto-continue
+	call DelayFrames
+.nodelay
 	push de
 	call ScrollTextUpOneLine
 	call ScrollTextUpOneLine

@@ -70,6 +70,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 v1.24.5-X (experimental)
 - Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
 - Corrected the text in green & red-jp pokedex entries
+- Fixed missing punctuation in Oak's pokedex evaluation
   
 v1.24.5
 - Fix Psywave symmetry
@@ -502,6 +503,7 @@ v1.24.1
   - Fixed inaccurate text when getting the rock slide TM
   - Adjusted some city names on signs
   - Fixed incorrect sign text in safari area 1
+  - Fixed missing punctuation in Oak's pokedex evaluation
 - Made adjustments to the game text
   - When a pkmn is caught and fills the box, a reminder is printed that the box is full
   - PC has a text prompt to tell you if its full after depositing
