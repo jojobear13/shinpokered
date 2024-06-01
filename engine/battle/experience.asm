@@ -65,7 +65,7 @@ GainExperience:
 
 	call AddExpToPokemon
 	;HL  now equals wPartyMon'X'Exp
-	;Now backup the general exp calculation into wExpAmountGained since the quotient addresses are going to get clobbered
+	;Now backup the general exp calculation since the quotient addresses are going to get clobbered
 	ld a, [H_QUOTIENT+2]
 	push af
 	ld a, [H_QUOTIENT+3]
