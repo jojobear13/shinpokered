@@ -609,6 +609,9 @@ ENDC
 	ld a, [hl]
 	ld [wd0b5], a
 	ld [wd11e], a
+	
+	push af		;backup the species value
+	
 	call GetMonHeader
 	
 	ld bc, (wPartyMon1MaxHP + 1) - wPartyMon1Species
@@ -706,15 +709,18 @@ IF DEF(_EXPBAR)
 	callba AnimateEXPBarAgain	;joenote - animate exp bar
 ENDC
 
-	call LoadMonData
+	call LoadMonData	;this clobbers the species value in wd0b5, which is needed for level-up moves
 	ld d, $1
 	callab PrintStatsBox
 	call WaitForTextScrollButtonPress
 	call LoadScreenTilesFromBuffer1
 	xor a ; PLAYER_PARTY_DATA
 	ld [wMonDataLocation], a
-	ld a, [wd0b5]
+	
+	pop af			;restore saved species value
+	ld [wd0b5], a
 	ld [wd11e], a
+	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;This has to do with shinpokered fixes implemented in engine\evos_moves.asm
