@@ -3175,10 +3175,20 @@ CheckMapForMon:
 	ld a, c
 	ld [de], a
 	inc de
+	jr .foundMon
 .nextEntry
 	inc hl
 	inc hl
 	dec b
 	jr nz, .loop
+	dec hl
+	ret
+;joenote - if the mon was found on the encounter table, 
+;skip through the rest of the table so as to not flood wBuffer with redundant entries
+.foundMon
+	inc hl
+	inc hl
+	dec b
+	jr nz, .foundMon
 	dec hl
 	ret
