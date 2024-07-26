@@ -176,7 +176,12 @@ MainMenu:
 	ld a, PLAYER_DIR_DOWN
 	ld [wPlayerDirection], a
 	ld [wPlayerLastStopDirection], a	;joenote - set face down as last direction for 180 degree turn frame
-	ResetEvent EVENT_10E	;joenote - reset ghost marowak for safety
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - clear saved events flags on load for safety
+	ResetEvent EVENT_10E	;ghost marowak
+	ld hl, wFlags_D733
+	res 1, [hl]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld c, 10
 	call DelayFrames
 
