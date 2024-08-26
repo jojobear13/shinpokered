@@ -71,6 +71,7 @@ v1.24.6
 - Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
 - Corrected the text in green & red-jp pokedex entries
 - Fixed missing punctuation in Oak's pokedex evaluation
+- Fixed Full Restores undoing burn/paralysis stat changes when healing a non-active pokemon
   
 v1.24.5
 - Fix Psywave symmetry

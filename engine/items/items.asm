@@ -1238,9 +1238,11 @@ ItemUseMedicine:
 	add hl, bc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
-	ld a, [wIsInBattle]
-	and a
-	jr z, .clearParBrn	;do not adjust the stats if not currently in battle
+	ld a, [wUsedItemOnWhichPokemon]
+	ld b, a
+	ld a, [wPlayerMonNumber]
+	cp b ; is pokemon the item was used on active in battle?
+	jr nz, .clearParBrn	;do not adjust the stats if not healing the active pokemon in battle
 	push hl
 	push de
 	ld a, [H_WHOSETURN]
