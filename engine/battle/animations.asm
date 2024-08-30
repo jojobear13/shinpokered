@@ -1586,14 +1586,22 @@ AdjustOAMBlockYPos2:
 	ld b, a
 	ld a, [hl]
 	add b
-	cp 112
+	cp $70
 	jr c, .skipSettingPreviousEntrysAttribute
-;	dec hl		;joenote - comment this out to fix the mentioned bug
-	ld a, 160 ; bug, sets previous OAM entry's attribute
-				;it causes the dust cloud when pushing a boulder downward to not show up very well
-	ld [hli], a
+	dec hl	;move from Y pos byte of current entry to attribute byte of prev entry
+	push af	;joenote - There is a bug here. Failure to preserve the A register means that 
+			;			the wrong value is written to [hl] at .skipSettingPreviousEntrysAttribute, so push af.
+	ld a, $A0	;10100000
+		;bit 7 - OBJ-BG-Priority	1=OBJ Behind BG color 1-3
+		;bit 6 - Y-FLIP				0=Not Vertically mirrored
+		;bit 5 - X-FLIP				1=Horizontally mirrored
+		;bit 4 - Palette number  **Non CGB Mode Only** 0=OBP0
+		;bit 3 - Tile VRAM-Bank  **CGB Mode Only**     0=Bank 0
+		;bit 2 to 0 - Palette number  **CGB Mode Only**     %000 = OBP0
+	ld [hli], a	; Set prev entry attribute bits and then increment back to Y pos byte of current entry
+	pop af	;joenote - now pop af to get the A value back...
 .skipSettingPreviousEntrysAttribute
-	ld [hl], a
+	ld [hl], a	;	...and now the correct value gets loaded
 	add hl, de
 	dec c
 	jr nz, .loop
