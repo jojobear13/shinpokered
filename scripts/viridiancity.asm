@@ -29,6 +29,11 @@ ViridianCityScript_1900b:
 	ld a, [wXCoord]
 	cp $20
 	ret nz
+	
+	;joenote - make the player face the door like for the cinnabar gym
+	ld a, PLAYER_DIR_UP
+	ld [wPlayerMovingDirection], a
+	
 	ld a, $e
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID

@@ -68,6 +68,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6
+- Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
 - Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
 - Corrected the text in green & red-jp pokedex entries
 - Fixed missing punctuation in Oak's pokedex evaluation
@@ -403,6 +404,7 @@ v1.24.1
   - Fixed picking a fossil causing all trainers on Mt. Moon floor 3 to lose line of sight
   - Fixed an underflow issue which caused trainers above the player to not see beyond 3 spaces downward
   - Lance and the player will face each other when speaking.
+  - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
  
  
 #Tweaks
