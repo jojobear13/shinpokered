@@ -73,7 +73,7 @@ v1.24.6
 - Corrected the text in green & red-jp pokedex entries
 - Fixed missing punctuation in Oak's pokedex evaluation
 - Fixed Full Restores undoing burn/paralysis stat changes when healing a non-active pokemon
-  
+
 v1.24.5
 - Fix Psywave symmetry
 
@@ -288,6 +288,7 @@ v1.24.1
   - Fixed a bug where HP bar animation can print the wrong tile for 1 frame
   - Fixed junk tiles displaying for 1 frame when the game resets after displaying THE END
   - Fixed transitions when entering and exiting Rock Tunnel
+  - The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
 
 
 - Item Fixes  

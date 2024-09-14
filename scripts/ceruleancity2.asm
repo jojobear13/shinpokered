@@ -12,6 +12,9 @@ CeruleanHideRocket:
 	ld a, HS_CERULEAN_ROCKET
 	ld [wMissableObjectIndex], a
 	predef HideObject
+;joenote - need to update sprites and delay
+	call UpdateSprites
+	call Delay3
 	call GBFadeInFromBlack
 	ret
 
