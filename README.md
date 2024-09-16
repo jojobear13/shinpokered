@@ -68,6 +68,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6
+- Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
 - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
 - Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
 - Corrected the text in green & red-jp pokedex entries
@@ -289,6 +290,7 @@ v1.24.1
   - Fixed junk tiles displaying for 1 frame when the game resets after displaying THE END
   - Fixed transitions when entering and exiting Rock Tunnel
   - The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
+  - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
 
 
 - Item Fixes  

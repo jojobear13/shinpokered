@@ -1531,7 +1531,8 @@ BattleAnimWriteOAMEntry:
 	add 8
 	ld e, a
 	ld [hli], a
-	cp 72	;is Y < ?
+;	cp $48	;is Y < $48	;joenote - BUG: Causes wrong OBJ palette to be loaded for back sprite tiles that go up too high.
+	cp $38
 	jr c, .asm_793d8
 	ld a, [wdeed]
 	inc a
@@ -1539,7 +1540,7 @@ BattleAnimWriteOAMEntry:
 .asm_793d8
 	ld a, [wBaseCoordX]
 	ld [hli], a
-	cp 88	;is X < ?
+	cp $58	;is X < $58
 	jr c, .asm_793e8
 	ld a, [wdeed]
 	add $2
