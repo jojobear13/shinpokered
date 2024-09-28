@@ -561,7 +561,7 @@ ItemUseBall:
 	ld [wd11e], a
 	ld a, [wBattleType]
 	dec a ; is this the old man battle?
-	jr z, .oldManCaughtMon ; if so, don't give the player the caught Pokémon
+	jp z, .oldManCaughtMon ; if so, don't give the player the caught Pokémon
 
 	ld hl, ItemUseBallText05
 	call PrintText
@@ -586,8 +586,15 @@ ItemUseBall:
 	and a ; was the Pokémon already in the Pokédex?
 	jr nz, .skipShowingPokedexData ; if so, don't show the Pokédex data
 
-	ld hl, ItemUseBallText06
+	
+	;joenote - BUG: some pokemon names are short (like Onix) which causes the page-added sfx to not play
+	;Splitting ItemUseBallText06 up with some wait time to fix it
+	ld hl, ItemUseBallText06_A
 	call PrintText
+	call WaitForSoundToFinish
+	ld hl, ItemUseBallText06_B
+	call TextCommandProcessor
+
 	call ClearSprites
 	ld a, [wEnemyMonSpecies]
 	ld [wd11e], a
@@ -675,10 +682,13 @@ ItemUseBallText08:
 	TX_FAR _ItemUseBallText08
 	db "@"
 
-ItemUseBallText06:
+;joenote - splitting ItemUseBallText06 into two so the sound plays properly
+ItemUseBallText06_A:
 ;"New DEX data will be added..."
-;play sound
 	TX_FAR _ItemUseBallText06
+	db "@"
+ItemUseBallText06_B:
+;play sound
 	TX_SFX_DEX_PAGE_ADDED
 	TX_BLINK
 	db "@"
