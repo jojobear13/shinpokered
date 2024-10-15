@@ -55,6 +55,8 @@ MainMenu:
 	ld de, VersionText
 	call PlaceString
 	
+;joenote - check for emulator issues
+	call EmuCheckWriteMode3
 	
 ;joenote - detect a random seed of 01 01 01 01 and do something to help correct it
 	callba RNG_Correction
@@ -908,3 +910,48 @@ ClearHackVersion:
 	xor a
 	ld [wRomHackVersion], a
 	ret
+
+;joenote - This function attempts to write and read values to VRAM during STAT mode 3.
+;On real hardware, this is not allowed because the LCD controller is accessing VRAM.
+;However, not all emulation implements this which will cause problems.
+;If the values are allowed to be written and read, an error message will display.
+;For example, the error message will display if played on the old Visual Boy Advance emulator. 
+EmuCheckWriteMode3:
+	ld hl, $8000
+	ld de, $BEEF
+	call .waitMode3
+	ld a, $BE
+	cp d
+	jr nz, .pass
+	ld a, $EF
+	cp e
+	jr nz, .pass
+.fail
+	coord hl, $00, $09
+	ld de, EmuFailText
+	call PlaceString
+	ret
+.pass
+	ret
+
+.waitMode3
+	di
+.waitMode3_loop
+	ldh a, [rSTAT]		;read from stat register to get the mode
+	and %11				;4 cycles
+	cp 3				;4 cycles
+	jr nz, .waitMode3_loop	;6 cycles to pass or 10 to loop
+	ld a, d
+	ld [hli], a
+	ld a, e
+	ld [hld], a
+	ld a, [hli]
+	ld d, a
+	ld a, [hld]
+	ld e, a
+	ei
+	ret
+	
+EmuFailText:
+	db "Emulator ERROR! Use a different emulator@"
+
