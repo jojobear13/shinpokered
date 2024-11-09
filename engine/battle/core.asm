@@ -2751,6 +2751,7 @@ SwitchPlayerMon:	;joedebug - this is where the player switches
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if enemy using trapping move, then end their move
 ; While different from the original game, this prevent numerous issues.
+;Note that SelectEnemyMove has not been run yet.
 	ld a, [wEnemyBattleStatus1]
 	bit USING_TRAPPING_MOVE, a
 	jr z, .preparewithdraw
@@ -2758,7 +2759,7 @@ SwitchPlayerMon:	;joedebug - this is where the player switches
 	res USING_TRAPPING_MOVE, [hl] 
 	xor a
 	ld [wEnemyNumAttacksLeft], a
-	ld a, $FF
+	ld a, $FF	; FF is a Do Nothing move
 	ld [wEnemySelectedMove], a
 	;don't let enemy change the selected move during the next picking function
 	ld a, [wUnusedC000]
@@ -3274,28 +3275,6 @@ TypeText:
 	db "TYPE@"
 
 SelectEnemyMove:
-	ld a, [wLinkState]
-	sub LINK_STATE_BATTLING
-	jr nz, .noLinkBattle
-; link battle
-	call SaveScreenTilesToBuffer1
-	call LinkBattleExchangeData
-	call LoadScreenTilesFromBuffer1
-	ld a, [wSerialExchangeNybbleReceiveData]
-	cp LINKBATTLE_STRUGGLE
-	jp z, .linkedOpponentUsedStruggle
-	cp LINKBATTLE_NO_ACTION
-	jr z, .unableToSelectMove
-	cp 4
-	ret nc
-	ld [wEnemyMoveListIndex], a
-	ld c, a
-	ld hl, wEnemyMonMoves
-	ld b, 0
-	add hl, bc
-	ld a, [hl]
-	jp .done
-.noLinkBattle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if raging, reset rage's accuracy here to prevent degradation
 ;	and also decrement the rage counter
@@ -3318,6 +3297,35 @@ SelectEnemyMove:
 	ld [wEnemyMoveAccuracy], a
 .not_enemy_thrashing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld a, [wLinkState]
+	sub LINK_STATE_BATTLING
+	jr nz, .noLinkBattle
+; link battle
+	call SaveScreenTilesToBuffer1
+	call LinkBattleExchangeData
+	call LoadScreenTilesFromBuffer1
+	ld a, [wSerialExchangeNybbleReceiveData]
+	cp LINKBATTLE_STRUGGLE
+	jp z, .linkedOpponentUsedStruggle
+	cp LINKBATTLE_NO_ACTION
+	jr z, .unableToSelectMove_general
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - check and reset flag for being unable to select a move
+	ld hl, wUnusedC000
+	bit 2, [hl]
+	res 2, [hl]
+	jr nz, .unableToSelectMove_general
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	cp 4
+	ret nc
+	ld [wEnemyMoveListIndex], a
+	ld c, a
+	ld hl, wEnemyMonMoves
+	ld b, 0
+	add hl, bc
+	ld a, [hl]
+	jp .done
+.noLinkBattle	;the following handles selection stuff for an AI opponent
 	ld a, [wEnemyBattleStatus2]
 	and (1 << NEEDS_TO_RECHARGE) | (1 << USING_RAGE) ; need to recharge or using rage
 	ret nz
@@ -3341,16 +3349,17 @@ SelectEnemyMove:
 	ld hl, wUnusedC000
 	bit 2, [hl]
 	res 2, [hl]
-	jr nz, .unableToSelectMove
+	jr nz, .unableToSelectMove_AI
 	
 	ld a, [wPlayerBattleStatus1]
 	bit USING_TRAPPING_MOVE, a ; caught in player's trapping move (e.g. wrap)
 	jr z, .canSelectMove
 	
-.unableToSelectMove
+.unableToSelectMove_AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call nz, NoAttackAICall	;joenote - get ai routines. flag register is preserved
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.unableToSelectMove_general
 	ld a, $ff
 	jr .done
 .canSelectMove
@@ -6410,7 +6419,7 @@ RandomizeDamage:
 ExecuteEnemyMove:
 	ld a, [wEnemySelectedMove]
 	inc a
-	jp z, ExecuteEnemyMoveDone
+	jp z, ExecuteEnemyMoveDone	;joenote - FF is a Do Nothing move
 	call PrintGhostText
 	jp z, ExecuteEnemyMoveDone
 	ld a, [wLinkState]

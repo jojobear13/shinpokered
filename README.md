@@ -68,6 +68,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6
+- Fixed desync problem during link battles with Rage, Thrash, and trapping moves
 - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
 - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
 - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
