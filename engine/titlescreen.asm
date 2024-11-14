@@ -310,6 +310,7 @@ ENDC
 	call ClearSprites
 	xor a
 	ld [hWY], a
+	ld [wMapPalOffset], a	;joenote - undo darkened rock tunnel if the player saved there and exited to the title screen
 	inc a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call ClearScreen

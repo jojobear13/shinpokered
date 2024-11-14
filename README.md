@@ -68,6 +68,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6
+- Fixed an issue with the title menu becoming dark when saving in rock tunnel
 - Fixed desync problem during link battles with Rage, Thrash, and trapping moves
 - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
 - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
@@ -293,6 +294,7 @@ v1.24.1
   - Fixed transitions when entering and exiting Rock Tunnel
   - The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
   - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
+  - Fixed an issue with the title menu becoming dark when saving in rock tunnel
 
 
 - Item Fixes  
