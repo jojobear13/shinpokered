@@ -585,6 +585,7 @@ SaveScreenInfoText:
 	next "TIME@"
 
 DisplayOptionMenu:
+	call GBPalNormal	;joenote - fixes rock tunnel darkness affecting option menu
 	coord hl, 0, 0
 	ld b, 3
 	ld c, 18
