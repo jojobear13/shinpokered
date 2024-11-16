@@ -320,6 +320,7 @@ hClearLetterPrintingDelayFlags EQU $FFF4
 hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 0: draw HP fraction to the right of bar instead of below (for party menu)
 ; bit 1: menu is double spaced
+; bit 2: something about skipping a line when printing text
 
 hFieldMoveMonMenuTopMenuItemX EQU $FFF7
 

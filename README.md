@@ -1,6 +1,6 @@
 # Shin Pokémon Red, Blue, Green, Red-JP, & Blue-JP
 
-Version 1.24.5
+Version 1.24.6
 
 Future bugfixes here will be eventually migrated to the Shin Pokemon master branch
 
@@ -66,6 +66,18 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 -----------
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
+
+v1.24.6
+- Fixed an issue with the title menu becoming dark when saving in rock tunnel
+- Fixed rock tunnel darkness affecting option menu
+- Fixed desync problem during link battles with Rage, Thrash, and trapping moves
+- The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
+- Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
+- Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
+- Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
+- Corrected the text in green & red-jp pokedex entries
+- Fixed missing punctuation in Oak's pokedex evaluation
+- Fixed Full Restores undoing burn/paralysis stat changes when healing a non-active pokemon
 
 v1.24.5
 - Fix Psywave symmetry
@@ -281,6 +293,10 @@ v1.24.1
   - Fixed a bug where HP bar animation can print the wrong tile for 1 frame
   - Fixed junk tiles displaying for 1 frame when the game resets after displaying THE END
   - Fixed transitions when entering and exiting Rock Tunnel
+  - The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
+  - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
+  - Fixed an issue with the title menu becoming dark when saving in rock tunnel
+  - Fixed rock tunnel darkness affecting option menu
 
 
 - Item Fixes  
@@ -332,6 +348,7 @@ v1.24.1
   - Fixed certain text sfx not playing when using zero-delay text
   - Meet Trainer jingle should not play before loading into the gym leader battle music
   - AI using dire hit item now plays a SFX
+  - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
   
 
 - Misc. fixes
@@ -397,6 +414,7 @@ v1.24.1
   - Fixed picking a fossil causing all trainers on Mt. Moon floor 3 to lose line of sight
   - Fixed an underflow issue which caused trainers above the player to not see beyond 3 spaces downward
   - Lance and the player will face each other when speaking.
+  - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
  
  
 #Tweaks
@@ -498,6 +516,7 @@ v1.24.1
   - Fixed inaccurate text when getting the rock slide TM
   - Adjusted some city names on signs
   - Fixed incorrect sign text in safari area 1
+  - Fixed missing punctuation in Oak's pokedex evaluation
 - Made adjustments to the game text
   - When a pkmn is caught and fills the box, a reminder is printed that the box is full
   - PC has a text prompt to tell you if its full after depositing

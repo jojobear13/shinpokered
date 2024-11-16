@@ -474,6 +474,6 @@ _OaksLabText_44247::
 _OaksLabText_4424c::
 	text "Your #DEX is"
 	line "entirely complete!"
-	cont "Congratulations!"
+	autocont "Congratulations!"	;joenote - auto-scroll so the previous exclamation point does not get cut off
 	done
 

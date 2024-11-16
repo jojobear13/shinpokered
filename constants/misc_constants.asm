@@ -1,7 +1,7 @@
 FALSE EQU 0
 TRUE  EQU 1
 
-HACK_VERSION EQU 9	;this should be an odd number for the lite version
+HACK_VERSION EQU 13	;this should be an odd number for the lite version
 
 MAX_LEVEL EQU 100
 

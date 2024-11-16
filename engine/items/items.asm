@@ -561,7 +561,7 @@ ItemUseBall:
 	ld [wd11e], a
 	ld a, [wBattleType]
 	dec a ; is this the old man battle?
-	jr z, .oldManCaughtMon ; if so, don't give the player the caught Pokémon
+	jp z, .oldManCaughtMon ; if so, don't give the player the caught Pokémon
 
 	ld hl, ItemUseBallText05
 	call PrintText
@@ -586,8 +586,15 @@ ItemUseBall:
 	and a ; was the Pokémon already in the Pokédex?
 	jr nz, .skipShowingPokedexData ; if so, don't show the Pokédex data
 
-	ld hl, ItemUseBallText06
+	
+	;joenote - BUG: some pokemon names are short (like Onix) which causes the page-added sfx to not play
+	;Splitting ItemUseBallText06 up with some wait time to fix it
+	ld hl, ItemUseBallText06_A
 	call PrintText
+	call WaitForSoundToFinish
+	ld hl, ItemUseBallText06_B
+	call TextCommandProcessor
+
 	call ClearSprites
 	ld a, [wEnemyMonSpecies]
 	ld [wd11e], a
@@ -675,10 +682,13 @@ ItemUseBallText08:
 	TX_FAR _ItemUseBallText08
 	db "@"
 
-ItemUseBallText06:
+;joenote - splitting ItemUseBallText06 into two so the sound plays properly
+ItemUseBallText06_A:
 ;"New DEX data will be added..."
-;play sound
 	TX_FAR _ItemUseBallText06
+	db "@"
+ItemUseBallText06_B:
+;play sound
 	TX_SFX_DEX_PAGE_ADDED
 	TX_BLINK
 	db "@"
@@ -1238,9 +1248,11 @@ ItemUseMedicine:
 	add hl, bc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - undo brn/par stat changes for Full Restore after restoring HP in battle
-	ld a, [wIsInBattle]
-	and a
-	jr z, .clearParBrn	;do not adjust the stats if not currently in battle
+	ld a, [wUsedItemOnWhichPokemon]
+	ld b, a
+	ld a, [wPlayerMonNumber]
+	cp b ; is pokemon the item was used on active in battle?
+	jr nz, .clearParBrn	;do not adjust the stats if not healing the active pokemon in battle
 	push hl
 	push de
 	ld a, [H_WHOSETURN]
@@ -3175,10 +3187,20 @@ CheckMapForMon:
 	ld a, c
 	ld [de], a
 	inc de
+	jr .foundMon
 .nextEntry
 	inc hl
 	inc hl
 	dec b
 	jr nz, .loop
+	dec hl
+	ret
+;joenote - if the mon was found on the encounter table, 
+;skip through the rest of the table so as to not flood wBuffer with redundant entries
+.foundMon
+	inc hl
+	inc hl
+	dec b
+	jr nz, .foundMon
 	dec hl
 	ret

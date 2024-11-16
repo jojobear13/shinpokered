@@ -20,3 +20,5 @@
 *.gif binary
 *.bps binary
 *.dll binary
+*.jpg binary
+*.psd binary

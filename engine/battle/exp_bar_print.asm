@@ -18,6 +18,11 @@ AnimateEXPBar:
 	ld a, [wBattleMonLevel]
 	cp MAX_LEVEL
 	ret nc
+	ld a, [wBattleMonHP]
+	ld b, a
+	ld a, [wBattleMonHP+1]
+	add b
+	ret z	;do not animate if the active pokemon is knocked out
 	;ld a, SFX_HEAL_HP
 	;call PlaySoundWaitForCurrent
 	call CalcEXPBarPixelLength

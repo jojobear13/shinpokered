@@ -62,6 +62,7 @@ RocketHideout4Script3:
 	ld [wMissableObjectIndex], a
 	predef ShowObject
 	call UpdateSprites
+	call Delay3	;joenote - add a delay of 3 frames so the whole screen can update
 	call GBFadeInFromBlack
 	xor a
 	ld [wJoyIgnore], a

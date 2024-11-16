@@ -50,9 +50,13 @@ OakSpeech:
 ;joenote - give option to play as a female trainer here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF DEF(_FPLAYER)
+.askBoyGirl
 	ld hl, AskIfGirlText
 	call PrintText
 	call BoyGirlChoice
+	ld a, [hJoyHeld]
+	bit BIT_B_BUTTON, A
+	jr nz, .askBoyGirl
 	ld a, [wCurrentMenuItem]
 	ld b, a
 	ld a, [wUnusedD721]

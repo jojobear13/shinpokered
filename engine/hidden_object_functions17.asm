@@ -58,6 +58,10 @@ DisplayMonFrontSpriteInBox:
 	ld a, 1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3
+
+	ld a, 0
+	ld [H_AUTOBGTRANSFERENABLED], a		;joenote - turn this off so the npc sprites don't overlap
+
 	xor a
 	ld [hWY], a
 	call SaveScreenTilesToBuffer1
@@ -70,6 +74,10 @@ DisplayMonFrontSpriteInBox:
 	call GetMonHeader
 	ld de, vChars1 + $310
 	call LoadMonFrontSprite
+
+	ld a, 1
+	ld [H_AUTOBGTRANSFERENABLED], a	;joenote - turn this back on to make the window show
+
 	ld a, $80
 	ld [hStartTileID], a
 	coord hl, 10, 11
