@@ -150,7 +150,16 @@ StatusScreen:
 	lb bc, LEADING_ZEROES | 1, 3
 	call PrintNumber ; Pokémon no.
 	coord hl, 11, 10
+	
+	;joenote - get mon types directly from party data for status screen
+	ld a, [wd0b5]
+	push af
+	xor a
+	ld [wd0b5], a
 	predef PrintMonType
+	pop af
+	ld [wd0b5], a
+
 	ld hl, NamePointers2
 	call .GetStringPointer
 	ld d, h
