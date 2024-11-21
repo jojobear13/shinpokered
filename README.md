@@ -707,15 +707,6 @@ v1.24.1
   - Withdrawing or depositing a key item from/to the player's PC will default its quantity to 1
   - Item evolutions having a level requirement is now supported
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
-
-- Blaine has a touched-up battle sprite so he doesn't look like an alien
-  - Snagged this off reddit, but original artist unknown (let me know if this is yours)
-- Greatly increased the speed and performance of spin tiles  
-- You can now cut the grass in the plateau tileset
-- Initiating the Pokemon Tower rival battle will deactivate the following skippable rival battles
-  - The Cerulean encounter
-  - The SS Anne encounter
-- Increased the speed of the HP bar animation
   
 
 #Credits / Special Thanks
