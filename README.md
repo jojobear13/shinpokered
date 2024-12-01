@@ -70,7 +70,8 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
-v1.24.6_dev
+v1.24.6(hotfix)
+- Moved CalcStat function out of home bank to free up space
 - Status Screen now prints types from party struct data instead of species header
 
 v1.24.6

@@ -166,3 +166,4 @@ PredefPointers::
 	add_predef SingleCPUSpeed
 	add_predef PrintPlayTime
 	add_predef GetCriticalHitProbability
+	add_predef _CalcStat
