@@ -317,6 +317,8 @@ H_WHOSETURN EQU $FFF3 ; 0 on player’s turn, 1 on enemy’s turn
 
 hClearLetterPrintingDelayFlags EQU $FFF4
 
+;$FFF5 --> used for an LCDC OAM timing test
+
 hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 0: draw HP fraction to the right of bar instead of below (for party menu)
 ; bit 1: menu is double spaced

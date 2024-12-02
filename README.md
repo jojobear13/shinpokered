@@ -45,6 +45,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
   - An accurate emulator, preferably a GBC-dedicated emulator, is required in order to avoid unexpected bugs
   - Goomba and Visual Boy Advance in particular are known to be problematic
   - BGB is the supported standard due to its accuracy and debugging tools
+  - There are error messages that may display on the initial menu if there is an emulator error detected
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
   - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
@@ -69,6 +70,11 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 -----------
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
+
+v1.24.6(hotfix)
+- Worked on emulator tests a bit more
+- Moved CalcStat function out of home bank to free up space
+- Status Screen now prints types from party struct data instead of species header
 
 v1.24.6
 - Fixed an issue with the title menu becoming dark when saving in rock tunnel
@@ -707,6 +713,7 @@ v1.24.1
   - Withdrawing or depositing a key item from/to the player's PC will default its quantity to 1
   - Item evolutions having a level requirement is now supported
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
+  - Status Screen now prints types from party struct data instead of species header
   
 
 #Credits / Special Thanks

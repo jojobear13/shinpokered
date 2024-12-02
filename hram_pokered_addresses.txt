@@ -248,7 +248,7 @@ hDivideBCDQuotient::
 ;FFA5, ;FFA6, ;FFA7
 hDivideBCDBuffer::
 	ds 3 ; BCD number
-;FFA8
+;FFA8	;unused?
 	ds 1
 
 ;FFA9
@@ -454,7 +454,7 @@ NEXTU
 hFFDB:: db
 hFFDC:: db
 ENDU
-;FFDF
+;FFDF 	;unused?
 	ds 1
 
 ;FFE0
@@ -465,7 +465,7 @@ hUnlockedSilphCoDoors::
 ; the first tile ID in a sequence of tile IDs that increase by 1 each step
 ;FFE1
 hStartTileID:: db
-;FFE2, ;FFE3
+;FFE2, ;FFE3		;unused?
 	ds 2
 
 ;FFE4
@@ -520,7 +520,7 @@ hSavedMapTextPtr:: dw
 ;FFEE
 	ds 1
 ENDU
-;FFEF, ;FFF0, ;FFF1, ;FFF2
+;FFEF, ;FFF0, ;FFF1, ;FFF2		;unused?
 	ds 4
 
 ;FFF3
@@ -529,7 +529,7 @@ hWhoseTurn:: db ; 0 on player's turn, 1 on enemy's turn
 ;FFF4
 hClearLetterPrintingDelayFlags:: db
 
-;FFF5
+;FFF5		;unused?
 	ds 1
 
 ; bit 0: draw HP fraction to the right of bar instead of below (for party menu)
@@ -546,5 +546,5 @@ hJoyInput:: db
 ;FFF9
 hDisableJoypadPolling:: db
 
-;FFFA, ;FFFB, ;FFFC, ;FFFD, ;FFFE
+;FFFA, ;FFFB, ;FFFC, ;FFFD, ;FFFE		;unused?
 	ds 5
