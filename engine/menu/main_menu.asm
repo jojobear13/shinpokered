@@ -57,6 +57,7 @@ MainMenu:
 	
 ;joenote - check for emulator issues
 	call EmuCheckWriteMode3
+	call EmuCheck_OAM_Timing
 	
 ;joenote - detect a random seed of 01 01 01 01 and do something to help correct it
 	callba RNG_Correction
@@ -912,12 +913,17 @@ ClearHackVersion:
 	ld [wRomHackVersion], a
 	ret
 
+
+	
 ;joenote - This function attempts to write and read values to VRAM during STAT mode 3.
 ;On real hardware, this is not allowed because the LCD controller is accessing VRAM.
 ;However, not all emulation implements this which will cause problems.
 ;If the values are allowed to be written and read, an error message will display.
-;For example, the error message will display if played on the old Visual Boy Advance emulator. 
+;Will fail on VisualBoyAdvance-1.8.0-beta3 as well as Goomba Emulator
+;Passes on BGB, MGBA, and Delta
 EmuCheckWriteMode3:
+	ld b, 3	;give it some extra chances to pass
+.test
 	ld hl, $8000
 	ld de, $BEEF
 	call .waitMode3
@@ -928,13 +934,17 @@ EmuCheckWriteMode3:
 	cp e
 	jr nz, .pass
 .fail
+	dec b
+	jr nz, .test
+	ld de, EmuFailText1
 	coord hl, $00, $09
-	ld de, EmuFailText
 	call PlaceString
+	ld a, 1
+	and a
 	ret
 .pass
+	xor a
 	ret
-
 .waitMode3
 	di
 .waitMode3_loop
@@ -952,7 +962,57 @@ EmuCheckWriteMode3:
 	ld e, a
 	ei
 	ret
+EmuFailText1:
+	db "Emulator ERROR! Mode-3 access violation.@"
 	
-EmuFailText:
-	db "Emulator ERROR! Use a different emulator@"
+	
+;Will fail on VisualBoyAdvance-M-2.1.11 as well as VisualBoyAdvance-1.8.0-beta3
+;Passes on BGB, MGBA, and Delta
+EmuCheck_OAM_Timing:
+	di
+	call DisableLCD
+	
+	ld a, [rSTAT]
+	push af
+	ld a, %00100000	;enable Mode 2 OAM interrupt for LCDC
+	ldh [rSTAT], a
+	
+	ld a, [rIE]
+	push af
+	ld a, %00000010	;enable LCDC STAT control interrupts
+	ldh [rIE], a
+	
+	xor a
+	ldh [rIF], a
 
+	ei
+	
+	;Enable the LCD
+	ld a, [rLCDC]
+	set rLCDC_ENABLE, a
+	ld [rLCDC], a
+	
+	xor a
+REPT 200
+	inc a
+ENDR	
+	
+	di
+	pop af
+	ldh [rIE], a
+	pop af
+	ldh [rSTAT], a
+	ei
+	
+	ld a, [$FFF5]
+	cp 111
+	ret z	;pass
+	ld de, EmuFailText2	;fail
+	coord hl, $00, $0B
+	call PlaceString
+	ld a, 1
+	and a
+	ret
+EmuFailText2:
+	db "Emulator ERROR! Incorrect OAMint timing.@"
+	

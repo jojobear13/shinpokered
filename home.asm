@@ -21,7 +21,9 @@ SECTION "rst 38", ROM0 [$38]
 SECTION "vblank", ROM0 [$40]
 	jp VBlank
 SECTION "hblank", ROM0 [$48]
-	rst $38
+	ld [$FFF5], a	;joenote - store A contents for the purpose of a LCDC OAM timing test
+	reti
+	;rst $38
 SECTION "timer",  ROM0 [$50]
 	jp Timer
 SECTION "serial", ROM0 [$58]
@@ -3834,7 +3836,7 @@ CalcStats::
 ; if b=0, then hl should point to <battle_struct>HP
 ; requires that data be preloaded into wMonHeader using GetMonHeader
 CalcStat::
-	predef _CalcStat	;joenote moved to make space in home bank
+	predef _CalcStat	;joenote - moved to make space in home bank
 	ret
 
 AddEnemyMonToPlayerParty::
