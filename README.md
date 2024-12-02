@@ -45,6 +45,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
   - An accurate emulator, preferably a GBC-dedicated emulator, is required in order to avoid unexpected bugs
   - Goomba and Visual Boy Advance in particular are known to be problematic
   - BGB is the supported standard due to its accuracy and debugging tools
+  - There are error messages that may display on the initial menu if there is an emulator error detected
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
   - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
