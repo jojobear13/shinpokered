@@ -939,6 +939,7 @@ EmptyFunc3:
 
 Diploma_TextBoxBorder:
 	call GetPredefRegisters
+	jr CableClub_TextBoxBorder.next	;joenote - fixes a wrong tiles with the diploma border due to cable club map check
 
 ; b = height
 ; c = width
