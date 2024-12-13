@@ -71,6 +71,9 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
+v1.24.6(hotfix 3)
+- Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
+
 v1.24.6(hotfix 2)
 - Fixed the wrong tiles for the border of the pokedex diploma
 
