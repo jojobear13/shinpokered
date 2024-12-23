@@ -771,9 +771,9 @@ GetMonFieldMoves:
 	cp $FF
 	jr z, .done
 	
-	ld a, [wNumFieldMoves]
-	cp NUM_MOVES
-	jr nc, .done
+;	ld a, [wNumFieldMoves]
+;	cp NUM_MOVES
+;	jr nc, .done
 	
 	ld a, [wWhichPokemon]
 	ld c, a
