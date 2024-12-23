@@ -583,6 +583,7 @@ DisplayFieldMoveMonMenu:
 	ld [hli], a ; wFieldMoves + 1
 	ld [hli], a ; wFieldMoves + 2
 	ld [hli], a ; wFieldMoves + 3
+	ld [hli], a ; wFieldMoves + 4	;joenote - increase field moves list
 	ld [hli], a ; wNumFieldMoves
 	ld [hl], 12 ; wFieldMovesLeftmostXCoord
 	call GetMonFieldMoves
@@ -619,7 +620,7 @@ DisplayFieldMoveMonMenu:
 	ld c, a
 	pop af
 
-; For each field move, move the top of the text box up 2 rows while the leaving
+; For each field move, move the top of the text box up 2 rows while leaving
 ; the bottom of the text box at the bottom of the screen.
 	ld de, -SCREEN_WIDTH * 2
 .textBoxHeightLoop
