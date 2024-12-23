@@ -945,7 +945,7 @@ wSwappedMenuItem:: ; cd3d
 wHoFMonSpecies:: ; cd3d
 
 wFieldMoves:: ; cd3d
-; 4 bytes
+; 4 bytes	;joenote - extended to 5 bytes
 ; the current mon's field moves
 
 wBadgeNumberTile:: ; cd3d
@@ -1093,8 +1093,6 @@ wHiddenObjectX:: ; cd41
 wSlotMachineWinningSymbol:: ; cd41
 ; the OAM tile number of the upper left corner of the winning symbol minus 2
 
-wNumFieldMoves:: ; cd41
-
 wSlotMachineWheel1BottomTile:: ; cd41
 
 wTrainerScreenX:: ; cd41
@@ -1102,6 +1100,8 @@ wTrainerScreenX:: ; cd41
 ; a lot of the uses for these values use more than the said address
 
 wHoFTeamNo:: ; cd42
+
+wNumFieldMoves:: ; cd42	;joenote - moved to cd42 from cd41
 
 wSlotMachineWheel1MiddleTile:: ; cd42
 
