@@ -1105,14 +1105,15 @@ wNumFieldMoves:: ; cd42	;joenote - moved to cd42 from cd41
 
 wSlotMachineWheel1MiddleTile:: ; cd42
 
-wFieldMovesLeftmostXCoord:: ; cd42
 	ds 1
-
-wLastFieldMoveID:: ; cd43
-; unused
 
 wSlotMachineWheel1TopTile:: ; cd43
+
+wFieldMovesLeftmostXCoord:: ; joenote - moved to cd43 from cd42
 	ds 1
+
+wLastFieldMoveID:: ; joenote - moved to cd44 from cd43
+; unused
 
 wSlotMachineWheel2BottomTile:: ; cd44
 	ds 1
