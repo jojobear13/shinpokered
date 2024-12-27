@@ -769,15 +769,19 @@ DoDisobeyLevelCheck:
 	ld [wMonIsDisobedient], a
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
-	jr z, .return_usemove
+	jr z, .return_usemove	;never apply obedience in link battles
 
-; compare the mon's original trainer ID with the player's ID to see if it was traded
 ;	CheckEvent EVENT_908	;joenote Check if Elite 4 beaten, and if so then don't even bother going further
 ;	jr nz, .return_usemove
+
 	ld a, [wUnusedD721]	;joenote - check if obedience level cap is active and always treat as traded if so
 	bit 5, a
 	jr nz, .monIsTraded
+
+	CheckEvent EVENT_90C
+	jr nz, .return_usemove	;do not apply obedience if level scaling is active
 	
+; compare the mon's original trainer ID with the player's ID to see if it was traded
 	ld hl, wPartyMon1OTID
 	ld bc, wPartyMon2 - wPartyMon1
 	ld a, [wPlayerMonNumber]
