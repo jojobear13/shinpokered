@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Fixed a minor cursor error on the town map when in route 1 or the power plant
 - Fixed text error in Vermilion gym referencing the bird type instead of flying type
 - Some hidden Game Corner coins can now be accessed when they previously were not.
 - The menu for field moves can now support up to five field moves for developer purposes.
@@ -318,6 +319,7 @@ v1.24.1
   - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
   - Fixed an issue with the title menu becoming dark when saving in rock tunnel
   - Fixed rock tunnel darkness affecting option menu
+  - Fixed a minor cursor error on the town map when in route 1 or the power plant
 
 
 - Item Fixes  
