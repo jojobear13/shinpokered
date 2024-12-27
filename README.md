@@ -358,6 +358,12 @@ Cheats and Secrets!
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
+v1.24.6(hotfix 4)
+- Some hidden Game Corner coins can now be accessed when they previously were not.
+- The menu for field moves can now support up to five field moves for developer purposes.
+- All five field moves a pokemon can have will now be displayed in the field move menu.
+- If level scaling is active, traded pokemon will not become disobedient under the normal badge limits.
+
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
 
@@ -811,7 +817,8 @@ v1.24.1
   - Fixed an underflow issue which caused trainers above the player to not see beyond 3 spaces downward
   - Lance and the player will face each other when speaking.
   - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
- 
+  - Some hidden Game Corner coins can now be accessed when they previously were not.
+  
  
 #Tweaks
 -----------
@@ -1081,7 +1088,8 @@ v1.24.1
   - Item evolutions having a level requirement is now supported
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
   - Status Screen now prints types from party struct data instead of species header
-
+  - The menu for field moves can now support up to five field moves for developer purposes.
+  
 - PokeDex Area enhancements
   - The AREA function of the PokeDex now takes the Super Rod into account
   - It will also notify you if the Pokemon you are referencing is available on the currently loaded map
@@ -1168,6 +1176,7 @@ v1.24.1
   - If trainer scaling is on, you do not need to beat the 1st route 22 rival solo to get oak's pokeballs
   - In hard mode, or against gym leaders, the scaling is based on the absolute highest level of your team
   - In normal difficulty against regular trainers, the scaling is based on a weighted average of your team's levels
+  - If level scaling is active, traded pokemon will not become disobedient under the normal badge limits
 - Playing on hard mode provides increased difficulty
   - Pressing RIGHT while the cursor is in the BATTLE STYLE box will toggle the feature on/off
   - Contrasting this, pressing LEFT will let you select a battle style without toggling difficulty
@@ -1279,9 +1288,6 @@ v1.24.1
   - You will be asked about filling the slot when teaching a field move out of battle
   - You cannot overwrite a slot with a field move already in it
   - A slot is cleared when its 'mon leaves the party (such as being put in the PC)
-  - In the case of a 'mon with 4 regular field moves:
-    - The slotted temporary move cannot be menu-selected
-    - The slotted temporary move, if it's a HM move, can be used via quick-key
   - Teaching a TM as a field move will not consume the TM
 
  
