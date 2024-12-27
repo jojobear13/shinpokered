@@ -71,6 +71,10 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
+v1.24.6(hotfix 4)
+- Some hidden Game Corner coins can now be accessed when they previously were not.
+- The menu for field moves can now support up to five field moves for developer purposes.
+
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
 
@@ -308,6 +312,7 @@ v1.24.1
   - Fixed a bug where HP bar animation can print the wrong tile for 1 frame
   - Fixed junk tiles displaying for 1 frame when the game resets after displaying THE END
   - Fixed transitions when entering and exiting Rock Tunnel
+  - Fixed a bug catcher on route 9 being able to walk onto a ledge
   - The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
   - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
   - Fixed an issue with the title menu becoming dark when saving in rock tunnel
@@ -317,7 +322,7 @@ v1.24.1
 - Item Fixes  
   - Great ball has a ball factor of 12 now
   - Stone evolutions cannot be triggered via level-up anymore
-  - Ether and elixer now account for PP-ups used when determining if move is at full PP
+  - Ether and elixir now account for PP-ups used when determining if move is at full PP
   - PP-restoring items no longer affect transformed moves and only restore the original moves
   - EXP ALL fixes
     - should now dispense the correct exp if multiple pokemon take place in a battle
@@ -343,7 +348,7 @@ v1.24.1
     - Fixes some channel conflicts between cries and the low-health alarm
     - Fixes some audio hiccups with Yellow's color palettes on the GBC
     - Press SELECT on the option menu to go to the extra menu and change the audio mixing option under "AUDIO"
-  - Fuschia gym plays the correct sfx when getting the TM from Koga
+  - Fuchsia gym plays the correct sfx when getting the TM from Koga
   - Vermilion gym plays the correct sfx when getting the TM from Surge
   - Restored sfx for getting a badge
     - A sfx is supposed to play when getting a badge, but not for all gym leaders and the sfx used is inconsistent
@@ -430,7 +435,8 @@ v1.24.1
   - Fixed an underflow issue which caused trainers above the player to not see beyond 3 spaces downward
   - Lance and the player will face each other when speaking.
   - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
- 
+  - Some hidden Game Corner coins can now be accessed when they previously were not.
+  
  
 #Tweaks
 -----------
@@ -720,6 +726,7 @@ v1.24.1
   - Item evolutions having a level requirement is now supported
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
   - Status Screen now prints types from party struct data instead of species header
+  - The menu for field moves can now support up to five field moves for developer purposes.
   
 
 #Credits / Special Thanks
