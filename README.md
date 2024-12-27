@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Fixed text error in Vermilion gym referencing the bird type instead of flying type
 - Some hidden Game Corner coins can now be accessed when they previously were not.
 - The menu for field moves can now support up to five field moves for developer purposes.
 
@@ -538,6 +539,7 @@ v1.24.1
   - Adjusted some city names on signs
   - Fixed incorrect sign text in safari area 1
   - Fixed missing punctuation in Oak's pokedex evaluation
+  - Fixed text error in Vermilion gym referencing the bird type instead of flying type
 - Made adjustments to the game text
   - When a pkmn is caught and fills the box, a reminder is printed that the box is full
   - PC has a text prompt to tell you if its full after depositing
