@@ -28,8 +28,26 @@ ENDC
 	ld de, TownMapCursor
 	lb bc, BANK(TownMapCursor), (TownMapCursorEnd - TownMapCursor) / $8
 	call CopyVideoDataDouble
+	
+	;joenote - this fixes a minor cursor error when the player is on route 1 or the power plant
+	ld a, $01
+	ld [wWhichTownMapLocation], a
+	ld a, [wCurMap]
+	ld hl, TownMapOrder+1
+	cp [hl]
+	jr z, .townmaplocationset
+
+	ld a, (TownMapOrderEnd-TownMapOrder)-1
+	ld [wWhichTownMapLocation], a
+	ld a, [wCurMap]
+	ld hl, TownMapOrderEnd-1
+	cp [hl]
+	jr z, .townmaplocationset
+
 	xor a
 	ld [wWhichTownMapLocation], a
+
+.townmaplocationset
 	pop af
 	jr .enterLoop
 
