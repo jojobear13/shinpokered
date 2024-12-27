@@ -468,7 +468,7 @@ DisplayWildLocations:
 	jr z, .nexttext1
 	ld hl, _DexAreaLand
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext1
 	ld a, [wActionResultOrTookBattleTurn]
@@ -476,7 +476,7 @@ DisplayWildLocations:
 	jr z, .nexttext2
 	ld hl, _DexAreaSurf
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext2
 	ld a, [wActionResultOrTookBattleTurn]
@@ -484,7 +484,7 @@ DisplayWildLocations:
 	jr z, .nexttext3
 	ld hl, _DexAreaSuperRod
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext3
 	ld a, [wActionResultOrTookBattleTurn]

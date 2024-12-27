@@ -365,6 +365,7 @@ v1.24.6(hotfix 4)
 - The menu for field moves can now support up to five field moves for developer purposes.
 - All five field moves a pokemon can have will now be displayed in the field move menu.
 - If level scaling is active, traded pokemon will not become disobedient under the normal badge limits.
+- Increased text delay by half second on area pokedex screen
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
