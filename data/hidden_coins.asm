@@ -10,5 +10,5 @@ HiddenCoinCoords:
 	db GAME_CORNER,$10,$0a
 	db GAME_CORNER,$07,$0b
 	db GAME_CORNER,$08,$0f
-	db GAME_CORNER,$0f,$0c
+	db GAME_CORNER,$10,$0c	;joenote - originally at $0f,$0c which cannot be accessed
 	db $ff
