@@ -1177,7 +1177,8 @@ AnyEnemyPokemonAliveCheck:
 ; stores whether enemy ran in Z flag
 ReplaceFaintedEnemyMon:
 	ld hl, wEnemyHPBarColor
-	ld e, $30
+;	ld e, $30	;get health bar palette of an HP bar E pixels long.
+	ld e, 0	;joenote - make the trainer pokeballs red
 	call GetBattleHealthBarColor
 	ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
 	ld [rOBP0], a
