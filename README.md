@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Pressing B on the main battle menu places the cursor over RUN
 - Made the trainer pokeballs red in the battle HUD
 - Fixed a minor cursor error on the town map when in route 1 or the power plant
 - Fixed text error in Vermilion gym referencing the bird type instead of flying type
@@ -502,6 +503,7 @@ v1.24.1
   - Toggled on/off the same way as the softlock warp, but by using 'A' instead of 'B'
   - Zero damage is not displayed
   - Damage is not displayed if either pokemon has zero HP remaining
+- Pressing B on the main battle menu places the cursor over RUN
 - Slot machine coin counter runs twice as fast
 - Interaction of slot reel modes tweaked for better gameplay
 - The surfboard, a nugget, and TM 15 are hidden items added to the vermilion dock
