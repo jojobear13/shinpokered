@@ -2449,15 +2449,16 @@ DisplayBattleMenu:
 	ld a, $1
 	ld [hli], a ; wMaxMenuItem
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - adding SELECT.
-;Aim is to play enemy pokemon's cry if it has been already caught when select is pressed
-	ld [hl], D_RIGHT | A_BUTTON | SELECT ; wMenuWatchedKeys	
+;joenote - adding SELECT and B
+	ld [hl], D_RIGHT | A_BUTTON | B_BUTTON | SELECT ; wMenuWatchedKeys	
 	call HandleMenuInput
-	bit 4, a ; check if right was pressed
+	bit BIT_D_RIGHT, a ; check if right was pressed
 	jr nz, .rightColumn
-	bit 0, a ;check if A was pressed
-	;jr .AButtonPressed 
-	jr nz, .AButtonPressed 
+	bit BIT_A_BUTTON, a ;check if A was pressed
+	jr nz, .AButtonPressed
+	bit BIT_B_BUTTON, a
+	jr nz, .BButtonPressed
+.SelectButtonPressed	
 	push bc
 	push hl
 	callba CryIfOwned
@@ -2493,14 +2494,20 @@ DisplayBattleMenu:
 	inc hl
 	ld a, $1
 	ld [hli], a ; wMaxMenuItem
-	ld a, D_LEFT | A_BUTTON
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - adding B button
+	ld a, D_LEFT | A_BUTTON | B_BUTTON
 	ld [hli], a ; wMenuWatchedKeys
 	call HandleMenuInput
-	bit 5, a ; check if left was pressed
+	bit BIT_B_BUTTON, a
+	jr nz, .BButtonPressed
+	bit BIT_D_LEFT, a ; check if left was pressed
 	jp nz, .leftColumn ; if left was pressed, jump
+;else A button was pressed
 	ld a, [wCurrentMenuItem]
 	add $2 ; if we're in the right column, the actual id is +2
 	ld [wCurrentMenuItem], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .AButtonPressed
 	call PlaceUnfilledArrowMenuCursor
 	ld a, [wBattleType]
@@ -2516,6 +2523,13 @@ DisplayBattleMenu:
 ; item menu was selected
 	inc a ; increment a to 2
 	jr .handleMenuSelection
+
+;joenote - make it so the cursor automatically moves to RUN when pressing B
+.BButtonPressed
+	ld a, 3
+	ld [wBattleAndStartSavedMenuItem], a
+	jp DisplayBattleMenu
+
 .notItemMenu
 	cp $2 ; was the party menu selected?
 	jr nz, .handleMenuSelection

@@ -359,6 +359,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Pressing B on the main battle menu places the cursor over RUN
 - Made the trainer pokeballs red in the battle HUD
 - Fixed a minor cursor error on the town map when in route 1 or the power plant
 - Fixed text error in Vermilion gym referencing the bird type instead of flying type
