@@ -1276,6 +1276,7 @@ v1.24.1
 - You can now check DVs or stat exp by holding down a button and entering the status screen
   - hold SELECT for stat exp
   - hold START for DVs
+- Pressing B on the main battle menu places the cursor over RUN
 - In-battle way to check if enemy pokemon is owned in the pokedex
   - On the main battle menu, place the cursor over an option in the left column
   - Press the SELECT button
