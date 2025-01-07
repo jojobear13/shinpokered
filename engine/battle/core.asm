@@ -3668,7 +3668,7 @@ PlayerCalcMoveDamage:
 	jr z, handleIfPlayerMoveMissed
 	call GetDamageVarsForPlayerAttack
 	call CalculateDamage
-	jp z, playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, skip any further damage calculation and, for now, skip MoveHitTest
+	jp z, playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
 	               ; for these moves, accuracy tests will only occur if they are called as part of the effect itself
 .static_skiphere	;joenote - skip here if a static damage move
 	call AdjustDamageForMoveType
@@ -5039,6 +5039,7 @@ GetEnemyMonStat:
 	ret
 
 CalculateDamage:
+;Basic calculation function for unmodified damage. Caps at 999 damage. Minimum 1 Damage.
 ; input:
 ;   b: attack
 ;   c: opponent defense
@@ -5066,7 +5067,7 @@ CalculateDamage:
 	cp $1e
 	jr z, .skipbp
 
-; Calculate OHKO damage based on remaining HP.
+; See if OHKO move can hit (having higher speed) and if so, input its damage.
 	cp OHKO_EFFECT
 	jp z, JumpToOHKOMoveEffect
 
@@ -5471,6 +5472,7 @@ ApplyAttackToEnemyPokemon:
 .damage_stored
 	call DrawHUDsAndHPBars
 	pop bc
+;fall through
 
 ApplyDamageToEnemyPokemon:
 	ld hl, wDamage
@@ -5587,7 +5589,8 @@ ApplyAttackToPlayerPokemon:
 .damage_stored
 	call DrawHUDsAndHPBars
 	pop bc
-	
+;fall through
+
 ApplyDamageToPlayerPokemon:
 	ld hl, wDamage
 	ld a, [hli]
@@ -5835,12 +5838,13 @@ IncrementMovePP:
 	inc [hl] ; increment PP in the party memory location
 	ret
 
-; function to adjust the base damage of an attack to account for type effectiveness
+;Function to adjust the base damage of an attack to account for type effectiveness
 ;joenote - re-writing this function to fix various bugs
 ;Effectiveness multiplier will be adjusted for both type 1 and 2 of the defender
 ;Type 1 and 2 are checked individually, so their order no longer matters
 ;Static damage moves will give a neutral multiplier if super effective or not very effective
 ;Static damage moves will obey type immunity
+;Has overflow protection for STAB modifier and 2X/4X weakness modifier
 AdjustDamageForMoveType:
 	ld a, $a
 	ld [wDamageMultipliers], a	;joenote - move this to AdjustDamageForMoveType to prevent multi-attack overflows
@@ -5893,6 +5897,7 @@ AdjustDamageForMoveType:
 	ld [wDamage], a
 	ld a, l
 	ld [wDamage + 1], a
+	call c, .overflow	;joenote - handle damage overflow
 	ld hl, wDamageMultipliers
 	set 7, [hl]
 .skipSameTypeAttackBonus
@@ -5913,7 +5918,7 @@ AdjustDamageForMoveType:
 	and $7F
 	jr z, .negate
 	
-	;static moves return neutral except for type immunity
+	;There is no type immunity at this line, so make any static moves return neutral
 	push af
 	ld a, [wUnusedC000]
 	ld b, a
@@ -5957,6 +5962,7 @@ AdjustDamageForMoveType:
 	sla [hl]
 	dec hl
 	rl [hl]
+	call c, .overflow	;joenote - handle damage overflow
 	ret
 .zerocheck
 ; if damage is 0, make the move miss
@@ -5975,6 +5981,11 @@ AdjustDamageForMoveType:
 	or $A
 	ld [wDamageMultipliers], a
 	jr .done
+.overflow	;joenote - cap damage at 65535
+	ld a, $ff
+	ld [wDamage], a
+	ld [wDamage+1], a	
+	ret
 	
 ;c = defender type 1 or 2
 TypeXEffectiveness:
@@ -6578,7 +6589,7 @@ EnemyCalcMoveDamage:
 	call GetDamageVarsForEnemyAttack
 	call SwapPlayerAndEnemyLevels
 	call CalculateDamage
-	jp z, EnemyCheckIfFlyOrChargeEffect
+	jp z, EnemyCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
 .static_skiphere	;joenote - skip here if a static damage move
 	call AdjustDamageForMoveType
 	call RandomizeDamage

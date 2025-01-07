@@ -1708,9 +1708,11 @@ wBattleType:: ; d05a
 wDamageMultipliers:: ; d05b
 ; bits 0-6: Effectiveness
    ;  $0 = immune
+   ;  $2 = really not very effective (quarter damage)
    ;  $5 = not very effective
    ;  $a = neutral
    ; $14 = super-effective
+   ; $28 = really super-effective (quadruple damage)
 ; bit 7: STAB
 	ds 1
 

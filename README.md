@@ -359,6 +359,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Added overflow protection to super-effective damage calculation
 - Pressing B on the main battle menu places the cursor over RUN
 - Made the trainer pokeballs red in the battle HUD
 - Fixed a minor cursor error on the town map when in route 1 or the power plant
@@ -538,6 +539,7 @@ v1.24.1
   - Fixed freeze that occurs in defense stat scaling (def < 4 glitch)
   - Enemy ai ignores type effectiveness for moves that have zero power
     - prevents things like spamming agility against poison pkmn
+  - Added overflow protection to super-effective damage calculation
   - Enemy ai ignores super-effectiveness for moves that do static amounts of damage
   - Fixed skipping move-learn on level-up glitch. 
     - when gaining multiple levels at a time, each in-between level is incrementally checked for moves learned
