@@ -293,11 +293,12 @@ SortItems:
 	ret
 
 
-ItemSortList::
+ItemSortList::	;only for items that are bag-accessed
 	; Active-Usage Key Items
 	db BICYCLE
 	db ITEMFINDER
 	db TOWN_MAP
+	db SURFBOARD
 	; Rods
 	db OLD_ROD
 	db GOOD_ROD
@@ -306,7 +307,6 @@ ItemSortList::
 	db POKE_BALL
 	db GREAT_BALL
 	db ULTRA_BALL
-	db SAFARI_BALL
 	db MASTER_BALL
 	; Common Items
 	db REPEL
@@ -365,25 +365,22 @@ ItemSortList::
 	db MIST_STONE
 	; Money
 	db COIN_CASE
-	db COIN
 	db NUGGET
 	; Gift Passives
 	db EXP_ALL
 	db DOME_FOSSIL
 	db HELIX_FOSSIL
 	db OLD_AMBER
-	; Maps and Items with No Use
-	db SAFARI_BAIT
-	db SAFARI_ROCK
+	; Key Items With No Active Use
 	db S_S_TICKET
-	; Key Items With No Use
-	db SECRET_KEY
-	db BIKE_VOUCHER
-	db CARD_KEY
-	db GOLD_TEETH
-	db OAKS_PARCEL
-	db LIFT_KEY
 	db SILPH_SCOPE
+	db SECRET_KEY
+	db LIFT_KEY
+	db CARD_KEY
+	; Key Items That Are Used For Events
+	db GOLD_TEETH
+	db BIKE_VOUCHER
+	db OAKS_PARCEL
 	; TMs
 	db TM_01
 	db TM_01 + 1
