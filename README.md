@@ -1,6 +1,6 @@
 # Shin Pokémon Red, Blue, Green, Red-JP, & Blue-JP
 
-Version 1.24.6
+Version 1.24.7
 
 *Shin (真) - The kanji for "true".  
 Used in Japanese media to denote a remastering, updated retelling , or a "true form" of something.*  
@@ -358,7 +358,7 @@ Cheats and Secrets!
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
-v1.24.6(hotfix 4)
+v1.24.7
 - Press SELECT on the extra options menu to get a sound test menu
   - Listen to the game's musical tracks
   - They even continue to play once you've backed out of the options menu

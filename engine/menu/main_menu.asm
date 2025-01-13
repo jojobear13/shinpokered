@@ -459,11 +459,11 @@ HandshakeList:
 	db $1
 	db $2
 	db $4
-	db $6
+	db $7
 	db $a
 	db $ff
 VersionText:
-	db "v1.24.6-h3-M@"
+	db "v1.24.7M@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText
