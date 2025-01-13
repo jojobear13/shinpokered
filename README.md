@@ -369,6 +369,9 @@ v1.24.6(hotfix 4)
 - All five field moves a pokemon can have will now be displayed in the field move menu.
 - If level scaling is active, traded pokemon will not become disobedient under the normal badge limits.
 - Increased text delay by half second on area pokedex screen
+- Can move items to the non-active bag space
+  - Place the cursor is over an item in the bag menu
+  - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
@@ -1293,6 +1296,9 @@ v1.24.1
     - For example, you can enter the Cinnabar Gym even if the Secret Key is in the non-active bag space
   - Certain unique systems may only recognize the active bag's item list
     - For example, the Pokemon Stadium games detect only the bag list that was active when last saved
+- Can move items to the non-active bag space
+  - Place the cursor is over an item in the bag menu
+  - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
 - The player's party 'mons now have temporary field move slots for HM moves
   - Each party 'mon has 1 slot separate from its regular move list
   - A field move in this slot can be used in the overworld as normal

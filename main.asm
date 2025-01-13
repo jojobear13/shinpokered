@@ -1934,6 +1934,7 @@ INCLUDE "custom_functions/func_gamma.asm"
 INCLUDE "custom_functions/func_extra_menu.asm"
 INCLUDE "custom_functions/func_move_secrets.asm"
 INCLUDE "custom_functions/func_linkbattlecomms.asm"
+INCLUDE "custom_functions/func_bag.asm"
 
 SECTION "Pics 1", ROMX, BANK[PICS_1]
 INCLUDE "constants/pic_banks/pic1.asm"

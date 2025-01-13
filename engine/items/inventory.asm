@@ -12,14 +12,21 @@ AddItemToInventory_:
 	push hl
 	push hl
 
-	ld d, PC_ITEM_CAPACITY ; how many items the PC can hold
-	ld a, wNumBagItems & $FF
-	cp l
-	jr nz, .checkIfInventoryFull
-	ld a, wNumBagItems >> 8
-	cp h
-	jr nz, .checkIfInventoryFull
+;	ld d, PC_ITEM_CAPACITY ; how many items the PC can hold
+;	ld a, wNumBagItems & $FF	;d31d & ff = 1d
+;	cp l	; L = 1d for wNumBagItems or L = 3a for wNumBoxItems
+;	jr nz, .checkIfInventoryFull	;jump if the destination is not the player bag, but the PC box
+;	ld a, wNumBagItems >> 8
+;	cp h
+;	jr nz, .checkIfInventoryFull
 ; if the destination is the bag
+;	ld d, BAG_ITEM_CAPACITY ; how many items the bag can hold
+
+;joenote - rewriting the above to be a little more workable
+	ld d, PC_ITEM_CAPACITY ; how many items the PC can hold
+	call .checkIfBox
+	jr z, .checkIfInventoryFull	;if z flag set, then hl points to the PC box
+	;else assume that it points to bag space
 	ld d, BAG_ITEM_CAPACITY ; how many items the bag can hold
 .checkIfInventoryFull
 	ld a, [hl]
@@ -94,7 +101,14 @@ AddItemToInventory_:
 	ld a, b
 	ld [wItemQuantity], a ; restore the initial value from when the function was called
 	ret
-
+.checkIfBox	;joenote - sets z flag if hl points to PC box, else unsets z flag
+	ld a, l
+	cp wNumBoxItems & $FF
+	ret nz
+	ld a, h
+	cp wNumBoxItems >> 8
+	ret
+	
 ; function to remove an item (in varying quantities) from the player's bag or PC box
 ; INPUT:
 ; hl = address of inventory (either wNumBagItems or wNumBoxItems)

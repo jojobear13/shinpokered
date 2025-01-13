@@ -326,6 +326,7 @@ This will tell the game to get on your bike. You can also get off your bike the 
 #### Extra Bag Pocket  
 The bag now supports an additional item list for an extra 20 slots of space.  
 Press START while in the bag menu to hot-swap the item list that populates the active bag.  
+Press and hold LEFT or RIGHT then press START to send the item the cursor is over to the non-active bag space.  
 This also works in battle or when depositing items into the PC.  
 In general, the non-active item list gets recognized by the game's systems.  
 For example, you can enter the Cinnabar Gym even if the Secret Key is in the non-active bag space.  
