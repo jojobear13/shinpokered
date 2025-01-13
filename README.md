@@ -1,6 +1,6 @@
 # Shin Pokémon Red, Blue, Green, Red-JP, & Blue-JP
 
-Version 1.24.6
+Version 1.24.7
 
 Future bugfixes here will be eventually migrated to the Shin Pokemon master branch
 
@@ -71,7 +71,10 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
-v1.24.6(hotfix 4)
+v1.24.7
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
 - Added overflow protection to super-effective damage calculation
 - Pressing B on the main battle menu places the cursor over RUN
 - Made the trainer pokeballs red in the battle HUD
@@ -449,6 +452,9 @@ v1.24.1
 #Tweaks
 -----------
 - Press SELECT on the option menu to get to the extra options menu and toggle various new features
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
 - Added built-in gamma shader for backlit LCD screens in GBC mode (press SELECT at the copyright screen)
   - Gamma shader defaults ON if the destination code in the rom header is set to 00 (JP)
   - Pressing SELECT at the copyright info now switches the shader from its default state
