@@ -195,6 +195,9 @@ This feature reinstitutes a speed-running trick that makes text print with zero 
 Toggle this on the extra options menu.  
 Please note that other text speed selections do nothing while this feature is active.  
 
+#### Quick Cursor Run  
+When on the main battle menu, pressing B will automatically place the cursor over RUN.  
+
 
 #Difficulty Settings
 -----------------------------------------------
