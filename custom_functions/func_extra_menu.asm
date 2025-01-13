@@ -48,7 +48,7 @@ DisplayExtraOptionMenu:
 	bit BIT_START, b ; Start button pressed?
 	jp nz, .exitMenu
 	bit BIT_SELECT, b ; Select button pressed?
-	jp nz, .exitMenu
+	jp nz, DisplaySoundTestMenu
 	bit BIT_A_BUTTON, b ; A button pressed?
 	jr nz, .cursor_section
 	jr .checkDirectionKeys	;jump if d-pad pressed
@@ -474,7 +474,7 @@ TextAISwitch:
 TextGamma:
 	db " Y SHADER@"
 TextBack:
-	db " BACK@"
+	db " BACK     SEL: OST@"
 
 ;TextAILevelCap:
 ;	db " LVL CAP@"
