@@ -359,6 +359,9 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.6(hotfix 4)
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
 - Added overflow protection to super-effective damage calculation
 - Pressing B on the main battle menu places the cursor over RUN
 - Made the trainer pokeballs red in the battle HUD
@@ -1245,6 +1248,9 @@ v1.24.1
 - Text with zero frame delay can be toggled from the extra menu under "INST. TXT"
   - The regular text speed selecttion will be ignored while ON
   - Turning this OFF will default the text speed to FAST
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
 - Softlock Warp 
   - Instantly teleport back to your mom's house if you get stuck or are unable to move after updating to a new patch
   - Sets money to at least 1000 if you have less than that

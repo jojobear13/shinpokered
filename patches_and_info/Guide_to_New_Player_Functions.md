@@ -195,6 +195,11 @@ This feature reinstitutes a speed-running trick that makes text print with zero 
 Toggle this on the extra options menu.  
 Please note that other text speed selections do nothing while this feature is active.  
 
+#### Sound Test  
+Press SELECT on the extra options menu to get a sound test menu.
+This way you can listen to the game's musical tracks.  
+They even continue to play once you've backed out of the options menu.  
+
 #### Quick Cursor Run  
 When on the main battle menu, pressing B will automatically place the cursor over RUN.  
 
