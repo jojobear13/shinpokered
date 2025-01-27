@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
 - Press SELECT on the extra options menu to get a sound test menu
   - Listen to the game's musical tracks
   - They even continue to play once you've backed out of the options menu
@@ -397,6 +398,7 @@ v1.24.1
   - An unused bit is now used to determine the ghost marowak battle
   - Can't use surf/teleport/escape rope to escape from trainer encounters
   - Fixed trainer escape glitch via blacking out from a wild battle
+  - Fixed issue where interacting with a hidden item or bookshelf when a trainer spots you will freeze the game
   - Can't fish or surf in the bases of statues
   - Can no longer fish or surf using the right wall corner tile on the SS Anne
   - Seafoam islands fast current applied to the right steps on floor B3

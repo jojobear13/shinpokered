@@ -101,6 +101,12 @@ OverworldLoopLessDelay::
 	ld a, [wd730]
 	bit 2, a	;check if input is being ignored
 	jp nz, .noDirectionButtonsPressed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - check if trainer is wanting to battle
+	ld a, [wFlags_D733]
+	bit 3, a
+	jp nz, .noDirectionButtonsPressed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call IsPlayerCharacterBeingControlledByGame
 	jr nz, .checkForOpponent
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
