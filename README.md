@@ -376,6 +376,7 @@ v1.24.7
 - Can move items to the non-active bag space
   - Place the cursor is over an item in the bag menu
   - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
+- Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
@@ -1638,6 +1639,7 @@ v1.24.1
 - Added hidden max revive on route 11
 - Added hidden ultra ball on route 8
 - Water Gun TM has been replaced by a super repel in Mt. Moon, and it is now found in the Pewter Museum
+- Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
 
 </details>
 

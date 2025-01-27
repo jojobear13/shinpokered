@@ -895,6 +895,8 @@ CeruleanCityHiddenObjects:
 Route4HiddenObjects:
 	db $03,$28,GREAT_BALL
 	dbw BANK(HiddenItems),HiddenItems
+	db 3,62,MOON_STONE
+	dbw BANK(HiddenItems),HiddenItems	;joenote - added an extra moon stone
 	db $FF
 Route6HiddenObjects: ;joenote - added hidden items
 	db 4,3,GREAT_BALL

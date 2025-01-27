@@ -70,4 +70,5 @@ HiddenItemCoords:
 	db ROUTE_6,4,17
 	db ROUTE_11,17,55
 	db ROUTE_8,4,51
+	db ROUTE_4,3,62
 	db $ff
