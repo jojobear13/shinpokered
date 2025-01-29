@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Added a different emulator check that tests the timing of memory modification opcodes
 - Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
 - Press SELECT on the extra options menu to get a sound test menu
   - Listen to the game's musical tracks
