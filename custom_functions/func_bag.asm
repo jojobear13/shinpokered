@@ -166,7 +166,7 @@ SendToBackupBag:
 .setMenuVariables
 	ld [wMaxMenuItem], a
 ;Play a sound effect
-	ld a, SFX_WITHDRAW_DEPOSIT
+	ld a, SFX_TINK
 	call PlaySound
 	call UpdateMenuInfo
 .return
