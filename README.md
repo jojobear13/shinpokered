@@ -378,6 +378,7 @@ v1.24.7
   - Place the cursor is over an item in the bag menu
   - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
 - Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
+- Added some proper rematch text instead of reusing the slot machine strings
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box

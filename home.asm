@@ -1274,7 +1274,7 @@ PokemartGreetingText::
 	db "@"
 
 RematchTrainerText::	;joenote - for trainer rematch
-	TX_FAR _OneMoreGoSlotMachineText
+	TX_FAR _RematchTrainerText
 	db "@"
 
 LoadItemList::

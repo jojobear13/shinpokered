@@ -728,6 +728,7 @@ So don't be shy about using TMs acquired from NPCs and exploration.
 - Added a hidden super potion in celadon city
 - Hidden Hyper Beam TM on the vermilion dock
 - Hidden nugget on the vermilion dock
+- Hidden Moon Stone on Route 4 past the Cerulean Cave entrance
 
 #### Changes to Mart Inventories  
 - Pewter city has ethers

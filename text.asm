@@ -3263,6 +3263,10 @@ _RomHackVersionText::
 	line "TOWN for safety?"
 	done
 
+_RematchTrainerText::
+	text "Offer a rematch?"
+	done
+
 SECTION "Pokedex Text", ROMX, BANK[POKEDEX_TEXT]
 
 IF DEF(_REDGREENJP)
