@@ -229,7 +229,11 @@ ENDC
 
 .finishedBouncingPokemonLogo
 	call LoadScreenTilesFromBuffer1
+IF DEF(_RGTITLE)
+	ld c, 20
+ELSE
 	ld c, 36
+ENDC
 	call DelayFrames
 IF DEF(_RGTITLE)
 	;do nothing
@@ -295,10 +299,16 @@ ENDC
 	call CheckForUserInterruption
 	jr c, .finishedWaiting
 	call TitleScreenScrollInMon
+
+IF DEF(_RGTITLE)
+	;do nothing
+ELSE
 	ld c, 1
 	call CheckForUserInterruption
 	jr c, .finishedWaiting
 	callba TitleScreenAnimateBallIfStarterOut
+ENDC
+
 	call TitleScreenPickNewMon
 	jr .awaitUserInterruptionLoop
 
