@@ -359,6 +359,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Made japanese patches more accurate to the original, particularly the timing of the intro
 - Added a different emulator check that tests the timing of memory modification opcodes
 - Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
 - Press SELECT on the extra options menu to get a sound test menu

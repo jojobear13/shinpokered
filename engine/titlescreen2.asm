@@ -17,8 +17,18 @@ TitleScroll_Out:
 	db $12, $22, $32, $42, $52, $62, $83, $93, $a3, 0	;joenote - added a3 at the end for a bit more scrolling
 
 TitleScroll:
-	ld a, d
+	ld a, d		;d = 0 or 1
 
+;japanese red/green has its own scrolling parameters
+IF DEF(_RGTITLE)
+	lb bc, $8, $14
+
+	and a
+	jr z, .ok
+
+	ld d, $a0
+	ld c, $c
+ELSE
 	ld bc, TitleScroll_In
 	ld d, $88
 	ld e, 0 ; don't animate titleball
@@ -29,8 +39,12 @@ TitleScroll:
 	ld bc, TitleScroll_Out
 	ld d, $00
 	ld e, 0 ; don't animate titleball
+ENDC
 .ok
 
+IF DEF(_RGTITLE)
+;do nothing
+ELSE
 _TitleScroll:
 	ld a, [bc]
 	and a
@@ -46,6 +60,7 @@ _TitleScroll:
 	and $f0
 	swap a
 	ld b, a
+ENDC
 
 .loop
 	ld h, d
@@ -60,12 +75,22 @@ _TitleScroll:
 	add b
 	ld d, a
 
+;japanese red/green does not have the title screen pokeball
+IF DEF(_RGTITLE)
+	;do nothing
+ELSE
 	call GetTitleBallY
+ENDC
+
 	dec c
 	jr nz, .loop
 
-	pop bc
+IF DEF(_RGTITLE)
+	ret
+ELSE
+	pop bc	;the corresponding push is in the _TitleScroll conditional
 	jr _TitleScroll
+ENDC
 
 .ScrollBetween:
 	predef BGLayerScrollingUpdate	;joenote - consolidated into a predef that also fixes some issues
@@ -85,6 +110,9 @@ ELSE
 	db 0, $71, $6f, $6e, $6d, $6c, $6d, $6e, $6f, $71, $74, 0
 ENDC
 
+IF DEF(_REDGREENJP)
+;nothing
+ELSE
 TitleScreenAnimateBallIfStarterOut:
 ; Animate the TitleBall if a starter just got scrolled out.
 	ld a, [wTitleMonSpecies]
@@ -99,6 +127,7 @@ TitleScreenAnimateBallIfStarterOut:
 	ld bc, TitleScroll_WaitBall
 	ld d, 0
 	jp _TitleScroll
+ENDC
 
 GetTitleBallY:
 ; Get position e from TitleBallYTable
