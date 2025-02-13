@@ -381,6 +381,7 @@ v1.24.7
   - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
 - Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
 - Added some proper rematch text instead of reusing the slot machine strings
+- Assuming you start a new save, Nuzlocke mode now knows if you're early in the game and have no access to pokeballs
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
@@ -1653,7 +1654,7 @@ v1.24.1
   - Go to the OPTIONS screen and press SELECT to get to the extra menu.
   - Toggle this mode under "NUZLOCKE".
   
-- This mode **DOES NOT** check if you have obtained pokeballs yet. It is in full effect when toggled to ON.  
+- This mode now checks if you have had access to pokeballs on the save file.
   
 - Rule 1: A pokemon that faints is considered dead and can no longer be used.
   - Revival items cannot be used in battle.
@@ -1671,9 +1672,9 @@ v1.24.1
   - An "area" is defined by the name displayed on the town map.
   - You will be unable to throw balls in subsequent wild battles in that area.
   - Static wild battles count for this as well.
-  - Wild battles before you can get pokeballs also count.
-  - In light of this, you may want to delay activating nuzlocke mode until pokeballs are available.
+  - Wild battles do not count when early in the game and you have no access to pokeballs.
   - Story wild battles (Old Man tutorial, Ghost Marowak, and Tower Ghosts) do not apply.
+  - Pokemon gained outside of battle (gifts, prizes, in-game trades, etc) do not apply.
   
 - Rule 3 (Optional): Nickname every pokemon you obtain.
   - You will always go straight to the nickname screen without a Yes/No prompt.

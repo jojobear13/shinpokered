@@ -76,7 +76,7 @@ HealParty_NuzlockeHandler:
 
 EncounterLoad_NuzlockeHandler:
 	call IsNuzlocke
-	jr z, .return_immediate	;return if not in nuzlocke mode
+	jp z, .return_immediate	;return if not in nuzlocke mode
 	
 	CheckEvent EVENT_9AF	;update catch symbol & return if the flags have already been handled this battle
 	jr nz, .return
@@ -92,6 +92,15 @@ EncounterLoad_NuzlockeHandler:
 	dec a
 	jr z, .return
 	
+	CheckEvent EVENT_01B	;enforce the catching rule if the player has caught a pokemon this save file
+	jr z, .enforceCatchingRule
+	
+	CheckEvent EVENT_01D	;enforce the catching rule if the player has access to pokeballs this save file
+	jr z, .enforceCatchingRule
+	
+	jr .return
+	
+.enforceCatchingRule	
 	call GetTownMapLocationCoords
 	call GetNuzlockeEncounterMapFlag
 	jr z, .return	;map not found on list of tracked nuzlocke maps

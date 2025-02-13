@@ -29,7 +29,7 @@ const_value = 0
 	const EVENT_DAISY_WALKING                        ; 01A, (D74A, bit 2)
 	const EVENT_01B  ;clear = made at least 1 catch  ; 01B, (D74A, bit 3)	;joenote
 	const EVENT_01C  								 ; 01C, (D74A, bit 4)	;1st route 22 rival beaten on hard mode
-	const EVENT_01D                                  ; 01D, (D74A, bit 5)
+	const EVENT_01D ;clear = access to pokeballs     ; 01D, (D74A, bit 5)	;for nuzlocke mode
 	const EVENT_01E                                  ; 01E, (D74A, bit 6)
 	const EVENT_01F                                  ; 01F, (D74A, bit 7)
 	const EVENT_FOLLOWED_OAK_INTO_LAB_2              ; 020, (D74B, bit 0)

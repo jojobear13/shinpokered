@@ -28,6 +28,14 @@ ViridianCityScript_1900b:
 	predef ShowObject
 .GioNoReload
 ;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - mark if pokeballs are available for nuzlocke purposes
+	CheckEvent EVENT_01D
+	jr z, .next1
+		CheckEvent EVENT_GOT_POKEDEX
+		jr z, .next1
+		ResetEvent EVENT_01D
+.next1
+;;;;;;;;;;;;;;;;;;;;;;;
 	CheckEvent EVENT_VIRIDIAN_GYM_OPEN
 	ret nz
 	ld a, [wObtainedBadges]
