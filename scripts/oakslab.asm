@@ -985,7 +985,7 @@ OaksLabText5:
 ;	cp 2
 ;	jp c, .asm_1d279
 ;joenote - check an event instead of checking the pokedex
-	CheckEvent EVENT_01B
+	CheckEvent EVENT_01B	;if set, the player has thrown any balls
 	jp nz, .asm_1d279
 	
 	CheckEvent EVENT_GOT_POKEDEX
