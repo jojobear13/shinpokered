@@ -112,6 +112,9 @@ ENDC
 	ld a, 1
 	ld [wItemQuantity], a
 	call AddItemToInventory  ; give one potion
+	
+	SetEvent EVENT_01B	;joenote - set a flag to indicate that a pokemon hasn't been caught yet
+	
 	ld a, [wDefaultMap]
 	ld [wDestinationMap], a
 	call SpecialWarpIn

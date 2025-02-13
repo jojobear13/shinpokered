@@ -596,6 +596,13 @@ ItemUseBall:
 	ld hl, ItemUseBallText05
 	call PrintText
 
+; Clear a flag to indicate that the player has caught a pokemon with a ball throw at least once
+	CheckEvent EVENT_01B
+	jr z, .madefirstcatchofgame
+	ResetEvent EVENT_01B
+.madefirstcatchofgame
+
+
 ; Add the caught Pokémon to the Pokédex.
 	predef IndexToPokedex
 	ld a, [wd11e]

@@ -359,6 +359,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Oak's five free pokeballs are now obtained based on never having caught a pokemon with a ball
 - Made japanese patches more accurate to the original, particularly the timing of the intro
 - Added a different emulator check that tests the timing of memory modification opcodes
 - Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
@@ -1195,7 +1196,6 @@ v1.24.1
     - Pokemon that evolve below level 30 will evolve at 4/3x the original level 
     - Pokemon that evolve >= level 30 will evolve at 8/7x the original level 
   - Gym leaders and the E4 scale slightly higher than normal trainers
-  - If trainer scaling is on, you do not need to beat the 1st route 22 rival solo to get oak's pokeballs
   - In hard mode, or against gym leaders, the scaling is based on the absolute highest level of your team
   - In normal difficulty against regular trainers, the scaling is based on a weighted average of your team's levels
   - If level scaling is active, traded pokemon will not become disobedient under the normal badge limits
