@@ -158,6 +158,8 @@ MemModifyInstructions:
 	 db $FF
 
 MemModify_Check_main:
+	 ld a, [rTAC]
+	 push af	;preserve timer control settings
      call init_tima_64
      call Copy_MemTest_to_WRAM
      
@@ -171,9 +173,13 @@ MemModify_Check_main:
 	 cp $FF
      jr   nz, .loop
 .pass
+	 pop af	;get back timer control setting
+     ld [rTAC], a
 	xor a
 	ret
 .fail
+	 pop af	;get back timer control setting
+     ld [rTAC], a
 	ld de, EmuFailText3	;fail
 	coord hl, $00, $0B
 	call PlaceString
