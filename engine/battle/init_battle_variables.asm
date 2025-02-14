@@ -3,9 +3,14 @@ InitBattleVariables:
 	ld [wSavedTilesetType], a
 
 ;joenote - make the trainer pokeballs red
+	ld a, [wIsInBattle]
+	cp 2
 	ld hl, wPlayerHPBarColor
 	ld a, HP_BAR_RED
 	ld [hli], a ; wPlayerHPBarColor
+	jr z, .clearbattlevars	;jump if this is a trainer battle
+	ld a, HP_BAR_GREEN	;set to green if this is a wild battle
+.clearbattlevars
 	ld [hl], a ; wEnemyHPBarColor
 
 	xor a
