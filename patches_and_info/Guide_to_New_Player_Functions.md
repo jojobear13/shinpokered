@@ -777,7 +777,7 @@ Note: Not available in the Lite patches.
 
 - Toggle this mode in the extra options menu.  
 
-- This mode **DOES NOT** check if you have obtained pokeballs yet. It is in full effect when toggled to ON.  
+- This mode now checks if you have had access to pokeballs on the save file.  
   
 #### Rule 1: Pokemon Death  
 - A pokemon that faints is considered dead and can no longer be used.
@@ -797,8 +797,7 @@ Note: Not available in the Lite patches.
   - An "area" is defined by the name displayed on the town map.
   - You will be unable to throw balls in subsequent wild battles in that area.
   - Static wild battles count for this as well.
-  - Wild battles before you can get pokeballs also count.
-  - In light of this, you may want to delay activating nuzlocke mode until pokeballs are available.
+  - Wild battles do not count when early in the game and you have no access to pokeballs.
   - Story wild battles (Old Man tutorial, Ghost Marowak, and Tower Ghosts) do not apply.
   - Pokemon gained outside of battle (gifts, prizes, in-game trades, etc) do not apply.
   
