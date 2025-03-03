@@ -1130,8 +1130,8 @@ RaichuEvosMoves:
 	db 11, TAIL_WHIP
 	db 13, THUNDER_WAVE
 	db 25, SLAM
-	db 31, THUNDERBOLT
-	db 46, THUNDER
+	db 31, THUNDER
+	db 46, REFLECT
 	db 55, LIGHT_SCREEN
 	db 0
 
