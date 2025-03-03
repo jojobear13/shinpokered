@@ -1843,12 +1843,12 @@ StarmieEvosMoves:
 	db 0
 ;joenote-modified for fun
 ; Learnset
-	db 21, WATER_GUN
-	db 26, HARDEN
-	db 31, RECOVER
+	db 17, WATER_GUN
+	db 22, HARDEN
+	db 29, RECOVER
 	db 36, SWIFT
-	db 46, BUBBLEBEAM
-	db 51, REFLECT
+	db 43, BUBBLEBEAM
+	db 50, REFLECT
 	db 0
 
 BulbasaurEvosMoves:
