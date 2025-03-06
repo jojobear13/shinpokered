@@ -1845,10 +1845,10 @@ StarmieEvosMoves:
 ; Learnset
 	db 17, WATER_GUN
 	db 22, HARDEN
-	db 29, RECOVER
-	db 36, SWIFT
-	db 43, BUBBLEBEAM
-	db 50, REFLECT
+	db 31, RECOVER
+	db 38, SWIFT
+	db 47, HYDRO_PUMP
+	db 54, REFLECT
 	db 0
 
 BulbasaurEvosMoves:
