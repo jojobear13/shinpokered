@@ -384,6 +384,7 @@ v1.24.7
 - Added some proper rematch text instead of reusing the slot machine strings
 - Assuming you start a new save, Nuzlocke mode now knows if you're early in the game and have no access to pokeballs
 - Altered the level-up move lists of Starmie and Raichu to work better with Misty and Surge
+- Fixed serial timer problem with syncing battle clauses over link cable
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
