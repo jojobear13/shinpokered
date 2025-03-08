@@ -8021,6 +8021,13 @@ _LoadTrainerPic:
 	and a
 	ld a, Bank(TrainerPics) ; this is where all the trainer pics are (not counting Red's)
 	jr z, .loadSprite
+IF DEF(_FPLAYER)	;joenote - support female trainer over link
+	CheckEvent EVENT_LINKED_FPLAYER
+	jr z, .next
+	ld a, bank(RedPicFFront)
+	jr .loadSprite
+.next
+ENDC
 	ld a, Bank(RedPicFront)
 .loadSprite
 	call UncompressSpriteFromDE

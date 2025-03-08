@@ -3121,6 +3121,12 @@ GetTrainerInformation::
 .linkBattle
 	ld hl, wTrainerPicPointer
 	ld de, RedPicFront
+IF DEF(_FPLAYER)	;joenote - support female trainer over link
+	CheckEvent EVENT_LINKED_FPLAYER
+	jr z, .next
+	ld de, RedPicFFront
+.next
+ENDC
 	ld [hl], e
 	inc hl
 	ld [hl], d

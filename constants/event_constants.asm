@@ -2262,7 +2262,11 @@ const_value = 0
 	const EVENT_8D3                                  ; 8D3, (D861, bit 3)
 	const EVENT_8D4                                  ; 8D4, (D861, bit 4)
 	const EVENT_8D5                                  ; 8D5, (D861, bit 5)
+IF DEF(_FPLAYER)
+	const EVENT_LINKED_FPLAYER                       ; 8D6, (D861, bit 6)	;if set, the link cable partner is female trainer
+ELSE
 	const EVENT_8D6                                  ; 8D6, (D861, bit 6)
+ENDC
 	const EVENT_8D7     ;true wild randomization     ; 8D7, (D861, bit 7)
 	const EVENT_8D8     ;randomize normal trainers   ; 8D8, (D862, bit 0)	;joenote
 	const EVENT_8D9     ;catch-up exp boost          ; 8D9, (D862, bit 1)
