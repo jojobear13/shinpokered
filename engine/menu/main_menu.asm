@@ -444,10 +444,18 @@ ShinPokemonHandshake:
 	inc hl	;otherwise increment to the next digit and loop.
 	jr .loop	
 .fail
+	xor a
+	ld hl, wUnknownSerialCounter
+	ld [hli], a
+	ld [hl], a
 	pop hl
 	pop af
 	jp LinkMenu.choseCancel
 .pass
+	xor a
+	ld hl, wUnknownSerialCounter
+	ld [hli], a
+	ld [hl], a
 	pop hl
 	pop af
 	jp LinkMenu.next

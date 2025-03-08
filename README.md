@@ -359,7 +359,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
-- Altered the level-up move lists of Starmie and Raichu to work better with Misty and Surge
+- Fixed a serial timer problem with the link cable version verification
 - Oak's five free pokeballs are now obtained based on never having caught a pokemon with a ball
 - Made japanese patches more accurate to the original, particularly the timing of the intro
 - Added a different emulator check that tests the timing of memory modification opcodes
@@ -383,6 +383,7 @@ v1.24.7
 - Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
 - Added some proper rematch text instead of reusing the slot machine strings
 - Assuming you start a new save, Nuzlocke mode now knows if you're early in the game and have no access to pokeballs
+- Altered the level-up move lists of Starmie and Raichu to work better with Misty and Surge
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
