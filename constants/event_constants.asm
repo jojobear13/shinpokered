@@ -297,7 +297,7 @@ const_value = 0
 	const EVENT_126                                  ; 126, (D76B, bit 6)
 	const EVENT_127                                  ; 127, (D76B, bit 7)
 	const EVENT_GOT_POKE_FLUTE                       ; 128, (D76C, bit 0)
-	const EVENT_129   ;Fuji gave MGENE                               ; 129, (D76C, bit 1)	;joenote - for free mgene item
+	const EVENT_129   ;Fuji gave MGENE               ; 129, (D76C, bit 1)	;joenote - for free mgene item
 	const EVENT_12A                                  ; 12A, (D76C, bit 2)
 	const EVENT_12B                                  ; 12B, (D76C, bit 3)
 	const EVENT_12C                                  ; 12C, (D76C, bit 4)
@@ -739,8 +739,8 @@ const_value = 0
 	const EVENT_GAVE_FOSSIL_TO_LAB                   ; 2E0, (D7A3, bit 0)
 	const EVENT_LAB_STILL_REVIVING_FOSSIL            ; 2E1, (D7A3, bit 1)
 	const EVENT_LAB_HANDING_OVER_FOSSIL_MON          ; 2E2, (D7A3, bit 2)
-	const EVENT_2E3   ;gave gene sample to lab                               ; 2E3, (D7A3, bit 3)	;joenote - for cloning
-	const EVENT_2E4   ;still gestating pokemon                               ; 2E4, (D7A3, bit 4)
+	const EVENT_2E3   ;gave gene sample to lab       ; 2E3, (D7A3, bit 3)	;joenote - for cloning
+	const EVENT_2E4   ;still gestating pokemon       ; 2E4, (D7A3, bit 4)
 	const EVENT_2E5                                  ; 2E5, (D7A3, bit 5)
 	const EVENT_2E6                                  ; 2E6, (D7A3, bit 6)
 	const EVENT_2E7                                  ; 2E7, (D7A3, bit 7)
@@ -2249,7 +2249,7 @@ const_value = 0
 	const EVENT_8C6   ;defeated seafoam missingno    ; 8C6, (D85F, bit 6)
 	const EVENT_8C7   ;used for shimmer feature      ; 8C7, (D85F, bit 7)
 	const EVENT_8C8   ;activate hyper beam clause    ; 8C8, (D860, bit 0)
-	const EVENT_8C9                                  ; 8C9, (D860, bit 1)
+	const EVENT_8C9   ;alt enemy trainer moves       ; 8C9, (D860, bit 1)
 	const EVENT_8CA                                  ; 8CA, (D860, bit 2)
 	const EVENT_8CB                                  ; 8CB, (D860, bit 3)
 	const EVENT_8CC                                  ; 8CC, (D860, bit 4)
