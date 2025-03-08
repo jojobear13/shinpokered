@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Fixed a serial timer problem with the link cable version verification
 - Oak's five free pokeballs are now obtained based on never having caught a pokemon with a ball
 - Made japanese patches more accurate to the original, particularly the timing of the intro
 - Added a different emulator check that tests the timing of memory modification opcodes
