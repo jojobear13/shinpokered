@@ -407,6 +407,18 @@ ShinPokemonHandshake:
 	ld [hl], a
 	ld [wSerialExchangeNybbleSendData], a
 	call Serial_PrintWaitingTextAndSyncAndExchangeNybble
+	;Check wUnknownSerialCounter. If FFFF is there, then the connection timed out.
+	ld hl, wUnknownSerialCounter
+	ld a, [hli]
+	inc a
+	jr nz, .connected
+	ld a, [hl]
+	inc a
+	jr nz, .connected
+	jr .fail
+.connected
+	;wSerialExchangeNybbleReceiveData holds the nybble recieved from the other game.
+	;This defaults to FF to indicate that no information was recieved.
 	ld a, [wSerialExchangeNybbleReceiveData]
 	and a
 	jr nz, .fail
