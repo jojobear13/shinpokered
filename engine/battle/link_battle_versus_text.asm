@@ -19,5 +19,10 @@ DisplayLinkBattleVersusTextBox:
 	xor a
 	ld [wUpdateSpritesEnabled], a
 	callab SetupPlayerAndEnemyPokeballs
+
+;	gbcnote - set a generic palette since once is not defined by the pokeyellow localizers
+	ld b, SET_PAL_GENERIC
+	call RunPaletteCommand
+
 	ld c, 150
 	jp DelayFrames
