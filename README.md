@@ -72,6 +72,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- The VS pokeballs in link battles have defined palettes now instead of whatever is in memory
 - If the female trainer option is compiled, a female link partner will have corresponding graphics
 - Fixed a serial timer problem with the link cable version verification
 - Oak's five free pokeballs are now obtained based on never having caught a pokemon with a ball
