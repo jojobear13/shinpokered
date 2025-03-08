@@ -445,6 +445,23 @@ ShinPokemonHandshake:
 	pop af
 	jp LinkMenu.choseCancel
 .pass
+IF DEF(_FPLAYER)
+;One more thing. Exchange if you are a male or female trainer with the other game.
+	ResetEvent EVENT_LINKED_FPLAYER
+	ld a, [wUnusedD721]
+	and $0F
+	ld [wSerialExchangeNybbleSendData], a	;load the digit to be sent over link
+	ld a, $ff
+	ld [wSerialExchangeNybbleReceiveData], a	;default the recieved data to FF
+	call Serial_SyncAndExchangeNybble
+	ld a, [wSerialExchangeNybbleReceiveData]
+	cp $ff
+	jr z, .fail
+	bit 0, a	;check bit 0 that was sent to tell if other trainer is female or not
+	jr z, .pass_exchanged
+	SetEvent EVENT_LINKED_FPLAYER
+.pass_exchanged
+ENDC
 	xor a
 	ld hl, wUnknownSerialCounter
 	ld [hli], a
@@ -452,7 +469,11 @@ ShinPokemonHandshake:
 	pop hl
 	pop af
 	jp LinkMenu.next
-HandshakeList:	;this serves as a version control passcode with FF as an end-of-list marker
+	
+HandshakeList:	
+;This serves as a version control passcode.
+;Each digit of the passcode is one nybble.
+;FF is used as an end-of-list marker.
 	db $1
 	db $2
 	db $4
