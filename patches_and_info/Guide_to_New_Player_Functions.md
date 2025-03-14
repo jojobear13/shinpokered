@@ -1234,8 +1234,8 @@ Pokemon that have had moves added to their learn-lists or changed levels at whic
   - L11, TAIL WHIP added
   - L13, THUNDER WAVE added
   - L25, SLAM added
-  - L31, THUNDERBOLT added
-  - L46, THUNDER added
+  - L31, THUNDER added
+  - L46, REFLECT added
   - L55, LIGHT SCREEN added
 - Tangela
   - L27, ABSORB
@@ -1246,9 +1246,9 @@ Pokemon that have had moves added to their learn-lists or changed levels at whic
   - L21, WATER GUN added
   - L26, HARDEN added
   - L31, RECOVER added
-  - L36, SWIFT added
-  - L46, BUBBLEBEAM added
-  - L51, REFLECT added
+  - L38, SWIFT added
+  - L47, HYDRO PUMP added
+  - L54, REFLECT added
 - Vaporeon
   - L8, SAND ATTACK added
   - L16, GROWL added
