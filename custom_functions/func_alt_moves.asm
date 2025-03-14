@@ -1,10 +1,6 @@
 ; writes the moves a mon has at level [wCurEnemyLVL] to [de]
 ; move slots are being filled up sequentially and shifted if all slots are full
 WriteMonMoves_Alt:
-	call GetPredefRegisters
-	push hl
-	push de
-	push bc
 	ld hl, EvosMovesPointerTable_Alt
 	ld b, 0
 	ld a, [wcf91]  ; cur mon ID
@@ -116,9 +112,6 @@ WriteMonMoves_Alt:
 	jr .nextMove
 
 .done
-	pop bc
-	pop de
-	pop hl
 	ret
 
 ; shifts all move data one up (freeing 4th move slot)
@@ -2382,3 +2375,269 @@ VictreebelEvosMoves_Alt:
 	db 37, ACID
 	db 44, RAZOR_LEAF
 	db 0
+
+	
+;Format Explanation:
+;	FD is the terminator for custom moves
+;	FE is the terminator for each trainer class entry
+;	FF is the terminator for the whole list
+;
+;A Class entry looks like this:
+;	db <trainer class>, <class instance>
+;	db <species instance>, <species>, <move to add>, ..., $FD
+;	db ...
+;	db $FE
+;
+;	<trainer class> = Constant of the trainer class to be affected.
+;
+;	<class instance> = Instance of the class to be affected. 
+;	Like how there are multiple instances of the champion rival depending on starter chosen.
+;	If this is 0, then the moves will be applied to the trainer class regardless of instance.
+;
+;	<species instance> = 1st, 2nd, 3rd, etc, occurance of a pokemon species on the trainer's team.
+;	If this is 0, then the moves will be applied to every one of that species on the trainer's team.
+;
+;	<species> = Constant of the pokemon species to be affected.
+;
+;	<move to add> = Constant of the move to be added.
+;	Moves that are already known are skipped.
+;	Moves will go into unoccupied move slots first.
+;	If all move slots are filled...
+;		The first move is erased and the other three moves are shifted upwards.
+;		The new move is then slotted into the fourth move slot.
+SpecialTrainerMoves_ALT:	
+	db BROCK, 1
+	db 1, ONIX, BIDE, $FD
+	db $FE
+	
+	db MISTY, 1
+	db 1, STARMIE, BUBBLEBEAM, $FD
+	db $FE
+	
+	db LT_SURGE, 1
+	db 1, RAICHU, THUNDERBOLT, $FD
+	db $FE
+	
+	db ERIKA, 1
+	db 1, VILEPLUME, PETAL_DANCE, MEGA_DRAIN, $FD
+	db $FE
+	
+	db KOGA, 1
+	db 1, WEEZING, TOXIC, $FD
+	db $FE
+	
+	db SABRINA, 1
+	db 1, ALAKAZAM, PSYWAVE, $FD
+	db $FE
+	
+	db BLAINE, 1
+	db 1, ARCANINE, FIRE_BLAST, $FD
+	db $FE
+	
+	db GIOVANNI, 3
+	db 1, DUGTRIO, FISSURE, $FD
+	db $FE
+	
+	db LORELEI, 1
+	db 1, LAPRAS, BLIZZARD, $FD
+	db $FE
+	
+	db BRUNO, 1
+	db 0, ONIX, FISSURE, $FD
+	db $FE
+	
+	db AGATHA, 1
+	db 2, GENGAR, TOXIC, $FD
+	db $FE
+	
+	db LANCE, 1
+	db 1, DRAGONITE, BARRIER, $FD
+	db $FE
+	
+	db SONY3, 0
+	db 1, VENUSAUR, MEGA_DRAIN, $FD
+	db 1, BLASTOISE, BLIZZARD, $FD
+	db 1, CHARIZARD, FIRE_BLAST, $FD
+	db $FE
+	
+	db $FF
+	
+	
+	
+TrainerCustomMoves:	
+	ld hl, SpecialTrainerMoves_ALT
+.load_class
+	ld a, [hl]
+	cp $FF
+	jr z, .return
+	ld a, [wTrainerClass]
+	cp [hl]	;compare to list trainer class
+	jr nz, .loop
+	call TrainerCustomMoves_TrainerNum
+.loop
+	ld a, [hli]
+	cp $FE
+	jr nz, .loop
+	jr .load_class
+.return
+	ret
+	
+	
+TrainerCustomMoves_TrainerNum:
+	inc hl	;point to list trainer number
+.load_num
+	ld a, [hl]
+	and a
+	jr z, .next	;an instance of zero treated as 'any'
+	ld a, [wTrainerNo]
+	cp [hl]
+	ret nz
+.next
+	call TrainerCustomMoves_Mon
+	ret
+
+	
+TrainerCustomMoves_Mon:
+	inc hl	;point to instance of species
+
+.load_instance
+	ld a, [hl]
+	cp $FE
+	ret z
+	ld a, [hli]
+	ld b, a
+	ld d, h
+	ld e, l
+	inc hl
+	;note - hl now points to first desired move
+	;note - de now points to desired species
+	;note - b now tracks the species instance
+	push hl
+
+	ld a, [wEnemyPartyCount]
+	ld c, a
+	ld hl, wEnemyMon1Species
+	;note - c now tracks the party position
+
+.loop
+	ld a, [de]
+	cp [hl]
+	call z, TrainerCustomMoves_Mon_Found
+	dec c
+	jr z, .end_party_search
+.party_search
+	push bc
+	ld bc, wEnemyMon2Species - wEnemyMon1Species
+	add hl, bc
+	pop bc
+	;HL now points to wEnemyMonXSpecies
+	jr .loop
+
+.end_party_search
+	pop hl	;note - hl now points to first desired move
+	
+.end_party_search_loop
+	ld a, [hli]
+	cp $FD
+	jr nz, .end_party_search_loop
+	
+	jr .load_instance
+
+
+TrainerCustomMoves_Mon_Found:
+;DE points to desired species
+;HL points to wEnemyMonXSpecies
+;B  tracks species instance
+;C  tracks party position - do not clobber
+	ld a, b
+	and a
+	jr z, .mon_load_moves	;if 0-value instance, start loading moves for the mon regardless of real instance
+	dec b
+	ret nz	;return if not the correct instance
+	;if correct instance, start loading moves for the mon
+	; also set B to a dummy value > PARTY_LENGTH
+	dec b	;make B = FF as a dummy value
+	
+.mon_load_moves
+	push de
+	push hl
+	ld a, d
+	ld d, h
+	ld h, a
+	ld a, e
+	ld e, l
+	ld l, a
+	inc hl
+	;de points to the proper wEnemyMonXSpecies
+	;hl points to first desired move
+.mon_load_moves_loop
+	ld a, [hli]
+	cp $FD
+	jr z, .done
+	;note - A holds the move we want to slot into the pokemon
+	call TrainerCustomMoves_AddMove
+	jr .mon_load_moves_loop
+.done
+	pop hl
+	pop de
+	ret
+
+	
+TrainerCustomMoves_AddMove:	
+;DE points to wEnemyMonXSpecies
+;HL points to the desired move + 1
+;B  tracks species instance - do not clobber
+;C  tracks party position - do not clobber
+;A  equals the desired move
+	push bc
+	push hl	
+
+	ld h, d
+	ld l, e
+	ld bc, wEnemyMon1Moves - wEnemyMon1Species
+	add hl, bc
+
+	;hl now points to wEnemyMonXMoves
+	push hl	
+
+	ld b, a
+	ld c, NUM_MOVES
+.loop
+	ld a, [hl]
+	cp b
+	jr z, .return	;return if the move is already known
+	and a
+	jr z, .copy_move	;add the move if a slot is open
+	inc hl
+	dec c
+	jr nz, .loop
+
+	;loop for shifting move list
+	ld c, NUM_MOVES-1
+	pop hl
+	push hl
+.loop2
+	inc hl
+	ld a, [hld]
+	ld [hli], a
+	dec c
+	jr nz, .loop2
+
+.copy_move
+	ld a, b
+	ld [hl], a
+.return
+	pop hl
+	pop hl
+	pop bc
+	ret
+
+
+
+
+
+
+
+
+
+	

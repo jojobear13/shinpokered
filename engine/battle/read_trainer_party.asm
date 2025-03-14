@@ -188,6 +188,20 @@ ReadTrainer:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .AddAdditionalMoveData
 ; does the trainer have additional move data?
+
+	CheckEvent EVENT_8C9
+	jr z, .YellowMethodMoveData
+;If event set, use alternate move list
+	push hl
+	push bc
+	push de
+	callba TrainerCustomMoves
+	pop de
+	pop bc
+	pop hl
+	jr .FinishUp
+	
+.YellowMethodMoveData	
 	ld a, [wTrainerClass]
 	ld b, a
 	ld a, [wTrainerNo]

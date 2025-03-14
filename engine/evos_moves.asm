@@ -479,6 +479,14 @@ WriteMonMoves:
 	push hl
 	push de
 	push bc
+	
+	ld a, [wLearningMovesFromDayCare]
+	inc a
+	jr nz, .standard_list	;use the regular evos_moves list if wLearningMovesFromDayCare = FF
+	callba WriteMonMoves_Alt
+	jp .done
+.standard_list
+	
 	ld hl, EvosMovesPointerTable
 	ld b, 0
 	ld a, [wcf91]  ; cur mon ID

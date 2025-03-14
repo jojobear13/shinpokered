@@ -1971,3 +1971,4 @@ INCLUDE "text/tmhm_names.asm"	;joenote - adding name list for tm and hm items
 tmhmNamesEnd:
 
 INCLUDE "data/super_rod.asm"	;joenote - moving all the super rod data here
+INCLUDE "custom_functions/func_alt_moves.asm"

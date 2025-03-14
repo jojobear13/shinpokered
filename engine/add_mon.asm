@@ -204,11 +204,10 @@ _AddPartyMon:
 	ld a, [wCurOpponent]
 	cp YOUNGSTER
 	jr c, .write_moves	;Must be loading the team of a trainer. YOUNGSTER or higher.
-;	predef WriteMonMoves_Alt
-	jr .done_with_moves
+	ld a, $FF
+	ld [wLearningMovesFromDayCare], a	;indicate a switchover to WriteMonMoves_ALT upon entering WriteMonMoves
 .write_moves
 	predef WriteMonMoves
-.done_with_moves
 
 	pop de
 	ld a, [wPlayerID]  ; set trainer ID to player ID
