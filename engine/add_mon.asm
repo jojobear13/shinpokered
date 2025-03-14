@@ -208,6 +208,8 @@ _AddPartyMon:
 	ld [wLearningMovesFromDayCare], a	;indicate a switchover to WriteMonMoves_ALT upon entering WriteMonMoves
 .write_moves
 	predef WriteMonMoves
+	xor a
+	ld [wLearningMovesFromDayCare], a	;reset wLearningMovesFromDayCare
 
 	pop de
 	ld a, [wPlayerID]  ; set trainer ID to player ID

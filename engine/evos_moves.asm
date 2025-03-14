@@ -482,8 +482,8 @@ WriteMonMoves:
 	
 	ld a, [wLearningMovesFromDayCare]
 	inc a
-	jr nz, .standard_list	;use the regular evos_moves list if wLearningMovesFromDayCare = FF
-	callba WriteMonMoves_Alt
+	jr nz, .standard_list	;joenote - use the regular evos_moves list if wLearningMovesFromDayCare = FF
+	callba WriteMonMoves_Alt			;else use the alternate level-up lists
 	jp .done
 .standard_list
 	
