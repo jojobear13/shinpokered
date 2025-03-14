@@ -43,9 +43,14 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 
 - **Certain emulators are known to cause bugs due to inaccuracies in replicating the original hardware**
   - An accurate emulator, preferably a GBC-dedicated emulator, is required in order to avoid unexpected bugs
-  - Goomba and Visual Boy Advance in particular are known to be problematic
-  - BGB is the supported standard due to its accuracy and debugging tools
   - There are error messages that may display on the initial menu if there is an emulator error detected
+  - Goomba, Visual Boy Advance, and VBA-M in particular are known to be problematic
+- **Known good emulators:**
+  - BGB is the supported standard due to its combination of accuracy and debugging tools
+  - mGBA also works very well
+  - The 3DS Virtual Console emulator might throw an error message but it is known to be fine
+  - Delta emulator for those on iOS devices
+  - The Gambatte core for Retroarch should be good for Android devices
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
   - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
@@ -63,7 +68,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
   - Link battling between a lite branch build and any other non-lite branch build
   - Link battling between builds of dissimilar revisions
 - A revision control function has been added that will cancel unsupported cable links
-- Link functions via 3DS hardware and its Virtual Console emulator are not supported at this time
+- Link functions via 3DS hardware and its Virtual Console emulator are not supported
 
 
 #Changelog From the Last Full Release
