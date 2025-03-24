@@ -177,6 +177,7 @@ AIMoveChoiceModification1:
 	inc de
 	call ReadMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.checkBadMoves
 ;joenote - do not use effects that end battle because this is a trainer battle and they do not work
 	ld a, [wEnemyMoveEffect]	;load the move effect
 	cp SWITCH_AND_TELEPORT_EFFECT	;see if it is a battle-ending effect
@@ -184,6 +185,11 @@ AIMoveChoiceModification1:
 ;and dont try to use splash either
 	cp SPLASH_EFFECT	
 	jp z, .heavydiscourage
+;rage kind of sucks even though it does something, so slightly discourage it
+	cp RAGE_EFFECT
+	jr nz, .endBadMoves
+	inc [hl]
+.endBadMoves
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use dream eater if enemy not asleep, otherwise encourage it
