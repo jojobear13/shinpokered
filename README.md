@@ -364,9 +364,6 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
-- AI tweaks:
-  - Rage is slightly discouraged
-  - Exploding moves slightly biased towards having lower HP
 - The VS pokeballs in link battles have defined palettes now instead of whatever is in memory
 - If the female trainer option is compiled, a female link partner will have corresponding graphics
 - Fixed a serial timer problem with the link cable version verification
