@@ -77,6 +77,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Engine now supports up to 255 predefs instead of 127
 - Rage is slightly discouraged in AI Layer 1
 - The VS pokeballs in link battles have defined palettes now instead of whatever is in memory
 - If the female trainer option is compiled, a female link partner will have corresponding graphics
@@ -757,6 +758,7 @@ v1.24.1
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
   - Status Screen now prints types from party struct data instead of species header
   - The menu for field moves can now support up to five field moves for developer purposes.
+  - Engine now supports up to 255 predefs instead of 127
   
 
 #Credits / Special Thanks
