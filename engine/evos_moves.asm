@@ -526,6 +526,8 @@ WriteMonMoves:
 
 ; check if the move is already known
 	push de
+	call CheckForBumpingSameMove	;joenote - extra functionality
+	jr nz, .alreadyKnowsCheckLoop_end
 	ld c, NUM_MOVES
 .alreadyKnowsCheckLoop
 	ld a, [de]
@@ -534,6 +536,7 @@ WriteMonMoves:
 	jr z, .nextMove
 	dec c
 	jr nz, .alreadyKnowsCheckLoop
+.alreadyKnowsCheckLoop_end
 
 ; try to find an empty move slot
 	pop de
@@ -807,6 +810,42 @@ PrepareRelearnableMoveList:
 	ld [hl], c
 	ret
 ENDC
+
+
+;joenote - This function makes it so that if a move is in the first slot you can bump it out with itself in a learn list 
+CheckForBumpingSameMove:
+;DE points to first move slot on the pokemon
+;HL points to move on the learn list
+;return with z flag set if the move on the learn list is to be ignored
+;return with z flag cleared if the learn list move is... 
+;	- the same as the 1st move slot
+;	- and all four move slots are full
+;	- and the intent is to bump the move out of the 1st move slot and slide the same move into the 4th slot
+	push de
+	;increment to 4th move slot
+	inc de
+	inc de
+	inc de
+	;return if this slot is $00, since it means the slots are not all full
+	ld a, [de]
+	and a
+	jr z, .return
+	;else all the slots are full, so point back to the first slot
+	pop de
+	push de
+	;see if the list move and the 1st slot move are the same
+	ld a, [de]
+	cp [hl]
+	jr z, .clear_z_flag
+	xor a
+	jr .return
+.clear_z_flag
+	ld a, 1
+	and a
+.return
+	pop de
+	ret
+
 	
 ;joenote - make it so a message is printed if the level requirement for an item evolution is not met
 _NeededLevelText:

@@ -364,6 +364,9 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- AI tweaks:
+  - Rage is slightly discouraged
+  - Exploding moves slightly biased towards having lower HP
 - The VS pokeballs in link battles have defined palettes now instead of whatever is in memory
 - If the female trainer option is compiled, a female link partner will have corresponding graphics
 - Fixed a serial timer problem with the link cable version verification
@@ -392,6 +395,9 @@ v1.24.7
 - Assuming you start a new save, Nuzlocke mode now knows if you're early in the game and have no access to pokeballs
 - Altered the level-up move lists of Starmie and Raichu to work better with Misty and Surge
 - Fixed serial timer problem with syncing battle clauses over link cable
+- Some Cueball teams include Pinsir
+- Biker teams can now include Beedrill, Magmar, an Electrode, and more Voltorbs
+- Fixed an issue where enemy level-up moves were being skipped
 
 v1.24.6(hotfix 3)
 - Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box

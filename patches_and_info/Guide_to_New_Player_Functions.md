@@ -934,6 +934,8 @@ Note: These are not applicable to the Lite patches.
   - Lvl 38 juggler in Fuchsia gym exchanges his hypno for two exeggute
   - Lvl 36 blackbelt in the dojo exchanges his primape for poliwrath
   - Dojo master increased to level 38
+  - Some cueball teams include pinsir
+  - Biker teams now include beedrill, magmar, an electrode, and more voltorbs
   
 #### Rival / Gym Leader / Elite 4 Guide  
 - Route 22 Rival
