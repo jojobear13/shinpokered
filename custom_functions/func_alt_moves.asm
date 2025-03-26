@@ -1928,7 +1928,7 @@ SpecialTrainerMoves_ALT:
 	db $FE
 	
 	db BRUNO, 1
-	db 0, ONIX, FISSURE, $FD
+	db 1, ONIX, FISSURE, ROCK_SLIDE, $FD
 	db $FE
 	
 	db AGATHA, 1
