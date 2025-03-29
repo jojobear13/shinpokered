@@ -364,6 +364,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- On AI Layer 1, biased preference for exploding more towards lower HP
 - Engine now supports up to 255 predefs instead of 127
 - Rage is slightly discouraged in AI Layer 1
 - The VS pokeballs in link battles have defined palettes now instead of whatever is in memory

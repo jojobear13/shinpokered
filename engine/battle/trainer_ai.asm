@@ -245,13 +245,11 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Heavily discourage healing or exploding moves if HP is full. Encourage if hp is low
-;Exploding has a slight preference over healing because overall this hurts the player more than the AI
 	ld a, [wEnemyMoveEffect]	;load the move effect
 	cp HEAL_EFFECT	;see if it is a healing move
 	jr z, .heal_explode	;skip out if move is not
 	cp EXPLODE_EFFECT	;what about an explosion effect?
 	jr nz, .not_heal_explode	;skip out if move is not
-	dec [hl]	;otherwise give a slight edge to exploding
 	
 	;since this is an explosion effect, it would be good to heavily discourage if
 	;the opponent is in fly/dig state and the exploder is for-sure faster than the opponent
@@ -264,16 +262,16 @@ AIMoveChoiceModification1:
 .heal_explode
 	ld a, 1	;
 	call AICheckIfHPBelowFraction
-	jp nc, .heavydiscourage	;heavy discourage if hp at max (heal +5 & explode +4)
-	inc [hl]	;1/2 hp to max hp - slight discourage (heal +1 & explode +0)
+	jp nc, .heavydiscourage	;heavy discourage if hp at max (heal +5 & explode +5)
+	inc [hl]	;1/2 hp to max hp - slight discourage (heal +1 & explode +1)
 	ld a, 2	;
 	call AICheckIfHPBelowFraction
 	jp nc, .nextMove	;if hp is 1/2 or more, get next move
-	dec [hl]	;else 1/3 to 1/2 hp - neutral (heal 0 & explode -1)
+	dec [hl]	;else 1/3 to 1/2 hp - neutral (heal 0 & explode 0)
 	ld a, 3	;
 	call AICheckIfHPBelowFraction
 	jp nc, .nextMove	;if hp is 1/3 or more, get next move
-	dec [hl]	;else 0 to 1/3 hp - slight preference (heal -1 & explode -2)
+	dec [hl]	;else 0 to 1/3 hp - slight preference (heal -1 & explode -1)
 	jp .nextMove	;get next move
 .not_heal_explode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
