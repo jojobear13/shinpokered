@@ -1159,7 +1159,12 @@ AnyEnemyPokemonAliveCheck:
 ReplaceFaintedEnemyMon:
 	ld hl, wEnemyHPBarColor
 ;	ld e, $30	;get health bar palette of an HP bar E pixels long.
-	ld e, 0	;joenote - make the trainer pokeballs red
+
+	;joenote - make the trainer pokeballs red
+	ld a, HP_BAR_GREEN
+	ld [hl], a	;reset the enemy HP bar to green because GetBattleHealthBarColor only works on differing colors
+	ld e, 0	;now prepare to load the color for a 0-pixel health bar (that being red)
+
 	call GetBattleHealthBarColor
 	ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
 	ld [rOBP0], a
@@ -2282,6 +2287,9 @@ DrawEnemyHUDAndHPBar:
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ld hl, wEnemyHPBarColor
 
+;get the current health bar color in B
+;get the new health bar color in A
+;update the health bar color if they are not the name
 GetBattleHealthBarColor:
 	ld b, [hl]
 	call GetHealthBarColor
