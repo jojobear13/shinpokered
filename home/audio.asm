@@ -120,8 +120,15 @@ PlayMusic::
 	jp PlaySound
 
 StopAllMusic::
+	;joenote - StopAllMusic should immediately stop ALL music and not care if a text SFX is playing
+	ld a, [hFlagsFFFA]
+	res 2, a
+	ld [hFlagsFFFA], a
+
 	ld a, $FF
 	ld [wNewSoundID], a
+	;fall through
+	
 ; plays music specified by a. If value is $ff, music is stopped
 PlaySound::
 	push hl
