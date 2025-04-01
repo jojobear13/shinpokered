@@ -160,10 +160,10 @@ AIMoveChoiceModification1:
 	bit 2, a
 	ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wBattleMonStatus]
-	and a
-	;joenote - don't return yet. going to check for dream eater. will do this later
-	;ret z ; return if no status ailment on player's mon
+;	ld a, [wBattleMonStatus]
+;	and a
+;	ret z ; return if no status ailment on player's mon
+;joenote - don't return yet. going to check for dream eater. will do this later
 	ld hl, wBuffer - 1 ; temp move selection array (-1 byte offset)
 	ld de, wEnemyMonMoves ; enemy moves
 	ld b, NUM_MOVES + 1
@@ -760,6 +760,13 @@ AIMoveChoiceModification3:
 	bit 2, a
 	ret nz
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - If player switched pokemon, do not run AIMoveChoiceModification3.
+;			This is because the AI opponent should not have perfect knowledge of the pokemon sent in.
+;			It will have to simply pick a move without the benefit of knowing the player 'mon information.
+	ld a, [wActionResultOrTookBattleTurn]
+	cp $A
+	ret z
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, wBuffer - 1 ; temp move selection array (-1 byte offset)
 	ld de, wEnemyMonMoves ; enemy moves
 	ld b, NUM_MOVES + 1
@@ -877,15 +884,16 @@ AIMoveChoiceModification3:
 .specialBPend
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;90.625% chance per move that AI is blind to the player switching, so treat the move as neutrally effective
-	ld a, [wActionResultOrTookBattleTurn]
-	cp $A
-	jr nz, .blind_end
-	call Random
-	cp 232
-	jr c, .neutral_effective	; if <, treat move as neutral damage
-	;else proceed as normal
-.blind_end
+;	;90.625% chance per move that AI is blind to the player switching, so treat the move as neutrally effective
+;	commented out because a different solution is used higher up
+;	ld a, [wActionResultOrTookBattleTurn]
+;	cp $A
+;	jr nz, .blind_end
+;	call Random
+;	cp 232
+;	jr c, .neutral_effective	; if <, treat move as neutral damage
+;	;else proceed as normal
+;.blind_end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - heavily discourage attack moves that have no effect due to typing

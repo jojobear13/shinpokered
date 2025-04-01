@@ -77,6 +77,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- AI Layer 3 will no longer run on the turn a player switches in order to keep battle information from the AI
 - Fixed a rare infinite loop caused by a text SFX playing right at the end of an audio fadeout
 - On AI Layer 1, biased preference for exploding more towards lower HP
 - Engine now supports up to 255 predefs instead of 127
@@ -664,11 +665,10 @@ v1.24.1
     - Wherein a physical move is being used on a 'mon with greater special than attack stat
   - Slightly discourage a move 25% of the time if it hits neutral with no STAB
   - The enemy is blind to the player type if considering a poisoning effect move and the player just switched
-  - 90.625% chance per damaging move that AI is blind to player type after player switches
+  - AI is blind to player type when the player switches 
     - Prevents situations where AI will always pick the ideal move against a switch-in
-	- 'Blind' in this case means the AI will act as if the move being considered has neutral effectiveness
-	- The AI might still favor a STAB move or a move that works better with its own stats
-
+    - 'Blind' in this case means the AI will act as if its moves are all equally effective
+ 
 - Trainer ai routine #4 is no longer unused. It now does rudimentary trainer switching.
   - AI will not switch if its HP is below 25% as it's ususally not worth it 
   - chance to switch based on power of incoming supereffective move
