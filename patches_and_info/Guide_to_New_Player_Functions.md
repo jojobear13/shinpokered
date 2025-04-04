@@ -1354,5 +1354,10 @@ Here are some freshly-baked cheat codes unique to Shin Pokemon.
   - 010042DA: If your play-clock was maxed at 255 from a previous save file, this will unlock the expanded game clock.  
   - 0180C4CF: The next encounter will be a shiny pokemon.
   - 01xx21D7: Resets the options and changes the player graphics to male (xx=00) or female (xx=01).
+  - 010472D1: Erases the Nuzlocke death flag for the Pokemon in your first team slot.
 
-
+#### Force Grayscale  
+It is possible, for whatever reason, to force Shin Pokemon to play in grayscale color all the time.  
+This can be done with some hex editing directly on the rom file.  
+Change both address 0x0143 and address 0x0151 to the value of 00.  
+This will force the rom file to operate as an old DMG game with no GBC features.  
