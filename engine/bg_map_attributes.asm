@@ -1,34 +1,38 @@
 LoadBGMapAttributes::
+;D = number of the attribute packet (1-indexed)
 	ld hl, BGMapAttributesPointers
 	ld c, d
 	ld a, c ; c = which packet
 	push af ; save for later (to determine if we're handling the trainer card or party menu)
-	dec a         ; read this code as:
-	add a         ;	dec a
-	ld e, a       ; add a
-	xor a         ; ld e, a
+				; read this code as:
+	dec a         ;	dec a
+	add a         ; add a
+	ld e, a       ; ld e, a
+	xor a         
 	ld d, a       ; ld d, 0
 	add hl, de    ; add hl, de
+;HL = points to packet location offset from BGMapAttributesPointers
 	ld a, [hli]   ; ld a, [hli]
 	ld e, a       ; ld h, [hl]
 	ld a, [hl]    ; ld l, a
 	ld h, a
 	ld a, e
 	ld l, a
-
-	di
+;HL = packet address
+	
+	di	;disable interurpts
 	ld a, $1
-	ld [rVBK], a
-	push hl
-	ld a, [hl]
+	ld [rVBK], a	;change to vram bank 1
+	push hl		;save packet address
+	ld a, [hl]	;get the attribute count
 	ld c, a ; save attribute count for later
 	ld de, $10
-	add hl, de
+	add hl, de	;advance 16 bytes to make HL point to the first BG Map Attribute tile
 	ld a, h
 	ld [rHDMA1], a
 	ld a, l
 	ld [rHDMA2], a
-	ld de, vBGMap0
+	ld de, vBGMap0		;loading address of vBGMap0 into DE, but note that it's the same address but in vBank1
 	ld a, d
 	ld [rHDMA3], a
 	ld a, e
@@ -50,7 +54,9 @@ LoadBGMapAttributes::
 	ld a, c ; number of BG attributes to transfer, plus 1 times 16
 	ld [rHDMA5], a ; initiate transfer
 	call Func_3082 ; update audio so it doesn't "lag"
-	pop hl
+
+
+	pop hl		;get packet address back because we're going to do it all again for vBGMap1
 	ld a, [hli]
 	ld c, a     ; number of BG attributes to transfer, plus 1 times 16
 	ld a, [hli]
