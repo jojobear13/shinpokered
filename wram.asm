@@ -365,6 +365,7 @@ wSerialEnemyMonsPatchList:: ; c5d0
 wTempPic::
 wOverworldMap:: ; c6e8
 	ds 1300
+wOverworldMap_End::
 
 wRedrawRowOrColumnSrcTiles:: ; cbfc
 ; the tiles of the row or column to be redrawn by RedrawRowOrColumn
