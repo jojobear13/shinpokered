@@ -2290,7 +2290,7 @@ LoadMapData::
 ;joenote - No need to disable/enable lcd. Pick a spare bit to use as a flag instead.
 ;	call DisableLCD
 	ld hl, hFlagsFFFA
-	set 3, [hl]
+	set 3, [hl]	;When set, the CopyData function will only copy when safe to do so for VRAM
 
 	callba InitMapSprites ; load tile pattern data for sprites
 	call LoadTileBlockMap
