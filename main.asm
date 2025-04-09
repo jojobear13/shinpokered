@@ -1961,3 +1961,6 @@ ENDC
 
 INCLUDE "text/tmhm_names.asm"	;joenote - adding name list for tm and hm items
 tmhmNamesEnd:
+
+SECTION "bank32",ROMX,BANK[$32]	
+INCLUDE "custom_functions/func_enhancedcolor.asm"

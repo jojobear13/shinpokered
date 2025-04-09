@@ -51,14 +51,14 @@ VermilionDock_1db9b:
 	ld [wSpriteStateData1 + 2], a
 	ld c, 120
 	call DelayFrames
-	ld b, $9c
-	call CopyScreenTileBufferToVRAM
+	ld b, $9c							;select vBGMap1 ($9c00)
+	call CopyScreenTileBufferToVRAM		;copy wTileMap to vBGMap1
 	coord hl, 0, 10
 	ld bc, SCREEN_WIDTH * 6
 	ld a, $14 ; water tile
-	call FillMemory
+	call FillMemory						;overwrite wTileMap to erase the SS Anne tiles and replace with water tiles
 	ld a, 1
-	ld [H_AUTOBGTRANSFERENABLED], a
+	ld [H_AUTOBGTRANSFERENABLED], a		;H_AUTOBGTRANSFERDEST already has $9C00 loaded, so re-copy wTileMap to vBGMap1
 	call Delay3
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
@@ -88,7 +88,7 @@ VermilionDock_1db9b:
 	ld [wMapViewVRAMPointer + 1], a
 	push hl
 	push de
-	call ScheduleEastColumnRedraw
+	call ScheduleEastColumnRedraw		;this redraws columns on vBGMap0 so garbage does not scroll in from the right
 	call VermilionDock_EmitSmokePuff
 	pop de
 	ld b, $10
@@ -96,7 +96,7 @@ VermilionDock_1db9b:
 	call VermilionDock_AnimSmokePuffDriftRight
 	ld c, $8
 .asm_1dc16
-	call VermilionDock_1dc7c
+	call VermilionDock_1dc7c	;this function includes an update of the scrolling layer
 	dec c
 	jr nz, .asm_1dc16
 	inc d

@@ -428,14 +428,17 @@ DecrementAllColorsGBC:
 	push af
 	xor a
 	ld [rIE], a
+
+	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
+	ld [wGBCColorControl], a
+
 .wait
 	ldh a, [rLY]		
 	cp $90
 	jr nz, .wait
 	
-	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
 .mainLoop
-	ld [wGBCColorControl], a
+	ld a, [wGBCColorControl]
 	and %00100011
 	cp 32
 	jr z, .skipTransparent	;color 0 of OBP 0 to 7 are always transparent, so skip these ones
@@ -498,14 +501,14 @@ DecrementAllColorsGBC:
 	inc a
 	cp 64
 	jr nc, .return	;return if finished with OBP 7
-	cp 16
-	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
+;	cp 16
+;	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
 	call GBCBackgroundBlock
-	jr .next
+;	jr .next
 
-.unusedBGP
-	add a	;add 16 to the location so we skip to color 32 which is OBP 0
-	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
+;.unusedBGP
+;	add a	;add 16 to the location so we skip to color 32 which is OBP 0
+;	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
 .next
 	ld [wGBCColorControl], a
 	jr .mainLoop
@@ -595,14 +598,16 @@ IncrementAllColorsGBC:
 	xor a
 	ld [rIE], a
 
+	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
+	ld [wGBCColorControl], a
+
 .wait
 	ldh a, [rLY]		
 	cp $90
 	jr nz, .wait
 	
-	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
 .mainLoop
-	ld [wGBCColorControl], a
+	ld a, [wGBCColorControl]
 	and %00100011
 	cp 32
 	jr z, .skipTransparent	;color 0 of OBP 0 to 7 are always transparent, so skip these ones
@@ -665,14 +670,14 @@ IncrementAllColorsGBC:
 	inc a
 	cp 64
 	jr nc, .return	;return if finished with OBP 7
-	cp 16
-	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
+;	cp 16
+;	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
 	call GBCBackgroundBlock
-	jr .next
+;	jr .next
 
-.unusedBGP
-	add a	;add 16 to the location so we skip to color 32 which is OBP 0
-	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
+;.unusedBGP
+;	add a	;add 16 to the location so we skip to color 32 which is OBP 0
+;	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
 .next
 	ld [wGBCColorControl], a
 	jr .mainLoop
@@ -741,7 +746,7 @@ GBCFadeOutToBlack:
 	
 	push de
 	ld de, FadePal4
-	callba BufferAllPokeyellowColorsGBC		;back up all colors to a buffer space in wram
+	call BufferAllPokeyellowColorsGBC_helper		;back up all colors to a buffer space in wram
 	
 	ld a, [hFlagsFFFA]	;need to set a flag that skips the $FF80 OAM call in VBLANK
 	push af
@@ -802,7 +807,7 @@ GBCFadeOutToWhite:
 	
 	push de
 	ld de, FadePal4
-	callba BufferAllPokeyellowColorsGBC		;back up all colors to a buffer space in wram
+	call BufferAllPokeyellowColorsGBC_helper		;back up all colors to a buffer space in wram
 	
 	ld a, [hFlagsFFFA]	;need to set a flag that skips the $FF80 OAM call in VBLANK
 	push af
@@ -863,7 +868,7 @@ GBCFadeInFromWhite:
 	
 	push de
 	ld de, FadePal4
-	callba BufferAllPokeyellowColorsGBC		;back up all colors to a buffer space in wram
+	call BufferAllPokeyellowColorsGBC_helper		;back up all colors to a buffer space in wram
 	
 	ld a, [hFlagsFFFA]	;need to set a flag that skips the $FF80 OAM call in VBLANK
 	push af
@@ -923,7 +928,7 @@ GBCFadeInFromBlack:
 	
 	push de
 	ld de, FadePal4
-	callba BufferAllPokeyellowColorsGBC		;back up all colors to a buffer space in wram
+	call BufferAllPokeyellowColorsGBC_helper		;back up all colors to a buffer space in wram
 	
 	ld a, [hFlagsFFFA]	;need to set a flag that skips the $FF80 OAM call in VBLANK
 	push af
@@ -1051,7 +1056,18 @@ ReadBufferColorGBC:
 	
 	
 
-	
+BufferAllPokeyellowColorsGBC_helper:
+	ld a, [wUnusedD721]
+	bit 7, a
+	jr z, .doNormal
+	ld a, [hFlagsFFFA]
+	bit 4, a
+	jr z, .doNormal
+	callba BufferAllEnhancedColorsGBC
+	ret
+.doNormal
+	callba BufferAllPokeyellowColorsGBC
+	ret
 	
 	
 	
