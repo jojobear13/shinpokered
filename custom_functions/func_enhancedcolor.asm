@@ -328,7 +328,7 @@ TransferGBCEnhancedBGMapAttributes:
 
 	
 	
-;This function writes the palettes used for the overworld to the GBC palette registers
+;This function builds the buffer and writes the palettes used for the overworld to the GBC palette registers
 TransferGBCEnhancedOverworldPalettes:
 ;only for GBC and only if option is active
 	ld a, [hGBC]
@@ -345,41 +345,6 @@ TransferGBCEnhancedOverworldPalettes:
 	call UpdateEnhancedGBCPal_OBP.skipHardwareUpdate
 
 	ret 
-;	xor a
-;	ld [wGBCColorControl], a
-;	ld hl, GBCEnhancedOverworldPalettes	
-;.loopBG
-;	ld a, [hli]
-;	ld e, a
-;	ld a, [hli]
-;	ld d, a
-;	push hl
-;	callba WriteColorGBC
-;	pop hl
-;	ld a, [wGBCColorControl]
-;	inc a
-;	and $1F
-;	ld [wGBCColorControl], a
-;	jr nz, .loopBG
-;	
-;	ld a, $20
-;	ld [wGBCColorControl], a
-;	ld hl, GBCEnhancedOverworldPalettes	
-;.loopOB
-;	ld a, [hli]
-;	ld e, a
-;	ld a, [hli]
-;	ld d, a
-;	push hl
-;	callba WriteColorGBC
-;	pop hl
-;	ld a, [wGBCColorControl]
-;	inc a
-;	and $3F
-;	ld [wGBCColorControl], a
-;	jr nz, .loopOB
-;
-;	ret
 
 
 	
@@ -541,45 +506,26 @@ UpdateEnhancedGBCPal_BGP:
 .doublespeed
 	push af
 
-	;prevent the BGmap from updating during vblank 
-	;because this is going to take a frame or two in order to fully run
-	;otherwise a partial update (like during a screen whiteout) can be distracting
-	ld hl, hFlagsFFFA
-	set 1, [hl]
-
-	ld de, rBGP
-	
+	ld de, rBGP	
 	call BufferAllEnhancedColorsGBC.BGP0to3Loop
 	call BufferAllEnhancedColorsGBC.BGP4to7Loop
-	call .TransferPals
-	
-	ld hl, hFlagsFFFA	;re-allow BGmap updates
-	res 1, [hl]
+
+	ld a, [rIE]		;manually disable interrupts
+	push af
+	xor a
+	ld [rIE], a
+
+	ld de, wGBCFullPalBuffer
+	call GBCBufferFastTransfer_BGP
+
+	pop af		;re-enable interrupts
+	ld [rIE], a
 	
 	pop af
 	inc a
 	ret z	;return now if 2x cpu mode was already active at the start of this function
 	;otherwise return to single cpu mode and return
 	predef SingleCPUSpeed
-	ret
-
-.TransferPals
-	xor a
-	ld [wGBCColorControl], a
-	ld hl, wGBCFullPalBuffer	
-.loopBG
-	ld a, [hli]
-	ld d, a
-	ld a, [hli]
-	ld e, a
-	push hl
-	callba WriteColorGBC
-	pop hl
-	ld a, [wGBCColorControl]
-	inc a
-	ld [wGBCColorControl], a
-	cp 32
-	jr c, .loopBG
 	ret
 	
 
@@ -611,24 +557,37 @@ UpdateEnhancedGBCPal_OBP::
 
 	ld a, d
 	dec a
-	jr nz, .OBP1
-.OBP0
+	push af	;save flag register
+	jr nz, .OBP1_buffer
+.OBP0_buffer
 	ld de, rOBP0
 	dec de	;this will get incremented in the next call
 	call BufferAllEnhancedColorsGBC.OBP0to3Loop
-	ld a, 32
-	ld [wGBCColorControl], a
-	ld hl, wGBCFullPalBuffer + 64	
 	jr .transfer
-.OBP1
+.OBP1_buffer
 	ld de, rOBP1
 	dec de	;this will get incremented in the next call
 	call BufferAllEnhancedColorsGBC.OBP4to7Loop
-	ld a, 48
-	ld [wGBCColorControl], a
-	ld hl, wGBCFullPalBuffer + 96	
+
 .transfer
-	call .TransferPals
+	pop af	;get flag register back
+	ld de, wGBCFullPalBuffer
+	
+	ld a, [rIE]		;manually disable interrupts
+	push af
+	ld a, 0
+	ld [rIE], a
+
+	jr nz, .OBP1_transfer
+.OBP0_transfer
+	call GBCBufferFastTransfer_OBP0
+	jr .done
+.OBP1_transfer
+	call GBCBufferFastTransfer_OBP1
+	
+.done	
+	pop af		;re-enable interrupts
+	ld [rIE], a	
 
 	pop af
 	inc a
@@ -637,20 +596,6 @@ UpdateEnhancedGBCPal_OBP::
 	predef SingleCPUSpeed
 	ret
 
-.TransferPals
-	ld a, [hli]
-	ld d, a
-	ld a, [hli]
-	ld e, a
-	push hl
-	callba WriteColorGBC
-	pop hl
-	ld a, [wGBCColorControl]
-	inc a
-	ld [wGBCColorControl], a
-	and $0F
-	jr nz, .TransferPals
-	ret
 
 	
 OverworldTilePalPointers:
@@ -744,3 +689,184 @@ PalSettings_TownSpecialPal:
 	db	PAL_ENH_OVW_RED		;	CINNABAR_ISLAND,	; $08
 	db	PAL_ENH_OVW_BLUE	;	INDIGO_PLATEAU,		; $09
 	db	PAL_ENH_OVW_YELLOW	;	SAFFRON_CITY,		; $0A
+
+	
+
+;This is an extremely fast and lightweight function for transferring an entire 128 byte buffer of colors to the GBC
+;Takes DE which points to the address of the buffer to use
+GBCBufferFastTransfer:
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
+	ld h, d
+	ld l, e
+	ld sp, hl
+	
+	ld hl, rBGPI	
+	ld a, %10000000	
+	ld [hli], a		
+	ld c, 32		
+
+.wait
+	ldh a, [rLY]		
+	cp $90			;8 cycles
+	jr nz, .wait	;8 cycles on pass-through
+	
+.loop
+	pop de			;12 cycles
+	ld a, d			;4 cycles
+	ld [hl], a		;8 cycles
+	ld a, e			;4 cycles
+	ld [hl], a		;8 cycles
+	dec c			;4 cycles
+	jr nz, .loop	;12 cycles on loop, 8 on pass-through
+
+	;now sitting at 1676 cycles passed
+	
+	ld hl, rOBPI	;12 cycles
+	ld a, %10000000	;8 cycles
+	ld [hli], a		;8 cycles
+	ld c, 32		;8 cycles
+
+.loop2
+	pop de			;12 cycles
+	ld a, d			;4 cycles
+	ld [hl], a		;8 cycles
+	ld a, e			;4 cycles
+	ld [hl], a		;8 cycles
+	dec c			;4 cycles
+	jr nz, .loop2	;12 cycles on loop, 8 on pass-through
+	
+	;completed in 3372 cycles
+	;at 456 cycles per scanline, this should fit within the vblank period
+
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ret
+	
+GBCBufferFastTransfer_BGP:
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
+	ld h, d
+	ld l, e
+	ld sp, hl
+	
+	ld hl, rBGPI	
+	ld a, %10000000	
+	ld [hli], a		
+	ld c, 32		
+
+.wait
+	ldh a, [rLY]		
+	cp $90			;8 cycles
+	jr c, .wait		;8 cycles on pass-through
+	
+.loop
+	pop de			;12 cycles
+	ld a, d			;4 cycles
+	ld [hl], a		;8 cycles
+	ld a, e			;4 cycles
+	ld [hl], a		;8 cycles
+	dec c			;4 cycles
+	jr nz, .loop	;12 cycles on loop, 8 on pass-through
+
+	;now sitting at 1676 cycles passed
+	
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ret
+	
+GBCBufferFastTransfer_OBP0:
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
+	ld h, d
+	ld l, e
+	ld de, 64
+	add hl, de
+	ld sp, hl
+	
+	ld hl, rOBPI	
+	ld a, %10000000	
+	ld [hli], a		
+	ld c, 16		
+
+.wait
+	ldh a, [rLY]		
+	cp $90			;8 cycles
+	jr c, .wait		;8 cycles on pass-through
+	
+.loop
+	pop de			;12 cycles
+	ld a, d			;4 cycles
+	ld [hl], a		;8 cycles
+	ld a, e			;4 cycles
+	ld [hl], a		;8 cycles
+	dec c			;4 cycles
+	jr nz, .loop	;12 cycles on loop, 8 on pass-through
+
+	;now sitting at 844 cycles passed
+	
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ret
+	
+GBCBufferFastTransfer_OBP1:
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
+	ld h, d
+	ld l, e
+	ld de, 96
+	add hl, de
+	ld sp, hl
+	
+	ld hl, rOBPI	
+	ld a, %10100000	
+	ld [hli], a		
+	ld c, 16		
+
+.wait
+	ldh a, [rLY]		
+	cp $90			;8 cycles
+	jr c, .wait		;8 cycles on pass-through
+	
+.loop
+	pop de			;12 cycles
+	ld a, d			;4 cycles
+	ld [hl], a		;8 cycles
+	ld a, e			;4 cycles
+	ld [hl], a		;8 cycles
+	dec c			;4 cycles
+	jr nz, .loop	;12 cycles on loop, 8 on pass-through
+
+	;now sitting at 844 cycles passed
+	
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ret
