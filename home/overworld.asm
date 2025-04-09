@@ -1288,6 +1288,7 @@ TilePairCollisionsWater::
 	db $FF
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
+; clobbers BC, HL, and DE
 LoadCurrentMapView::
 	ld a, [H_LOADEDROMBANK]
 	push af
@@ -1376,6 +1377,10 @@ LoadCurrentMapView::
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a ; restore previous ROM bank
+	
+	callba MakeOverworldBGMapAttributes	;GBCnote - use the new Tile Map to make BGMap Attributes for enhanced GBC color
+	;now transfer the BG Map Attributes
+	callba TransferGBCEnhancedBGMapAttributes
 	ret
 
 AdvancePlayerSprite::
@@ -2339,6 +2344,9 @@ LoadMapData::
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
+	
+;	callba TransferGBCEnhancedBGMapAttributes	;GBCnote - transfer BGMap Attributes for enhanced GBC color
+;commenting out because this is already done during the above call of RunPaletteCommand
 	ret
 
 ; function to switch to the ROM bank that a map is stored in

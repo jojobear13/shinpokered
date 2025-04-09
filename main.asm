@@ -1972,3 +1972,6 @@ tmhmNamesEnd:
 
 INCLUDE "data/super_rod.asm"	;joenote - moving all the super rod data here
 INCLUDE "custom_functions/func_alt_moves.asm"
+
+SECTION "bank32",ROMX,BANK[$32]	
+INCLUDE "custom_functions/func_enhancedcolor.asm"

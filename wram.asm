@@ -345,7 +345,8 @@ wOAMBuffer:: ; c300
 wTileMap:: ; c3a0
 ; buffer for tiles that are visible on screen (20 columns by 18 rows)
 	ds 20 * 18
-
+wTileMap_End::
+	
 wSerialPartyMonsPatchList:: ; c508
 ; list of indexes to patch with SERIAL_NO_DATA_BYTE after transfer
 
@@ -365,7 +366,6 @@ wSerialEnemyMonsPatchList:: ; c5d0
 wTempPic::
 wOverworldMap:: ; c6e8
 	ds 1300
-wOverworldMap_End::
 
 wRedrawRowOrColumnSrcTiles:: ; cbfc
 ; the tiles of the row or column to be redrawn by RedrawRowOrColumn
@@ -3041,8 +3041,10 @@ wLastOBP1::
 	ds 1 
 wBGPPalsBuffer:: 
 	ds NUM_ACTIVE_PALS * PAL_SIZE ;32 bytes
-	
-	ds 5
+wUpdateGBCPal_Index::
+	ds 1
+
+	ds 4
 
 wObtainedHiddenItemsFlags::
 	ds 14
@@ -3138,7 +3140,7 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 	;bit 4 - 60fps option flag
 	;bit 5 - obedience level cap
 	;bit 6 - nuzlocke mode activated
-	;bit 7 - not used
+	;bit 7 - enhanced GBC colors toggle
 ;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
