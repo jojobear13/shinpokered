@@ -913,15 +913,15 @@ _UpdateGBCPal_BGP::
 	ret
 .notEnhancedGBC
 	
-;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
-	ld a, [rKEY1]
-	bit 7, a
-	ld a, $ff
-	jr nz, .doublespeed	
-	predef SetCPUSpeed
-	xor a
-.doublespeed
-	push af
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
 
 	;prevent the BGmap from updating during vblank 
 	;because this is going to take a frame or two in order to fully run
@@ -969,11 +969,11 @@ _UpdateGBCPal_BGP::
 	ld hl, hFlagsFFFA	;re-allow BGmap updates
 	res 1, [hl]
 	
-	pop af
-	inc a
-	ret z	;return now if 2x cpu mode was already active at the start of this function
-	;otherwise return to single cpu mode and return
-	predef SingleCPUSpeed
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 
 _UpdateGBCPal_OBP::
@@ -988,15 +988,15 @@ _UpdateGBCPal_OBP::
 	ret
 .notEnhancedGBC
 
-;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
-	ld a, [rKEY1]
-	bit 7, a
-	ld a, $ff
-	jr nz, .doublespeed	
-	predef SetCPUSpeed
-	xor a
-.doublespeed
-	push af
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
 
 ; d then c = CONVERT_OBP0 or CONVERT_OBP1
 	ld a, d
@@ -1058,11 +1058,11 @@ _UpdateGBCPal_OBP::
 ;index = index + 1
 ;	ENDR
 
-	pop af
-	inc a
-	ret z	;return now if 2x cpu mode was already active at the start of this function
-	;otherwise return to single cpu mode and return
-	predef SingleCPUSpeed
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 	
 ;gbcnote - new function

@@ -924,7 +924,6 @@ DecrementAllColorsGBC_improved:
 	and a
 	ret z
 	
-	push de
 	ld c, d
 	
 	push bc
@@ -966,15 +965,14 @@ DecrementAllColorsGBC_improved:
 
 ;If not in 2x CPU mode, everything updates in less than 144 scanlines
 ;Therefore, normal mode needs an audio update but 60 fps mode does not
-	ld a, [rKEY1]
-	bit 7, a
-	push af
-	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
-	pop af
-	jr nz, .return_next
-	callba Audio1_UpdateMusic	
-.return_next
-	pop de
+;	ld a, [rKEY1]
+;	bit 7, a
+;	push af
+;	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
+;	pop af
+;	jr nz, .return_next
+;	callba Audio1_UpdateMusic	
+;.return_next
 	ld a, 1
 	and a
 	ret
