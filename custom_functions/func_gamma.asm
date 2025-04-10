@@ -718,18 +718,20 @@ GBCFadeOutToBlack:
 	ld [hFlagsFFFA], a
 
 	ld c, 3
+	ld b, c
 .loop
+;	push bc
+;	call DecrementAllColorsGBC	;read buffered colors, decrement them C times, and write them to hardware
+;	pop bc
 	push bc
-	call DecrementAllColorsGBC	;read buffered colors, decrement them C times, and write them to hardware
+	ld d, c
+	callba DecrementAllColorsGBC_improved
 	pop bc
-;	ld d, c
-;	callba DecrementAllColorsGBC_improved
-;	ld c, d
 
 	ld a, c
-	add 3	;step size of C
+	add b	;step size of C
 	ld c, a
-	cp 32
+	cp 32	;number of r, g, or b values
 	jr c, .loop
 
 	pop af
