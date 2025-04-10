@@ -1,6 +1,7 @@
 w2BGMapAttributesPointer	EQU $d0fe 	;In wram bank 2 (GBC only). This is 2 bytes.
-w2BGMapAttributes 		EQU $d100 	;In wram bank 2 (GBC only). This is 1024 bytes (32 by 32).
-w2BGMapAttributes_End 	EQU $d500
+w2BGMapAttributes 			EQU $d100 	;In wram bank 2 (GBC only). This is 1024 bytes (32 by 32).
+w2BGMapAttributes_End 		EQU $d500
+w2GBCFullPalBuffer			EQU $d500	;secondary buffer that is 128 bytes
 const_value = 0
 
 	const PAL_ENH_OVW_RED     	; $00
@@ -870,3 +871,203 @@ GBCBufferFastTransfer_OBP1:
 	ld l, a
 	ld sp, hl
 	ret
+
+	
+
+;clobbers bc, hl and de
+CopyGBCFullPalBuffer1to2:
+	ld a, [rIE]		
+	push af
+	ld a, [rSVBK]
+	push af
+	
+	ld de, w2GBCFullPalBuffer
+	ld hl, wGBCFullPalBuffer
+	ld c, 128
+.loop
+	ld a, [hli]
+	ld b, a
+
+	;interrupts off
+	di
+	;svbk1
+	ld a, [rSVBK]
+	set 1, a
+	ld [rSVBK], a
+
+
+	ld a, b
+	ld [de], a
+
+	;svbk0
+	ld a, [rSVBK]
+	res 1, a
+	ld [rSVBK], a
+	;interrupts on
+	ei
+
+	inc de
+	dec c
+	jr nz, .loop
+	
+	pop af
+	ld [rSVBK], a
+	pop af
+	ld [rIE], a
+	ret
+	
+
+	
+DecrementAllColorsGBC_improved:	
+	;Check if playing on a GBC and return if not so
+	ld a, [hGBC]
+	and a
+	ret z
+	
+	push de
+	ld c, d
+	
+	push bc
+	call CopyGBCFullPalBuffer1to2
+	pop bc
+	
+	;manually disable interrupts
+	ld a, [rIE]		
+	push af
+	xor a
+	ld [rIE], a
+	
+	ld a, [rSVBK]
+	set 1, a
+	ld [rSVBK], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld hl, w2GBCFullPalBuffer
+	ld b, 128
+.mainLoop
+	push bc	;save the value in C, which is the amount to darken this function call
+
+	jr .darkenColor		;using the jr command so that time isn't wasted doing calls and returns in a loop
+.darkenColor_ret
+
+	pop bc	;get the number of times to iterate
+	dec b
+	jr nz, .mainLoop
+	ld de, w2GBCFullPalBuffer
+	call GBCBufferFastTransfer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	ld a, [rSVBK]
+	res 1, a
+	ld [rSVBK], a
+
+	;re-enable interrupts
+	pop af		
+	ld [rIE], a
+
+;If not in 2x CPU mode, everything updates in less than 144 scanlines
+;Therefore, normal mode needs an audio update but 60 fps mode does not
+	ld a, [rKEY1]
+	bit 7, a
+	push af
+	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
+	pop af
+	jr nz, .return_next
+	callba Audio1_UpdateMusic	
+.return_next
+	pop de
+	ld a, 1
+	and a
+	ret
+
+.darkenColor
+;C = number to subract from each R, G, and B value
+;HL = pointer for the color bytes to modify
+
+;red
+	ld a, [hl]
+	ld b, a				
+	and %00000011	
+	ld d, a				;d = red negative
+	ld a, %01111100
+	and b				;a = positive
+	ld b, c				
+	rlc b
+	rlc b				;b = amount to subtract from red
+	sub b				;a = a - b
+	jr nc, .nocarryRed
+	ld a, $C	;minimum red value if underflow
+.nocarryRed	
+	or d
+	ld [hli], a
+	
+;blue
+	ld a, [hl]
+	ld b, a
+	and %11100000
+	ld e, a				;e = blue negative
+	ld a, %00011111
+	and b				;a = positive
+	sub c				;a = a - c
+	jr nc, .nocarryBlue
+	ld a, $3	;minimum blue value if underflow
+.nocarryBlue
+	or e
+	ld [hld], a
+
+;green
+	ld a, [hli]
+	ld b, a
+	ld a, [hld]
+
+	;load and shift HL five bits to the left
+	push hl		;save the pointer
+	ld h, 0
+	ld l, c
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+
+	ld c, a
+	;color is now in BC and number to subtract is in HL
+	
+	;e = green positive lo = blue negative from above
+	;d = green positive hi = red negative from above
+	
+	;do DE = DE - HL
+	ld a, e
+	sub l
+	ld e, a
+	ld a, d
+	sbc h
+	ld d, a
+	jr nc, .nocarryGreen
+	ld de, $0060	;minimum green value if underflow
+.nocarryGreen
+	pop hl
+	
+	;now make BC the green negatives, OR with DE, and load back into HL
+	ld a, %01111100
+	and b
+	or d
+	ld [hli], a
+	ld a, %00011111
+	and c
+	or e
+	ld [hli], a
+	jr .darkenColor_ret
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

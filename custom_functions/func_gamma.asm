@@ -315,51 +315,7 @@ SetGBCPalIndex:
 	and a
 	ret
 	
-;Based on the settings used for SetGBCPalIndex, this function will read the desired color into DE
-;Like VRAM, the color data of the GBC can only be read/written during VBLANK, HBLANK, or OAM Scan
-ReadColorGBC:
-	call SetGBCPalIndex	;set the color index to read
-	ret z	;return if there was a problem
-	;HL should now point to either rBGPD or rOBPD
-	;The final offset should be in B
-	
-	call .read		;read the color's low byte from the data address then decrement back to the indexing address
-	
-	push af			;push the low byte on the stack for later
-	inc b			;increment the offset so that we can read the color's high byte
-	ld a, b
-	ld [hli], a		;update the indexing address with the high byte's offset and increment to the data address
-	
-	call .read		;read the color's high byte from the data address then decrement back to the indexing address
-	
-	ld d, a	;store the high byte in D
-	pop af
-	ld e, a	;store the low byte in E
-	ret
 
-.read
-	ldh a, [rIE]
-	rrca	;see if vblank interrupt is already disabled (bit 0 of rIE)
-	jr c, .read_DI		;if enabled right now, jump to disable it while doing the read
-.waitVRAM
-	ldh a, [rSTAT]		
-	and %10		; mask for non-V-blank/non-H-blank STAT mode
-	jr nz, .waitVRAM
-	;we are now in a viable mode
-	ld a, [hld]	
-	ret	
-
-.read_DI
-	di	;disable interrupts so that the VBLANK functions don't mess up the timing
-	;wait for mode 0 or 1 (HBLANK or VBLANK)
-.waitVRAM2
-	ldh a, [rSTAT]		
-	and %10		; mask for non-V-blank/non-H-blank STAT mode
-	jr nz, .waitVRAM2
-	;we are now in a viable mode
-	ld a, [hld]		
-	ei	;re-enable interrupts
-	ret
 	
 ;Based on the settings used for SetGBCPalIndex, this function will write the desired color from DE
 ;Like VRAM, the color data of the GBC can only be read/written during VBLANK, HBLANK, or OAM Scan
@@ -412,7 +368,21 @@ WriteColorGBC:
 	
 	
 	
+;Read a specific color from the buffer into DE, similar to ReadColorGBC
+ReadBufferColorGBC:
+	ld de, $0000
+	ld a, [wGBCColorControl]
+	add a	;double A since each color is 2 bytes
+	ld e, a
+	ld hl, wGBCFullPalBuffer
+	add hl, de
+	ld a, [hli]		;read high byte
+	ld d, a
+	ld a, [hl]		;read low byte
+	ld e, a
+	ret
 	
+
 	
 ;This function does a few decrements to all the colors of the GBC in BGP 0-3 and OBP 0-7.
 ;It's used for fading to black or other things that need darkening.
@@ -428,17 +398,14 @@ DecrementAllColorsGBC:
 	push af
 	xor a
 	ld [rIE], a
-
-	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
-	ld [wGBCColorControl], a
-
 .wait
 	ldh a, [rLY]		
 	cp $90
 	jr nz, .wait
 	
+	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
 .mainLoop
-	ld a, [wGBCColorControl]
+	ld [wGBCColorControl], a
 	and %00100011
 	cp 32
 	jr z, .skipTransparent	;color 0 of OBP 0 to 7 are always transparent, so skip these ones
@@ -501,14 +468,14 @@ DecrementAllColorsGBC:
 	inc a
 	cp 64
 	jr nc, .return	;return if finished with OBP 7
-;	cp 16
-;	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
+	cp 16
+	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
 	call GBCBackgroundBlock
-;	jr .next
+	jr .next
 
-;.unusedBGP
-;	add a	;add 16 to the location so we skip to color 32 which is OBP 0
-;	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
+.unusedBGP
+	add a	;add 16 to the location so we skip to color 32 which is OBP 0
+	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
 .next
 	ld [wGBCColorControl], a
 	jr .mainLoop
@@ -583,6 +550,8 @@ GBCBackgroundBlock:
 .return
 	ret
 
+	
+	
 ;This function does a few increments to all the colors of the GBC in BGP 0-3 and OBP 0-7.
 ;It's used for fading to white or other things that need lightening.
 ;Returns the z-flag state: set = invalid | cleared = successful
@@ -598,16 +567,14 @@ IncrementAllColorsGBC:
 	xor a
 	ld [rIE], a
 
-	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
-	ld [wGBCColorControl], a
-
 .wait
 	ldh a, [rLY]		
 	cp $90
 	jr nz, .wait
 	
+	xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
 .mainLoop
-	ld a, [wGBCColorControl]
+	ld [wGBCColorControl], a
 	and %00100011
 	cp 32
 	jr z, .skipTransparent	;color 0 of OBP 0 to 7 are always transparent, so skip these ones
@@ -670,14 +637,14 @@ IncrementAllColorsGBC:
 	inc a
 	cp 64
 	jr nc, .return	;return if finished with OBP 7
-;	cp 16
-;	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
+	cp 16
+	jr z, .unusedBGP	;increment past unused color locations and loop if at BGP 4
 	call GBCBackgroundBlock
-;	jr .next
+	jr .next
 
-;.unusedBGP
-;	add a	;add 16 to the location so we skip to color 32 which is OBP 0
-;	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
+.unusedBGP
+	add a	;add 16 to the location so we skip to color 32 which is OBP 0
+	inc a	; color 0 of OBP 0 to 7 are always transparent, so increment to color 33
 .next
 	ld [wGBCColorControl], a
 	jr .mainLoop
@@ -716,10 +683,7 @@ IncrementAllColorsGBC:
 	ret
 	
 	
-	
-	
-	
-	
+
 ;Functions for smooth fades utilizing the GBC's palette hardware
 ;Returns the z-flag state: set = success | cleared = invalid
 GBCFadeOutToBlack:
@@ -758,6 +722,10 @@ GBCFadeOutToBlack:
 	push bc
 	call DecrementAllColorsGBC	;read buffered colors, decrement them C times, and write them to hardware
 	pop bc
+;	ld d, c
+;	callba DecrementAllColorsGBC_improved
+;	ld c, d
+
 	ld a, c
 	add 3	;step size of C
 	ld c, a
@@ -781,6 +749,8 @@ GBCFadeOutToBlack:
 	ld a, 1
 	and a
 	ret
+
+
 	
 ;Functions for smooth fades utilizing the GBC's palette hardware
 ;Returns the z-flag state: set = success | cleared = invalid
@@ -963,99 +933,8 @@ GBCFadeInFromBlack:
 	and a
 	ret
 	
-	
-	
-;This function uses DE as a passthrough to buffer all the BGP 0-7 and OBP 0-7 colors at wGBCFullPalBuffer	
-; BufferAllColorsGBC:
-	; ld hl, wGBCFullPalBuffer
-	; xor a	;load zero to start with the very first color of BGP 0 so we can loop through everything
-; .mainLoop
-	; ld [wGBCColorControl], a
-	; push hl
-	; call ReadColorGBC	;get the color into DE
-	; pop hl
-	; ld a, d
-	; ld [hli], a		;buffer high byte
-	; ld a, e
-	; ld [hli], a		;buffer low byte
-	
-	; ld a, [wGBCColorControl]
-	; inc a
-	; cp 64
-	; jr c, .mainLoop
-	; ret
 
-;Read a specific color from the buffer into DE, similar to ReadColorGBC
-ReadBufferColorGBC:
-	ld de, $0000
-	ld a, [wGBCColorControl]
-	add a	;double A since each color is 2 bytes
-	ld e, a
-	ld hl, wGBCFullPalBuffer
-	add hl, de
-	ld a, [hli]		;read high byte
-	ld d, a
-	ld a, [hl]		;read low byte
-	ld e, a
-	ret
 	
-	
-	
-;Alternate version of this function that is more specific	
-; BufferAllColorsGBC:
-	; push de
-	
-	; call .BGP0to3Loop
-
-	; call .OBP0to3Loop
-	
-	; call .OBP4to7Loop
-
-	; pop de
-	; ret	
-	
-; .BGP0to3Loop
-	; ld hl, wGBCFullPalBuffer
-	; xor a
-; .BGP0to3Loop_back
-	; call .readwriteinc
-	; cp 16
-	; jr c, .BGP0to3Loop_back
-	; ret
-
-; .OBP0to3Loop
-	; ld hl, wGBCFullPalBuffer+64
-	; ld a, 32
-; .OBP0to3Loop_back
-	; call .readwriteinc
-	; cp 48
-	; jr c, .OBP0to3Loop_back
-	; ret
-
-; .OBP4to7Loop
-	; ld hl, wGBCFullPalBuffer+96
-	; ld a, 48
-; .OBP4to7Loop_back
-	; call .readwriteinc
-	; cp 64
-	; jr c, .OBP4to7Loop_back
-	; ret
-
-; .readwriteinc
-	; ld [wGBCColorControl], a
-	; push hl
-	; call ReadColorGBC	;get the color into DE
-	; pop hl
-	; ld a, d
-	; ld [hli], a		;buffer high byte
-	; ld a, e
-	; ld [hli], a		;buffer low byte	
-	; ld a, [wGBCColorControl]
-	; inc a
-	; ret	
-	
-	
-
 BufferAllPokeyellowColorsGBC_helper:
 	ld a, [wUnusedD721]
 	bit 7, a
@@ -1068,13 +947,5 @@ BufferAllPokeyellowColorsGBC_helper:
 .doNormal
 	callba BufferAllPokeyellowColorsGBC
 	ret
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
