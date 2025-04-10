@@ -945,39 +945,7 @@ DecrementAllColorsGBC_improved:
 .mainLoop
 	push bc	;save the value in C, which is the amount to darken this function call
 
-	jr .darkenColor		;using the jr command so that time isn't wasted doing calls and returns in a loop
-.darkenColor_ret
-
-	pop bc	;get the number of times to iterate
-	dec b
-	jr nz, .mainLoop
-	ld de, w2GBCFullPalBuffer
-	call GBCBufferFastTransfer
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	
-	ld a, [rSVBK]
-	res 1, a
-	ld [rSVBK], a
-
-	;re-enable interrupts
-	pop af		
-	ld [rIE], a
-
-;If not in 2x CPU mode, everything updates in less than 144 scanlines
-;Therefore, normal mode needs an audio update but 60 fps mode does not
-;	ld a, [rKEY1]
-;	bit 7, a
-;	push af
-;	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
-;	pop af
-;	jr nz, .return_next
-;	callba Audio1_UpdateMusic	
-;.return_next
-	ld a, 1
-	and a
-	ret
-
-.darkenColor
+;********************************************************************************************************************
 ;C = number to subract from each R, G, and B value
 ;HL = pointer for the color bytes to modify
 
@@ -992,9 +960,14 @@ DecrementAllColorsGBC_improved:
 	rlc b
 	rlc b				;b = amount to subtract from red
 	sub b				;a = a - b
-	jr nc, .nocarryRed
+	
+	jr c, .makeMinRed
+	cp $C
+	jr nc, .meetsMinRed
+.makeMinRed
 	ld a, $C	;minimum red value if underflow
-.nocarryRed	
+.meetsMinRed
+	
 	or d
 	ld [hli], a
 	
@@ -1006,9 +979,14 @@ DecrementAllColorsGBC_improved:
 	ld a, %00011111
 	and b				;a = positive
 	sub c				;a = a - c
-	jr nc, .nocarryBlue
-	ld a, $3	;minimum blue value if underflow
-.nocarryBlue
+
+	jr c, .makeMinBlue
+	cp $03
+	jr nc, .meetsMinBlue
+.makeMinBlue
+	ld a, $03	;minimum blue value if underflow
+.meetsMinBlue
+
 	or e
 	ld [hld], a
 
@@ -1033,18 +1011,30 @@ DecrementAllColorsGBC_improved:
 	;e = green positive lo = blue negative from above
 	;d = green positive hi = red negative from above
 	
-	;do DE = DE - HL
+	;do DE = DE - HL - 3
 	ld a, e
 	sub l
 	ld e, a
 	ld a, d
 	sbc h
 	ld d, a
-	jr nc, .nocarryGreen
+	jr c, .makeMinGreen
+	ld a, e
+	sub 3
+	ld e, a
+	ld a, d
+	sbc 0
+	ld d, a
+	jr nc, .meetsMinGreen	
+.makeMinGreen
 	ld de, $0060	;minimum green value if underflow
-.nocarryGreen
-	pop hl
+.meetsMinGreen
 	
+	inc de
+	inc de
+	inc de
+	pop hl	
+
 	;now make BC the green negatives, OR with DE, and load back into HL
 	ld a, %01111100
 	and b
@@ -1054,7 +1044,36 @@ DecrementAllColorsGBC_improved:
 	and c
 	or e
 	ld [hli], a
-	jr .darkenColor_ret
+;********************************************************************************************************************
+
+	pop bc	;get the number of times to iterate
+	dec b
+	jr nz, .mainLoop
+	ld de, w2GBCFullPalBuffer
+	call GBCBufferFastTransfer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	ld a, [rSVBK]
+	res 1, a
+	ld [rSVBK], a
+
+	;re-enable interrupts
+	pop af		
+	ld [rIE], a
+
+;If not in 2x CPU mode, everything updates in less than 144 scanlines
+;Therefore, normal mode needs an audio update but 60 fps mode does not
+	ld a, [rKEY1]
+	bit 7, a
+	push af
+	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
+	pop af
+	jr nz, .return
+	callba Audio1_UpdateMusic	
+.return
+	ld a, 1
+	and a
+	ret
 	
 	
 	

@@ -717,7 +717,7 @@ GBCFadeOutToBlack:
 	set 0, a
 	ld [hFlagsFFFA], a
 
-	ld c, 3
+	ld c, 2
 	ld b, c
 .loop
 ;	push bc
