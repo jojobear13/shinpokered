@@ -5,13 +5,13 @@ w2GBCFullPalBuffer			EQU $d500	;secondary buffer that is 128 bytes
 const_value = 0
 
 	const PAL_ENH_OVW_RED     	; $00
-	const PAL_ENH_OVW_GREEN    	; $01
-	const PAL_ENH_OVW_BLUE  	; $02
-	const PAL_ENH_OVW_BROWN    	; $03
-	const PAL_ENH_OVW_YELLOW  	; $04
-	const PAL_ENH_OVW_PINK  	; $05
-	const PAL_ENH_OVW_PURPLE 	; $06
-	const PAL_ENH_OVW_GRAY   	; $07
+	const PAL_ENH_OVW_PINK  	; $01
+	const PAL_ENH_OVW_PURPLE 	; $02
+	const PAL_ENH_OVW_GRAY   	; $03
+	const PAL_ENH_OVW_GREEN    	; $04
+	const PAL_ENH_OVW_YELLOW  	; $05
+	const PAL_ENH_OVW_BROWN    	; $06
+	const PAL_ENH_OVW_BLUE  	; $07
 
 GBCEnhancedOverworldPalettes:	
 	; PAL_ENH_OVW_RED     	; $00
@@ -20,46 +20,46 @@ GBCEnhancedOverworldPalettes:
 	RGB 21,  0,  0
 	RGB  3,  3,  3
 	
-	; PAL_ENH_OVW_GREEN    	; $01
-	RGB 31, 31, 31
-	RGB 17, 31, 11
-	RGB  1, 22,  6
-	RGB  3,  3,  3
-	
-	; PAL_ENH_OVW_BLUE  	; $02
-	RGB 31, 31, 31
-	RGB 12, 14, 31
-	RGB  0,  1, 25
-	RGB  3,  3,  3
-
-	; PAL_ENH_OVW_BROWN    	; $03
-	RGB 31, 31, 31
-	RGB 22, 16,  5
-	RGB 15,  7,  3
-	RGB  3,  3,  3
-
-	; PAL_ENH_OVW_YELLOW  	; $04
-	RGB 31, 31, 31
-	RGB 31, 31,  0
-	RGB 28, 14,  0
-	RGB  3,  3,  3
-
-	; PAL_ENH_OVW_PINK  	; $05
+	; PAL_ENH_OVW_PINK  	; $01
 	RGB 31, 31, 31
 	RGB 31, 15, 18
 	RGB 31,  0,  6
 	RGB  3,  3,  3
 
-	; PAL_ENH_OVW_PURPLE 	; $06
+	; PAL_ENH_OVW_PURPLE 	; $02
 	RGB 31, 31, 31
 	RGB 25, 15, 31
 	RGB 19,  0, 22
 	RGB  3,  3,  3
 
-	; PAL_ENH_OVW_GRAY   	; $07
+	; PAL_ENH_OVW_GRAY   	; $03
 	RGB 31, 31, 31
 	RGB 20, 23, 10
 	RGB 11, 11,  5
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_GREEN    	; $04
+	RGB 31, 31, 31
+	RGB 17, 31, 11
+	RGB  1, 22,  6
+	RGB  3,  3,  3
+	
+	; PAL_ENH_OVW_YELLOW  	; $05
+	RGB 31, 31, 31
+	RGB 31, 31,  0
+	RGB 28, 14,  0
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_BROWN    	; $06
+	RGB 31, 31, 31
+	RGB 22, 16,  5
+	RGB 15,  7,  3
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_BLUE  	; $07
+	RGB 31, 31, 31
+	RGB 12, 14, 31
+	RGB  0,  1, 25
 	RGB  3,  3,  3
 
 
@@ -497,15 +497,15 @@ UpdateEnhancedGBCPal_BGP:
 	ld [wLastBGP], a
 .skipHardwareUpdate
 
-;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
-	ld a, [rKEY1]
-	bit 7, a
-	ld a, $ff
-	jr nz, .doublespeed	
-	predef SetCPUSpeed
-	xor a
-.doublespeed
-	push af
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
 
 	ld de, rBGP	
 	call BufferAllEnhancedColorsGBC.BGP0to3Loop
@@ -522,11 +522,11 @@ UpdateEnhancedGBCPal_BGP:
 	pop af		;re-enable interrupts
 	ld [rIE], a
 	
-	pop af
-	inc a
-	ret z	;return now if 2x cpu mode was already active at the start of this function
-	;otherwise return to single cpu mode and return
-	predef SingleCPUSpeed
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 	
 
@@ -546,15 +546,15 @@ UpdateEnhancedGBCPal_OBP::
 	ld [wLastOBP1], a
 .skipHardwareUpdate
 
-;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
-	ld a, [rKEY1]
-	bit 7, a
-	ld a, $ff
-	jr nz, .doublespeed	
-	predef SetCPUSpeed
-	xor a
-.doublespeed
-	push af
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
 
 	ld a, d
 	dec a
@@ -590,11 +590,11 @@ UpdateEnhancedGBCPal_OBP::
 	pop af		;re-enable interrupts
 	ld [rIE], a	
 
-	pop af
-	inc a
-	ret z	;return now if 2x cpu mode was already active at the start of this function
-	;otherwise return to single cpu mode and return
-	predef SingleCPUSpeed
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 
 
@@ -629,17 +629,17 @@ OverworldTilePalPointers:
 ;A value of 8 is a "wild card" to set the color register based on the current town.
 PalSettings_OVERWORLD:   	; 0
 ;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	7,	3,	3,	5,	3,	8,	8,	8,	8,	8,	7,	3,	3,	7,	3,	7;
+db	3,	6,	6,	1,	6,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
 ;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	7,	3,	8,	3,	2,	8,	8,	8,	8,	8,	7,	3,	3,	7,	3,	7;
+db	3,	6,	8,	6,	7,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
 ;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	7,	7,	7,	7,	3,	8,	8,	3,	8,	8,	7,	7,	1,	1,	1,	7;
+db	3,	3,	3,	3,	6,	8,	8,	6,	8,	8,	3,	3,	4,	4,	4,	3;
 ;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	1,	3,	3,	3,	3,	3,	3,	3,	8,	1,	7,	7,	3,	1,	1,	7;
+db	4,	6,	6,	6,	6,	6,	6,	6,	8,	4,	3,	3,	6,	4,	4,	3;
 ;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	1,	1,	0,	0,	2,	2,	3,	3,	3,	3,	7,	7,	8,	8,	7,	7;
+db	4,	4,	0,	0,	7,	7,	6,	6,	6,	6,	3,	3,	8,	8,	3,	3;
 ;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	1,	1,	1,	8,	3,	3,	3,	3,	3,	3,	8,	0,	8,	8,	7,	7;
+db	4,	4,	4,	8,	6,	6,	6,	6,	6,	6,	8,	0,	8,	8,	3,	3;
 PalSettings_REDS_HOUSE_1:	; 1
 PalSettings_MART:        	; 2
 PalSettings_FOREST:      	; 3
