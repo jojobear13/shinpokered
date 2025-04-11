@@ -1,6 +1,8 @@
 NUM_MUSIC_TRACKS EQU 45
 
 DisplaySoundTestMenu:
+	ld a, SFX_PRESS_AB
+	call PlaySound
 	call ClearScreen
 	ld a, 1
 	ld [hJoy7], a
@@ -50,6 +52,8 @@ DisplaySoundTestMenu:
 .exitMenu
 	xor a
 	ld [hJoy7], a
+	ld a, SFX_PRESS_AB
+	call PlaySound
 	call ClearScreen
 	ret
 	
