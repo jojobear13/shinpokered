@@ -208,6 +208,9 @@ SetPal_Overworld:
 ;It loads a full BG Map Attributes table directly from w2BGMapAttributes
 ;not used at the moment
 .enhancedGBCOverworld
+	ld a, SET_PAL_OVERWORLD
+	ld [wDefaultPaletteCommand], a
+
 	ld hl, hFlagsFFFA
 	set 4, [hl]
 
