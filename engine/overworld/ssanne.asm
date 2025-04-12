@@ -9,6 +9,7 @@ AnimateBoulderDust:
 	ld [rOBP1], a
 	call UpdateGBCPal_OBP1
 	call LoadSmokeTileFourTimes
+	ld d, 5	;gbcnote - set OB pal
 	callba WriteCutOrBoulderDustAnimationOAMBlock
 	ld c, 8 ; number of steps in animation
 .loop
