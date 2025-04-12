@@ -1975,3 +1975,4 @@ INCLUDE "custom_functions/func_alt_moves.asm"
 
 SECTION "bank32",ROMX,BANK[$32]	
 INCLUDE "custom_functions/func_enhancedcolor.asm"
+INCLUDE "engine/overworld/cut3.asm"

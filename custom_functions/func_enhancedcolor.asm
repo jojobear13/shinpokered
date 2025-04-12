@@ -187,7 +187,16 @@ MakeOverworldBGMapAttributes:
 	;restore the original wram bank and return
 	ld hl, rSVBK
 	res 1, [hl]
+
+;re-enabling interrupts causes blank to run which in turn creates a weird scanline glitch for a 1 frame
+;skip OAM in order to prevent it
+	ld a, [hFlagsFFFA]
+	push af
+	set 0, a
+	ld [hFlagsFFFA], a
 	ei	;re-enable interrupts
+	pop af
+	ld [hFlagsFFFA], a
 	ret
 .incrementRow
 	ld a, e
@@ -695,6 +704,8 @@ PalSettings_TownSpecialPal:
 
 ;This is an extremely fast and lightweight function for transferring an entire 128 byte buffer of colors to the GBC
 ;Takes DE which points to the address of the buffer to use
+;Unlike the reduced versions below for BGP/OBP, this has a built-in 1 frame delay as it waits for LY=$90
+;--> Since you're writing every color, it's assumed you want it all to happen during the vblank period
 GBCBufferFastTransfer:
 	ld hl, sp + 0
 	ld a, h
@@ -767,12 +778,20 @@ GBCBufferFastTransfer_BGP:
 	ld [hli], a		
 	ld c, 32		
 
-.wait
-	ldh a, [rLY]		
-	cp $90			;8 cycles
-	jr c, .wait		;8 cycles on pass-through
-	
 .loop
+.wait
+; In case we're already in H-blank or V-blank, wait for it to end. This is a
+; precaution so that the transfer doesn't extend past the blanking period.
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr z, .wait	;repeat if still in h-blank or v-blank
+; Wait for H-blank or V-blank to begin.
+.notInBlankingPeriod
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr nz, .notInBlankingPeriod
+	
+;.loop
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
@@ -781,8 +800,6 @@ GBCBufferFastTransfer_BGP:
 	dec c			;4 cycles
 	jr nz, .loop	;12 cycles on loop, 8 on pass-through
 
-	;now sitting at 1676 cycles passed
-	
 	ld a, [H_SPTEMP]
 	ld h, a
 	ld a, [H_SPTEMP + 1]
@@ -808,12 +825,20 @@ GBCBufferFastTransfer_OBP0:
 	ld [hli], a		
 	ld c, 16		
 
-.wait
-	ldh a, [rLY]		
-	cp $90			;8 cycles
-	jr c, .wait		;8 cycles on pass-through
-	
 .loop
+.wait
+; In case we're already in H-blank or V-blank, wait for it to end. This is a
+; precaution so that the transfer doesn't extend past the blanking period.
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr z, .wait	;repeat if still in h-blank or v-blank
+; Wait for H-blank or V-blank to begin.
+.notInBlankingPeriod
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr nz, .notInBlankingPeriod
+	
+;.loop
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
@@ -822,8 +847,6 @@ GBCBufferFastTransfer_OBP0:
 	dec c			;4 cycles
 	jr nz, .loop	;12 cycles on loop, 8 on pass-through
 
-	;now sitting at 844 cycles passed
-	
 	ld a, [H_SPTEMP]
 	ld h, a
 	ld a, [H_SPTEMP + 1]
@@ -849,12 +872,20 @@ GBCBufferFastTransfer_OBP1:
 	ld [hli], a		
 	ld c, 16		
 
-.wait
-	ldh a, [rLY]		
-	cp $90			;8 cycles
-	jr c, .wait		;8 cycles on pass-through
-	
 .loop
+.wait
+; In case we're already in H-blank or V-blank, wait for it to end. This is a
+; precaution so that the transfer doesn't extend past the blanking period.
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr z, .wait	;repeat if still in h-blank or v-blank
+; Wait for H-blank or V-blank to begin.
+.notInBlankingPeriod
+	ld a, [rSTAT]
+	and %10 ; mask for non-V-blank/non-H-blank STAT mode
+	jr nz, .notInBlankingPeriod
+	
+;.loop
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
@@ -863,8 +894,6 @@ GBCBufferFastTransfer_OBP1:
 	dec c			;4 cycles
 	jr nz, .loop	;12 cycles on loop, 8 on pass-through
 
-	;now sitting at 844 cycles passed
-	
 	ld a, [H_SPTEMP]
 	ld h, a
 	ld a, [H_SPTEMP + 1]
