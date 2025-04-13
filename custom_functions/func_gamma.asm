@@ -786,15 +786,21 @@ GBCFadeOutToWhite:
 	set 0, a
 	ld [hFlagsFFFA], a
 
-	ld c, 3
+	ld c, 2
+	ld b, c
 .loop
+;	push bc
+;	call IncrementAllColorsGBC	;read buffered colors, increment them C times, and write them to hardware
+;	pop bc
 	push bc
-	call IncrementAllColorsGBC	;read buffered colors, increment them C times, and write them to hardware
+	ld d, c
+	callba IncrementAllColorsGBC_improved
 	pop bc
+
 	ld a, c
-	add 3	;step size of C
+	add b	;step size of C
 	ld c, a
-	cp 32
+	cp 32	;number of r, g, or b values
 	jr c, .loop
 
 	pop af
@@ -848,12 +854,18 @@ GBCFadeInFromWhite:
 	ld [hFlagsFFFA], a
 
 	ld c, 28
+	ld b, 2
 .loop
+;	push bc
+;	call IncrementAllColorsGBC	;read buffered colors, increment them C times, and write them to hardware
+;	pop bc
 	push bc
-	call IncrementAllColorsGBC	;read buffered colors, increment them C times, and write them to hardware
+	ld d, c
+	callba IncrementAllColorsGBC_improved
 	pop bc
+
 	ld a, c
-	sub 3	;step size of C
+	sub b	;step size of C
 	ld c, a
 	jr nc, .loop
 
@@ -908,12 +920,18 @@ GBCFadeInFromBlack:
 	ld [hFlagsFFFA], a
 
 	ld c, 28
+	ld b, 2
 .loop
+;	push bc
+;	call DecrementAllColorsGBC	;read buffered colors, decrement them C times, and write them to hardware
+;	pop bc
 	push bc
-	call DecrementAllColorsGBC	;read buffered colors, increment them C times, and write them to hardware
+	ld d, c
+	callba DecrementAllColorsGBC_improved
 	pop bc
+
 	ld a, c
-	sub 3	;step size of C
+	sub b	;step size of C
 	ld c, a
 	jr nc, .loop
 
@@ -934,8 +952,8 @@ GBCFadeInFromBlack:
 	ld a, 1
 	and a
 	ret
-	
 
+	
 	
 BufferAllPokeyellowColorsGBC_helper:
 	ld a, [wUnusedD721]
