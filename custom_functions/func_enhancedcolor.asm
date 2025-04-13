@@ -300,7 +300,7 @@ ConvertTile2PalSetting:
 	ld a, SAFFRON_CITY
 	cp c
 	ret nc
-	ld a, PAL_ENH_OVW_GRAY	;for routes and other such maps
+	ld a, PAL_ENH_OVW_BROWN	;for routes and other such maps
 	ld [de], a
 	ret
 .errorTrap
@@ -690,7 +690,7 @@ db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 PalSettings_TownSpecialPal:
 	db	PAL_ENH_OVW_PURPLE	;	PALLET_TOWN,		; $00
 	db	PAL_ENH_OVW_GREEN	;	VIRIDIAN_CITY,		; $01
-	db	PAL_ENH_OVW_BROWN	;	PEWTER_CITY,		; $02
+	db	PAL_ENH_OVW_GRAY	;	PEWTER_CITY,		; $02
 	db	PAL_ENH_OVW_BLUE	;	CERULEAN_CITY,		; $03
 	db	PAL_ENH_OVW_PURPLE	;	LAVENDER_TOWN,		; $04
 	db	PAL_ENH_OVW_RED		;	VERMILION_CITY,		; $05
@@ -1103,6 +1103,166 @@ DecrementAllColorsGBC_improved:
 	ld a, 1
 	and a
 	ret
+	
+	
+	
+IncrementAllColorsGBC_improved:	
+	;Check if playing on a GBC and return if not so
+	ld a, [hGBC]
+	and a
+	ret z
+	
+	ld c, d
+	
+	push bc
+	call CopyGBCFullPalBuffer1to2
+	pop bc
+	
+	;manually disable interrupts
+	ld a, [rIE]		
+	push af
+	xor a
+	ld [rIE], a
+	
+	ld a, [rSVBK]
+	set 1, a
+	ld [rSVBK], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ld hl, w2GBCFullPalBuffer
+	ld b, 128
+.mainLoop
+	push bc	;save the value in C, which is the amount to lighten this function call
+
+;********************************************************************************************************************
+;C = number to add to each R, G, and B value
+;HL = pointer for the color bytes to modify
+
+;red
+	ld a, [hl]
+	ld b, a				
+	and %00000011	
+	ld d, a				;d = red negative
+	ld a, %01111100
+	and b				;a = positive
+	ld b, c				
+	rlc b
+	rlc b				;b = amount to add to red
+	add b				;a = a + b
+	
+	cp $7C+1
+	jr c, .meetsMaxRed
+.makeMaxRed
+	ld a, $7C	;Maximum red value if overflow
+.meetsMaxRed
+	
+	or d
+	ld [hli], a
+	
+;blue
+	ld a, [hl]
+	ld b, a
+	and %11100000
+	ld e, a				;e = blue negative
+	ld a, %00011111
+	and b				;a = positive
+	add c				;a = a + c
+
+	cp $1F+1
+	jr c, .meetsMaxBlue
+.makeMaxBlue
+	ld a, $1F	;Maximum blue value if underflow
+.meetsMaxBlue
+
+	or e
+	ld [hld], a
+
+;green
+	ld a, [hli]
+	ld b, a
+	ld a, [hld]
+
+	;load and shift HL five bits to the left
+	push hl		;save the pointer
+	ld h, 0
+	ld l, c
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+
+	ld c, a
+	;color is now in BC and number to add is in HL
+	
+	;e = green positive lo = blue negative from above
+	;d = green positive hi = red negative from above
+	
+	;do HL = HL + DE then make sure it's < $03E0+1
+	add hl, de
+	ld a, l
+	sub $E1
+	ld a, h
+	sbc $03
+	ld d, h
+	ld e, l
+	jr c, .meetsMaxGreen
+.makeMaxGreen
+	ld de, $03E0	;Maximum green value if overflow
+.meetsMaxGreen
+	
+	
+	pop hl	
+
+	;now make BC the green negatives, OR with DE, and load back into HL
+	ld a, %01111100
+	and b
+	or d
+	ld [hli], a
+	ld a, %00011111
+	and c
+	or e
+	ld [hli], a
+;********************************************************************************************************************
+
+	pop bc	;get the number of times to iterate
+	dec b
+	jr nz, .mainLoop
+	ld de, w2GBCFullPalBuffer
+	call GBCBufferFastTransfer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+	ld a, [rSVBK]
+	res 1, a
+	ld [rSVBK], a
+
+	;re-enable interrupts
+	pop af		
+	ld [rIE], a
+
+;If not in 2x CPU mode, everything updates in less than 144 scanlines
+;Therefore, normal mode needs an audio update but 60 fps mode does not
+	ld a, [rKEY1]
+	bit 7, a
+	push af
+	call nz, DelayFrame	;Delay a frame in 60 fps mode to get the timing down right for any fades
+	pop af
+	jr nz, .return
+	callba Audio1_UpdateMusic	
+.return
+	ld a, 1
+	and a
+	ret
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
