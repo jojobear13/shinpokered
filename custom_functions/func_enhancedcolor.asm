@@ -1,6 +1,8 @@
-w2BGMapAttributesPointer	EQU $d0fe 	;In wram bank 2 (GBC only). This is 2 bytes.
+w2MapViewHLPointer			EQU $d0fa	;wram bank 2 backup. 2 bytes
+w2CurMap					EQU $d0fc
+w2CurMapTileset				EQU $d0fd
+w2MapViewVRAMPointer		EQU $d0fe	;wram bank 2 backup. 2 bytes
 w2BGMapAttributes 			EQU $d100 	;In wram bank 2 (GBC only). This is 1024 bytes (32 by 32).
-w2BGMapAttributes_End 		EQU $d500
 w2GBCFullPalBuffer			EQU $d500	;secondary buffer that is 128 bytes
 const_value = 0
 
@@ -65,8 +67,7 @@ GBCEnhancedOverworldPalettes:
 
 	
 ;This copies everything in wTileMap to w2BGMapAttributes in wram bank 2
-;It additionally takes into account where the viewable tile map area is positioned in the BG Map grid
-;It then calls the procedure to convert all the tile values to BG Map Attribute palettes
+;It also converts all the tile values to BG Map Attribute palettes
 ;Clobbers BC, HL, and DE
 ;This function is in the same spirit as LoadCurrentMapView, but for GBC color pals instead of tiles
 MakeOverworldBGMapAttributes:	
@@ -78,236 +79,513 @@ MakeOverworldBGMapAttributes:
 	bit 7, a
 	ret z
 
-;first find the offset of the visible 20x18 tile map within the BG Map and set that as the starting destination 
 	ld a, [wMapViewVRAMPointer]
-	ld e, a
+	ld b, a
 	ld a, [wMapViewVRAMPointer+1]
+	ld c, a
+	ld a, [wCurMap]
 	ld d, a
-	ld hl, ($FFFF - vBGMap0 + 1)
-	add hl, de
-	ld de, w2BGMapAttributes
-	add hl, de
-	ld d, h
-	ld e, l
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+	ld a, [wCurMapTileset]
+	ld e, a
+	
 	di	;disable the interrupts while messing around in the other wram bank since a bunch of stuff runs during vblank
+
 	ld hl, rSVBK
 	set 1, [hl]		;switch over to wram bank 2 (covers everything from address D700 to DFFF)
-	;back up the pointer
+	
+	ld a, b
+	ld [w2MapViewVRAMPointer], a
+	ld a, c
+	ld [w2MapViewVRAMPointer+1], a
 	ld a, d
-	ld [w2BGMapAttributesPointer], a
+	ld [w2CurMap], a
 	ld a, e
-	ld [w2BGMapAttributesPointer+1], a
+	ld [w2CurMapTileset], a
+	
+	ld hl, hFlags_0xFFF6
+	bit 3, [hl]
+	jp nz, MakeOverworldBGMapAttributes_RolColUpdate	
+
+;back up the stack pointer
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;copy wTileMap to w2BGMapAttributes
 	ld hl, wTileMap
-	ld b, 18 	;tile map height
-	ld c, 20	;tile map width
-.w2ramCopyLoop
-	push bc
-	call MakeOverworldBGMapAttributes_CopyRow
-	pop bc
-;reset to the correct starting column
-	push bc
-	ld c, 32 - 20
-.rowIncrementLoop
-	call .incrementRow
+	ld sp, hl
+	ld hl, w2BGMapAttributes - vBGMap0
+	ld a, [w2MapViewVRAMPointer]
+	ld c, a
+	ld a, [w2MapViewVRAMPointer+1]
+	ld b, a
+	add hl, bc
+	
+
+	ld b, SCREEN_HEIGHT 	;tile map height
+.w2ramCopyLoop_Y
+	ld a, h
+	ld [w2MapViewHLPointer], a
+	ld a, l
+	ld [w2MapViewHLPointer+1], a
+	ld c, SCREEN_WIDTH	;tile map width
+.w2ramCopyLoop_X
+	pop de
+	ld a, e
+	ld [hli], a
+	ld a, d
+	ld [hl], a
+	ld a, l
+	and $1f
+	cp $1f
+	jr c, .w2ramCopyLoop_X_nowrap
+	ld a, l
+	sub 32
+	ld l, a
+	ld a, h
+	sbc 0
+	ld h, a
+.w2ramCopyLoop_X_nowrap	
+	inc hl
 	dec c
-	jr nz, .rowIncrementLoop
-	pop bc
-;now move down to the next row
-	ld a, 32
-	add e	
-	ld e, a
-	jr nc, .noCarry
-	inc d
-.noCarry
-;wrap around to the top row of the BG Map Attributes if needed
-	ld a, d
-	push bc
-	ld bc, w2BGMapAttributes_End
-	sub b
-	pop bc
-	jr c, .carry	;if the value of D is less that $D5, then we haven't gone over
-	;else wrap back to first row
-	ld a, d
+	dec c
+	jr nz, .w2ramCopyLoop_X
+
+	ld a, [w2MapViewHLPointer+1]
+	add 32
+	ld l, a
+	ld a, [w2MapViewHLPointer]
+	adc 0
+	cp $d5
+	jr c, .w2ramCopyLoop_Y_nowrap
 	sub 4
-	ld d, a
-.carry
+.w2ramCopyLoop_Y_nowrap
+	ld h, a
 	dec b
-	jr nz, .w2ramCopyLoop
+	jr nz, .w2ramCopyLoop_Y
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-	ld a, [w2BGMapAttributesPointer]
-	ld d, a
-	ld a, [w2BGMapAttributesPointer+1]
-	ld e, a
+;restore the stack pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
 
-	ld a, [de]
-	push af
-	call ConvertTile2PalSetting		;do one conversion at the start just to initialize HL to where it needs to be
-	pop af
-	ld [de], a
-
-	ld b, 18 	;tile map height
-	ld c, 20	;tile map width
-.w2ramConvertLoop
-	push bc
-	call MakeOverworldBGMapAttributes_ConvertRow
-	pop bc
-;reset to the correct starting column
-	push bc
-	ld c, 32 - 20
-.rowIncrementLoop2
-	call .incrementRow
-	dec c
-	jr nz, .rowIncrementLoop2
-	pop bc
-;now move down to the next row
-	ld a, 32
-	add e	
-	ld e, a
-	jr nc, .noCarry2
-	inc d
-.noCarry2
-;wrap around to the top row of the BG Map Attributes if needed
-	ld a, d
-	push bc
-	ld bc, w2BGMapAttributes_End
-	sub b
-	pop bc
-	jr c, .carry2	;if the value of D is less that $D5, then we haven't gone over
-	;else wrap back to first row
-	ld a, d
-	sub 4
-	ld d, a
-.carry2
-	dec b
-	jr nz, .w2ramConvertLoop	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.return
-	;restore the original wram bank and return
-	ld hl, rSVBK
-	res 1, [hl]
-
-;re-enabling interrupts causes blank to run which in turn creates a weird scanline glitch for a 1 frame
-;skip OAM in order to prevent it
-	ld a, [hFlagsFFFA]
-	push af
-	set 0, a
-	ld [hFlagsFFFA], a
-	ei	;re-enable interrupts
-	pop af
-	ld [hFlagsFFFA], a
-	ret
-.incrementRow
-	ld a, e
-	and $1F
-	cp $1F
-	jr nz, .incrementE
-	ld a, e
-	sub $1F
-	ld e, a
-	ret
-.incrementE
-	inc e
-	ret
-	
-MakeOverworldBGMapAttributes_CopyRow:
-	ld a, [hli]
-	ld [de], a
-	ld a, e
-	and $1F
-	cp $1F
-	jr nz, .incrementE
-	ld a, e
-	sub $1F
-	ld e, a
-	jr .decrementC
-.incrementE
-	inc e
-.decrementC
-	dec c
-	jr nz, MakeOverworldBGMapAttributes_CopyRow
-	ret
-
-MakeOverworldBGMapAttributes_ConvertRow:
-	push bc
-	call ConvertTile2PalSetting.doWrite
-	pop bc
-	ld a, e
-	and $1F
-	cp $1F
-	jr nz, .incrementE
-	ld a, e
-	sub $1F
-	ld e, a
-	jr .decrementC
-.incrementE
-	inc e
-.decrementC
-	dec c
-	jr nz, MakeOverworldBGMapAttributes_ConvertRow
-	ret
-
-
-	
-;Replace a tile value pointed to by DE with its desired BG Map Attribute palette
-;Clobbers BC and HL
-;Preserves HL pointing to the proper PalSettings_ tileset so it can be quickly called over and over
-ConvertTile2PalSetting:	
-	ld hl, rSVBK
-	res 1, [hl]
-	ld a, [wCurMapTileset]
-	set 1, [hl]
+;get the current map tileset
+;based on the tileset, point HL to the correct list of BG map attributes for its tiles
+	ld a, [w2CurMapTileset]
 	ld c, a
 	ld b, 0
 	ld hl, OverworldTilePalPointers	
 	add hl, bc
 	add hl, bc
-	
 	ld a, [hli]   
 	ld b, a       
 	ld a, [hl]    
 	ld h, a
 	ld a, b
 	ld l, a
-	
-.doWrite	
-	ld a, [de]
-	cp $60	;tilesets only go up to $5F
-	jr nc, .errorTrap
+
+;backup this HL pointer
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP+1], a
+
+;now point DE to w2BGMapAttributes
+	ld hl, w2BGMapAttributes - vBGMap0
+	ld a, [w2MapViewVRAMPointer]
 	ld c, a
-	ld b, 0
-	push hl
+	ld a, [w2MapViewVRAMPointer+1]
+	ld b, a
 	add hl, bc
+	ld d, h
+	ld e, l
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;Convert the tile values in w2BGMapAttributes to color attribute settings
+	ld b, SCREEN_HEIGHT 	;tile map height
+.w2ramCopyLoop2_Y
+
+	ld a, d
+	ld [w2MapViewHLPointer], a
+	ld a, e
+	ld [w2MapViewHLPointer+1], a
+	ld c, SCREEN_WIDTH	;tile map width
+.w2ramCopyLoop2_X
+	;get the tileset address pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP+1]
+	ld l, a
+
+	;point to the correct tile
+	ld a, [de]
+	add l
+	ld l, a
+	ld a, 0
+	adc h
+	ld h, a
+	
+	;get the correct color
 	ld a, [hl]
-	pop hl
+	cp 8
+	jr c, .copyColorAttribute
+	call .townColor
+.copyColorAttribute	
 	ld [de], a
-	cp 8	;check for town-based color register
-	ret nz
-.townColor
-	push hl
+	ld a, e
+	and $1f
+	cp $1f
+	jr c, .w2ramCopyLoop2_X_nowrap
+	ld a, e
+	sub 32
+	ld e, a
+	ld a, d
+	sbc 0
+	ld d, a
+.w2ramCopyLoop2_X_nowrap	
+	inc de
+	dec c
+	jr nz, .w2ramCopyLoop2_X
+
+	ld a, [w2MapViewHLPointer+1]
+	add 32
+	ld e, a
+	ld a, [w2MapViewHLPointer]
+	adc 0
+	cp $d5
+	jr c, .w2ramCopyLoop2_Y_nowrap
+	sub 4
+.w2ramCopyLoop2_Y_nowrap	
+	ld d, a
+	dec b
+	jr nz, .w2ramCopyLoop2_Y
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.return
+;restore the original wram bank and return
 	ld hl, rSVBK
 	res 1, [hl]
-	ld a, [wCurMap]
-	set 1, [hl]
+
+;re-enabling interrupts causes vblank to run which in turn creates a weird scanline glitch for a 1 frame
+;skip OAM in order to prevent it
+	ld a, [hFlagsFFFA]
+	set 5, a
+	ld [hFlagsFFFA], a
+	ei	;re-enable interrupts
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.townColor
+	push hl
+	push bc
+	ld a, [w2CurMap]
 	ld c, a
 	ld b, 0
 	ld hl, PalSettings_TownSpecialPal	
 	add hl, bc
-	ld a, [hl]	
+	ld a, c
+	cp SAFFRON_CITY+1	;set flags
+	ld a, [hl]	;get pal value into A
+	pop bc
 	pop hl
-	ld [de], a
-	ld a, SAFFRON_CITY
-	cp c
-	ret nc
+	
+	ret c
 	ld a, PAL_ENH_OVW_BROWN	;for routes and other such maps
-	ld [de], a
-	ret
-.errorTrap
-	xor a
-	ld [de], a
 	ret
 	
+	
+;same as above but just for updating the row/column when the player walks
+MakeOverworldBGMapAttributes_RolColUpdate:	
+	ld a, [wSpriteStateData1 + 3]
+	cp $01
+	jr z, .south
+	cp $ff
+	jr z, .north
+	ld a, [wSpriteStateData1 + 5]
+	cp $01
+	jr z, .east
+	cp $ff
+	jr z, .west
+	jp MakeOverworldBGMapAttributes.return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.south
+	ld hl, wTileMap + (SCREEN_WIDTH*SCREEN_HEIGHT - 2*SCREEN_WIDTH)
+	
+	;vram should be the $9800 table right now
+	;get the pointer offset into BC
+	ld a, [w2MapViewVRAMPointer]
+	ld c, a
+	ld a, [w2MapViewVRAMPointer+1]
+	sub $98
+	ld b, a
+	
+	;point to w2BGMapAttributes + offset
+	ld de, w2BGMapAttributes
+	ld a, c
+	add e
+	ld e, a
+	ld a, b
+	adc d
+	ld d, a
+	
+	;point to w2BGMapAttributes + offset + offset to the last two rows of the map view
+	ld bc, 32*(SCREEN_HEIGHT-2)
+	ld a, c
+	add e
+	ld e, a
+	ld a, b
+	adc d
+	cp $d5
+	jr c, .south_no_wrap
+	sub 4
+.south_no_wrap
+	ld d, a
+	
+	call .copyrow
+	call .copyrow
+	jp MakeOverworldBGMapAttributes.return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.north
+	ld hl, wTileMap
+	
+	;vram should be the $9800 table right now
+	;get the pointer offset into BC
+	ld a, [w2MapViewVRAMPointer]
+	ld c, a
+	ld a, [w2MapViewVRAMPointer+1]
+	sub $98
+	ld b, a
+	
+	;point to w2BGMapAttributes + offset
+	ld de, w2BGMapAttributes
+	ld a, c
+	add e
+	ld e, a
+	ld a, b
+	adc d
+	ld d, a
+	
+	call .copyrow
+	call .copyrow
+	jp MakeOverworldBGMapAttributes.return	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.east
+	ld hl, wTileMap + (SCREEN_WIDTH - 2)
+	
+	;vram should be the $9800 table right now
+	;get the pointer offset into BC
+	ld a, [w2MapViewVRAMPointer]
+	ld c, a
+	ld a, [w2MapViewVRAMPointer+1]
+	sub $98
+	ld b, a
+	
+	;point to w2BGMapAttributes + offset
+	ld de, w2BGMapAttributes
+	ld a, c
+	add e
+	ld e, a
+	ld a, b
+	adc d
+	ld d, a
+	
+	;point to w2BGMapAttributes + offset + offset to the last two columns of the map view
+	ld a, e
+	and %11100000
+	ld b, a
+	ld a, (SCREEN_WIDTH-2)
+	add e
+	and %00011111
+	or b
+	ld e, a
+	
+	call .copycol
+	call .copycol
+	jp MakeOverworldBGMapAttributes.return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.west
+	ld hl, wTileMap
+	
+	;vram should be the $9800 table right now
+	;get the pointer offset into BC
+	ld a, [w2MapViewVRAMPointer]
+	ld c, a
+	ld a, [w2MapViewVRAMPointer+1]
+	sub $98
+	ld b, a
+	
+	;point to w2BGMapAttributes + offset
+	ld de, w2BGMapAttributes
+	ld a, c
+	add e
+	ld e, a
+	ld a, b
+	adc d
+	ld d, a
+	
+	call .copycol
+	call .copycol
+	jp MakeOverworldBGMapAttributes.return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.copyrow	;copy a row from tile map address in HL to map attribute address in DE
+	ld c, SCREEN_WIDTH
+	push de
+.copyrow_loop
+	ld a, [hli]
+	ld [de], a
+	call .convert
+	ld a, e
+	and $1F
+	cp $1F
+	jr c, .notRowEnd
+	ld a, e
+	sub 32
+	ld e, a
+	ld a, d
+	sbc 0
+	ld d, a
+.notRowEnd
+	inc de
+	dec c
+	jr nz, .copyrow_loop
+	;move to next row
+	pop de
+	ld a, 32
+	add e
+	ld e, a
+	ld a, 0
+	adc d
+	ld d, a
+	;account for rows looping back to the top
+	cp $D5
+	ret c
+	sub 4
+	ld d, a
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.copycol	;copy a column from tile map address in HL to map attribute address in DE
+	ld c, SCREEN_HEIGHT
+	push de
+	push hl
+.copycol_loop
+	ld a, [hl]
+	ld [de], a
+	call .convert
+;increment to the next map view row
+	ld a, SCREEN_WIDTH
+	add l
+	ld l, a
+	ld a, 0
+	adc h
+	ld h, a
+;increment to the next BG Map attribute row	
+	ld a, 32
+	add e
+	ld e, a
+	ld a, 0
+	adc d
+	cp $D5
+	jr c, .notColEnd
+	sub 4
+.notColEnd
+	ld d, a
+;decrement counter
+	dec c
+	jr nz, .copycol_loop
+;move to next column
+	pop hl
+	pop de
+	inc hl
+	ld a, e
+	and %11100000
+	ld b, a
+	inc de
+	ld a, e
+	and %00011111
+	or b
+	ld e, a
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.convert
+	push hl
+	push bc
+;get the current map tileset
+;based on the tileset, point HL to the correct list of BG map attributes for its tiles
+	ld a, [w2CurMapTileset]
+	ld c, a
+	ld b, 0
+	ld hl, OverworldTilePalPointers	
+	add hl, bc
+	add hl, bc
+	ld a, [hli]   
+	ld b, a       
+	ld a, [hl]    
+	ld h, a
+	ld a, b
+	ld l, a
+;point to the correct tile
+	ld a, [de]
+	add l
+	ld l, a
+	ld a, 0
+	adc h
+	ld h, a	
+;get the correct color
+	ld a, [hl]
+	cp 8
+	jr c, .copyColorAttribute
+	call MakeOverworldBGMapAttributes.townColor
+.copyColorAttribute	
+	ld [de], a
+	pop bc
+	pop hl
+	ret
+	
+	
+	
+;Just for being called during RedrawRowOrColumn	during VBLANK
+TransferGBCEnhancedBGMapAttributes_RolColByte:
+;only for GBC and only if option is active
+	ld a, [hGBC]
+	and a
+	ret z
+	ld a, [wUnusedD721]
+	bit 7, a
+	ret z
+
+	ld hl, rSVBK
+	set 1, [hl]		;switch over to wram bank 2 (covers everything from address D700 to DFFF)
+
+	ld a, 1
+	ld [rVBK], a	;switch to vram bank 1
+
+	dec de	
+	ld bc, w2BGMapAttributes - vBGMap0
+	ld h, d
+	ld l, e
+	add hl, bc
+
+.waitVRAM
+	ldh a, [rSTAT]		
+	and %10				
+	jr nz, .waitVRAM	
+		
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hli]
+	ld [de], a
+	
+	;restore the original vram bank
+	xor a
+	ld [rVBK], a
+
+	;restore the original wram bank and return
+	ld hl, rSVBK
+	res 1, [hl]
+	ret
+
 	
 	
 TransferGBCEnhancedBGMapAttributes:
@@ -337,7 +615,7 @@ TransferGBCEnhancedBGMapAttributes:
 	ret
 
 	
-	
+
 ;This function builds the buffer and writes the palettes used for the overworld to the GBC palette registers
 TransferGBCEnhancedOverworldPalettes:
 ;only for GBC and only if option is active

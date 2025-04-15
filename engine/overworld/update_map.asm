@@ -79,6 +79,7 @@ RedrawMapView:
 	ld [hTilesetType], a ; no flower/water BG tile animations
 	call LoadCurrentMapView
 	call RunDefaultPaletteCommand
+;GBCnote - 	for enhanced GBC colors, TransferGBCEnhancedBGMapAttributes already ran during RunDefaultPaletteCommand
 	ld hl, wMapViewVRAMPointer
 	ld a, [hli]
 	ld h, [hl]
