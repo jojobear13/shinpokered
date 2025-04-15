@@ -43,6 +43,14 @@ ShakeElevatorRedrawRow:
 ; This function is used to redraw certain portions of the screen, but it does
 ; not appear to ever result in any visible effect, so this function seems to
 ; be pointless.
+
+;No it's not. It deals with a very edge case where the player saves 
+;in the elevator right in front of the button,
+; then reload the save file,
+; then immediately selects the button to go to a new floor.
+;White space will appear above and below the screen as the elevator shakes 
+;because no "bleed" tiles exist outside of the map view upon directly loading the save.
+
 	ld hl, wMapViewVRAMPointer + 1
 	ld a, [hld]
 	push af
