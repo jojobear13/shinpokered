@@ -1378,9 +1378,11 @@ LoadCurrentMapView::
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a ; restore previous ROM bank
 	
-	callba MakeOverworldBGMapAttributes	;GBCnote - use the new Tile Map to make BGMap Attributes for enhanced GBC color
+;GBCnote - use the new Tile Map to make BGMap Attributes for enhanced GBC color
+;	--> build the whole thing if the player is not advancing movement
+	callba MakeOverworldBGMapAttributes	
 	;now transfer the BG Map Attributes
-	callba TransferGBCEnhancedBGMapAttributes
+;	callba TransferGBCEnhancedBGMapAttributes
 	ret
 
 AdvancePlayerSprite::
@@ -1529,7 +1531,13 @@ AdvancePlayerSprite::
 	ld a, [wCurMapWidth]
 	call MoveTileBlockMapPointerNorth
 .updateMapView
+	;GBCnote - use a flag to indicate that LoadCurrentMapView is being called during player movement
+	ld hl, hFlags_0xFFF6
+	set 3, [hl]
 	call LoadCurrentMapView
+	ld hl, hFlags_0xFFF6
+	res 3, [hl]
+
 	ld a, [wSpriteStateData1 + 3] ; delta Y
 	cp $01
 	jr nz, .checkIfMovingNorth2

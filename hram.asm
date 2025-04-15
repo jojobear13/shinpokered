@@ -325,6 +325,7 @@ hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 0: draw HP fraction to the right of bar instead of below (for party menu)
 ; bit 1: menu is double spaced
 ; bit 2: something about skipping a line when printing text
+; bit 3: LoadCurrentMapView is being called during player movement - GBCnote--> added this
 
 hFieldMoveMonMenuTopMenuItemX EQU $FFF7
 
@@ -333,7 +334,7 @@ hDisableJoypadPolling EQU $FFF9
 hJoyInput EQU $FFF8
 
 hFlagsFFFA EQU $FFFA	;joenote - added for various uses
-;bit 0 - PrepareOAMData and DMARoutine will not run in Vblank while this bit is set
+;bit 0 - DMARoutine will not run in Vblank while this bit is set
 ;bit 1 - BGmap update functions will not run in Vblank while this bit is set
 ;bit 2 - This gets set to indicate that a sfx is playing while printing text
 ;bit 3 - When set, the CopyData function will only copy when safe to do so for VRAM
