@@ -78,6 +78,12 @@ VBlank::
 	and a
 	call z, ReadJoypad
 
+	ld a, [hVblankBackup]
+	and a
+	jr z, .skip_GBCEnhancedRedrawRowOrColumn
+	callba GBCEnhancedRedrawRowOrColumn
+.skip_GBCEnhancedRedrawRowOrColumn
+
 	ld a, [wVBlankSavedROMBank]
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a

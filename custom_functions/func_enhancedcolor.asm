@@ -142,7 +142,7 @@ MakeOverworldBGMapAttributes:
 	cp $1f
 	jr c, .w2ramCopyLoop_X_nowrap
 	ld a, l
-	sub 32
+	sub BG_MAP_WIDTH
 	ld l, a
 	ld a, h
 	sbc 0
@@ -154,7 +154,7 @@ MakeOverworldBGMapAttributes:
 	jr nz, .w2ramCopyLoop_X
 
 	ld a, [w2MapViewHLPointer+1]
-	add 32
+	add BG_MAP_WIDTH
 	ld l, a
 	ld a, [w2MapViewHLPointer]
 	adc 0
@@ -240,7 +240,7 @@ MakeOverworldBGMapAttributes:
 	cp $1f
 	jr c, .w2ramCopyLoop2_X_nowrap
 	ld a, e
-	sub 32
+	sub BG_MAP_WIDTH
 	ld e, a
 	ld a, d
 	sbc 0
@@ -251,7 +251,7 @@ MakeOverworldBGMapAttributes:
 	jr nz, .w2ramCopyLoop2_X
 
 	ld a, [w2MapViewHLPointer+1]
-	add 32
+	add BG_MAP_WIDTH
 	ld e, a
 	ld a, [w2MapViewHLPointer]
 	adc 0
@@ -330,7 +330,7 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	ld d, a
 	
 	;point to w2BGMapAttributes + offset + offset to the last two rows of the map view
-	ld bc, 32*(SCREEN_HEIGHT-2)
+	ld bc, BG_MAP_WIDTH*(SCREEN_HEIGHT-2)
 	ld a, c
 	add e
 	ld e, a
@@ -440,7 +440,7 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	cp $1F
 	jr c, .notRowEnd
 	ld a, e
-	sub 32
+	sub BG_MAP_WIDTH
 	ld e, a
 	ld a, d
 	sbc 0
@@ -451,7 +451,7 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	jr nz, .copyrow_loop
 	;move to next row
 	pop de
-	ld a, 32
+	ld a, BG_MAP_WIDTH
 	add e
 	ld e, a
 	ld a, 0
@@ -480,7 +480,7 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	adc h
 	ld h, a
 ;increment to the next BG Map attribute row	
-	ld a, 32
+	ld a, BG_MAP_WIDTH
 	add e
 	ld e, a
 	ld a, 0
@@ -544,50 +544,179 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	
 	
 	
-;Just for being called during RedrawRowOrColumn	during VBLANK
-TransferGBCEnhancedBGMapAttributes_RolColByte:
-;only for GBC and only if option is active
+;This is called late in VBLANK and transfers the BG Map Attributes for any redrawn rows/columns after RedrawRowOrColumn
+GBCEnhancedRedrawRowOrColumn::
+	ld a, [hVblankBackup]
+	ld b, a
+	xor a
+	ld [hVblankBackup], a
+	
+	;only for GBC and only if option is active
 	ld a, [hGBC]
 	and a
 	ret z
 	ld a, [wUnusedD721]
 	bit 7, a
 	ret z
+	
+	;only on the overworld bgmap
+	ld a, [hFlagsFFFA]
+	bit 4, a
+	ret z
+
+	dec b
+	jr nz, .colorRow
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.colorColumn
+	ld a, $1
+	ld [rVBK], a	;change to vram bank 1
 
 	ld hl, rSVBK
-	set 1, [hl]		;switch over to wram bank 2 (covers everything from address D700 to DFFF)
+	set 1, [hl]		;switch over to wram bank 2
 
-	ld a, 1
-	ld [rVBK], a	;switch to vram bank 1
-
-	dec de	
-	ld bc, w2BGMapAttributes - vBGMap0
-	ld h, d
-	ld l, e
+	ld a, [hRedrawRowOrColumnDest]
+	ld e, a
+	ld l, a
+	ld a, [hRedrawRowOrColumnDest + 1]
+	ld d, a
+	ld h, a
+	ld bc, (w2BGMapAttributes - vBGMap0)
 	add hl, bc
+	ld c, SCREEN_HEIGHT
+.loopCol
 
-.waitVRAM
+.waitVRAMC1
 	ldh a, [rSTAT]		
 	and %10				
-	jr nz, .waitVRAM	
-		
+	jr nz, .waitVRAMC1	
+
 	ld a, [hli]
 	ld [de], a
 	inc de
-	ld a, [hli]
+
+.waitVRAMC2
+	ldh a, [rSTAT]		
+	and %10				
+	jr nz, .waitVRAMC2	
+
+	ld a, [hl]
 	ld [de], a
-	
-	;restore the original vram bank
+	ld a, BG_MAP_WIDTH - 1
+	add e
+	ld e, a
+	ld a, BG_MAP_WIDTH - 1
+	add l
+	ld l, a
+	jr nc, .noCarryCol
+	inc d
+	inc h
+.noCarryCol
+; the following lines wrap us from bottom to top if necessary
+	ld a, h
+	cp $D5
+	jr c, .noTopWrap
+	ld a, $D1
+	ld h, a
+	ld a, $98
+	ld d, a
+.noTopWrap
+	dec c
+	jr nz, .loopCol
+.finishColumn
 	xor a
 	ld [rVBK], a
 
-	;restore the original wram bank and return
+	ld hl, rSVBK
+	res 1, [hl]
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.colorRow
+	ld a, $1
+	ld [rVBK], a	;change to vram bank 1
+
+	ld hl, rSVBK
+	set 1, [hl]		;switch over to wram bank 2
+
+	ld a, [hRedrawRowOrColumnDest]
+	ld e, a
+	ld l, a
+	ld a, [hRedrawRowOrColumnDest + 1]
+	ld d, a
+	ld h, a
+	ld bc, (w2BGMapAttributes - vBGMap0)
+	add hl, bc
+
+; draw upper half
+	call .DrawHalf
+
+	ld a, [hRedrawRowOrColumnDest]
+	ld e, a
+	ld l, a
+	ld a, [hRedrawRowOrColumnDest + 1]
+	ld d, a
+	ld h, a
+	ld bc, (w2BGMapAttributes - vBGMap0)
+	add hl, bc
+	ld a, BG_MAP_WIDTH ; width of VRAM background map
+	add e
+	ld e, a
+	ld a, BG_MAP_WIDTH ; width of VRAM background map
+	add l
+	ld l, a
+
+; draw lower half
+	call .DrawHalf
+
+.finishRow
+	xor a
+	ld [rVBK], a
 	ld hl, rSVBK
 	res 1, [hl]
 	ret
 
+.DrawHalf
+	ld c, SCREEN_WIDTH / 2
+.loopRow
+.waitVRAMR1
+	ldh a, [rSTAT]		
+	and %10				
+	jr nz, .waitVRAMR1	
+
+	ld a, [hli]
+	ld [de], a
+	inc de
+
+.waitVRAMR2
+	ldh a, [rSTAT]		
+	and %10				
+	jr nz, .waitVRAMR2
+
+	ld a, [hli]
+	ld [de], a
+	inc de
+; the following lines wrap us from the right edge to the left edge if necessary
+	ld a, e
+	and $1f
+	jr nz, .noSideWrap
+	ld a, e
+	sub BG_MAP_WIDTH
+	ld e, a
+	ld a, d
+	sbc 0
+	ld d, a
+	ld a, l
+	sub BG_MAP_WIDTH
+	ld l, a
+	ld a, h
+	sbc 0
+	ld h, a
+.noSideWrap
+	dec c
+	jr nz, .loopRow
+	ret
 	
 	
+
 TransferGBCEnhancedBGMapAttributes:
 ;only for GBC and only if option is active
 	ld a, [hGBC]
@@ -989,7 +1118,7 @@ GBCBufferFastTransfer:
 	ld a, h
 	ld [H_SPTEMP], a
 	ld a, l
-	ld [H_SPTEMP + 1], a ; save stack pinter
+	ld [H_SPTEMP + 1], a ; save stack pointer
 	
 	ld h, d
 	ld l, e
