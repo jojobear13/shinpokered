@@ -78,6 +78,11 @@ MakeOverworldBGMapAttributes:
 	ld a, [wUnusedD721]
 	bit 7, a
 	ret z
+	
+;only do theattributes when walking around, not during a menu or text since that will mess up the settings
+	ld a, [H_AUTOBGTRANSFERENABLED]
+	and a
+	ret nz
 
 	ld a, [wMapViewVRAMPointer]
 	ld b, a
@@ -222,6 +227,13 @@ MakeOverworldBGMapAttributes:
 
 	;point to the correct tile
 	ld a, [de]
+
+;error trap
+	cp $60
+	ld a, 0
+	jr nc, .copyColorAttribute
+	ld a, [de]
+	
 	add l
 	ld l, a
 	ld a, 0

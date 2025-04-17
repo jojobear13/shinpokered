@@ -8,6 +8,11 @@ DisplayStartMenu::
 	call PlaySound
 
 RedisplayStartMenu::
+	;GBCNote - if using enhanced GBC color, add some extra delay
+	ld a, [wUnusedD721]
+	bit 7, a
+	call nz, Delay3
+
 	callba DrawStartMenu
 	callba PrintSafariZoneSteps ; print Safari Zone info, if in Safari Zone
 	call LoadGBPal	;joenote - moved this here for smoother whiteout transition
