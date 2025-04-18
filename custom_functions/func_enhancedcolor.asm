@@ -88,6 +88,7 @@ MakeOverworldBGMapAttributes:
 	ld b, a
 	ld a, [wMapViewVRAMPointer+1]
 	ld c, a
+.jump_in	;label used for being called from other functions
 	ld a, [wCurMap]
 	ld d, a
 	ld a, [wCurMapTileset]
@@ -279,12 +280,6 @@ MakeOverworldBGMapAttributes:
 ;restore the original wram bank and return
 	ld hl, rSVBK
 	res 1, [hl]
-
-;re-enabling interrupts causes vblank to run which in turn creates a weird scanline glitch for a 1 frame
-;skip OAM in order to prevent it
-	ld a, [hFlagsFFFA]
-	set 5, a
-	ld [hFlagsFFFA], a
 	ei	;re-enable interrupts
 	ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
@@ -556,11 +551,49 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	
 	
 	
-;This is called late in VBLANK and transfers the BG Map Attributes for any redrawn rows/columns after RedrawRowOrColumn
-GBCEnhancedRedrawRowOrColumn::
-	ld a, [hVblankBackup]
+MakeAndTransferOverworldBGMapAttributes_OpenText:	
+;only for GBC and only if option is active
+	ld a, [hGBC]
+	and a
+	ret z
+	ld a, [wUnusedD721]
+	bit 7, a
+	ret z
+;only on the overworld bgmap
+	ld a, [hFlagsFFFA]
+	bit 4, a
+	ret z
+;opening a text box
+	ld bc, $0098	;set the MapView offset to zero
+	call MakeOverworldBGMapAttributes.jump_in
+	ld a, %10 ;only do vBGMap1 space
+	ld [hDivideBCDBuffer+2], a
+	jp TransferGBCEnhancedBGMapAttributes.vBGMap_selected
+
+MakeAndTransferOverworldBGMapAttributes_CloseText:	
+;only on the overworld bgmap
+	ld a, [hFlagsFFFA]
+	bit 4, a
+	ret z
+;closing a text box
+	ld a, [wMapViewVRAMPointer]
 	ld b, a
-	xor a
+	ld a, [wMapViewVRAMPointer+1]
+	ld c, a
+	call MakeOverworldBGMapAttributes.jump_in	
+	ld a, %01 ;only do vBGMap0 space
+	ld [hDivideBCDBuffer+2], a
+	jp TransferGBCEnhancedBGMapAttributes.vBGMap_selected
+
+
+
+;This is called late in VBLANK and transfers the BG Map Attributes for any redrawn rows/columns after RedrawRowOrColumn
+GBCEnhancedRedrawRowOrColumn:
+	ld a, [hVblankBackup]
+	and %00000011
+	ld b, a
+	ld a, [hVblankBackup]
+	and %11111100
 	ld [hVblankBackup], a
 	
 	;only for GBC and only if option is active
@@ -738,14 +771,16 @@ TransferGBCEnhancedBGMapAttributes:
 	bit 7, a
 	ret z
 
+	ld a, %11
+	ld [hDivideBCDBuffer+2], a
+
+.vBGMap_selected
 	ld de, $3F00
 	ld hl, w2BGMapAttributes
 	ld a, h
 	ld [hDivideBCDBuffer], a
 	ld a, l
 	ld [hDivideBCDBuffer+1], a
-	ld a, %11
-	ld [hDivideBCDBuffer+2], a
 	di
 	ld hl, rSVBK
 	set 1, [hl]
@@ -959,7 +994,7 @@ UpdateEnhancedGBCPal_BGP:
 	
 
 
-UpdateEnhancedGBCPal_OBP::
+UpdateEnhancedGBCPal_OBP:
 ; d = CONVERT_OBP0 or CONVERT_OBP1
 
 	ld a, d
@@ -1081,7 +1116,31 @@ PalSettings_MUSEUM:       	; 10
 PalSettings_UNDERGROUND:  	; 11
 PalSettings_GATE:         	; 12
 PalSettings_SHIP:         	; 13
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 PalSettings_SHIP_PORT:    	; 14
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	7,	0,	7,	7,	7,	7,	7,	7,	7,	7,	6,	7,	7,	7,	7,	7;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	7,	3,	6,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	7,	7,	7,
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	7,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	6,	6,	7,	7,	7,
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	7,	7,	7,	7,	7,	0,	0,	6,	6,	7,	7,	7,	7,	7,	7;
 PalSettings_CEMETERY:     	; 15
 PalSettings_INTERIOR:     	; 16
 PalSettings_CAVERN:       	; 17
@@ -1098,11 +1157,11 @@ db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 ;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 ;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	6,	0,	0,	0;
 ;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	6,	6,	6,	0,	0,	0;
 ;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	0,	0,	0,	0,	0,	0;
 
 
 
@@ -1674,12 +1733,33 @@ IncrementAllColorsGBC_improved:
 	
 	
 	
+AutoBGMapTransferStatusTracker:
+	ld hl, hVblankBackup
+
+	ld a, [hVblankBackup] 
+	and %0000100
+	ld b, a
 	
+	ld a, [H_AUTOBGTRANSFERENABLED]
+	add a
+	add a
 	
-	
-	
-	
-	
+	cp b
+
+	ret z	; no change
+	jr c, .hi2lo	
+
+.lo2hi
+	set 2, [hl]
+	set 3, [hl]
+	res 4, [hl]
+	ret	
+
+.hi2lo	
+	res 2, [hl]
+	res 3, [hl]
+	set 4, [hl]
+	ret	
 	
 	
 	

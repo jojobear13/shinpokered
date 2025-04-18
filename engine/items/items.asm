@@ -3284,6 +3284,12 @@ WaterTilesets:
 ; for items that cause the overworld to be displayed
 ItemUseReloadOverworldData:
 	call LoadCurrentMapView
+
+;GBCNote - for enhanced GBC color
+;makes it so that the vBGMap1 space gets updated for the side menu going away
+	call DelayFrame
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+
 	call UpdateSprites
 	jp DelayFrame	;joenote - need to make sure OAM data gets updated too
 

@@ -247,12 +247,19 @@ SetPal_Overworld:
 	ld hl, hFlagsFFFA
 	set 4, [hl]
 
+;flag to not generate or transfer attributes
+	ld a, [hFlagsFFFA]
+	bit 5, a
+	jr nz, .done_attributes
+	
+
 	;first make the BG Map Attribute table
 	callba MakeOverworldBGMapAttributes
 
 	;now transfer the BG Map Attributes
 	callba TransferGBCEnhancedBGMapAttributes
 	
+.done_attributes
 	;now we've effectively done the same thing as TranslatePalPacketToBGMapAttributes
 	;now transfer the palette data to accomplish what InitGBCPalettes does
 	callba TransferGBCEnhancedOverworldPalettes	

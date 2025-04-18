@@ -78,12 +78,24 @@ VBlank::
 	and a
 	call z, ReadJoypad
 
+;GBCnote - for enhanced GBC colors, do the bg map attributes for new rows/columns if required
 	ld a, [hVblankBackup]
 	and a
 	jr z, .skip_GBCEnhancedRedrawRowOrColumn
 	callba GBCEnhancedRedrawRowOrColumn
 .skip_GBCEnhancedRedrawRowOrColumn
 
+;GBCnote - for enhanced GBC colors, track how AutoBgMapTransfer gets run
+	callba AutoBGMapTransferStatusTracker
+
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 	ld a, [wVBlankSavedROMBank]
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
