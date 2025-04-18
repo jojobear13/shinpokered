@@ -1206,12 +1206,24 @@ HoldTextDisplayOpen::
 CloseTextDisplay::
 	ld a, [wCurMap]
 	call SwitchToMapRomBank
+
+
+;GBCNote - moved these functions up here to make things update properly for enhanced GBC color
+	xor a
+	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
+	call LoadCurrentMapView
+	;The map view tiles for the normal overworld map are now loaded in wTileMap
+	;This function will make new map attributes based on the current map view
+	;And then also transfer those attributes to the vBGMap0 space
+	;That way the background is ready when the window gets slid off the screen upon writing to hWY
+	callba MakeAndTransferOverworldBGMapAttributes_CloseText
+
 	ld a, $90
 	ld [hWY], a ; move the window off the screen
 	call DelayFrame
 	call LoadGBPal
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
+;	xor a
+;	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
 ; loop to make sprites face the directions they originally faced before the dialogue
 	ld hl, wSpriteStateData2 + $19
 	ld c, $0f
@@ -1233,7 +1245,7 @@ CloseTextDisplay::
 	ld a, [wd732]
 	bit 3, a ; used fly warp
 	call z, LoadPlayerSpriteGraphics
-	call LoadCurrentMapView
+;	call LoadCurrentMapView
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a

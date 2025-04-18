@@ -45,9 +45,16 @@ UsedCut:
 	call RestoreScreenTilesAndReloadTilePatterns
 	ld a, SCREEN_HEIGHT_PIXELS
 	ld [hWY], a
+;	call Delay3
+;	call LoadGBPal
+;	call LoadCurrentMapView
+
+	call LoadCurrentMapView
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+	callba MakeAndTransferOverworldBGMapAttributes_CloseText
 	call Delay3
 	call LoadGBPal
-	call LoadCurrentMapView
+
 	call SaveScreenTilesToBuffer2
 	call Delay3
 	xor a
@@ -62,7 +69,13 @@ UsedCut:
 	call InitCutAnimOAM
 	ld de, CutTreeBlockSwaps
 	call ReplaceTreeTileBlock
+
+	ld hl, hFlagsFFFA
+	set 5, [hl]
 	call RedrawMapView
+	ld hl, hFlagsFFFA
+	res 5, [hl]
+
 	callba AnimCut
 	ld a, $1
 	ld [wUpdateSpritesEnabled], a

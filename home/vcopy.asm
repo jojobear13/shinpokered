@@ -43,8 +43,14 @@ RedrawRowOrColumn::
 	ld a, [hRedrawRowOrColumnMode]
 	and a
 	ret z
-	ld [hVblankBackup], a	;GBCnote - saving this for later in vblank
-	ld b, a
+	ld b, a	;00, 01, or 02
+
+	;GBCnote - saving this for later in vblank
+	ld a, [hVblankBackup]
+	and %1111100
+	or b
+	ld [hVblankBackup], a	
+
 	xor a
 	ld [hRedrawRowOrColumnMode], a
 	dec b
