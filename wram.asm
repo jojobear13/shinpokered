@@ -1424,7 +1424,7 @@ wScriptedNPCWalkCounter:: ; cf18
 
 	ds 1
 
-;joenote - used for temporary GBC color control settings
+;GBCnote - used for temporary GBC color control settings
 wGBCColorControl:: ; cf1a
 	;bits 0 & 1 --> a value from 0 to 3 to select color 0 through 3
 	;bits 2, 3, & 4 --> a value from 0 to 7 to select BGP/OBP 0 through 7
