@@ -85,17 +85,6 @@ VBlank::
 	callba GBCEnhancedRedrawRowOrColumn
 .skip_GBCEnhancedRedrawRowOrColumn
 
-;GBCnote - for enhanced GBC colors, track how AutoBgMapTransfer gets run
-	callba AutoBGMapTransferStatusTracker
-
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
 	ld a, [wVBlankSavedROMBank]
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a

@@ -980,6 +980,13 @@ UpdateEnhancedGBCPal_BGP:
 	ld [rIE], a
 
 	ld de, wGBCFullPalBuffer
+
+;since the background is getting updates, wait until vblank starts
+;this way the scanlines don't update halfway down the screen
+.wait
+	ld a, [rLY]
+	cp $90
+	jr c, .wait
 	call GBCBufferFastTransfer_BGP
 
 	pop af		;re-enable interrupts
@@ -1730,49 +1737,6 @@ IncrementAllColorsGBC_improved:
 	ld a, 1
 	and a
 	ret
-	
-	
-	
-AutoBGMapTransferStatusTracker:
-	ld hl, hVblankBackup
-
-	ld a, [hVblankBackup] 
-	and %0000100
-	ld b, a
-	
-	ld a, [H_AUTOBGTRANSFERENABLED]
-	add a
-	add a
-	
-	cp b
-
-	ret z	; no change
-	jr c, .hi2lo	
-
-.lo2hi
-	set 2, [hl]
-	set 3, [hl]
-	res 4, [hl]
-	ret	
-
-.hi2lo	
-	res 2, [hl]
-	res 3, [hl]
-	set 4, [hl]
-	ret	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
