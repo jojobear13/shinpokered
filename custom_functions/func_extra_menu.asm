@@ -364,7 +364,13 @@ ToggleGammaShader:
 	ret z	;do nothing if on dmg or sgb
 	xor %00000011
 	ld [hGBC], a
+;GBCNote - RunDefaultPaletteCommand which messes up enhanced GBC colors
+;set a flag for prevent this from happening
+	ld hl, hFlagsFFFA
+	set 5, [hl]
 	call RunDefaultPaletteCommand
+	ld hl, hFlagsFFFA
+	res 5, [hl]
 	;fall through
 ShowGammaSetting:
 	ld hl, OptionMenuOnOffText

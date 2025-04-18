@@ -7,8 +7,11 @@ EnterMap::
 ; Load a new map.
 	ld a, $ff
 	ld [wJoyIgnore], a
-	call LoadMapData
+;	call LoadMapData
+;	callba ClearVariablesOnEnterMap
+;GBCNote - flipping these so the enhanced gbc colors load from main menu
 	callba ClearVariablesOnEnterMap
+	call LoadMapData
 	ld hl, wd72c
 	bit 0, [hl] ; has the player already made 3 steps since the last battle?
 	jr z, .skipGivingThreeStepsOfNoRandomBattles

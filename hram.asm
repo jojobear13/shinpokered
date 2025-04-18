@@ -341,9 +341,6 @@ hFlagsFFFA EQU $FFFA	;joenote - added for various uses
 
 hVblankBackup EQU $FFFC	; added for more various uses involving enhanced GBC colors
 ;bits 0 and 1 - backup of hRedrawRowOrColumnMode
-;bit 2 - previous status of H_AUTOBGTRANSFERENABLED
-;bit 3 - if set, H_AUTOBGTRANSFERENABLED changed from 0 to 1
-;bit 4 - if set, H_AUTOBGTRANSFERENABLED changed from 1 to 0
 
 hRGB EQU $FFFB	; FFFB=Red, FFFC=Green, FFFD=BLUE	;3 bytes ;joenote - used to store color RGB color values
 hGBC EQU $FFFE ;gbcnote - 0 if DMG or SGB, != 0 if GBC, =2 for gamma shader

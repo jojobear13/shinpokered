@@ -49,6 +49,7 @@ UsedCut:
 ;	call LoadGBPal
 ;	call LoadCurrentMapView
 
+;GBCNote - arrange a bit differently for enhanced GBC colors
 	call LoadCurrentMapView
 	callba MakeAndTransferOverworldBGMapAttributes_OpenText
 	callba MakeAndTransferOverworldBGMapAttributes_CloseText
@@ -70,6 +71,8 @@ UsedCut:
 	ld de, CutTreeBlockSwaps
 	call ReplaceTreeTileBlock
 
+;GBCNote - RedrawMapView forces RunDefaultPaletteCommand which messes up enhanced GBC colors
+;set a flag for prevent this from happening
 	ld hl, hFlagsFFFA
 	set 5, [hl]
 	call RedrawMapView
