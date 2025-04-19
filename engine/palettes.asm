@@ -895,6 +895,15 @@ TransferBGPPals::
 	ld [de], a
 	dec c
 	jr nz, .loop
+;GBCnote - the version for non-enhanced GBC colors should white out BGP 4-7 since it is not used. prevents problems.
+	ld c, 2 * PAL_SIZE
+.loop2
+	ld a, $ff
+	ld [de], a
+	ld a, $7f
+	ld [de], a
+	dec c
+	jr nz, .loop2
 	ret
 
 TransferCurOBPData:
