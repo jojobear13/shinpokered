@@ -1,6 +1,11 @@
 BattleTransition:
 	ld a, 1
 	ld [H_AUTOBGTRANSFERENABLED], a
+
+;GBCnote - for enhanced gbc colors, need to update the window as if opening a menu or text box
+;Else colors will be wrong upon writing sliding the window onto the screen
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+
 	call Delay3
 	xor a
 	ld [hWY], a
