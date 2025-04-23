@@ -1384,8 +1384,6 @@ LoadCurrentMapView::
 ;GBCnote - use the new Tile Map to make BGMap Attributes for enhanced GBC color
 ;	--> build the whole thing if the player is not advancing movement
 	callba MakeOverworldBGMapAttributes	
-	;now transfer the BG Map Attributes
-;	callba TransferGBCEnhancedBGMapAttributes
 	ret
 
 AdvancePlayerSprite::

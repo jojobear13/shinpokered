@@ -80,7 +80,7 @@ VBlank::
 
 ;GBCnote - for enhanced GBC colors, do the bg map attributes for new rows/columns if required
 	ld a, [hVblankBackup]
-	and a
+	and %11
 	jr z, .skip_GBCEnhancedRedrawRowOrColumn
 	callba GBCEnhancedRedrawRowOrColumn
 .skip_GBCEnhancedRedrawRowOrColumn
