@@ -79,7 +79,7 @@ MakeOverworldBGMapAttributes:
 	bit 7, a
 	ret z
 	
-;only do theattributes when walking around, not during a menu or text since that will mess up the settings
+;only do the attributes when walking around, not during a menu or text since that will mess up the settings
 	ld a, [H_AUTOBGTRANSFERENABLED]
 	and a
 	ret nz
@@ -304,6 +304,7 @@ MakeOverworldBGMapAttributes:
 	
 ;same as above but just for updating the row/column when the player walks
 MakeOverworldBGMapAttributes_RolColUpdate:	
+	call .getTileset
 	ld a, [wSpriteStateData1 + 3]
 	cp $01
 	jr z, .south
@@ -516,20 +517,10 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 .convert
 	push hl
-	push bc
-;get the current map tileset
 ;based on the tileset, point HL to the correct list of BG map attributes for its tiles
-	ld a, [w2CurMapTileset]
-	ld c, a
-	ld b, 0
-	ld hl, OverworldTilePalPointers	
-	add hl, bc
-	add hl, bc
-	ld a, [hli]   
-	ld b, a       
-	ld a, [hl]    
+	ld a, [H_SPTEMP]   
 	ld h, a
-	ld a, b
+	ld a, [H_SPTEMP+1]   
 	ld l, a
 ;point to the correct tile
 	ld a, [de]
@@ -545,8 +536,21 @@ MakeOverworldBGMapAttributes_RolColUpdate:
 	call MakeOverworldBGMapAttributes.townColor
 .copyColorAttribute	
 	ld [de], a
-	pop bc
 	pop hl
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+.getTileset
+;get the current map tileset
+	ld a, [w2CurMapTileset]
+	ld c, a
+	ld b, 0
+	ld hl, OverworldTilePalPointers	
+	add hl, bc
+	add hl, bc
+	ld a, [hli]   
+	ld [H_SPTEMP+1], a
+	ld a, [hl]    
+	ld [H_SPTEMP], a
 	ret
 	
 	
@@ -1124,7 +1128,7 @@ db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 ;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_FOREST:      	; 3
+PalSettings_FOREST:      	; 3		- done
 ;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
 db	4,	3,	6,	6,	4,	4,	4,	4,	6,	6,	3,	3,	6,	6,	6,	6;
 ;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
