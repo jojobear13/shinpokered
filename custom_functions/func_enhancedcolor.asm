@@ -66,6 +66,304 @@ GBCEnhancedOverworldPalettes:
 
 
 	
+OverworldTilePalPointers:
+	dw PalSettings_OVERWORLD    ; 0
+	dw PalSettings_REDS_HOUSE_1 ; 1
+	dw PalSettings_MART         ; 2
+	dw PalSettings_FOREST       ; 3
+	dw PalSettings_REDS_HOUSE_2 ; 4
+	dw PalSettings_DOJO         ; 5
+	dw PalSettings_POKECENTER   ; 6
+	dw PalSettings_GYM          ; 7
+	dw PalSettings_HOUSE        ; 8
+	dw PalSettings_FOREST_GATE  ; 9
+	dw PalSettings_MUSEUM       ; 10
+	dw PalSettings_UNDERGROUND  ; 11
+	dw PalSettings_GATE         ; 12
+	dw PalSettings_SHIP         ; 13
+	dw PalSettings_SHIP_PORT    ; 14
+	dw PalSettings_CEMETERY     ; 15
+	dw PalSettings_INTERIOR     ; 16
+	dw PalSettings_CAVERN       ; 17
+	dw PalSettings_LOBBY        ; 18
+	dw PalSettings_MANSION      ; 19
+	dw PalSettings_LAB          ; 20
+	dw PalSettings_CLUB         ; 21
+	dw PalSettings_FACILITY     ; 22
+	dw PalSettings_PLATEAU      ; 23
+
+;Assign a color register to be used for each tile in every tileset.
+;A value of 8 is a "wild card" to set the color register based on the current town.
+PalSettings_OVERWORLD:   	; 0		- done
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	3,	6,	6,	1,	6,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	3,	6,	8,	6,	7,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	3,	3,	3,	3,	6,	8,	8,	6,	8,	8,	3,	3,	4,	4,	4,	3;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	4,	6,	6,	6,	6,	6,	6,	6,	8,	4,	3,	3,	6,	4,	4,	3;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	4,	4,	0,	0,	7,	7,	6,	6,	6,	6,	3,	3,	8,	8,	3,	3;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	4,	4,	4,	8,	6,	6,	6,	6,	6,	6,	8,	0,	8,	8,	3,	3;
+PalSettings_REDS_HOUSE_1:	; 1
+PalSettings_REDS_HOUSE_2:	; 4
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	6,	3,	3,	3,	2,	3,	7,	7,	4,	4,	6,	6,	6,	6,	3,	3;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	3,	3,	3,	3,	2,	3,	7,	7,	6,	6,	6,	6,	6,	6,	3,	3;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	3,	3,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	3,	3,	6;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	6,	6,	3,	3,	4,	4,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	3,	3,	3;
+PalSettings_FOREST:      	; 3		- done
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	4,	3,	6,	6,	4,	4,	4,	4,	6,	6,	3,	3,	6,	6,	6,	6;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	6,	6,	7,	4,	4,	4,	6,	6,	3,	3,	6,	6,	6,	6;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	4,	6,	6,	4,	4,	4,	4,	4,	6,	6,	6,	6,	6,	6,	6,	6;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	4,	6,	6,	3,	4,	6,	6,	3,	6,	4,	6,	6,	6,	6,	6,	6;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	3,	3,	3,	3,	6,	6,	6,	6,	6,	6,	6,	3,	3,	6,	6,	6;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	6,	6,	6,	6,	4,	4,	4,	4,	6,	6,	6,	6,	6,	6,	4,	4;
+PalSettings_MART:        	; 2
+PalSettings_POKECENTER:  	; 6
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_DOJO:        	; 5
+PalSettings_GYM:          	; 7
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_HOUSE:        	; 8
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_FOREST_GATE:  	; 9
+PalSettings_MUSEUM:       	; 10
+PalSettings_GATE:         	; 12
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_UNDERGROUND:  	; 11
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_SHIP:         	; 13
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_SHIP_PORT:    	; 14	- done
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	7,	0,	7,	7,	7,	7,	7,	7,	7,	7,	6,	7,	7,	7,	7,	7;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	7,	3,	6,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	7,	7,	7,
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	7,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	6,	6,	7,	7,	7,
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	7,	7,	7,	7,	7,	0,	0,	6,	6,	7,	7,	7,	7,	7,	7;
+PalSettings_CEMETERY:     	; 15
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_INTERIOR:     	; 16
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_CAVERN:       	; 17
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_LOBBY:        	; 18
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_MANSION:      	; 19
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_LAB:          	; 20
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_CLUB:         	; 21
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+PalSettings_FACILITY:     	; 22	- done
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	3,	3,	6,	3,	3,	4,	4,	6,	3,	6,	6,	3,	3,	6,	6,	6;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	3,	3,	6,	3,	7,	4,	4,	6,	3,	6,	6,	3,	3,	6,	6,	6;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	2,	2,	1,	5,	3,	3,	6,	2,	6,	6,	7,	7,	7,	7,	7,	2;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	2,	2,	1,	3,	3,	6,	6,	2,	6,	6,	7,	7,	7,	3,	3,	2;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	3,	3,	1,	3,	6,	6,	5,	7,	5,	5,	3,	3,	3,	3,	3,	6;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	3,	3,	1,	6,	6,	3,	3,	7,	3,	7,	3,	3,	7,	7,	2,	7;
+PalSettings_PLATEAU:      	; 23
+;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
+db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	6,	0,	0,	0;
+;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
+db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	6,	6,	6,	0,	0,	0;
+;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
+db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	0,	0,	0,	0,	0,	0;
+
+
+
+PalSettings_TownSpecialPal:
+	db	PAL_ENH_OVW_PURPLE	;	PALLET_TOWN,		; $00
+	db	PAL_ENH_OVW_GREEN	;	VIRIDIAN_CITY,		; $01
+	db	PAL_ENH_OVW_GRAY	;	PEWTER_CITY,		; $02
+	db	PAL_ENH_OVW_BLUE	;	CERULEAN_CITY,		; $03
+	db	PAL_ENH_OVW_PURPLE	;	LAVENDER_TOWN,		; $04
+	db	PAL_ENH_OVW_RED		;	VERMILION_CITY,		; $05
+	db	PAL_ENH_OVW_GREEN	;	CELADON_CITY,		; $06
+	db	PAL_ENH_OVW_PINK	;	FUCHSIA_CITY,		; $07
+	db	PAL_ENH_OVW_RED		;	CINNABAR_ISLAND,	; $08
+	db	PAL_ENH_OVW_BLUE	;	INDIGO_PLATEAU,		; $09
+	db	PAL_ENH_OVW_YELLOW	;	SAFFRON_CITY,		; $0A
+
+	
+
 ;This copies everything in wTileMap to w2BGMapAttributes in wram bank 2
 ;It also converts all the tile values to BG Map Attribute palettes
 ;Clobbers BC, HL, and DE
@@ -1073,304 +1371,6 @@ UpdateEnhancedGBCPal_OBP:
 
 
 	
-OverworldTilePalPointers:
-	dw PalSettings_OVERWORLD    ; 0
-	dw PalSettings_REDS_HOUSE_1 ; 1
-	dw PalSettings_MART         ; 2
-	dw PalSettings_FOREST       ; 3
-	dw PalSettings_REDS_HOUSE_2 ; 4
-	dw PalSettings_DOJO         ; 5
-	dw PalSettings_POKECENTER   ; 6
-	dw PalSettings_GYM          ; 7
-	dw PalSettings_HOUSE        ; 8
-	dw PalSettings_FOREST_GATE  ; 9
-	dw PalSettings_MUSEUM       ; 10
-	dw PalSettings_UNDERGROUND  ; 11
-	dw PalSettings_GATE         ; 12
-	dw PalSettings_SHIP         ; 13
-	dw PalSettings_SHIP_PORT    ; 14
-	dw PalSettings_CEMETERY     ; 15
-	dw PalSettings_INTERIOR     ; 16
-	dw PalSettings_CAVERN       ; 17
-	dw PalSettings_LOBBY        ; 18
-	dw PalSettings_MANSION      ; 19
-	dw PalSettings_LAB          ; 20
-	dw PalSettings_CLUB         ; 21
-	dw PalSettings_FACILITY     ; 22
-	dw PalSettings_PLATEAU      ; 23
-
-;Assign a color register to be used for each tile in every tileset.
-;A value of 8 is a "wild card" to set the color register based on the current town.
-PalSettings_OVERWORLD:   	; 0		- done
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	3,	6,	6,	1,	6,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	3,	6,	8,	6,	7,	8,	8,	8,	8,	8,	3,	6,	6,	3,	6,	3;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	3,	3,	3,	3,	6,	8,	8,	6,	8,	8,	3,	3,	4,	4,	4,	3;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	4,	6,	6,	6,	6,	6,	6,	6,	8,	4,	3,	3,	6,	4,	4,	3;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	4,	4,	0,	0,	7,	7,	6,	6,	6,	6,	3,	3,	8,	8,	3,	3;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	4,	4,	4,	8,	6,	6,	6,	6,	6,	6,	8,	0,	8,	8,	3,	3;
-PalSettings_REDS_HOUSE_1:	; 1
-PalSettings_REDS_HOUSE_2:	; 4
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_FOREST:      	; 3		- done
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	4,	3,	6,	6,	4,	4,	4,	4,	6,	6,	3,	3,	6,	6,	6,	6;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	6,	6,	7,	4,	4,	4,	6,	6,	3,	3,	6,	6,	6,	6;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	4,	6,	6,	4,	4,	4,	4,	4,	6,	6,	6,	6,	6,	6,	6,	6;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	4,	6,	6,	3,	4,	6,	6,	3,	6,	4,	6,	6,	6,	6,	6,	6;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	3,	3,	3,	3,	6,	6,	6,	6,	6,	6,	6,	3,	3,	6,	6,	6;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	6,	6,	6,	6,	4,	4,	4,	4,	6,	6,	6,	6,	6,	6,	4,	4;
-PalSettings_MART:        	; 2
-PalSettings_POKECENTER:  	; 6
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_DOJO:        	; 5
-PalSettings_GYM:          	; 7
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_HOUSE:        	; 8
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_FOREST_GATE:  	; 9
-PalSettings_MUSEUM:       	; 10
-PalSettings_GATE:         	; 12
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_UNDERGROUND:  	; 11
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_SHIP:         	; 13
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_SHIP_PORT:    	; 14	- done
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	7,	0,	7,	7,	7,	7,	7,	7,	7,	7,	6,	7,	7,	7,	7,	7;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	7,	3,	6,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	7,	7,	7,
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	7,	7,	7,	7,	7,	7,	7,	7,	6,	6,	6,	6,	6,	7,	7,	7,
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	7,	7,	7,	7,	7,	0,	0,	6,	6,	7,	7,	7,	7,	7,	7;
-PalSettings_CEMETERY:     	; 15
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_INTERIOR:     	; 16
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_CAVERN:       	; 17
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_LOBBY:        	; 18
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_MANSION:      	; 19
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_LAB:          	; 20
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_CLUB:         	; 21
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_FACILITY:     	; 22	- done
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	3,	3,	6,	3,	3,	4,	4,	6,	3,	6,	6,	3,	3,	6,	6,	6;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	3,	3,	6,	3,	7,	4,	4,	6,	3,	6,	6,	3,	3,	6,	6,	6;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	2,	2,	1,	5,	3,	3,	6,	2,	6,	6,	7,	7,	7,	7,	7,	2;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	2,	2,	1,	3,	3,	6,	6,	2,	6,	6,	7,	7,	7,	3,	3,	2;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	3,	3,	1,	3,	6,	6,	5,	7,	5,	5,	3,	3,	3,	3,	3,	6;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	3,	3,	1,	6,	6,	3,	3,	7,	3,	7,	3,	3,	7,	7,	2,	7;
-PalSettings_PLATEAU:      	; 23
-;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	6,	0,	0,	0;
-;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	6,	6,	6,	0,	0,	0;
-;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
-db	0,	0,	0,	0,	0,	0,	0,	0,	6,	6,	0,	0,	0,	0,	0,	0;
-
-
-
-PalSettings_TownSpecialPal:
-	db	PAL_ENH_OVW_PURPLE	;	PALLET_TOWN,		; $00
-	db	PAL_ENH_OVW_GREEN	;	VIRIDIAN_CITY,		; $01
-	db	PAL_ENH_OVW_GRAY	;	PEWTER_CITY,		; $02
-	db	PAL_ENH_OVW_BLUE	;	CERULEAN_CITY,		; $03
-	db	PAL_ENH_OVW_PURPLE	;	LAVENDER_TOWN,		; $04
-	db	PAL_ENH_OVW_RED		;	VERMILION_CITY,		; $05
-	db	PAL_ENH_OVW_GREEN	;	CELADON_CITY,		; $06
-	db	PAL_ENH_OVW_PINK	;	FUCHSIA_CITY,		; $07
-	db	PAL_ENH_OVW_RED		;	CINNABAR_ISLAND,	; $08
-	db	PAL_ENH_OVW_BLUE	;	INDIGO_PLATEAU,		; $09
-	db	PAL_ENH_OVW_YELLOW	;	SAFFRON_CITY,		; $0A
-
-	
-
 ;This is an extremely fast and lightweight function for transferring an entire 128 byte buffer of colors to the GBC
 ;Takes DE which points to the address of the buffer to use
 ;Unlike the reduced versions below for BGP/OBP, this has a built-in 1 frame delay as it waits for LY=$90
@@ -1647,43 +1647,43 @@ DecrementAllColorsGBC_improved:
 ;C = number to subract from each R, G, and B value
 ;HL = pointer for the color bytes to modify
 
-;red
+;blue
 	ld a, [hl]
 	ld b, a				
 	and %00000011	
-	ld d, a				;d = red negative
+	ld d, a				;d = blue negative
 	ld a, %01111100
 	and b				;a = positive
 	ld b, c				
 	rlc b
-	rlc b				;b = amount to subtract from red
+	rlc b				;b = amount to subtract from blue
 	sub b				;a = a - b
 	
-	jr c, .makeMinRed
+	jr c, .makeMinBlue
 	cp $C
-	jr nc, .meetsMinRed
-.makeMinRed
-	ld a, $C	;minimum red value if underflow
-.meetsMinRed
+	jr nc, .meetsMinBlue
+.makeMinBlue
+	ld a, $C	;minimum blue value if underflow
+.meetsMinBlue
 	
 	or d
 	ld [hli], a
 	
-;blue
+;red
 	ld a, [hl]
 	ld b, a
 	and %11100000
-	ld e, a				;e = blue negative
+	ld e, a				;e = red negative
 	ld a, %00011111
 	and b				;a = positive
 	sub c				;a = a - c
 
-	jr c, .makeMinBlue
+	jr c, .makeMinRed
 	cp $03
-	jr nc, .meetsMinBlue
-.makeMinBlue
-	ld a, $03	;minimum blue value if underflow
-.meetsMinBlue
+	jr nc, .meetsMinRed
+.makeMinRed
+	ld a, $03	;minimum red value if underflow
+.meetsMinRed
 
 	or e
 	ld [hld], a
@@ -1706,8 +1706,8 @@ DecrementAllColorsGBC_improved:
 	ld c, a
 	;color is now in BC and number to subtract is in HL
 	
-	;e = green positive lo = blue negative from above
-	;d = green positive hi = red negative from above
+	;e = green positive lo = red negative from above
+	;d = green positive hi = blue negative from above
 	
 	;do DE = DE - HL - 3
 	ld a, e
@@ -1725,7 +1725,7 @@ DecrementAllColorsGBC_improved:
 	ld d, a
 	jr nc, .meetsMinGreen	
 .makeMinGreen
-	ld de, $0060	;minimum green value if underflow
+	ld de, $0060 - 3	;<minimum green value if underflow> - 3
 .meetsMinGreen
 	
 	inc de
@@ -1806,41 +1806,41 @@ IncrementAllColorsGBC_improved:
 ;C = number to add to each R, G, and B value
 ;HL = pointer for the color bytes to modify
 
-;red
+;blue
 	ld a, [hl]
 	ld b, a				
 	and %00000011	
-	ld d, a				;d = red negative
+	ld d, a				;d = blue negative
 	ld a, %01111100
 	and b				;a = positive
 	ld b, c				
 	rlc b
-	rlc b				;b = amount to add to red
+	rlc b				;b = amount to add to blue
 	add b				;a = a + b
 	
 	cp $7C+1
-	jr c, .meetsMaxRed
-.makeMaxRed
-	ld a, $7C	;Maximum red value if overflow
-.meetsMaxRed
+	jr c, .meetsMaxBlue
+.makeMaxBlue
+	ld a, $7C	;Maximum Blue value if overflow
+.meetsMaxBlue
 	
 	or d
 	ld [hli], a
 	
-;blue
+;red
 	ld a, [hl]
 	ld b, a
 	and %11100000
-	ld e, a				;e = blue negative
+	ld e, a				;e = Red negative
 	ld a, %00011111
 	and b				;a = positive
 	add c				;a = a + c
 
 	cp $1F+1
-	jr c, .meetsMaxBlue
-.makeMaxBlue
-	ld a, $1F	;Maximum blue value if underflow
-.meetsMaxBlue
+	jr c, .meetsMaxRed
+.makeMaxRed
+	ld a, $1F	;Maximum Red value if underflow
+.meetsMaxRed
 
 	or e
 	ld [hld], a
@@ -1863,8 +1863,8 @@ IncrementAllColorsGBC_improved:
 	ld c, a
 	;color is now in BC and number to add is in HL
 	
-	;e = green positive lo = blue negative from above
-	;d = green positive hi = red negative from above
+	;e = green positive lo = red negative from above
+	;d = green positive hi = blue negative from above
 	
 	;do HL = HL + DE then make sure it's < $03E0+1
 	add hl, de
@@ -1878,7 +1878,6 @@ IncrementAllColorsGBC_improved:
 .makeMaxGreen
 	ld de, $03E0	;Maximum green value if overflow
 .meetsMaxGreen
-	
 	
 	pop hl	
 
