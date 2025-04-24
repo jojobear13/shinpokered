@@ -2,6 +2,8 @@ AnimCut:
 	ld a, [wCutTile]
 	cp $52
 	jr z, .grass
+	cp $45	;joenote - added plateau grass
+	jr z, .grass
 	ld c, $8
 .cutTreeLoop
 	push bc
