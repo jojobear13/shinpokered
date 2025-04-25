@@ -1344,6 +1344,7 @@ LoadCurrentMapView::
 .noCarry2
 	dec b
 	jr nz, .rowLoop
+	
 	ld hl, wTileMapBackup
 	ld bc, $0000
 .adjustForYCoordWithinTileBlock
@@ -1358,25 +1359,65 @@ LoadCurrentMapView::
 	jr z, .copyToVisibleAreaBuffer
 	ld bc, $0002
 	add hl, bc
+
+;joenote - doing optimization for speed
+;saves 6 scanlines of time in GBC double speed mode
 .copyToVisibleAreaBuffer
-	coord de, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
+	ld d, h
+	ld e, l
+	di
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	ld h, d
+	ld l, e
+	ld sp, hl	
+	coord hl, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
 	ld b, SCREEN_HEIGHT
 .rowLoop2
-	ld c, SCREEN_WIDTH
+	ld c, SCREEN_WIDTH / 2
 .rowInnerLoop2
-	ld a, [hli]
-	ld [de], a
-	inc de
+	pop de
+	ld a, e
+	ld [hli], a
+	ld a, d
+	ld [hli], a
 	dec c
 	jr nz, .rowInnerLoop2
-	ld a, $04
-	add l
-	ld l, a
-	jr nc, .noCarry3
-	inc h
-.noCarry3
+	pop de
+	pop de
 	dec b
 	jr nz, .rowLoop2
+;restore the stack pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ei
+	
+;.copyToVisibleAreaBuffer
+;	coord de, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
+;	ld b, SCREEN_HEIGHT
+;.rowLoop2
+;	ld c, SCREEN_WIDTH
+;.rowInnerLoop2
+;	ld a, [hli]
+;	ld [de], a
+;	inc de
+;	dec c
+;	jr nz, .rowInnerLoop2
+;	ld a, $04
+;	add l
+;	ld l, a
+;	jr nc, .noCarry3
+;	inc h
+;.noCarry3
+;	dec b
+;	jr nz, .rowLoop2
+
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a ; restore previous ROM bank
@@ -1751,8 +1792,20 @@ ScheduleWestColumnRedraw::
 
 ; function to write the tiles that make up a tile block to memory
 ; Input: c = tile block ID, hl = destination address
+;joenote - doing optimization for speed
+;saves 5 scanlines of time in GBC double speed mode overall when called in LoadCurrentMapView's loops
 DrawTileBlock::
-	push hl
+	ld d, h
+	ld e, l
+
+;back up the stack pointer
+	di
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
 	ld a, [wTilesetBlocksPtr] ; pointer to tiles
 	ld l, a
 	ld a, [wTilesetBlocksPtr + 1]
@@ -1766,30 +1819,79 @@ DrawTileBlock::
 	and $0f
 	ld b, a ; bc = tile block ID * 0x10
 	add hl, bc
-	ld d, h
-	ld e, l ; de = address of the tile block's tiles
-	pop hl
+	ld sp, hl
+	; sp = address of the tile block's tiles
+	
+	ld h, d
+	ld l, e		;hl = destination address
+
 	ld c, $04 ; 4 loop iterations
 .loop ; each loop iteration, write 4 tile numbers
-	push bc
-	ld a, [de]
+	pop de
+	ld a, e
 	ld [hli], a
-	inc de
-	ld a, [de]
+	ld a, d
 	ld [hli], a
-	inc de
-	ld a, [de]
+	pop de
+	ld a, e
 	ld [hli], a
-	inc de
-	ld a, [de]
+	ld a, d
 	ld [hl], a
-	inc de
-	ld bc, $0015
-	add hl, bc
-	pop bc
+
+	ld de, $0015
+	add hl, de
 	dec c
 	jr nz, .loop
+	
+;restore the stack pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ei
+	
 	ret
+
+; DrawTileBlock::
+	; push hl
+	; ld a, [wTilesetBlocksPtr] ; pointer to tiles
+	; ld l, a
+	; ld a, [wTilesetBlocksPtr + 1]
+	; ld h, a
+	; ld a, c
+	; swap a
+	; ld b, a
+	; and $f0
+	; ld c, a
+	; ld a, b
+	; and $0f
+	; ld b, a ; bc = tile block ID * 0x10
+	; add hl, bc
+	; ld d, h
+	; ld e, l ; de = address of the tile block's tiles
+	; pop hl
+	; ld c, $04 ; 4 loop iterations
+; .loop ; each loop iteration, write 4 tile numbers
+	; push bc
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hl], a
+	; inc de
+	; ld bc, $0015
+	; add hl, bc
+	; pop bc
+	; dec c
+	; jr nz, .loop
+	; ret
 
 ; function to update joypad state and simulate button presses
 JoypadOverworld::
