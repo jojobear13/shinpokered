@@ -66,6 +66,57 @@ GBCEnhancedOverworldPalettes:
 
 
 	
+GBCEnhancedOverworldPalettes_ColdCavern:	;just used for seafoam islands for aesthetic
+	; PAL_ENH_OVW_RED     	; $00
+	RGB 31, 31, 31
+	RGB 31, 10,  0
+	RGB 21,  0,  0
+	RGB  3,  3,  3
+	
+	; PAL_ENH_OVW_PINK  	; $01
+	RGB 31, 31, 31
+	RGB 31, 15, 18
+	RGB 31,  0,  6
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_PURPLE 	; $02
+	RGB 31, 31, 31
+	RGB 25, 15, 31
+	RGB 19,  0, 22
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_GRAY   	; $03
+	RGB 31, 31, 31
+	RGB $12, $12, $18
+	RGB $A, $A,  $F
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_GREEN    	; $04
+	RGB 31, 31, 31
+	RGB 17, 31, 11
+	RGB  1, 22,  6
+	RGB  3,  3,  3
+	
+	; PAL_ENH_OVW_YELLOW  	; $05
+	RGB 31, 31, 31
+	RGB 31, 31,  0
+	RGB 28, 14,  0
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_BROWN    	; $06
+	RGB 31, 31, 31
+	RGB $10, $5, $16
+	RGB $7, $3,  $F
+	RGB  3,  3,  3
+
+	; PAL_ENH_OVW_BLUE  	; $07
+	RGB 31, 31, 31
+	RGB 12, 14, 31
+	RGB  0,  1, 25
+	RGB  3,  3,  3
+
+
+	
 OverworldTilePalPointers:
 	dw PalSettings_OVERWORLD    ; 0
 	dw PalSettings_REDS_HOUSE_1 ; 1
@@ -255,17 +306,17 @@ db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 ;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
-PalSettings_CAVERN:       	; 17
+PalSettings_CAVERN:       	; 17	- done
 ;	00	01	02	03	04	05	06	07	08	09	0A	0B	0C	0D	0E	0F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	3,	3,	6,	6,	3,	6,	3,	3,	3,	3,	3,	3,	3,	3,	3,	3;
 ;	10	11	12	13	14	15	16	17	18	19	1A	1B	1C	1D	1E	1F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	6,	6,	6,	6,	7,	6,	6,	6,	3,	3,	3,	3,	3,	3,	3,	3;
 ;	20	21	22	23	24	25	26	27	28	29	2A	2B	2C	2D	2E	2F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	3,	5,	3,	3,	3,	6,	6,	3,	6,	6,	6,	3,	3,	3,	3,	3;
 ;	30	31	32	33	34	35	36	37	38	39	3A	3B	3C	3D	3E	3F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	3,	6,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	3,	6,	6,	6;
 ;	40	41	42	43	44	45	46	47	48	49	4A	4B	4C	4D	4E	4F
-db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
+db	6,	6,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 ;	50	51	52	53	54	55	56	57	58	59	5A	5B	5C	5D	5E	5F
 db	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0;
 PalSettings_LOBBY:        	; 18
@@ -1192,7 +1243,18 @@ BufferAllEnhancedColorsGBC:
 	add a
 	add a
 	ld e, a
+
 	ld hl, GBCEnhancedOverworldPalettes
+	ld a, [wCurMap]
+	cp SEAFOAM_ISLANDS_1
+	jr z, .isColdCavern
+	cp SEAFOAM_ISLANDS_2
+	jr c, .notColdCavern
+	cp SEAFOAM_ISLANDS_5 + 1
+	jr nc, .notColdCavern
+.isColdCavern	
+	ld hl, GBCEnhancedOverworldPalettes_ColdCavern
+.notColdCavern
 	add hl, de
 	
 	pop de ;get the pal pattern back
