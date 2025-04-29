@@ -364,6 +364,9 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Added missing sfx when leaving the trainer card screen
+- Increased the speed of the LoadCurrentMapView function
+- Fixed a bug where cutting grass loads the wrong palette for the animation
 - AI Layer 3 will no longer run on the turn a player switches in order to keep battle information from the AI
 - Fixed a rare infinite loop caused by a text SFX playing right at the end of an audio fadeout
 - On AI Layer 1, biased preference for exploding more towards lower HP
@@ -739,6 +742,7 @@ v1.24.1
   - Fixed rock tunnel darkness affecting option menu
   - Fixed a minor cursor error on the town map when in route 1 or the power plant
   - Made the trainer pokeballs red in the battle HUD
+  - Fixed a bug where cutting grass loads the wrong palette for the animation
 
 
 - Item Fixes  
@@ -791,6 +795,7 @@ v1.24.1
   - Meet Trainer jingle should not play before loading into the gym leader battle music
   - AI using dire hit item now plays a SFX
   - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
+  - Added missing sfx when leaving the trainer card screen
   
 
 - Misc. fixes
@@ -1131,6 +1136,7 @@ v1.24.1
   - Status Screen now prints types from party struct data instead of species header
   - The menu for field moves can now support up to five field moves for developer purposes.
   - Engine now supports up to 255 predefs instead of 127
+  - Increased the speed of the LoadCurrentMapView function
   
 - PokeDex Area enhancements
   - The AREA function of the PokeDex now takes the Super Rod into account

@@ -548,6 +548,8 @@ StartMenu_TrainerInfo:
 	
 	call GBPalNormal
 	call WaitForTextScrollButtonPress ; wait for button press
+	ld a, SFX_PRESS_AB	;joenote - this menu is the only one that lacks a sfx when you leave
+	call PlaySound
 	call GBPalWhiteOut
 	call LoadFontTilePatterns
 	call LoadScreenTilesFromBuffer2 ; restore saved screen
