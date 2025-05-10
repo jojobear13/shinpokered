@@ -1138,11 +1138,15 @@ DisplayTextID::
 .spriteHandling
 ; get the text ID of the sprite
 	push hl
-	push de
-	push bc
-	callba UpdateSpriteFacingOffsetAndDelayMovement ; update the graphics of the sprite the player is talking to (to face the right direction)
-	pop bc
-	pop de
+	
+;joenote - Bugged. This only affects the 15th sprite on a map and doesn't even work correctly.
+;Pokemon yellow removed this for having issues with the following Pikachu.
+;	push de
+;	push bc
+;	callba UpdateSpriteFacingOffsetAndDelayMovement ; update the graphics of the sprite the player is talking to (to face the right direction)
+;	pop bc
+;	pop de
+
 	ld hl, wMapSpriteData ; NPC text entries
 	ld a, [hSpriteIndexOrTextID]
 	dec a

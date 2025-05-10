@@ -364,6 +364,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Fixed graphical display bug when talking to the 15th sprite on a map
 - Added missing sfx when leaving the trainer card screen
 - Increased the speed of the LoadCurrentMapView function
 - Fixed a bug where cutting grass loads the wrong palette for the animation
@@ -743,7 +744,8 @@ v1.24.1
   - Fixed a minor cursor error on the town map when in route 1 or the power plant
   - Made the trainer pokeballs red in the battle HUD
   - Fixed a bug where cutting grass loads the wrong palette for the animation
-
+  - Fixed graphical display bug when talking to the 15th sprite on a map
+  
 
 - Item Fixes  
   - Great ball has a ball factor of 12 now
