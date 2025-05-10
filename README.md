@@ -364,6 +364,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
 - Added missing sfx when leaving the trainer card screen
 - Increased the speed of the LoadCurrentMapView function
@@ -798,6 +799,7 @@ v1.24.1
   - AI using dire hit item now plays a SFX
   - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
   - Added missing sfx when leaving the trainer card screen
+  - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
   
 
 - Misc. fixes

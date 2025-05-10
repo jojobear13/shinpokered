@@ -24,7 +24,9 @@ RocketHideout1Script_44be0:
 .asm_44bf7
 	ld a, SFX_GO_INSIDE
 	call PlaySound
-	CheckEventHL EVENT_677
+;	CheckEventHL EVENT_677	;joenote - this is a bug. 
+;it's supposed to be SetEvent so that the SFX doesn't play every time the map loads
+	SetEvent EVENT_677
 .asm_44c01
 	ld a, $e
 .asm_44c03
