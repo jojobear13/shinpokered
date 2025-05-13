@@ -326,6 +326,7 @@ hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 1: menu is double spaced
 ; bit 2: something about skipping a line when printing text
 ; bit 3: LoadCurrentMapView is being called during player movement - GBCnote--> added this
+; bit 4: Menus in the cable club are being displayed - GBCnote--> added this
 
 hFieldMoveMonMenuTopMenuItemX EQU $FFF7
 

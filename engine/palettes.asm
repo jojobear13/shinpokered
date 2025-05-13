@@ -188,6 +188,9 @@ SetPal_Overworld:
 	ld a, [hGBC]
 	and a
 	jr z, .notGBC
+	ld a, [hFlags_0xFFF6]
+	bit 4, a		;gbcnote - check bit that indicates cable club menus are being displayed
+	jr nz, .notGBC
 	ld a, [wUnusedD721]
 	bit 7, a
 	jr nz, .enhancedGBCOverworld
