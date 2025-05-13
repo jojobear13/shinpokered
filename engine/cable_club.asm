@@ -9,6 +9,13 @@ CableClub_DoBattleOrTrade:
 	call LoadFontTilePatterns
 	call LoadHpBarAndStatusTilePatterns
 	call LoadTrainerInfoTextBoxTiles
+
+	ld hl, hFlags_0xFFF6
+	set 4, [hl]		;gbcnote - mark bit to signal cable club menus
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand ;gbcnote - refresh pal
+
+
 	coord hl, 3, 8
 	ld b, 2
 	ld c, 12
@@ -278,7 +285,7 @@ CableClub_DoBattleOrTradeAgain:
 	ld [wCurOpponent], a
 	call ClearScreen
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand ;gbcnote - refresh pal
 	ld hl, wOptions
 	res BIT_BATTLE_ANIMATION, [hl]
@@ -311,7 +318,7 @@ CallCurrentTradeCenterFunction:
 TradeCenter_SelectMon:
 	call ClearScreen
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call LoadTrainerInfoTextBoxTiles
 	call TradeCenter_DrawPartyLists
@@ -597,6 +604,13 @@ ReturnToCableClubRoom:
 	pop hl
 	pop af
 	ld [hl], a
+
+	ld hl, hFlags_0xFFF6
+	res 4, [hl]		;gbcnote - mark bit to signal cable club menus
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand ;gbcnote - refresh pal
+	call Delay3
+
 	call GBFadeInFromWhite
 	ret
 
@@ -630,7 +644,7 @@ TradeCenter_DisplayStats:
 	predef StatusScreen
 	predef StatusScreen2
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call GBPalNormal
 	call LoadTrainerInfoTextBoxTiles
@@ -857,7 +871,7 @@ TradeCenter_Trade:
 	call ClearScreen
 	call LoadTrainerInfoTextBoxTiles
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call Serial_PrintWaitingTextAndSyncAndExchangeNybble
 	ld c, 40
