@@ -364,6 +364,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Game now keeps the status of the gamma shader with the save on file
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
 - Added missing sfx when leaving the trainer card screen

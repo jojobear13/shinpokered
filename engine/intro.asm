@@ -360,6 +360,27 @@ PlayShootingStar:
 	add b ;(A = 02 for JP or 01 for !JP)
 	ld [hGBC], a	;set default shader state (02 for ON or 01 for OFF)
 	
+;check if there is a save on file, and instead load the last known gamma setting if a save is found
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, $1
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ld hl, sMainData + ($D886 - wMainDataStart)
+	bit 7, [hl]
+	jr z, .sramOff
+	ld a, 2
+	bit 6, [hl]
+	jr nz, .load2
+.load1
+	dec a
+.load2
+	ld [hGBC], a
+.sramOff
+	xor a
+	ld [MBC1SRamEnable], a
+	ld [MBC1SRamBankingMode], a
+	
 .gammaloop
 	call DelayFrame
 	push bc
