@@ -2562,5 +2562,5 @@ ENDC
 	const EVENT_9FB                                  ; 9FB, (D886, bit 3)
 	const EVENT_9FC                                  ; 9FC, (D886, bit 4)
 	const EVENT_9FD                                  ; 9FD, (D886, bit 5)
-	const EVENT_9FE                                  ; 9FE, (D886, bit 6)
-	const EVENT_9FF                                  ; 9FF, (D886, bit 7)
+	const EVENT_9FE                                  ; 9FE, (D886, bit 6);joenote - reserved for gamma shader
+	const EVENT_9FF                                  ; 9FF, (D886, bit 7);joenote - reserved to indicate there is a saved game

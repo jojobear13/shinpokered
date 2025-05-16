@@ -71,13 +71,35 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ld [wOptions], a
 
 	ld a, [wUnusedD721]
-	and %11100111
+	and %01100111
 	ld [wUnusedD721], a
 
 	ResetEvent EVENT_910
 	ret
 
 	
+	ResetEvent EVENT_9FE
+	ResetEvent EVENT_9FF
+	ret
+
+TrainerRematch:
+	xor a
+	CheckEvent EVENT_909
+	jr nz, .skip_rematch_choice
+	ld hl, RematchTrainerText
+	call PrintText
+	call NoYesChoice
+	ld a, [wCurrentMenuItem]
+	and a
+	ret nz
+.skip_rematch_choice
+	ResetEvent EVENT_909
+	xor a
+	ret
+
+
+		
+>>>>>>> e662ef725 (Game now keeps the status of the gamma shader with the save on file)
 ;this function handles tracking of how fast to go on or off a bike
 ;biking ORs with $2
 ;running by holding B ORs with $1

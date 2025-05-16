@@ -165,6 +165,23 @@ SaveSAV:
 	and a
 	ret nz
 .save
+	CheckEvent	EVENT_9FF
+	jr nz, .flagset
+	SetEvent EVENT_9FF	;joenote - set a flag to quickly indicate a save exists on file
+.flagset
+;now save the status of the gamma shader
+	ld a, [hGBC]
+	and a
+	jr z, .doneGamma
+	cp 2
+	jr z, .onGamma
+.offGamma
+	ResetEvent EVENT_9FE
+	jr .doneGamma
+.onGamma
+	SetEvent EVENT_9FE
+.doneGamma
+
 	call SaveSAVtoSRAM
 	coord hl, 1, 13
 	lb bc, 4, 18
