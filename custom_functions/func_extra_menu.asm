@@ -14,11 +14,11 @@ DisplayExtraOptionMenu:
 
 ;draw text box border for lite options
 	coord hl, 0, 0
-	ld b, 6
+	ld b, 7
 	ld c, 18
 	call TextBoxBorder
 ;draw text box border for master options
-;	coord hl, 0, 8
+;	coord hl, 0, 9
 ;	ld b, 2
 ;	ld c, 18
 ;	call TextBoxBorder
@@ -67,9 +67,11 @@ DisplayExtraOptionMenu:
 	jr z, .cursorAISwitch
 	cp $6 ;cursor over gamma shader?
 	jr z, .cursorGamma
-;	cp $9 ; cursor over lvl cap?
+	cp $7 ;cursor over enhanced gbc?
+	jr z, .cursorEnhGBC
+;	cp $A ; cursor over lvl cap?
 ;	jr z, .cursorLvlCap
-;	cp $A ; cursor over nuzlocke?
+;	cp $B ; cursor over nuzlocke?
 ;	jr z, .cursorNuzlocke
 	cp $10 ; is the cursor on Back?
 	jr z, .exitMenu
@@ -93,6 +95,9 @@ DisplayExtraOptionMenu:
 .cursorGamma
 	call ToggleGammaShader
 	jr .getJoypadStateLoop
+.cursorEnhGBC
+	call ToggleEnhancedGBCColors
+	jr .getJoypadStateLoop
 ;.cursorLvlCap
 ;	call ToggleBadgeCap
 ;	jr .getJoypadStateLoop
@@ -115,8 +120,8 @@ DisplayExtraOptionMenu:
 	cp 16
 	ld b, -15
 	jr z, .updateMenuVariables
-	cp 6
-	ld b, 10	;	ld b, 3
+	cp 7
+	ld b, 9	;	ld b, 3
 	jr z, .updateMenuVariables
 ;	cp 10
 ;	ld b, 6
@@ -128,11 +133,11 @@ DisplayExtraOptionMenu:
 	cp 1
 	ld b, 15
 	jr z, .updateMenuVariables
-;	cp 9
+;	cp 10
 ;	ld b, -3
 ;	jr z, .updateMenuVariables
 	cp 16
-	ld b, -10	;ld b, -6
+	ld b, -9	;ld b, -5
 	jr z, .updateMenuVariables
 	;else
 	ld b, -1
@@ -193,12 +198,12 @@ PlaceExtraOptionStrings:
 	call PlaceString
 
 ;place lvl cap text
-;	coord hl, 1, 9
+;	coord hl, 1, 10
 ;	ld de, TextAILevelCap
 ;	call PlaceString
 
 ;place nuzlocke text
-;	coord hl, 1, 10
+;	coord hl, 1, 11
 ;	ld de, TextNuzlocke
 ;	call PlaceString
 
@@ -432,7 +437,7 @@ ShowGammaSetting:
 	; ;fall through
 ; ShowBadgeCap:
 	; ld de, OptionMenu5Spaces
-	; coord hl, $0E, $9
+	; coord hl, $0E, $A
 	; call PlaceString
 	; ld de, OptionMenu5SpacesOFF
 	; ld a, [wUnusedD721]	;check if obedience level cap is active
@@ -441,7 +446,7 @@ ShowGammaSetting:
 	; ld de, OptionMenuCapLevelText
 ; .print
 	; push af
-	; coord hl, $0E, $9
+	; coord hl, $0E, $A
 	; call PlaceString
 	; pop af
 	; ret z
@@ -450,7 +455,7 @@ ShowGammaSetting:
 	; callba GetBadgeCap
 	; ld a, d
 	; ld [wNumSetBits], a
-	; coord hl, $10, $9
+	; coord hl, $10, $A
 	; ld de, wNumSetBits
 	; lb bc, 1, 3
 	; call PrintNumber
@@ -478,7 +483,7 @@ ShowGammaSetting:
 	; jr z, .print
 	; ld de, OptionMenuTextON
 ; .print
-	; coord hl, $10, $A
+	; coord hl, $10, $B
 	; call PlaceString
 	; ret
 ; ;default to recommended settings when turned on
