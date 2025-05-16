@@ -82,24 +82,8 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ResetEvent EVENT_9FF
 	ret
 
-TrainerRematch:
-	xor a
-	CheckEvent EVENT_909
-	jr nz, .skip_rematch_choice
-	ld hl, RematchTrainerText
-	call PrintText
-	call NoYesChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	ret nz
-.skip_rematch_choice
-	ResetEvent EVENT_909
-	xor a
-	ret
 
-
-		
->>>>>>> e662ef725 (Game now keeps the status of the gamma shader with the save on file)
+	
 ;this function handles tracking of how fast to go on or off a bike
 ;biking ORs with $2
 ;running by holding B ORs with $1
