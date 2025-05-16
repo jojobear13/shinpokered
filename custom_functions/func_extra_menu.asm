@@ -31,6 +31,7 @@ DisplayExtraOptionMenu:
 	call ShowHardModeSetting	;joenote - display marker for hard mode or not
 	call ShowNoSwitchSetting	;joenote - display marker for deactivated trainer switching or not
 	call ShowGammaSetting
+	call ShowEnhancedGBCSetting
 	
 ;	call ShowBadgeCap	;joenote - show the level cap depending on badge
 ;	call ShowNuzlocke
@@ -180,6 +181,11 @@ PlaceExtraOptionStrings:
 	coord hl, 1, 6
 	ld de, TextGamma
 	call PlaceString
+	
+;place enhanced GBC color text
+	coord hl, 1, 7
+	ld de, TextEnhancedGBC
+	call PlaceString
 
 ;place back text
 	coord hl, 1, 16
@@ -324,6 +330,36 @@ ShowHardModeSetting:
 	inc hl
 	ld d, [hl]
 	coord hl, $10, $4
+	call PlaceString
+	ret
+
+
+;joenote - for enhanced GBC colors option
+ToggleEnhancedGBCColors:
+	ld a, [hGBC]
+	and a
+	ret z	;do nothing if on dmg or sgb
+	ld a, [wUnusedD721]
+	xor ENH_GBC_COLORS
+	ld [wUnusedD721], a
+	call RunDefaultPaletteCommand
+	;fall through
+ShowEnhancedGBCSetting:
+	ld hl, OptionMenuOnOffText
+	ld a, [hGBC]
+	and a
+	jr z, .off
+	ld a, [wUnusedD721]
+	bit BIT_ENH_GBC_COLORS, a
+	jr nz, .print
+.off
+	inc hl
+	inc hl
+.print
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	coord hl, $10, $7
 	call PlaceString
 	ret
 
@@ -479,6 +515,8 @@ TextAISwitch:
 	db " AI SWAPS@"
 TextGamma:
 	db " Y SHADER@"
+TextEnhancedGBC:
+	db " ENH. COLOR@"
 TextBack:
 	db " BACK     SEL: OST@"
 
