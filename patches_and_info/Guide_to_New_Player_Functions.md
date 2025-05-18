@@ -195,6 +195,10 @@ This feature reinstitutes a speed-running trick that makes text print with zero 
 Toggle this on the extra options menu.  
 Please note that other text speed selections do nothing while this feature is active.  
 
+#### Enhanced Color  
+Colorizes the overworld even further when playing an a GBC.  
+Toggle this on the extra options menu.  
+
 #### Sound Test  
 Press SELECT on the extra options menu to get a sound test menu.
 This way you can listen to the game's musical tracks.  

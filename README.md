@@ -92,6 +92,10 @@ Pokemon Yellow Backported Palettes and Gym Leader Names Restored
 ![Backported Palettes](/screenshots/bgb00022.bmp?raw=true)
 ![Gym Leader Names](/screenshots/bgb00037.bmp?raw=true)
 
+Enhanced Colors  
+![Enhanced Colors 1](/screenshots/bgb00048.bmp?raw=true)
+![Enhanced Colors 2](/screenshots/bgb00049.bmp?raw=true)
+
 Rematches  
 ![Rematches](/screenshots/bgb00003.bmp?raw=true)
 
@@ -176,6 +180,7 @@ It also has all the pokedex data in metric.
 
 Engine features from USA Yellow version have been backported.
 No more duochrome! Yellow's color scheme gets converted to display on the Gameboy Color.
+Or play with further enhanced colorization for the overworld.
 Attack animations are colored according to type during Gameboy Color play.
 Yellow's audio engine is backported for stereo sound support. 
 
@@ -188,6 +193,7 @@ New options that can be toggled! Hit SELECT on the options screen to see an extr
 - Zero-Delay Text
 - Hard Mode
 - AI Trainer Switching
+- Enhanced colorization for GBC
 
 The hard mode option increases difficulty by making the stats of trainer pokemon more on your level.
 It also doubles the effect of the X-stat items that AI trainers are fond of.
@@ -364,6 +370,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
@@ -1278,7 +1285,7 @@ v1.24.1
   - The default state of the gamma shader can be changed with any gameboy rom header editor
   - Alternately, remove the 'j' in 'cjsv' in the Makefile to compile with a JP destination code
 - Added an option to make the overworld run in 60fps
-  - Press SELECT on the opion menu to go to the extra menu, and there you can toggle 30 or 60 under "FPS"
+  - Press SELECT on the option menu to go to the extra menu, and there you can toggle 30 or 60 under "FPS"
   - This feature is more of a proof-of-concept and is still kinda rusty
   - Takes advantage of double-speed CPU mode when played as a GBC game
 - Text with zero frame delay can be toggled from the extra menu under "INST. TXT"
@@ -1359,6 +1366,7 @@ v1.24.1
   - When playing in GBC-mode, move animations are colored based on their type
   - In GBC-mode, when a pokemon is caught, the resting ball now has a defined color
   - Tossing pokeballs have color in GBC mode
+- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - You can now play as a girl when starting a new game
   - Has front, back, walking, fishing, and cycling sprites
   - Has unique default names when starting a new game
