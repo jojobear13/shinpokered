@@ -79,6 +79,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 v1.24.7
 =======
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
+- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
@@ -503,6 +504,7 @@ v1.24.1
   - When playing in GBC-mode, move animations are colored based on their type
   - In GBC-mode, when a pokemon is caught, the resting ball now has a defined color
   - Tossing pokeballs have color in GBC mode
+  - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Added an option to make the overworld run in 60fps
   - Feature is a proof-of-concept and is still a bit rusty
   - Toggle this in the extra options menu
