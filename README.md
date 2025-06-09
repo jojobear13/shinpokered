@@ -77,6 +77,8 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 
 v1.24.7
+=======
+- Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Game now keeps the status of the gamma shader with the save on file
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
@@ -475,6 +477,7 @@ v1.24.1
   - Lance and the player will face each other when speaking.
   - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
   - Some hidden Game Corner coins can now be accessed when they previously were not.
+  - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
   
  
 #Tweaks
