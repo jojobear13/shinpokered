@@ -94,6 +94,7 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ResetEvent EVENT_8C5
 	ResetEvent EVENT_8C7
 	ResetEvent EVENT_8C8
+	ResetEvent EVENT_8C9
 
 	ResetEvent EVENT_9FE
 	ResetEvent EVENT_9FF
