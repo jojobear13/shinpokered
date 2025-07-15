@@ -5,8 +5,8 @@ Version 1.24.7
 *Shin (真) - The kanji for "true".  
 Used in Japanese media to denote a remastering, updated retelling , or a "true form" of something.*  
 
-     This is an enhancement ROM hack of Pokemon Red & Blue based on the Pret team's pokered disassembly project.
-It is a mostly-vanilla hack that focuses on fixing game engine bugs and oversights from the original game.
+     This is a community enhancement patch of Pokemon Red & Blue based on the Pret team's pokered disassembly project.
+It is a mostly-vanilla mod that focuses on fixing game engine bugs and oversights from the original game.
 Additionally, trainer AI routines are improved and multiple quality-of-life enhancements have been added.
 It also acts as a kind of research-informed speculative work that presents an alternate interpretation of the games.
 Specifically, that being what the 2016 Nintendo Virtual Console re-release of Gen-1 Pokemon could have been.
@@ -22,7 +22,7 @@ Finally, the source code documents many differences and changes between the vari
 No, really, there's a TON of new options and features. You are bound to miss many of them if you do not read this guide.
 *********************************************************************************************************************************
 
-Don't like the non-vanilla changes? Prefer only the bugfixes and AI improvements? Want a codebase from which to launch your own rom hack? Then the [Lite branch](https://github.com/jojobear13/shinpokered/tree/lite) is what you want. Head on over and start compiling.
+Don't like the non-vanilla changes? Prefer only the bugfixes and AI improvements? Want a codebase from which to launch your own modding project? Then the [Lite branch](https://github.com/jojobear13/shinpokered/tree/lite) is what you want. Head on over and start compiling.
 
 Discuss Shin Pokemon in its dedicated [PokéCommunity Showcase](https://www.pokecommunity.com/showthread.php?t=427398).
 
@@ -30,7 +30,7 @@ Follow media related to Shin Pokemon on [YouTube](https://www.youtube.com/@13joj
 
 Leave a review for Shin Pokemon over at [Rom Hack Plaza](https://romhackplaza.org/romhacks/shin-pokemon-game-boy/).
 
-Find other rom hacks at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
+Find other mods and patches at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
 
 Other Social Links:
 [Discord server where I lurk](https://discord.com/invite/bGksMvxqgv).
@@ -350,7 +350,7 @@ Cheats and Secrets!
   - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2.
   - Will play and save in the GB Tower of Stadium 2.
   - Will **not work** with the GB Tower of Stadium 1.
-- Might be possible to use a save from vanilla USA red/blue with this rom hack 
+- Might be possible to use a save from vanilla USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
 - New builds are tested and debugged with the BGB 1.5.8 emulator and verified using original hardware
@@ -1131,11 +1131,11 @@ v1.24.1
   - The 1.5x EXP boost function now has overflow protection
   - EXP Gained can now print up to five digits instead of four
   - The "<LF>" character mapping can be used as a line-feed
-  - Added rom hack version tracking for save files
+  - Added patch version tracking for save files
     - It's a single byte in the save file that gets incremented each version
     - If the save byte does not match, the player is automatically warped back to Pallet Town
     - Helps prevent crashes and glitches when updating an older save file
-    - You will be given the choice to warp to Pallet Town if the rom hack version does not match
+    - You will be given the choice to warp to Pallet Town if the patch version does not match
   - The function that shows the dex entry for starter pokemon is now more robust
     - It now works for any pokemon (like if the starters are changed or randomized)
 	- It keeps a backup of the pokedex-owned flags instead of erasing them
@@ -1412,7 +1412,7 @@ v1.24.1
   - This feature was added with the intent of spicing-up subsequent Gen-1 playthroughs
 - New NPC in celadon hotel will reward coins for showing him requested pkmn
 - Move deleter/relearner added to the saffron house below COPYCAT's house
-  - Code comes from Mateo's Red++ hack. It's simply the best gen-1 implementation and I cannot come up with something better.
+  - Code comes from Mateo's Red++ patch. It's simply the best gen-1 implementation and I cannot come up with something better.
   - Talk to the little girl to delete moves.
   - Talk to her tutor to relearn moves.
   - I have expanded Mateo's code so that it also detects default level-0 moves from the baseStats header files.
@@ -1530,15 +1530,15 @@ v1.24.1
   - AI trainers can only have shinies in hard mode, so it affords more chances to find wild shinies
   - Also, shiny mercy extends to tower ghosts, ghost marowak, and the old man catching tutorial
 - Winning the SS Anne tournament with a pikachu in the party will set its catch rate to 168
-  - In this rom hack, a pikachu with this catch rate can be taught Surf via HM
+  - In this community patch, a pikachu with this catch rate can be taught Surf via HM
   - This catch rate makes it hold a gorgeous box if transferred to Gen 2
   - In case of multiple pikachus, only the first in the roster will be affected
-  - Likewise, a pikachu holding a gorgeous box can learn surf if transferred into this rom hack
+  - Likewise, a pikachu holding a gorgeous box can learn surf if transferred into this community patch
 - Defeat Lance with a Dragonite in your top spot and it will be given a catch rate of 168
   - Dragonite's cry will play to confirm that this has happened
-  - In this rom hack, a dragonite with this catch rate can be taught Fly via HM
+  - In this community patch, a dragonite with this catch rate can be taught Fly via HM
   - This catch rate makes it hold a gorgeous box if transferred to Gen 2
-  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this rom hack
+  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this community patch
 - Added Bill's secret garden behind his house
   - Put Mew in your top spot and show Bill to gain access
   - You will encounter the starter pokemon plus some other rarer pokemon
@@ -1783,7 +1783,7 @@ These are things that are commonly requested but fall outside the scope of the p
 ---------------------------
 > **I'm getting an Emulator Error message at the main title menu. What does this mean?**
 
-There are a couple checks performed in the background under the assumption that some form of emulation is being used. One or more messages may be displayed to indicate failures of these checks. For example, emulators like Visual Boy Advance and Goomba allow data read/writes to VRAM during mode 3 wherein the LCD controller is utilizing it; this is not possible on a real Game Boy and may cause issues with Shin Pokemon. Another example, one where Visual Boy Advance-M fails, is in the cpu cycles required to initiate an OAM Interrupt after the LCD goes from being disabled to enabled.
+There are a couple checks performed in the background under the assumption that some form of emulation is being used. One or more messages may be displayed to indicate failures of these checks. For example, emulators like Visual Boy Advance and Goomba allow data read/writes to VRAM during mode 3 wherein the LCD controller is utilizing it; this is not possible on a real Game Boy and may cause issues with Shin Pokemon. Another example, one where Visual Boy Advance-M fails, is a test that checks multiple memory modification opcodes to make sure they execute within the correct amount of time.
 
 These messages are informative in nature and do not impede play. That said, it is encouraged to switch to a more accurate emulator to avoid things like graphical glitches and other weirdness. See "Compatibility Notes" for more info.
 
@@ -1795,22 +1795,27 @@ No. Such requests will be politely declined. If you think you have a good recomm
 
 The gesture is appreciated and highly flattering, but donations of any sort are politely declined.
 	
+> **I saw an online storefront selling physical cartridges of Shin Pokemon. Is that associated with you guys?**
+
+No, it is not. The members of the Shin Pokemon project do not endorse this kind of business.
+	
 > **What are the best ways to support Shin Pokemon?**
 
 There are several ways you can support the project:
-- Stream your playthrough.
-- Make a Let's Play series.
+- Post stream VODs or make a Let's Play series. 
+  - Members of the project team regularly search for these and watch them for debugging purposes.
+  - The best kind of footage for debugging avoids using emulator speedup, but we're not picky.
 - Do a review or an analysis piece.
 - Create highly detailed bug reports with an "Issues" ticket.
-- Recording and uploading your gameplay is the best resource for troubleshooting. Let's Plays and stream VODs are routinely searched for and examined. 
+- Post thoughtful feedback. Intelligent criticism has positively influenced the project over the years.
 
 > **How do you come up with with new features and their implementations?**
 
-It's primarily based on nostalgic schoolyard rumors, interesting "what if" ideas, and love for secrets and easter eggs from the 1990s gaming era.
+It's primarily based on nostalgic schoolyard rumors, interesting "what if" ideas, and love for secrets and easter eggs from the 1990s gaming era. Everyone on the team is old enough to have experienced the first wave of Pokemon-mania and largely draw upon our own memories and feelings of that time to maintain the correct vibe. 
 
 > **A separate project used code from Shin Pokemon to do such-and-such feature. Will you backport it into Shin Pokemon?**
 
-Let such projects have their own identity. Other creators need to be able to show off and be proud of what they made.
+Let such projects have their own identity. Other creators need to be able to showcase their work.
 
 > **Why did you not use the artwork of Trainer Green from the Adventures comic or the Let's Go games for the female trainer option?**
 
@@ -1819,7 +1824,7 @@ Internal debate was heated on how to proceed for a female player option, but her
 - Trainer Red was always supposed to be the player. An original female trainer was never considered until gen-2's development phase around Nov-Dec 1997.
 - Others already created original sprite art to include in their own projects, and lifting it might step on their toes or foster ill feelings.
 
-So it was decided to whip-up something simple and original that depicted a female version of Trainer Red. She also acts as a (private) dev shoutout.
+So it was decided to whip-up something simple and original that depicted a female version of Trainer Red. She also acts as a somewhat-private dev shoutout.
 
 > **Why can Bide still hit opponents in the Fly/Dig state when Pokemon Stadium fixes this?**
 
@@ -1831,8 +1836,8 @@ Shin Pokemon did do always-recharge at one point, but it was hated by *literally
 
 > **Why is there a brief white frame flash when the screen transitions on Gameboy or Gameboy Color?**
 
-It's a hardware quirk. There is a brief moment where the LCD is disabled. When it is re-enabled, the screen displays blank white for 1 frame. The LCD gets disabled because it allows writing to VRAM at any time.  
-EDIT: I believe I've found a workaround by writing to VRAM during the HBLANK and VBLANK periods. The timing is a little tricky.
+It's a hardware quirk. There is a brief moment where the LCD is disabled. When it is re-enabled, the screen displays blank white for 1 frame. The LCD gets disabled because it allows writing to VRAM without timing constraints.  
+EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLANK periods. The timing is a little tricky.
 
 
 #Credits / Special Thanks

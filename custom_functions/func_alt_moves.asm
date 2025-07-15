@@ -1940,7 +1940,7 @@ SpecialTrainerMoves_ALT:
 	db $FE
 	
 	db SONY3, 0
-	db 1, VENUSAUR, MEGA_DRAIN, $FD
+	db 1, VENUSAUR, RAZOR_LEAF, $FD
 	db 1, BLASTOISE, BLIZZARD, $FD
 	db 1, CHARIZARD, FIRE_BLAST, $FD
 	db $FE
