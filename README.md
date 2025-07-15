@@ -57,7 +57,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
   - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2.
   - Will play and save in the GB Tower of Stadium 2.
   - Will **not work** with the GB Tower of Stadium 1.
-- Might be possible to use a save from vanilla USA red/blue with this rom hack 
+- Might be possible to use a save from vanilla USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
 - New builds are tested and debugged with the BGB 1.5.8 emulator and verified using original hardware
@@ -753,11 +753,11 @@ v1.24.1
   - The 1.5x EXP boost function now has overflow protection
   - EXP Gained can now print up to five digits instead of four
   - The "<LF>" character mapping can be used as a line-feed
-  - Added rom hack version tracking for save files
+  - Added community patch version tracking for save files
     - It's a single byte in the save file that gets incremented each version
     - If the save byte does not match, the player is automatically warped back to Pallet Town
     - Helps prevent crashes and glitches when updating an older save file
-    - You will be given the choice to warp to Pallet Town if the rom hack version does not match
+    - You will be given the choice to warp to Pallet Town if the community patch version does not match
   - The function that shows the dex entry for starter pokemon is now more robust
     - It now works for any pokemon (like if the starters are changed or randomized)
 	- It keeps a backup of the pokedex-owned flags instead of erasing them
