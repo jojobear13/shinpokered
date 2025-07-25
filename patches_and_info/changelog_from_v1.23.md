@@ -73,9 +73,9 @@
 - Defeat Lance with a Dragonite in your top spot and it will be given a catch rate of 168
   - Dragonite's cry will play to confirm that this has happened
   - You can swap with another Dragonite in your party and listen to his after-battle text again to repeat the process
-  - In this rom hack, a dragonite with this catch rate can be taught Fly via HM
+  - In this community patch, a dragonite with this catch rate can be taught Fly via HM
   - This catch rate makes it hold a gorgeous box if transferred to Gen 2
-  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this rom hack
+  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this community patch
 
 - Implemented the old Down+B urban legend for pokeballs as a cheat code
   - The timing is different. You have to hold Down+B before the "[PLAYER] used [ITEM]" text finishes printing.
@@ -148,7 +148,7 @@
 
 
 ---
-**Hack-related fixes exclusively for the master branch**
+**community patch-related fixes exclusively for the master branch**
 - Fixed gift pokemon not having above-average DVs if sent to the box
 - Adjusted Oak's pokemon moves
 - Fixed text overlap for trainer Seiga
@@ -173,7 +173,7 @@
 
 
 ---
-**Hack-related fixes exclusively for the lite branch**
+**Project-related fixes exclusively for the lite branch**
 - Cleaned up compiler tags and made it easy to compile with spaceworld-style sprites
 - Female trainer can be activated by compiling with the _FPLAYER tag
 - TMs and HMs have their names determined by a list now
@@ -229,11 +229,11 @@
 
 - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
 
-- Added rom hack version tracking for save files
+- Added community patch version tracking for save files
   - It's a single byte in the save file that gets incremented each version
   - If the save byte does not match, the player is automatically warped back to Pallet Town
   - Helps prevent crashes and glitches when updating an older save file
-- You will now be given the choice to warp if the rom hack version does not match
+- You will now be given the choice to warp if the community patch version does not match
 
 - If on GBC, intitializing options in a New Game turns 60 fps ON
 
@@ -399,13 +399,13 @@
 
 
 ---
-**Hack-related fixes for both branches**
+**Project-related fixes for both branches**
 - Minor timing fix to title object palette loading
 - Fixed Raticate not appearing in Unknown Dungeon 2F in Blue-Jp
 - Fixed incorrect encounters on route 13 in Blue-Jp
 - Fixed an invalid apostrophe
 - Fixed pewter npc following distance in 60 fps mode
-- Fixed rom hack byte not getting set on new game
+- Fixed community patch byte not getting set on new game
 - Fixed an issue with trapping moves being allowed on switch-in
 - Fixed typo causing incorrect game corner prizes
 - Minor adjustments to title screen and intro
@@ -423,7 +423,7 @@
 - Added script that verifies the RGBDS version when compiling
 - Updated the project to build with RGBDS 0.6.0
 - Readjusted enemy stat exp accumulation and removed reduntant lines in CriticalHitTest
-- Updating a save to a new hack version now checks to see if the elite-4 were already defeated
+- Updating a save to a new patch version now checks to see if the elite-4 were already defeated
 - Fixed problem with the menu selection byte changing if opponent switches first (affects mimic and others)
 - If Transform copies an opponent's Transform move, and the the PP of that move is < 6, it will copy that move's instantaneous PP less 1.
 - Fixed a problem where multi-hit moves could overflow the damage effectiveness multiplier
