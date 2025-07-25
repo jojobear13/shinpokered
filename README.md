@@ -1,6 +1,6 @@
 # Shin Pokémon Red, Blue, Green, Red-JP, & Blue-JP
 
-Version 1.24.7
+Version 1.25.0
 
 Future bugfixes here will be eventually migrated to the Shin Pokemon master branch
 
@@ -75,9 +75,9 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 -----------
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
+[View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
-v1.24.7
-=======
+v1.25.0
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
@@ -108,67 +108,6 @@ v1.24.7
 - Fixed text error in Vermilion gym referencing the bird type instead of flying type
 - Some hidden Game Corner coins can now be accessed when they previously were not.
 - The menu for field moves can now support up to five field moves for developer purposes.
-
-v1.24.6(hotfix 3)
-- Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
-
-v1.24.6(hotfix 2)
-- Fixed the wrong tiles for the border of the pokedex diploma
-
-v1.24.6(hotfix)
-- Worked on emulator tests a bit more
-- Moved CalcStat function out of home bank to free up space
-- Status Screen now prints types from party struct data instead of species header
-
-v1.24.6
-- Fixed an issue with the title menu becoming dark when saving in rock tunnel
-- Fixed rock tunnel darkness affecting option menu
-- Fixed desync problem during link battles with Rage, Thrash, and trapping moves
-- The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
-- Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
-- Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
-- Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
-- Corrected the text in green & red-jp pokedex entries
-- Fixed missing punctuation in Oak's pokedex evaluation
-- Fixed Full Restores undoing burn/paralysis stat changes when healing a non-active pokemon
-
-v1.24.5
-- Fix Psywave symmetry
-
-v1.24.4
-- Can no longer fish or surf using the right wall corner tile on the SS Anne.
-- Fixed incorrect sign text in safari area 1
-- Adjusted some city names on signs
-- Lance and the player will face each other when speaking.
-- Increased the speed of the HP bar animation
-
-v1.24.3  
-- Disable and static damage moves will not crit or show super/not very effectiveness
-- Fixed an issue with NPCs overlapping menu and text boxes
-- Adjusted the parity of in-game trades across versions
-- Option menu graphics tweak
-- Toggling the gamma shader in the extra options menu now automatically updates the palette
-- Moved NPC in celadon prize house two spaces to the right
-- Optimized the GBC smooth fading a little bit
-
-v1.24.2  
-- Fixed a text bug on multi-hit moves
-
-v1.24.1  
-- Optimized smooth fades to eliminate graphical jank during battle black-outs
-- Trainers will not use non-healing items if they or the player are at low HP, making them more aggressive
-- AI will not switch if its HP is below 25% as it's ususally not worth it
-- Fades in or out to white in GBC mode with gamma shader enabled will no longer have a frame of incorrect color
-- The move Transform now decrements PP properly when used by the AI recursively
-- Spinner tiles animate properly without resorting to vblank-induced slowdown
-- Fixed wrong color for move animation when it comes after self-inflicted confusion damage
-- Reworked the prize mon level function and synchronized DVs for gift pokemon added to party or box
-- Fixed typed effectiveness being applied the wrong way to static damage moves
-- All the extra options on the option menu have been moved to their own separate menu
-- Fixed a bug catcher on route 9 being able to walk onto a ledge
-- The message for substitute taking damage now only displays after the first attack of a multi-attack move
-- Multi-attack moves display effectivenes only on first attack instead of the last attack
-- Twineedle does not print redundant messages like other multi-hit moves
 
 
 #Bugfixes
