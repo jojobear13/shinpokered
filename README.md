@@ -762,27 +762,29 @@ The shinpokered repository was branched from pret/pokered at [merge pull request
 
 #Legal Mumbo Jumbo
 --------------------------
-The Shin Pokemon project is primarily an educational endeavor. 
+
+Shin (真) Pokémon is an unofficial, non-commercial community patch made by fans and is unaffiliated with Nintendo/Creatures Inc./GAME FREAK inc.
+© 2025 Pokémon. © 1995–2025 Nintendo/Creatures Inc./GAME FREAK inc. 
+Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.
+
+The Shin Pokemon project is an educational endeavor. 
 Its source code has been made fully viewable in edification of learning assembly programming, forensically documenting bugs in the original Red and Blue games, and showcasing solutions for fixing them. 
 Members of the Shin Pokemon team make no claim of ownership over assets and code that did not originate internally. 
 Its members also encourage people to utilize the project project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
 
-That being said, the Shin Pokemon Project is open-source only in the colloquial sense, not in legal meaning, and it gives no open-source or closed-source license for usage. 
-
-There are certain works of original, self-contained, non-derivative programming code within the Shin Pokemon project over which its members jointly hold all applicable intellectual property rights. 
-These works include, but are not limited to, the code that implements the built-in gamma shader and the code that implements enhanced colorization of background layer tiles. 
+The Shin Pokemon Project is open-source only in the colloquial sense, not in legal meaning, and has no open-source license. 
+There are specific works of original, self-contained, non-derivative programming code libraries within the Shin Pokemon project over which its members jointly hold all applicable intellectual property rights. 
+These works include, but are not limited to, the code library that implements the built-in gamma shader and the code library that implements enhanced colorization of background layer tiles. 
 All rights are reserved.
 
-The Shin Pokemon team does not believe in granting formal permissions or licences.
-Instead, it expects that people adhere to a few simple historical guidelines common in the community.
+The Shin Pokemon team does not believe in granting formal permissions or licences for its original code libraries.
+Instead, it expects that people adhere to a few simple historical guidelines common in the fan community.
 Don't be uncool by:
-- Plagiarizing code, not because of IP law, but because nobody likes a liar
-- Not giving proper credit, or by giving ambiguous/low-information credit
+- Plagiarizing code, because nobody likes a liar
+- Not giving proper credit or giving ambiguous/low-information credit
 - Copying original code and putting it into a closed-source project
 - Selling original code in any form for money, barter, favors, or putting it behind a paywall
 
-The team is not a litigious lot. 
-Nor is the team interested in playing Internet Police. 
+The team is not interested in playing Internet Police. 
 This is all done for free as a hobby and for stress-relief.
-But the right to take action is reserved in case it is ever deemed necessary.
 Be cool.
