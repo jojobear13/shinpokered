@@ -164,6 +164,10 @@ Also, it's DVs will be set to match the quantities of the first four items in yo
 
 #Engine Functions
 -----------------------------------------------
+#### Game Boy Printer  
+Game Boy Printer functions have been backported from Yellow version.  
+They can be accessed from the normal PC in any Pokemon Center.  
+
 #### Extra Options Menu  
 Press SELECT on the main options menu to go to the extra menu where several new features can be toggled.  
 
