@@ -10,24 +10,50 @@ DisplayPCMainMenu::
 	ld a, [wNumHoFTeams]
 	and a
 	jr nz, .leaguePCAvailable
+
+	; coord hl, 0, 0
+	; ld b, 8
+	; ld c, 14
+	; jr .next
+; .noOaksPC
+	; coord hl, 0, 0
+	; ld b, 6
+	; ld c, 14
+	; jr .next
+; .leaguePCAvailable
+	; coord hl, 0, 0
+	; ld b, 10
+	; ld c, 14
+
+;adding GB_PRINTER
+;have to make the text box bigger to make room for the printer option
+	;regular PC
 	coord hl, 0, 0
-	ld b, 8
+	ld b, 10
 	ld c, 14
 	jr .next
 .noOaksPC
+	;early game before getting pokedex
 	coord hl, 0, 0
 	ld b, 6
 	ld c, 14
 	jr .next
 .leaguePCAvailable
+	;post game after beating the elite 4
 	coord hl, 0, 0
-	ld b, 10
+	ld b, 12
 	ld c, 14
+
 .next
 	call TextBoxBorder
 	call UpdateSprites
-	ld a, 3
+
+;	ld a, 3	;This is the regular number of main game menu items (excluding Log Off)
+;adding GB_PRINTER
+;have to increase this by +1
+	ld a, 4
 	ld [wMaxMenuItem], a
+
 	CheckEvent EVENT_MET_BILL
 	jr nz, .metBill
 	coord hl, 2, 2
@@ -53,20 +79,46 @@ DisplayPCMainMenu::
 	ld a, [wNumHoFTeams]
 	and a
 	jr z, .noLeaguePC
-	ld a, 4
+
+;	ld a, 4	;This is the regular number of post-game menu items (excluding Log Off)
+;adding GB_PRINTER
+;have to increase this by +1
+	ld a, 5
 	ld [wMaxMenuItem], a
+
+	; ld [wMaxMenuItem], a
+	; coord hl, 2, 8
+	; ld de, PKMNLeaguePCText
+	; call PlaceString
+	; coord hl, 2, 10
+	; ld de, LogOffPCText
+	; jr .next3
+; .noLeaguePC
+	; coord hl, 2, 8
+	; ld de, LogOffPCText
+	; jr .next3
+
+;adding GB_PRINTER
+;have to add the printer option to the text box
 	coord hl, 2, 8
 	ld de, PKMNLeaguePCText
 	call PlaceString
 	coord hl, 2, 10
+	ld de, PrinterPCText
+	call PlaceString
+	coord hl, 2, 12
 	ld de, LogOffPCText
 	jr .next3
 .noLeaguePC
 	coord hl, 2, 8
+	ld de, PrinterPCText
+	call PlaceString
+	coord hl, 2, 10
 	ld de, LogOffPCText
 	jr .next3
+
 .noOaksPC2
-	ld a, $2
+	ld a, 2		;This is the regular number of pre-pokedex menu items (excluding Log Off)
 	ld [wMaxMenuItem], a
 	coord hl, 2, 6
 	ld de, LogOffPCText
@@ -91,6 +143,8 @@ PlayersPCText:    db "'s PC@"
 OaksPCText:       db "PROF.OAK's PC@"
 PKMNLeaguePCText: db $4a, "LEAGUE@"
 LogOffPCText:     db "LOG OFF@"
+;adding GB_PRINTER
+PrinterPCText:     db "PRINTER@"
 
 BillsPC_::
 	ld hl, wd730

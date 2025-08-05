@@ -2528,3 +2528,14 @@ PlayThudAndLoop:
 	call PlaySound ; play collision sound (if it's not already playing)
 .jump
 	jp OverworldLoop
+
+;adding GB_PRINTER
+ReloadMapAfterPrinter::
+	ld a, [H_LOADEDROMBANK]
+	push af
+	ld a, [wCurMap]
+	call SwitchToMapRomBank
+	call LoadTileBlockMap
+	pop af
+	call BankswitchCommon
+	ret

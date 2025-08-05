@@ -364,8 +364,94 @@ wSerialEnemyMonsPatchList:: ; c5d0
 	ds 80
 
 wTempPic::
+;wOverworldMap:: ; c6e8
+;	ds 1300
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;adding GB_PRINTER
+;wOverworldMap is 1300 bytes long and runs from c6e8 to cbfb. 
+;Printer data and TempPic data overlaps with this Overworld Map data.
+wPrinterData:: ;c6e8
+wPrinterSendState:: ; c6e8
 wOverworldMap:: ; c6e8
-	ds 1300
+	ds 1
+wPrinterRowIndex:: ; c6e9
+	ds 1
+; Printer data header runs from c6ea to c6ed
+wPrinterDataHeader:: ; c6ea
+	ds 4
+wPrinterChecksum:: ; c6ee
+	dw
+
+UNION
+wPrinterSerialReceived:: ; c6f0
+	ds 1
+wPrinterStatusReceived:: ; c6f1
+; bit 7: set if error 1 (battery low)
+; bit 6: set if error 4 (too hot or cold)
+; bit 5: set if error 3 (paper jammed or empty)
+; if this and the previous byte are both $ff: error 2 (connection error)
+	ds 1
+;These are for temporarily handling printer settings
+wc6f2:: ; c6f2
+	ds 1
+wc6f3:: ; c6f3
+	ds 13
+;filler for this section of the UNION
+; c700
+	ds $270
+NEXTU
+wPrinterSendDataSource1:: ; c6f0
+; two 20-tile buffers
+	ds $140
+wPrinterSendDataSource2::
+	ds $140
+ENDU
+wPrinterSendDataSource1End:: ; c970
+
+wPrinterHandshake:: ; c970
+	ds 1
+wPrinterStatusFlags:: ; c971
+	ds 1
+wHandshakeFrameDelay:: ; c972
+	ds 1
+wPrinterSerialFrameDelay:: ; c973
+	ds 1
+wPrinterSendByteOffset:: ; c974
+	dw
+wPrinterDataSize:: ; c976
+	dw
+wPrinterTileBuffer:: ; c978
+	ds SCREEN_HEIGHT * SCREEN_WIDTH
+wPrinterStatusIndicator:: ; cae0
+	ds 2
+;used for storing commands having to do with printer transmission
+wcae2:: ; cae2
+	ds 1
+wPrinterSettingsTempCopy:: ; cae3
+	ds 17
+wPrinterQueueLength:: ; caf4
+	ds 1
+wPrinterDataEnd:: ; caf5
+
+wPrinterPokedexEntryTextPointer:: ; caf5
+	dw
+
+; caf7
+	ds 2
+
+wPrinterPokedexMonIsOwned:: ; caf9
+	ds 227
+
+;These appear to be for handling vram during printing
+wcbdc:: ; cbdc
+	ds 14
+wcbea:: ; cbea
+	ds 2
+wcbec:: ; cbec
+	ds 16
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 wRedrawRowOrColumnSrcTiles:: ; cbfc
 ; the tiles of the row or column to be redrawn by RedrawRowOrColumn
@@ -2756,7 +2842,16 @@ wTilesetTalkingOverTiles:: ; d532
 wGrassTile:: ; d535
 	ds 1
 
-	ds 4
+;	ds 4
+;adding GB_PRINTER
+wPrinterSettings:: ; d536
+	ds 1
+wPrinterConnectionOpen:: ; d537
+	ds 1
+wPrinterOpcode:: ; d538
+	ds 1
+;leftover	
+	ds 1
 
 wNumBoxItems:: ; d53a
 	ds 1
