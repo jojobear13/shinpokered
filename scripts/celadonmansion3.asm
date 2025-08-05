@@ -50,6 +50,7 @@ DirectorText:
 	TX_BLINK
 	TX_ASM
 	callab DisplayDiploma
+	call ReloadTilesetTilePatterns	;added for GB_PRINTER
 	SetEvent EVENT_90B	;joenote - set event that diploma has been attained
 	ld a, $1
 	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
