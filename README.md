@@ -183,6 +183,7 @@ No more duochrome! Yellow's color scheme gets converted to display on the Gamebo
 Or play with further enhanced colorization for the overworld.
 Attack animations are colored according to type during Gameboy Color play.
 Yellow's audio engine is backported for stereo sound support. 
+Game Boy Printer functionality has been added. 
 
 New options that can be toggled! Hit SELECT on the options screen to see an extra options menu.
 - Cycle through audio types.
@@ -371,6 +372,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 v1.25.0
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
@@ -1121,6 +1123,7 @@ v1.25.0
 
 
 #Quick Keys / Options / Menu-Related
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Press SELECT on the option menu to go to the extra options menu where many new options can be toggled!
 - Added built-in gamma shader for backlit LCD screens (press SELECT at the copyright screen)
   - Gamma shader defaults ON if the destination code in the rom header is set to 00 (JP)
@@ -1699,6 +1702,7 @@ EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLAN
 - Poketto for the spaceworld-style Trainer Red back sprite
 - easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - devolov for the bag-sorting feature
+- CreamElDudJafar for GB Printer backporting
 - powderpup for box covers using Sugimori cardass art
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
