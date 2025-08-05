@@ -163,6 +163,8 @@ None
 
 - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
+
 - Press SELECT on the extra options menu to get a sound test menu
   - Listen to the game's musical tracks
   - They even continue to play once you've backed out of the options menu

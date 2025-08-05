@@ -78,6 +78,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 v1.25.0
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
@@ -422,6 +423,7 @@ v1.25.0
  
 #Tweaks
 -----------
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Press SELECT on the option menu to get to the extra options menu and toggle various new features
 - Press SELECT on the extra options menu to get a sound test menu
   - Listen to the game's musical tracks
@@ -733,6 +735,7 @@ v1.25.0
 - Poketto for the spaceworld-style Trainer Red back sprite
 - easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - devolov for the bag-sorting feature
+- CreamElDudJafar for GB Printer backporting
 - powderpup for box covers using Sugimori cardass art
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
