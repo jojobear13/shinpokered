@@ -26,8 +26,33 @@ PCMainMenu:
 	jr z, .playersPC ;if current menu item id is 1, it's players pc
 	jp LogOff        ;otherwise, it's 2, and you're logging off
 .next
-	cp 3
-	jr nz, .next2 ;if not 3 menu items (not counting log off) (3 occurs after you get the pokedex, before you beat the pokemon league)
+
+	; cp 3
+	; jr nz, .next2 ;if not 3 menu items (not counting log off) (3 occurs after you get the pokedex, before you beat the pokemon league)
+	; ld a, [wCurrentMenuItem]
+	; and a
+	; jp z, BillsPC    ;if current menu item id is 0, it's bills pc
+	; cp 1
+	; jr z, .playersPC ;if current menu item id is 1, it's players pc
+	; cp 2
+	; jp z, OaksPC     ;if current menu item id is 2, it's oaks pc
+	; jp LogOff        ;otherwise, it's 3, and you're logging off
+; .next2
+	; ld a, [wCurrentMenuItem]
+	; and a
+	; jp z, BillsPC    ;if current menu item id is 0, it's bills pc
+	; cp 1
+	; jr z, .playersPC ;if current menu item id is 1, it's players pc
+	; cp 2
+	; jp z, OaksPC     ;if current menu item id is 2, it's oaks pc
+	; cp 3
+	; jp z, PKMNLeague ;if current menu item id is 3, it's pkmnleague
+	; jp LogOff        ;otherwise, it's 4, and you're logging off
+
+;adding GB_PRINTER
+;have to account for the printer option in the text box
+	cp 4
+	jr nz, .next2
 	ld a, [wCurrentMenuItem]
 	and a
 	jp z, BillsPC    ;if current menu item id is 0, it's bills pc
@@ -35,7 +60,9 @@ PCMainMenu:
 	jr z, .playersPC ;if current menu item id is 1, it's players pc
 	cp 2
 	jp z, OaksPC     ;if current menu item id is 2, it's oaks pc
-	jp LogOff        ;otherwise, it's 3, and you're logging off
+	cp 3
+	jp z, PrinterPC     ;if current menu item id is 3, it's the GB_PRINTER
+	jp LogOff        ;otherwise you're logging off
 .next2
 	ld a, [wCurrentMenuItem]
 	and a
@@ -46,7 +73,10 @@ PCMainMenu:
 	jp z, OaksPC     ;if current menu item id is 2, it's oaks pc
 	cp 3
 	jp z, PKMNLeague ;if current menu item id is 3, it's pkmnleague
-	jp LogOff        ;otherwise, it's 4, and you're logging off
+	cp 4
+	jp z, PrinterPC     ;if current menu item id is 4, it's the GB_PRINTER
+	jp LogOff        ;otherwise you're logging off
+
 .playersPC
 	ld hl, wFlags_0xcd60
 	res 5, [hl]
@@ -64,6 +94,15 @@ OaksPC:
 	call WaitForSoundToFinish
 	callba OpenOaksPC
 	jr ReloadMainMenu
+
+;adding GB_PRINTER
+PrinterPC:
+	ld a, SFX_ENTER_PC
+	call PlaySound
+	call WaitForSoundToFinish
+	callba OpenPrinterPC
+	jr ReloadMainMenu
+
 PKMNLeague:
 	ld a, SFX_ENTER_PC
 	call PlaySound

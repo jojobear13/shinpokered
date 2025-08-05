@@ -270,6 +270,9 @@ hMovingBGTilesCounter1 EQU $FFD8
 
 H_CURRENTSPRITEOFFSET EQU $FFDA ; multiple of $10
 
+;adding GB_PRINTER
+hCanceledPrinting EQU $FFDB
+
 hItemCounter EQU $FFDB
 
 hGymGateIndex EQU $FFDB
@@ -325,6 +328,7 @@ hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 2: something about skipping a line when printing text
 ; bit 3: LoadCurrentMapView is being called during player movement - GBCnote--> added this
 ; bit 4: Menus in the cable club are being displayed - GBCnote--> added this
+; bit 5: For GB_PRINTER - If set, do not print the triangle at the end of a line and instead do a line feed 
 
 hFieldMoveMonMenuTopMenuItemX EQU $FFF7
 

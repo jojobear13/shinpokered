@@ -953,6 +953,12 @@ EmptyFunc3:
 
 Diploma_TextBoxBorder:
 	call GetPredefRegisters
+	
+	;adding GB_PRINTER
+	ld a, [wPrinterSettings]
+	bit 7, a
+	jp nz, PrintDiploma_TextBoxBorder
+	
 	jr CableClub_TextBoxBorder.next	;joenote - fixes a wrong tiles with the diploma border due to cable club map check
 
 ; b = height
@@ -1039,3 +1045,73 @@ LoadTrainerInfoTextBoxTiles:
 	ld hl, vChars2 + $760
 	lb bc, BANK(TrainerInfoTextBoxTileGraphics), (TrainerInfoTextBoxTileGraphicsEnd - TrainerInfoTextBoxTileGraphics) / $10
 	jp CopyVideoData
+
+	
+;adding GB_PRINTER
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PrintDiploma_DrawHorizontalLine:	;alternates between the value of A and A+1
+	ld d, c
+.loop
+	ld [hli], a
+	inc a
+	dec d
+	ld [hli], a
+	dec a
+	dec d
+	jr nz, .loop
+	ret
+
+PrintDiploma_DrawVerticalBorders:	;B must be an even number
+	push hl
+	push bc
+	ld de, 20
+	add hl, de
+.loop
+	push hl
+	ld a, $04 ; border left vertical line tile
+	ld [hli], a
+	ld a, " "
+	call CableClub_DrawHorizontalLine
+	ld [hl], $04 ; border right vertical line tile
+	pop hl
+	ld de, 40
+	add hl, de
+	dec b
+	dec b
+	jr nz, .loop
+	pop bc
+	pop hl
+.loop2
+	push hl
+	ld a, $03 ; border left vertical line tile
+	ld [hli], a
+	ld a, " "
+	call CableClub_DrawHorizontalLine
+	ld [hl], $03 ; border right vertical line tile
+	pop hl
+	ld de, 40
+	add hl, de
+	dec b
+	dec b
+	jr nz, .loop2
+	ret
+	
+PrintDiploma_TextBoxBorder:	;prints the page-1 border for yellow version's diploma
+	push hl
+	ld a, $00 ; border upper left corner tile
+	ld [hli], a
+	inc a ; border top horizontal line tile
+	call PrintDiploma_DrawHorizontalLine
+	ld a, $00 ; border upper right corner tile
+	ld [hl], a
+	pop hl
+	ld de, 20
+	add hl, de
+	call PrintDiploma_DrawVerticalBorders
+	ld a, $03 ; border lower left corner tile
+	ld [hli], a
+	ld a, " " ; border bottom horizontal line tile
+	call CableClub_DrawHorizontalLine
+	ld [hl], $03 ; border lower right corner tile
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
