@@ -71,6 +71,7 @@ VBlank::
 
 	callbs Music_DoLowHealthAlarm
 	callbs Audio1_UpdateMusic
+	call SerialFunction		;adding GB_PRINTER
 
 	callba TrackPlayTime ; keep track of time played
 

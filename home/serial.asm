@@ -331,7 +331,7 @@ PrinterSerial::
 	homecall PrinterSerial_
 	ret
 
-SerialFunction::
+SerialFunction::	;This needs to be called every VBLANK
 	ld a, [wPrinterConnectionOpen]
 	bit 0, a
 	ret z
