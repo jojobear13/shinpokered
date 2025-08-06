@@ -313,6 +313,9 @@ hCoordsInFrontOfPlayerMatch EQU $FFEA
 
 hSpriteAnimFrameCounter EQU $FFEA
 
+hVblankBackup EQU $FFEF	; added for more various uses involving enhanced GBC colors
+;bits 0 and 1 - backup of hRedrawRowOrColumnMode
+
 hRandomLast EQU $FFF0 ; FFF1	;2 bites for xor-shift rng
 
 H_WHOFIRST EQU $FFF2 ; joenote - 0 on player going first, 1 on enemy going first
@@ -343,9 +346,6 @@ hFlagsFFFA EQU $FFFA	;joenote - added for various uses
 ;bit 3 - When set, the CopyData function will only copy when safe to do so for VRAM
 ;bit 4 - When set, the enhanced GBC overworld BG Map Attributes are being used
 ;bit 5 - When set, enhanced GBC overworld BG Map Attributes should not be done during RunDefaultPaletteCommand
-
-hVblankBackup EQU $FFFC	; added for more various uses involving enhanced GBC colors
-;bits 0 and 1 - backup of hRedrawRowOrColumnMode
 
 hRGB EQU $FFFB	; FFFB=Red, FFFC=Green, FFFD=BLUE	;3 bytes ;joenote - used to store color RGB color values
 hGBC EQU $FFFE ;gbcnote - 0 if DMG or SGB, != 0 if GBC, =2 for gamma shader
