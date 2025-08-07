@@ -233,6 +233,7 @@ None
 - Fixed graphical display bug when talking to the 15th sprite on a map
 - Fixed a bug where cutting grass loads the wrong palette for the animation
 - Fixed a minor cursor error on the town map when in route 1 or the power plant
+- Fixed a vanilla bug involving minor text box flicker when a pokemon learns a move after evolving
 
 - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads

@@ -402,6 +402,12 @@ Evolution_ReloadTilesetTilePatterns:
 	ld a, [wLinkState]
 	cp LINK_STATE_TRADING
 	ret z
+
+;joenote - BUG: 
+;If the pokemon learned a move after evolving, there is currently a text box on the screen.
+;ReloadTilesetTilePatterns disables and then re-enables the LCD, so this will cause a slight visible flicker when this happens.
+;Fix this by first doing a white-out with GBPalWhiteOutWithDelay3.
+	call GBPalWhiteOutWithDelay3
 	jp ReloadTilesetTilePatterns
 
 ;joenote - this has been modified to allow for learning multiple moves at the same level
