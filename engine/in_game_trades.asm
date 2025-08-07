@@ -122,7 +122,12 @@ InGameTrade_DoTrade:
 	push af
 	call LoadHpBarAndStatusTilePatterns
 	call InGameTrade_PrepareTradeData
+
+	call GBPalWhiteOut
+	ld b, SET_PAL_GENERIC
+	call RunPaletteCommand
 	predef InternalClockTradeAnim
+
 	pop af
 	ld [wCurEnemyLVL], a
 	pop af
@@ -140,8 +145,13 @@ InGameTrade_DoTrade:
 	callab EvolveTradeMon
 	call ClearScreen
 	call InGameTrade_RestoreScreen
-	callba RedrawMapView
-	and a
+
+;	callba RedrawMapView
+;gbcnote - it is useful to have a version of RedrawMapView that does not mess with H_AUTOBGTRANSFERENABLED
+;used particularly for clean enhanced GBC colors during in-game trades
+	callba RedrawMapView_NoChangeAutoBGTransfer
+
+	and a	;this is so the carry flag gets reset
 	ld a, $3
 	jr .tradeSucceeded
 .tradeFailed
