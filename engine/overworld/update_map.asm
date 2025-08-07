@@ -66,6 +66,19 @@ ReplaceTileBlock:
 	call IsBCInHLTileBlockMapView
 	ret c
 
+;gbcnote - it is useful to have a version of RedrawMapView that does not mess with H_AUTOBGTRANSFERENABLED
+;used particularly for clean enhanced GBC colors during in-game trades
+RedrawMapView_NoChangeAutoBGTransfer:
+	ld a, [wIsInBattle]
+	inc a
+	ret z
+	ld a, [H_AUTOBGTRANSFERENABLED]
+	push af
+	ld a, [hTilesetType]
+	push af
+	xor a
+	jp RedrawMapView.done_AutoBGTransfer
+
 RedrawMapView:
 	ld a, [wIsInBattle]
 	inc a
@@ -76,6 +89,7 @@ RedrawMapView:
 	push af
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
+.done_AutoBGTransfer
 	ld [hTilesetType], a ; no flower/water BG tile animations
 	call LoadCurrentMapView
 	call RunDefaultPaletteCommand
