@@ -1794,6 +1794,11 @@ HasMonFainted:
 	ld a, [wFirstMonsNotOutYet]
 	and a
 	jr nz, .done
+
+;joenote - The side menu, if it's there, does not get erased because the screen buffers are being used
+;Let's fix that oversight by reloading the menu with a blank message box
+	call RefreshPartyMenu
+	
 	ld hl, NoWillText
 	call PrintText
 .done
@@ -2755,6 +2760,11 @@ PartyMenuOrRockOrRun:
 	cp d ; check if the mon to switch to is already out
 	jr nz, .notAlreadyOut
 ; mon is already out
+
+;joenote - The side menu does not get erased because the screen buffers are being used
+;Let's fix that oversight by reloading the menu with a blank message box
+	call RefreshPartyMenu
+
 	ld hl, AlreadyOutText
 	call PrintText
 	jp .partyMonDeselected

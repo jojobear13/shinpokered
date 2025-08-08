@@ -80,6 +80,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 v1.25.0
 - Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
+- Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle 
 - Fixed a vanilla bug involving minor text box flicker when a pokemon learns a move after evolving
 - Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
@@ -298,6 +299,7 @@ v1.25.0
   - Fixed a bug where cutting grass loads the wrong palette for the animation
   - Fixed graphical display bug when talking to the 15th sprite on a map
   - Fixed a minor text box flicker when a pokemon learns a move after evolving
+  - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle
   
 
 - Item Fixes  
