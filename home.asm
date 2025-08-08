@@ -4595,6 +4595,17 @@ Random_DV::
 	pop hl
 	ret
 
+;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
+RefreshPartyMenu:
+	ld a, [wPartyMenuTypeOrMessageID]
+	push af
+	ld a, 6
+	ld [wPartyMenuTypeOrMessageID], a
+	call RedrawPartyMenu
+	pop af
+	ld [wPartyMenuTypeOrMessageID], a
+	ret
+
 StatModifierRatios:
 ; first byte is numerator, second byte is denominator
 	db 25, 100  ; 0.25
