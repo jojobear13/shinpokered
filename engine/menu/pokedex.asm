@@ -12,9 +12,10 @@ ShowPokedexMenu:
 	ld [wd11e], a
 	ld [hJoy7], a
 .setUpGraphics
+	callab LoadPokedexTilePatterns
+.setUpPals
 	ld b, SET_PAL_GENERIC
 	call RunPaletteCommand
-	callab LoadPokedexTilePatterns
 .doPokemonListMenu
 	ld hl, wTopMenuItemY
 	ld a, 3
@@ -48,6 +49,8 @@ ShowPokedexMenu:
 	jr z, .exitPokedex ; if the player chose Quit
 	dec b
 	jr z, .doPokemonListMenu ; if pokemon not seen or player pressed B button
+	dec b
+	jr z, .setUpPals	;do not reload the tiles if exiting from GB_PRINTER
 	jp .setUpGraphics ; if pokemon data or area was shown
 
 ; handles the menu on the lower right in the pokedex screen
