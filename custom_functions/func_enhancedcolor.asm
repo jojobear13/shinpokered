@@ -420,6 +420,11 @@ PalSettings_TownSpecialPal:
 ;Clobbers BC, HL, and DE
 ;This function is in the same spirit as LoadCurrentMapView, but for GBC color pals instead of tiles
 MakeOverworldBGMapAttributes:	
+;only do the attributes when walking around, not during a menu or text since that will mess up the settings
+	ld a, [H_AUTOBGTRANSFERENABLED]
+	and a
+	ret nz
+.endAutoBGTransferFlag
 ;only for GBC and only if option is active
 	ld a, [hGBC]
 	and a
@@ -428,10 +433,6 @@ MakeOverworldBGMapAttributes:
 	bit 7, a
 	ret z
 	
-;only do the attributes when walking around, not during a menu or text since that will mess up the settings
-	ld a, [H_AUTOBGTRANSFERENABLED]
-	and a
-	ret nz
 
 	ld a, [wMapViewVRAMPointer]
 	ld b, a
