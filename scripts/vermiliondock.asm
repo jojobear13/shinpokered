@@ -60,6 +60,10 @@ VermilionDock_1db9b:
 	ld a, 1
 	ld [H_AUTOBGTRANSFERENABLED], a		;H_AUTOBGTRANSFERDEST already has $9C00 loaded, so re-copy wTileMap to vBGMap1
 	call Delay3
+
+;gbcnote: for enhanced GBC colors, you have to update the palettes for the water tiles just written to vBGMap1
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ld [wSSAnneSmokeDriftAmount], a
@@ -88,6 +92,40 @@ VermilionDock_1db9b:
 	ld [wMapViewVRAMPointer + 1], a
 	push hl
 	push de
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;gbcnote - initiate a bg map attribute column update to the east for the enhanced GBC palettes
+	
+	;set the flag that says you want to do a row/column update
+	ld hl, hFlags_0xFFF6
+	set 3, [hl]
+	
+	;preserve the player facing
+	ld a, [wSpriteStateData1 + 3]
+	push af
+	ld a, [wSpriteStateData1 + 5]
+	push af
+	
+	;pretend like the player is facing east for  the time being
+	xor a
+	ld [wSpriteStateData1 + 3], a
+	inc a
+	ld [wSpriteStateData1 + 5], a
+	
+	;do the update without caring about the state of H_AUTOBGTRANSFERENABLED
+	callba MakeOverworldBGMapAttributes.endAutoBGTransferFlag
+	
+	;restore facing
+	pop af
+	ld [wSpriteStateData1 + 5], a
+	pop af
+	ld [wSpriteStateData1 + 3], a
+	
+	;clear flag
+	ld hl, hFlags_0xFFF6
+	res 3, [hl]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+
 	call ScheduleEastColumnRedraw		;this redraws columns on vBGMap0 so garbage does not scroll in from the right
 	call VermilionDock_EmitSmokePuff
 	pop de
