@@ -173,7 +173,19 @@ ENDC
 	callba TransferMonPal ;gbcnote - update the bg pal for the new title mon
 	pop de
 
-IF DEF(_RGTITLE)
+;joenote - for sound test, make sure the correct bank is loaded here	
+	ld a, BANK(Music_TitleScreen)
+	ld b, a
+	ld a, [wAudioROMBank]
+	cp b
+	jr z, .correct_audio_bank
+	call StopAllMusic
+	ld a, BANK(Music_TitleScreen)
+	ld [wAudioROMBank], a
+	ld [wAudioSavedROMBank], a
+.correct_audio_bank
+
+	IF DEF(_RGTITLE)
 	ld a, SFX_INTRO_WHOOSH
 	call PlaySound
 	
