@@ -2726,10 +2726,11 @@ PartyMenuOrRockOrRun:
 	call GBPalNormal
 	jp DisplayBattleMenu
 .partyMonDeselected
-	coord hl, 11, 11
-	ld bc, 6 * SCREEN_WIDTH + 9
-	ld a, " "
-	call FillMemory
+;	joenote - this is not needed anymore because RefreshPartyMenu takes care of it
+;	coord hl, 11, 11
+;	ld bc, 6 * SCREEN_WIDTH + 9
+;	ld a, " "
+;	call FillMemory
 	xor a ; NORMAL_PARTY_MENU
 	ld [wPartyMenuTypeOrMessageID], a
 	call GoBackToPartyMenu
