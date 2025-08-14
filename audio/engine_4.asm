@@ -1,25 +1,27 @@
-Audio3_PlaySound::
+;adding audio 4 to allow for more music constants
+;this is just a copy of Audio 3
+Audio4_PlaySound::
 	ld [wSoundID], a
 	cp $ff
-	jp z, Audio3_7daa8
-	cp MUSIC3_FIRST_ENTRY - 1
-	jp z, Audio3_7d9c2
-	jp c, Audio3_7d9c2
+	jp z, Audio4_7daa8
+	cp MUSIC4_FIRST_ENTRY - 1
+	jp z, Audio4_7d9c2
+	jp c, Audio4_7d9c2
 	cp $fe
 	jr z, .asm_7d901
-	jp nc, Audio3_7d9c2
+	jp nc, Audio4_7d9c2
 .asm_7d901
 	call InitMusicVariables
-	jp Audio3_7db03
+	jp Audio4_7db03
 
-Audio3_7d9c2:
+Audio4_7d9c2:
 	ld l, a
 	ld e, a
 	ld h, $0
 	ld d, h
 	add hl, hl
 	add hl, de
-	ld de, SFX_Headers_3
+	ld de, SFX_Headers_4
 	add hl, de
 	ld a, h
 	ld [wSfxHeaderPointer], a
@@ -75,15 +77,15 @@ Audio3_7d9c2:
 .asm_7da9f
 	ld a, c
 	and a
-	jp z, Audio3_7db03
+	jp z, Audio4_7db03
 	dec c
 	jp .asm_7d9db
 
-Audio3_7daa8:
+Audio4_7daa8:
 	call StopAllAudio
 	ret
 
-Audio3_7db03:
+Audio4_7db03:
 	ld a, [wSoundID]
 	ld l, a
 	ld e, a
@@ -91,7 +93,7 @@ Audio3_7db03:
 	ld d, h
 	add hl, hl
 	add hl, de
-	ld de, SFX_Headers_3
+	ld de, SFX_Headers_4
 	add hl, de
 	ld e, l
 	ld d, h
@@ -170,7 +172,7 @@ Audio3_7db03:
 	ld [hli], a
 	ld [hl], a
 	ld hl, wChannelCommandPointers + Ch6 * 2 ; sfx noise channel pointer
-	ld de, Noise3_endchannel
+	ld de, Noise4_endchannel
 	ld [hl], e
 	inc hl
 	ld [hl], d ; overwrite pointer to point to endchannel
@@ -184,6 +186,6 @@ Audio3_7db03:
 .asm_7db89
 	ret
 
-Noise3_endchannel:
+Noise4_endchannel:
 	endchannel
 

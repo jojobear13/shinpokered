@@ -1,3 +1,4 @@
+Music_Audio3Start::
 Music_TitleScreen::
 	audio Music_TitleScreen, Ch0, Ch1, Ch2, Ch3
 

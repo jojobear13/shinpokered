@@ -173,6 +173,8 @@ None
 
 - Added an emulator check that tests the timing of memory modification opcodes
 
+- Audio Bank 4 from Yellow has been implemented to allow for more music constants
+
 - Trainers will not use non-healing items if they or the player are at low HP, making them more aggressive
 - AI will not switch if its HP is below 25% as it's usually not worth it
 - AI Layer 3 will no longer run on the turn a player switches in order to keep battle information from the AI
@@ -236,6 +238,7 @@ None
 - Fixed a vanilla bug involving minor text box flicker when a pokemon learns a move after evolving
 - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle
 
+- The unused Trading Song has been fixed up and put back into use
 - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Added missing sfx when leaving the trainer card screen

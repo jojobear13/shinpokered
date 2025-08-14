@@ -1,4 +1,4 @@
-NUM_MUSIC_TRACKS EQU 45
+NUM_MUSIC_TRACKS EQU 46
 
 DisplaySoundTestMenu:
 	ld a, SFX_PRESS_AB
@@ -178,6 +178,7 @@ SoundTestTrackList:
 	dw Title_Music_MeetEvilTrainer, (MUSIC_MEET_EVIL_TRAINER << 8) | Bank(Music_MeetEvilTrainer)
 	dw Title_Music_MeetFemaleTrainer, (MUSIC_MEET_FEMALE_TRAINER << 8) | Bank(Music_MeetFemaleTrainer)
 	dw Title_Music_MeetMaleTrainer, (MUSIC_MEET_MALE_TRAINER << 8) | Bank(Music_MeetMaleTrainer)
+	dw Title_Music_UnusedSong, (MUSIC_UNUSED_SONG << 8) | Bank(Music_UnusedSong)
 
 Title_Music_PalletTown: db "Pallet Town@"
 Title_Music_Pokecenter: db "#MON Center@"
@@ -224,3 +225,4 @@ Title_Music_SilphCo: db "Silph Co.@"
 Title_Music_MeetEvilTrainer: db "Evil Trainer@"
 Title_Music_MeetFemaleTrainer: db "Female Trainer@"
 Title_Music_MeetMaleTrainer: db "Male Trainer@"
+Title_Music_UnusedSong: db "Unused Trade Song@"
