@@ -372,6 +372,8 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 v1.25.0
+- Audio Bank 4 from Yellow has been implemented to allow for more music constants
+- The unused Trading Song has been fixed up and put back into use
 - Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle 
@@ -657,6 +659,7 @@ v1.25.0
   - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
   - Added missing sfx when leaving the trainer card screen
   - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
+  - The unused Trading Song has been fixed up and put back into use
   
 
 - Misc. fixes
@@ -967,6 +970,7 @@ v1.25.0
 
 - Engine changes just for developers
   - The trainer move engine has been backported from Yellow version; trainer movesets can now be fully customized
+  - Audio Bank 4 from Yellow has been implemented to allow for more music constants 
   - Improved exp calculation for developers who want a level cap between 101 and 255
     - EXP calculation routine now does math in 4 bytes instead of 3 bytes
 	- Exp calculation result is still capped to 3 bytes regardless of level cap to prevent overflow
@@ -1702,7 +1706,7 @@ EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLAN
 - The Pokemon Prism team for improved RNG used in this project's previous versions
 - Patrik Rak for the new xor-shift RNG code
 - Move deleter/relearner coded by TheFakeMateo/RegularLuna for Pokemon Red++
-- SteppoBlazer for the spaceworld-style old man back sprite
+- SteppoBlazer for: fixed unused song and spaceworld old man back sprite
 - Poketto for the spaceworld-style Trainer Red back sprite
 - easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - devolov for the bag-sorting feature

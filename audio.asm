@@ -1,7 +1,9 @@
+;adding audio 4 to allow for more music constants
 
 AUDIO_1 EQU $2
 AUDIO_2 EQU $8
 AUDIO_3 EQU $1f
+AUDIO_4 EQU $33
 
 INCLUDE "constants.asm"
 
@@ -636,7 +638,6 @@ INCLUDE "audio/music/routes3.asm"
 INCLUDE "audio/music/routes4.asm"
 INCLUDE "audio/music/indigoplateau.asm"
 INCLUDE "audio/music/pallettown.asm"
-INCLUDE "audio/music/unusedsong.asm"
 INCLUDE "audio/music/cities1.asm"
 INCLUDE "audio/sfx/get_item1_1.asm"
 INCLUDE "audio/music/museumguy.asm"
@@ -697,3 +698,11 @@ INCLUDE "audio/music/jigglypuffsong.asm"
 INCLUDE "audio/music/halloffame.asm"
 INCLUDE "audio/music/credits.asm"
 
+SECTION "General Section Audio 4", ROMX, BANK[AUDIO_4]
+INCLUDE "audio/headers/sfxheaders4.asm"
+INCLUDE "audio/headers/musicheaders4.asm"
+;INCLUDE "audio/sfx/snare1_4.asm"
+Audio4_WavePointers: INCLUDE "audio/wave_instruments.asm"
+;INCLUDE "audio/sfx/start_menu_4.asm"
+INCLUDE "audio/engine_4.asm"
+INCLUDE "audio/music/unusedsong.asm"

@@ -2,7 +2,7 @@ Audio2_PlaySound::
 	ld [wSoundID], a
 	cp $ff
 	jp z, Audio2_221f3
-	cp $e9
+	cp MUSIC2_FIRST_ENTRY - 1
 	jp z, Audio2_2210d
 	jp c, Audio2_2210d
 	cp $fe
