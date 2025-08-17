@@ -1,3 +1,4 @@
+Music_Audio1Start::
 Music_PalletTown::
 	audio Music_PalletTown, Ch0, Ch1, Ch2
 
@@ -64,3 +65,4 @@ Music_Routes4::
 ; Route 23, Indigo Plateau
 Music_IndigoPlateau::
 	audio Music_IndigoPlateau, Ch0, Ch1, Ch2, Ch3
+Music_Audio1End::

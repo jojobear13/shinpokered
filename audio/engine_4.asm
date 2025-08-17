@@ -3,18 +3,17 @@
 Audio4_PlaySound::
 	ld [wSoundID], a
 	cp $ff
-	jp z, Audio4_7daa8
-	cp MUSIC4_FIRST_ENTRY - 1
-	jp z, Audio4_7d9c2
-	jp c, Audio4_7d9c2
-	cp $fe
-	jr z, .asm_7d901
-	jp nc, Audio4_7d9c2
-.asm_7d901
+	jp z, .stopAllAudio	
+	cp MUSIC4_FIRST_ENTRY
+	jp c, .playSfx	
+	cp MUSIC4_END - 1
+	jr z, .playMusic
+	jp nc, .playSfx	
+.playMusic
 	call InitMusicVariables
 	jp Audio4_7db03
 
-Audio4_7d9c2:
+.playSfx
 	ld l, a
 	ld e, a
 	ld h, $0
@@ -81,7 +80,7 @@ Audio4_7d9c2:
 	dec c
 	jp .asm_7d9db
 
-Audio4_7daa8:
+.stopAllAudio
 	call StopAllAudio
 	ret
 

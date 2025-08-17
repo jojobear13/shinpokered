@@ -3,3 +3,4 @@
 Music_Audio4Start::
 Music_UnusedSong::
 	audio Music_UnusedSong, Ch0, Ch1
+Music_Audio4End::
