@@ -1,18 +1,17 @@
 Audio2_PlaySound::
 	ld [wSoundID], a
 	cp $ff
-	jp z, Audio2_221f3
-	cp MUSIC2_FIRST_ENTRY - 1
-	jp z, Audio2_2210d
-	jp c, Audio2_2210d
-	cp $fe
-	jr z, .asm_2204c
-	jp nc, Audio2_2210d
-.asm_2204c
+	jp z, .stopAllAudio
+	cp MUSIC2_FIRST_ENTRY
+	jp c, .playSfx
+	cp MUSIC2_END - 1
+	jr z, .playMusic
+	jp nc, .playSfx
+.playMusic
 	call InitMusicVariables
 	jp Audio2_2224e
 
-Audio2_2210d:
+.playSfx
 	ld l, a
 	ld e, a
 	ld h, $0
@@ -79,7 +78,7 @@ Audio2_2210d:
 	dec c
 	jp .asm_22126
 
-Audio2_221f3:
+.stopAllAudio
 	call StopAllAudio
 	ret
 	

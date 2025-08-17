@@ -36,8 +36,6 @@ REG_DUTY_SOUND_LEN  EQU 1
 REG_VOLUME_ENVELOPE EQU 2
 REG_FREQUENCY_LO    EQU 3
 
-MAX_SFX_ID EQU $B9
-
 CRY_SFX_START EQU $14
 CRY_SFX_END   EQU $86
 
@@ -60,6 +58,7 @@ MACRO music_const
 ENDM
 
 	; AUDIO_1
+	music_const MUSIC1_FIRST_ENTRY,        Music_Audio1Start
 	music_const MUSIC_PALLET_TOWN,         Music_PalletTown
 	music_const MUSIC_POKECENTER,          Music_Pokecenter
 	music_const MUSIC_GYM,                 Music_Gym
@@ -80,6 +79,7 @@ ENDM
 	music_const MUSIC_ROUTES3,             Music_Routes3
 	music_const MUSIC_ROUTES4,             Music_Routes4
 	music_const MUSIC_INDIGO_PLATEAU,      Music_IndigoPlateau
+	music_const MUSIC1_END,                Music_Audio1End
 
 	; AUDIO_2
 	music_const MUSIC2_FIRST_ENTRY,        Music_Audio2Start
@@ -90,6 +90,7 @@ ENDM
 	music_const MUSIC_DEFEATED_TRAINER,    Music_DefeatedTrainer
 	music_const MUSIC_DEFEATED_WILD_MON,   Music_DefeatedWildMon
 	music_const MUSIC_DEFEATED_GYM_LEADER, Music_DefeatedGymLeader
+	music_const MUSIC2_END,                Music_Audio2End
 
 	; AUDIO_3
 	music_const MUSIC3_FIRST_ENTRY,        Music_Audio3Start
@@ -111,11 +112,13 @@ ENDM
 	music_const MUSIC_MEET_EVIL_TRAINER,   Music_MeetEvilTrainer
 	music_const MUSIC_MEET_FEMALE_TRAINER, Music_MeetFemaleTrainer
 	music_const MUSIC_MEET_MALE_TRAINER,   Music_MeetMaleTrainer
+	music_const MUSIC3_END,                Music_Audio3End
 
 ;putting the unused song back into use
 	; AUDIO_4
 	music_const MUSIC4_FIRST_ENTRY,       Music_Audio4Start
 	music_const MUSIC_UNUSED_SONG,        Music_UnusedSong
+	music_const MUSIC4_END,               Music_Audio4End
 
 	; AUDIO_1 AUDIO_2 AUDIO_3
 	music_const SFX_SNARE_1,            SFX_Snare1_1
