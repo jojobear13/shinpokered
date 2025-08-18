@@ -174,6 +174,7 @@ None
 - Added an emulator check that tests the timing of memory modification opcodes
 
 - Audio Bank 4 from Yellow has been implemented to allow for more music constants
+- Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
 
 - Trainers will not use non-healing items if they or the player are at low HP, making them more aggressive
 - AI will not switch if its HP is below 25% as it's usually not worth it
