@@ -1,4 +1,5 @@
-;Notes
+;Putting Audio 4 from pokeyellow into use
+
 ;constants are lowercase notes while macros are uppercase
 	const_def
 	const c_ ; 0
@@ -120,7 +121,7 @@ ENDM
 	music_const MUSIC_UNUSED_SONG,        Music_UnusedSong
 	music_const MUSIC4_END,               Music_Audio4End
 
-	; AUDIO_1 AUDIO_2 AUDIO_3
+	; AUDIO_1 AUDIO_2 AUDIO_3 AUDIO_4
 	music_const SFX_SNARE_1,            SFX_Snare1_1
 	music_const SFX_SNARE_2,            SFX_Snare2_1
 	music_const SFX_SNARE_3,            SFX_Snare3_1
@@ -179,6 +180,7 @@ ENDM
 	music_const SFX_CRY_24,             SFX_Cry24_1
 	music_const SFX_CRY_25,             SFX_Cry25_1
 
+	; AUDIO_1 AUDIO_2 AUDIO_3 AUDIO_4
 	music_const SFX_GET_ITEM_2,         SFX_Get_Item2_1
 	music_const SFX_TINK,               SFX_Tink_1
 	music_const SFX_HEAL_HP,            SFX_Heal_HP_1
@@ -186,9 +188,8 @@ ENDM
 	music_const SFX_START_MENU,         SFX_Start_Menu_1
 	music_const SFX_PRESS_AB,           SFX_Press_AB_1
 
-	; AUDIO_1 AUDIO_3
+	; AUDIO_1 AUDIO_3 AUDIO_4
 	music_const SFX_GET_ITEM_1,         SFX_Get_Item1_1
-
 	music_const SFX_POKEDEX_RATING,     SFX_Pokedex_Rating_1
 	music_const SFX_GET_KEY_ITEM,       SFX_Get_Key_Item_1
 	music_const SFX_POISONED,           SFX_Poisoned_1
@@ -220,12 +221,11 @@ ENDM
 	music_const SFX_SAVE,               SFX_Save_1
 
 	; AUDIO_1
-	music_const SFX_POKEFLUTE,           SFX_Pokeflute
+	music_const SFX_POKEFLUTE,          SFX_Pokeflute
 	music_const SFX_SAFARI_ZONE_PA,     SFX_Safari_Zone_PA
 
 	; AUDIO_2
 	music_const SFX_LEVEL_UP,           SFX_Level_Up
-
 	music_const SFX_BALL_TOSS,          SFX_Ball_Toss
 	music_const SFX_BALL_POOF,          SFX_Ball_Poof
 	music_const SFX_FAINT_THUD,         SFX_Faint_Thud
