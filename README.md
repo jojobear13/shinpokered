@@ -374,6 +374,7 @@ Cheats and Secrets!
 v1.25.0
 - Audio Bank 4 from Yellow has been implemented to allow for more music constants
 - The unused Trading Song has been fixed up and put back into use
+- Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
 - Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle 
@@ -660,6 +661,7 @@ v1.25.0
   - Added missing sfx when leaving the trainer card screen
   - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
   - The unused Trading Song has been fixed up and put back into use
+  - Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
   
 
 - Misc. fixes

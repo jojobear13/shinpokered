@@ -867,9 +867,23 @@ TradeCenter_Trade:
 	ld [wTradedEnemyMonSpecies], a
 	ld a, 10
 	ld [wAudioFadeOutControl], a
-	ld a, $2
+
+;	ld a, $2
+;	ld [wAudioSavedROMBank], a
+;	ld a, MUSIC_SAFARI_ZONE
+
+	ld a, BANK(Music_UnusedSong)
 	ld [wAudioSavedROMBank], a
-	ld a, MUSIC_SAFARI_ZONE
+	ld a, [hSerialConnectionStatus]
+	cp USING_INTERNAL_CLOCK
+	jr z, .playL
+.playR
+	ld a, MUSIC_UNUSED_SONG_R
+	jr .donePlay
+.playL
+	ld a, MUSIC_UNUSED_SONG_L
+.donePlay
+	
 	ld [wNewSoundID], a
 	call PlaySound
 	ld c, 100
