@@ -78,16 +78,19 @@ UsedCut:
 	call RedrawMapView
 	ld hl, hFlagsFFFA
 	res 5, [hl]
-
+	
+	call .common		;joenote - consolidated a few things so they can be called from elsewhere
+	jp RedrawMapView
+.common
+	ld a, SFX_CUT
+	call PlaySound	;This was probably suppused to be here instead of after AnimCut
 	callba AnimCut
 	ld a, $1
 	ld [wUpdateSpritesEnabled], a
-	ld a, SFX_CUT
-	call PlaySound
 	ld a, $90
 	ld [hWY], a
 	call UpdateSprites
-	jp RedrawMapView
+	ret
 
 CheckCutTile:	;joenote - consolidate this into its own function
 	ld a, [wCurMapTileset]

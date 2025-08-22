@@ -78,6 +78,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 v1.25.0
+- The overworld Cut SFX now syncs up better with the animation
 - Audio Bank 4 from Yellow has been implemented to allow for more music constants
 - The unused Trading Song has been fixed up and put back into use
 - Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
@@ -359,6 +360,7 @@ v1.25.0
   - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
   - The unused Trading Song has been fixed up and put back into use
   - Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
+  - The overworld Cut SFX now syncs up better with the animation
   
 
 - Misc. fixes
