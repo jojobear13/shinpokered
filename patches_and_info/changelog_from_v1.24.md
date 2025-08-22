@@ -244,6 +244,7 @@ None
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Added missing sfx when leaving the trainer card screen
 - Fixed a rare infinite loop caused by a text SFX playing right at the end of an audio fadeout
+- The overworld Cut SFX now syncs up better with the animation
 
 - Fixed text error in Vermilion gym referencing the bird type instead of flying type
 
