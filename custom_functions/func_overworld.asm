@@ -182,14 +182,7 @@ CheckForSmartHMuse:
 	ld de, CutTreeBlockSwaps
 	callba ReplaceTreeTileBlock
 	callba RedrawMapView
-	callba AnimCut
-	ld a, $1
-	ld [wUpdateSpritesEnabled], a
-	ld a, SFX_CUT
-	call PlaySound
-	ld a, $90
-	ld [hWY], a
-	call UpdateSprites
+	callba UsedCut.common
 	callba RedrawMapView
 	jp .return
 .nocut
