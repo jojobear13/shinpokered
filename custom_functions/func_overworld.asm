@@ -386,7 +386,7 @@ PartyMoveTest:
 	push hl
 	ld b, 0
 	ld c, d
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	ld a, [hl]
 	pop hl

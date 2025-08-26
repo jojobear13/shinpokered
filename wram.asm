@@ -3111,7 +3111,7 @@ wRoute18GateCurScript:: ; d669
 	ds 1
 ;usused space
 	ds 30
-wTempFieldMoveSLots::	;joenote - for field move slot
+wTempFieldMoveSlots::	;joenote - for field move slot
 	ds 6
 wBagBackupSpace::	;joenote - added to expand the bag space (42 bytes long)
 wBagNumBackup::

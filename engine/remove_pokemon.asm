@@ -110,7 +110,7 @@ ClearTempFieldMove:	;joenote - for field move slot
 	ld a, [wWhichPokemon]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	ld d, h
 	ld e, l

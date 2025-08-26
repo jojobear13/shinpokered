@@ -929,7 +929,7 @@ SwapTempFieldMoves:	;joenote - for field move slot
 	ld a, [wCurrentMenuItem]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -937,7 +937,7 @@ SwapTempFieldMoves:	;joenote - for field move slot
 	ld a, [wMenuItemToSwap]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	
 	ld a, [de]

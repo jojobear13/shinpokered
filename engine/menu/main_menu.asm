@@ -206,6 +206,17 @@ MainMenu:
 	jp nz, SpecialEnterMap
 .pallet_warp
 	;doing the special warp to pallet town so update some save-able parameters
+	ld a, [wRomHackVersion]
+	and a 
+	jr nz, .updateVersion
+	;clear the ununsed spaced utilized for wTempFieldMoveSlots if coming from a really old version or vanilla
+	ld [wTempFieldMoveSlots+0], a
+	ld [wTempFieldMoveSlots+1], a
+	ld [wTempFieldMoveSlots+2], a
+	ld [wTempFieldMoveSlots+3], a
+	ld [wTempFieldMoveSlots+4], a
+	ld [wTempFieldMoveSlots+5], a
+.updateVersion
 	ld a, HACK_VERSION
 	ld [wRomHackVersion], a	;update the working ram with the current rom hack version
 	ld a, [wNumHoFTeams]
