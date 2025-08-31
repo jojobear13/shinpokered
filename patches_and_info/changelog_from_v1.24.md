@@ -1,5 +1,10 @@
 **New features exclusively for the master branch**
 
+- Added a feature for Alt Trainer Moves  
+  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+  - Their moves will be more competitive at higher levels.
+
 - Added Debug Stat Reset feature
 
 - PokeDex Area enhancements
