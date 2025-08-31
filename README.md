@@ -423,6 +423,10 @@ v1.25.0
 - Some Cueball teams include Pinsir
 - Biker teams can now include Beedrill, Magmar, an Electrode, and more Voltorbs
 - Fixed an issue where enemy level-up moves were being skipped
+- Added a feature for Alt Trainer Moves  
+  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+  - Their moves will be more competitive at higher levels.
 
 
 #Bugfixes
@@ -1108,6 +1112,10 @@ v1.25.0
   - Non-link battles in hard mode use the Stadium 1 formulas for critical hit probability
   - Warning: The difficulty will be compounded if both trainer scaling and hard mode are active
   - Oak's pokeballs will be upgraded to great balls if you beat the route 22 rival in hard mode
+- Alt Trainer Moves  
+  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+  - Their moves will be more competitive at higher levels.
 - Added the Clause Brothers to Viridian City
   - They toggle enforcement of the item, sleep, and/or freeze clauses
   - The clauses apply to the player and AI equally
