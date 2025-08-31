@@ -504,12 +504,12 @@ HandshakeList:
 ;FF is used as an end-of-list marker.
 	db $1
 	db $2
-	db $4
-	db $7
+	db $5
+	db $0
 	db $a
 	db $ff
 VersionText:
-	db "v1.24.7M@"
+	db "v1.25.0M@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText
