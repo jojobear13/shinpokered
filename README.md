@@ -1751,9 +1751,9 @@ The shinpokered repository was branched from pret/pokered at [merge pull request
 #Legal Mumbo Jumbo
 --------------------------
 
-Shin (真) Pokémon is an unofficial, non-commercial community patch made by fans and is unaffiliated with Nintendo/Creatures Inc./GAME FREAK inc.
-© 2025 Pokémon. © 1995–2025 Nintendo/Creatures Inc./GAME FREAK inc. 
-Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.
+Shin (真) Pokémon is an unofficial, non-commercial community patch made by fans and is unaffiliated with Nintendo/Creatures Inc./GAME FREAK inc.  
+© 2025 Pokémon. © 1995–2025 Nintendo/Creatures Inc./GAME FREAK inc.  
+Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.  
 
 The Shin Pokemon project is an educational endeavor. 
 Its source code has been made fully viewable in edification of learning assembly programming, forensically documenting bugs in the original Red and Blue games, and showcasing solutions for fixing them. 
