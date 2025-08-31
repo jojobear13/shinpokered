@@ -1332,6 +1332,29 @@ This is a throwback feature for certain Japan-only event pokemon giveaways.
 - Talk to him with Fearow or Rapidash at the top of your party, and he will offer to teach it Pay Day for 1000 yen.
 - Talk to him with Pikachu at the top of your party that has an empty move slot, and he can teach it Fly for 2000 yen.
 
+### Cheat-Move Tutors  
+These are tutors, just for fun, that teach unavailable moves to certain pokemon.  
+Make sure the pokemon is in the top party spot in order to trigger.  
+- Lickitung can learn Lick via the move-relearner in Saffron City.
+- Flareon can learn Agility and Low Kick from the Karate Master.
+- Hitmonlee can learn Agility and Quick Attack from the Pikachu in the Vermilion Fan Club.
+- Moltres can learn Flamethrower from Blaine.
+- Pidgeot and Pidgeotto can learn Drill Peck from the Fearow in the Route 16 house.
+- Ninetales can learn Hypnosis from Mr. Psychic in Saffron City.
+- Vileplume, Gloom, and Oddish can learn Leech Seed from Bill.
+- Examine the Omanyte sign in Fuschia City with one of these pokemon.
+  - Omastar will learn Rock Slide
+  - Kabutops will learn Mega Drain
+  - Aerodactyl will learn Earthquake
+- Ninja Scyther: Scyther can get a "ninja form" if you defeat Koga with it as the only member of your team.
+  - It will exchange its Flying type for Ghost type.
+  - Koga becomes a move tutor and can teach it a selection of new moves:
+	- Confuse Ray
+	- Hypnosis
+	- Light Screen
+	- Pin Missile
+	- Rolling Kick
+
 #### The Surfboard  
 The truck at the Vermilion Dock holds the Surfboard as a hidden item.  
 The surfboard substitutes for a pokemon that knows how to Surf.  

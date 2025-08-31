@@ -33,7 +33,7 @@ Leave a review for Shin Pokemon over at [Rom Hack Plaza](https://romhackplaza.or
 Find other mods and patches at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
 
 Other Social Links:
-[Discord server where I lurk](https://discord.com/invite/bGksMvxqgv).
+[Lurked Discord server](https://discord.gg/5CKzeWmZZU)
 [Twitter](https://twitter.com/13JoJoBear)
 [Bluesky](https://jojobear13.bsky.social)
 
@@ -42,7 +42,7 @@ Other Social Links:
 #Patch Info  
 -----------
 BPS patches are provided for entry into your preferred emulator, patching tool, or other accessory that supports the BPS format. 
-Download and enter a patch which corresponds to the ROM of which you own a lawful copy.  
+Download and apply a patch which corresponds to the ROM of which you own a lawful copy.  
 - **Red patches (Shin Pokemon Red, Red_origback, and Red-JP) are intended for USA Red.**
   - File/ROM SHA-1: EA9BCAE617FDF159B045185467AE58B2E4A48B9A
   - File/ROM CRC32: 9F7FDD53
@@ -1642,7 +1642,13 @@ These are things that are commonly requested but fall outside the scope of the p
 
 There are a couple checks performed in the background under the assumption that some form of emulation is being used. One or more messages may be displayed to indicate failures of these checks. For example, emulators like Visual Boy Advance and Goomba allow data read/writes to VRAM during mode 3 wherein the LCD controller is utilizing it; this is not possible on a real Game Boy and may cause issues with Shin Pokemon. Another example, one where Visual Boy Advance-M fails, is a test that checks multiple memory modification opcodes to make sure they execute within the correct amount of time.
 
+Reproduction and FPGA hardware (such as the Modretro Chromatic, FPGBC, and Analogue Pocket) may also display these messages depending on their design and their emulation cores.
+
 These messages are informative in nature and do not impede play. That said, it is encouraged to switch to a more accurate emulator to avoid things like graphical glitches and other weirdness. See "Compatibility Notes" for more info.
+
+> **How hard is Shin Pokemon in terms of difficulty?**
+
+It is variable. The default difficulty of Shin Pokemon is only slightly harder than the unpatched retail experience, and this is largely due to improvements in the trainer AI logic. The optional hard mode increases the challenge by giving trainer opponents proper stats so that they keep up with players' teams. The Master branch of the project also makes slight adjustments to trainer rosters and moves for variety and challenge, and it adds additional options like level-scaling and battle clauses. Shin Pokemon can provide a laid-back vanilla difficulty that surprises you once in a while, or it can be turned into a crushing uphill battle.  
 
 > **Will you do a special request just for me or make some specific patches or a ROM file for me?**
 
