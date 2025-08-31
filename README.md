@@ -1721,6 +1721,7 @@ EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLAN
 - easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - devolov for the bag-sorting feature
 - CreamElDudJafar for GB Printer backporting
+- Gambler Keegen for Alt Trainer Move consulting and curation
 - powderpup for box covers using Sugimori cardass art
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
