@@ -251,6 +251,12 @@ Enemy pokemon will evolve by level if applicable (biased to higher levels).
 Gym leaders and the Elite-4 scale slightly higher than normal trainers.  
 Warning - The difficulty will be compounded if both trainer scaling and hard mode are active.  
 
+#### Alt Trainer Moves  
+Not available in the Lite patches.  
+There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+Their moves will be more competitive at higher levels.  
+
 
 #Battle Modifiers
 -----------------------------------------------
