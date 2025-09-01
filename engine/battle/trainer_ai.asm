@@ -402,6 +402,10 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use defense-up moves if opponent is special attacking
 	ld a, [wEnemyMoveEffect]	;get the move effect
+	cp LIGHT_SCREEN_EFFECT	
+	jr z, .do_def_check
+	cp REFLECT_EFFECT	
+	jr z, .do_def_check
 	cp DEFENSE_UP1_EFFECT	
 	jr z, .do_def_check
 	cp DEFENSE_UP2_EFFECT
@@ -415,6 +419,15 @@ AIMoveChoiceModification1:
 	ld a, [wPlayerMovePower]	;all regular damage moves have a power of at least 10
 	cp 10
 	jr c, .nodefupmove
+.do_def_check_lightscreen
+	ld a, [wEnemyMoveEffect]	;get the move effect
+	cp LIGHT_SCREEN_EFFECT
+	jr nz, .do_def_check_other
+	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
+	cp $09
+	jp c, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
+	jr .nodefupmove
+.do_def_check_other
 	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
 	cp $14
 	jp nc, .heavydiscourage	;at this point, heavy discourage defense-boosting because player is using a special move of 10+ power
