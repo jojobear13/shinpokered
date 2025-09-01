@@ -1,16 +1,16 @@
 
-#Shin Pokemon Summary of AI Trainer Logic
+# Shin Pokemon Summary of AI Trainer Logic
 
 
 Every trainer class has a number of interchangeable AI layers assigned in order to determine how moves are chosen.
 These are also called AIMoveChoiceModification functions.
 Here we can see how some of these layers are assigned.
 
-0 - This is a terminator value.
-1 - Makes the trainer avoid dumb things like using sleep moves on a sleeping target.
-2 - The trainer will attempt to use a buffing move on the first turn after it sends out a new pokemon.
-3 - Applies more advanced strategy that includes type-matchups and STAB.
-4 - Not directly involved with moves. The trainer will evaluate if it should switch its active pokemon.
+0 - This is a terminator value.  
+1 - Makes the trainer avoid dumb things like using sleep moves on a sleeping target.  
+2 - The trainer will attempt to use a buffing move on the first turn after it sends out a new pokemon.  
+3 - Applies more advanced strategy that includes type-matchups and STAB.  
+4 - Not directly involved with moves. The trainer will evaluate if it should switch its active pokemon.  
 
 		TrainerClassMoveChoiceModifications:
 			db 0      ; YOUNGSTER
