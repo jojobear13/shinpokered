@@ -1,5 +1,5 @@
 
-**Shin Pokemon Summary of AI Trainer Logic**
+#Shin Pokemon Summary of AI Trainer Logic
 
 
 Every trainer class has a number of interchangeable AI layers assigned in order to determine how moves are chosen.
