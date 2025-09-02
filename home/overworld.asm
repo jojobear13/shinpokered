@@ -675,6 +675,10 @@ HandleBlackOut::
 ; For when all the player's pokemon faint.
 ; Does not print the "blacked out" message.
 
+	;pre-emptively reset to the overworld palette to prefent jank with enhanced GBC colors
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand
+
 	call GBFadeOutToBlack
 	ld a, $08
 	call StopMusic
