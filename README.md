@@ -344,13 +344,13 @@ Cheats and Secrets!
   - mGBA also works very well
   - The 3DS Virtual Console emulator might throw an error message but it is known to be fine
   - Delta emulator for those on iOS devices
-  - The Gambatte core for Retroarch should be good for Android devices
+  - The Gambatte or mGBA cores for Retroarch should be good for Android devices
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
   - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
   - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2.
   - Will play and save in the GB Tower of Stadium 2.
-  - Will **not work** with the GB Tower of Stadium 1.
+  - Will **not work** with the GB Tower of Stadium 1 due to cartridge header prerequisites.
 - Might be possible to use a save from vanilla USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
