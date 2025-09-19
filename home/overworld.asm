@@ -669,8 +669,14 @@ MapEntryAfterBattle::
 	ld a, [wMapPalOffset]
 	and a
 	jp z, GBFadeInFromWhite
-	jp LoadGBPal
-
+	
+	;jp LoadGBPal
+	
+;GBCnote - gives a cleaner palette transition from the white screen
+	call DisableLCD
+	call LoadGBPal
+	jp EnableLCD
+	
 HandleBlackOut::
 ; For when all the player's pokemon faint.
 ; Does not print the "blacked out" message.

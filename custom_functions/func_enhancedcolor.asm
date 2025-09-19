@@ -1351,10 +1351,14 @@ UpdateEnhancedGBCPal_BGP:
 
 ;since the background is getting updates, wait until vblank starts
 ;this way the scanlines don't update halfway down the screen
+	ld a, [rLCDC]
+	bit 7, a
+	jr z, .next
 .wait
 	ld a, [rLY]
 	cp $90
 	jr c, .wait
+.next
 	call GBCBufferFastTransfer_BGP
 
 	pop af		;re-enable interrupts
@@ -1514,6 +1518,9 @@ GBCBufferFastTransfer_BGP:
 	ld c, 32		
 
 .loop
+	ld a, [rLCDC]
+	bit 7, a
+	jr z, .next
 .wait
 ; In case we're already in H-blank or V-blank, wait for it to end. This is a
 ; precaution so that the transfer doesn't extend past the blanking period.
@@ -1526,7 +1533,7 @@ GBCBufferFastTransfer_BGP:
 	and %10 ; mask for non-V-blank/non-H-blank STAT mode
 	jr nz, .notInBlankingPeriod
 	
-;.loop
+.next
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
@@ -1561,6 +1568,9 @@ GBCBufferFastTransfer_OBP0:
 	ld c, 16		
 
 .loop
+	ld a, [rLCDC]
+	bit 7, a
+	jr z, .next
 .wait
 ; In case we're already in H-blank or V-blank, wait for it to end. This is a
 ; precaution so that the transfer doesn't extend past the blanking period.
@@ -1573,7 +1583,7 @@ GBCBufferFastTransfer_OBP0:
 	and %10 ; mask for non-V-blank/non-H-blank STAT mode
 	jr nz, .notInBlankingPeriod
 	
-;.loop
+.next
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
@@ -1608,6 +1618,9 @@ GBCBufferFastTransfer_OBP1:
 	ld c, 16		
 
 .loop
+	ld a, [rLCDC]
+	bit 7, a
+	jr z, .next
 .wait
 ; In case we're already in H-blank or V-blank, wait for it to end. This is a
 ; precaution so that the transfer doesn't extend past the blanking period.
@@ -1620,7 +1633,7 @@ GBCBufferFastTransfer_OBP1:
 	and %10 ; mask for non-V-blank/non-H-blank STAT mode
 	jr nz, .notInBlankingPeriod
 	
-;.loop
+.next
 	pop de			;12 cycles
 	ld a, d			;4 cycles
 	ld [hl], a		;8 cycles
