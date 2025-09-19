@@ -7,6 +7,20 @@ w2GBCFullPalBuffer			EQU $d500	;secondary buffer that is 128 bytes
 
 END_OF_OVERWORLD_TILES 		EQU $60		;This is 1 plus the value of the last overworld tile.
 
+MACRO GBCEnh_Dark1
+		dw (11 << 10 | 5 << 5 | 7)
+ENDM
+MACRO GBCEnh_Dark2
+		dw (6 << 10 | 3 << 5 | 3)
+ENDM
+
+MACRO GBCEnh_Black
+		dw (3 << 10 | 3 << 5 | 3)
+ENDM
+MACRO GBCEnh_White
+		dw (31 << 10 | 31 << 5 | 31)
+ENDM
+
 const_value = 0
 
 	const PAL_ENH_OVW_RED     	; $00
@@ -20,103 +34,155 @@ const_value = 0
 
 GBCEnhancedOverworldPalettes:	
 	; PAL_ENH_OVW_RED     	; $00
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 10,  0
 	RGB 21,  0,  0
-	RGB  3,  3,  3
+	GBCEnh_Black
 	
 	; PAL_ENH_OVW_PINK  	; $01
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 15, 18
 	RGB 31,  0,  6
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_PURPLE 	; $02
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 25, 15, 31
 	RGB 19,  0, 22
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_GRAY   	; $03
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 20, 23, 10
 	RGB 11, 11,  5
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_GREEN    	; $04
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 17, 31, 11
 	RGB  1, 22,  6
-	RGB  3,  3,  3
+	GBCEnh_Black
 	
 	; PAL_ENH_OVW_YELLOW  	; $05
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 31,  0
 	RGB 28, 14,  0
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_BROWN    	; $06
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 22, 16,  5
 	RGB 15,  7,  3
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_BLUE  	; $07
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 12, 14, 31
 	RGB  0,  1, 25
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 
 	
 GBCEnhancedOverworldPalettes_ColdCavern:	;just used for seafoam islands for aesthetic
 	; PAL_ENH_OVW_RED     	; $00
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 10,  0
 	RGB 21,  0,  0
-	RGB  3,  3,  3
+	GBCEnh_Black
 	
 	; PAL_ENH_OVW_PINK  	; $01
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 15, 18
 	RGB 31,  0,  6
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_PURPLE 	; $02
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 25, 15, 31
 	RGB 19,  0, 22
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_GRAY   	; $03
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB $12, $12, $18
 	RGB $A, $A,  $F
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_GREEN    	; $04
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 17, 31, 11
 	RGB  1, 22,  6
-	RGB  3,  3,  3
+	GBCEnh_Black
 	
 	; PAL_ENH_OVW_YELLOW  	; $05
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 31, 31,  0
 	RGB 28, 14,  0
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_BROWN    	; $06
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB $10, $5, $16
 	RGB $7, $3,  $F
-	RGB  3,  3,  3
+	GBCEnh_Black
 
 	; PAL_ENH_OVW_BLUE  	; $07
-	RGB 31, 31, 31
+	GBCEnh_White
 	RGB 12, 14, 31
 	RGB  0,  1, 25
-	RGB  3,  3,  3
+	GBCEnh_Black
+
+
+	
+GBCEnhancedOverworldPalettes_DarkCavern:	;palette set used for darkened areas like Rock Tunnel
+
+	; PAL_ENH_OVW_RED     	; $00
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+	
+	; PAL_ENH_OVW_PINK  	; $01
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+
+	; PAL_ENH_OVW_PURPLE 	; $02
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+
+	; PAL_ENH_OVW_GRAY   	; $03
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+
+	; PAL_ENH_OVW_GREEN    	; $04
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+	
+	; PAL_ENH_OVW_YELLOW  	; $05
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+
+	; PAL_ENH_OVW_BROWN    	; $06
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
+
+	; PAL_ENH_OVW_BLUE  	; $07
+	GBCEnh_White
+	GBCEnh_Dark1
+	GBCEnh_Dark1
+	GBCEnh_Dark2
 
 
 	
@@ -1259,8 +1325,14 @@ BufferAllEnhancedColorsGBC:
 .isColdCavern	
 	ld hl, GBCEnhancedOverworldPalettes_ColdCavern
 .notColdCavern
+
+	ld a, [wMapPalOffset]
+	cp 6
+	jr nz, .notdark
+	ld hl, GBCEnhancedOverworldPalettes_DarkCavern
+.notdark
+
 	add hl, de
-	
 	pop de ;get the pal pattern back
 	ld a, [de]
 	;now put the pattern in E and make D zero
