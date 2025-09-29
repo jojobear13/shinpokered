@@ -436,7 +436,7 @@ CharmanderEvosMoves_Alt:
     db 30, SLASH
     db 38, FLAMETHROWER
     db 46, FIRE_SPIN
-    db 48, EARTHQUAKE
+    db 48, SWORDS_DANCE
     db 50, BODY_SLAM
     db 52, FIRE_BLAST
     db 54, SLASH 
@@ -452,7 +452,7 @@ CharmeleonEvosMoves_Alt:
     db 33, SLASH
     db 42, FLAMETHROWER
     db 56, FIRE_SPIN
-    db 58, EARTHQUAKE
+    db 58, SWORDS_DANCE
     db 60, BODY_SLAM
     db 62, FIRE_BLAST
     db 64, SLASH 
@@ -545,7 +545,7 @@ ButterfreeEvosMoves_Alt:
     db 32, PSYCHIC_M
     db 35, STUN_SPORE
     db 37, SLEEP_POWDER
-    db 40, PSYWAVE 
+    db 40, SUPERSONIC 
 	db 0
 	
 WeedleEvosMoves_Alt:
@@ -566,7 +566,7 @@ BeedrillEvosMoves_Alt:
     db 25, DOUBLE_EDGE
     db 30, PIN_MISSILE
     db 35, MEGA_DRAIN
-    db 37, FOCUS_ENERGY
+    db 37, SUBSTITUTE
     db 40, TWINEEDLE
     db 43, DOUBLE_EDGE 
 	db 0
@@ -577,7 +577,7 @@ PidgeyEvosMoves_Alt:
     db 12, QUICK_ATTACK
     db 19, SWIFT
     db 28, FLY
-    db 32, DOUBLE_TEAM
+    db 32, SUBSTITUTE
     db 36, DOUBLE_EDGE
     db 44, QUICK_ATTACK 
 	db 0
@@ -589,7 +589,7 @@ PidgeottoEvosMoves_Alt:
     db 12, QUICK_ATTACK
     db 21, SWIFT
     db 31, FLY
-    db 35, DOUBLE_TEAM
+    db 35, SUBSTITUTE
     db 40, DOUBLE_EDGE
     db 49, QUICK_ATTACK 
 	db 0
@@ -602,9 +602,9 @@ PidgeotEvosMoves_Alt:
     db 12, QUICK_ATTACK
     db 21, SWIFT
     db 31, FLY
-    db 37, DOUBLE_TEAM
+    db 37, SUBSTITUTE
     db 44, DOUBLE_EDGE
-    db 54, QUICK_ATTACK 
+    db 54, HYPER_BEAM 
 	db 0
 	
 RattataEvosMoves_Alt:
@@ -629,7 +629,8 @@ RaticateEvosMoves_Alt:
     db 34, BUBBLEBEAM
     db 41, SUPER_FANG
     db 45, BODY_SLAM
-    db 50, DIG 
+    db 50, DIG
+    db 54, HYPER_BEAM
 	db 0
 	
 SpearowEvosMoves_Alt:
@@ -637,10 +638,10 @@ SpearowEvosMoves_Alt:
     db 1, PECK
     db 9, LEER
     db 15, FURY_ATTACK
-    db 22, DOUBLE_TEAM
+    db 22, SUBSTITUTE
     db 29, DRILL_PECK
-    db 36, AGILITY
-    db 40, DOUBLE_EDGE 
+    db 36, DOUBLE_EDGE
+    db 40, DOUBLE_TEAM 
 	db 0
 	
 FearowEvosMoves_Alt:
@@ -649,10 +650,10 @@ FearowEvosMoves_Alt:
     db 1, LEER
     db 9, LEER
     db 15, FURY_ATTACK
-    db 25, DOUBLE_TEAM
+    db 25, SUBSTITUTE
     db 34, DRILL_PECK
-    db 43, AGILITY
-    db 48, DOUBLE_EDGE 
+    db 43, DOUBLE_EDGE
+    db 48, HYPER_BEAM 
 	db 0
 	
 EkansEvosMoves_Alt:
@@ -673,7 +674,8 @@ ArbokEvosMoves_Alt:
     db 17, BODY_SLAM
     db 27, GLARE
     db 36, ROCK_SLIDE
-    db 47, EARTHQUAKE 
+    db 47, EARTHQUAKE
+    db 52, HYPER_BEAM
 	db 0
 	
 PikachuEvosMoves_Alt:
@@ -700,7 +702,7 @@ SandshrewEvosMoves_Alt:
     db 17, SLASH
     db 24, EARTHQUAKE
     db 31, BODY_SLAM
-    db 38, ROCK_SLIDE 
+    db 38, SUBSTITUTE
 	db 0
 	
 SandslashEvosMoves_Alt:
@@ -710,7 +712,7 @@ SandslashEvosMoves_Alt:
     db 17, SLASH
     db 27, EARTHQUAKE
     db 36, BODY_SLAM
-    db 47, ROCK_SLIDE 
+    db 47, SUBSTITUTE 
 	db 0
 	
 Nidoran_fEvosMoves_Alt:
@@ -821,7 +823,7 @@ NinetalesEvosMoves_Alt:
     db 15, FIRE_BLAST
     db 25, CONFUSE_RAY
     db 35, BODY_SLAM
-    db 45, FIRE_SPIN 
+    db 45, TAIL_WHIP 
 	db 0
 	
 JigglypuffEvosMoves_Alt:
@@ -922,8 +924,8 @@ ParasectEvosMoves_Alt:
     db 20, LEECH_LIFE
     db 30, SPORE
     db 35, MEGA_DRAIN
-    db 39, SLASH
-    db 48, GROWTH 
+    db 39, STUN_SPORE
+    db 48, BODY_SLAM
 	db 0
 	
 VenonatEvosMoves_Alt:
@@ -947,7 +949,7 @@ VenomothEvosMoves_Alt:
     db 24, POISONPOWDER
     db 27, LEECH_LIFE
     db 30, STUN_SPORE
-    db 38, PSYWAVE
+    db 38, SUPERSONIC
     db 43, SLEEP_POWDER
     db 50, PSYCHIC_M 
 	db 0
@@ -1056,7 +1058,7 @@ PrimeapeEvosMoves_Alt:
     db 32, LOW_KICK
     db 37, BODY_SLAM
     db 42, ROCK_SLIDE
-    db 46, THUNDER 
+    db 46, HYPER_BEAM
 	db 0
 	
 GrowlitheEvosMoves_Alt:
@@ -1074,10 +1076,10 @@ ArcanineEvosMoves_Alt:
     db 1, EMBER
     db 1, LEER
     db 1, TAKE_DOWN
-    db 10, DIG
+    db 10, BODY_SLAM
     db 20, FIRE_BLAST
-    db 30, BODY_SLAM
-    db 40, AGILITY 
+    db 30, HYPER_BEAM
+    db 40, SUBSTITUTE
 	db 0
 	
 PoliwagEvosMoves_Alt:
@@ -1184,8 +1186,8 @@ MachampEvosMoves_Alt:
     db 36, FOCUS_ENERGY
     db 40, SUBMISSION
     db 44, BODY_SLAM
-    db 48, ROCK_SLIDE
-    db 52, EARTHQUAKE 
+    db 48, EARTHQUAKE
+    db 52, HYPER_BEAM 
 	db 0
 	
 BellsproutEvosMoves_Alt:
@@ -1316,7 +1318,7 @@ RapidashEvosMoves_Alt:
     db 43, HORN_DRILL
     db 47, BODY_SLAM
     db 51, FIRE_BLAST
-    db 55, AGILITY 
+    db 55, SUBSTITUTE 
 	db 0
 	
 SlowpokeEvosMoves_Alt:
@@ -1380,7 +1382,7 @@ FarfetchdEvosMoves_Alt:
     db 31, AGILITY
     db 35, FLY
     db 39, SLASH
-    db 43, DOUBLE_TEAM 
+    db 43, SUBSTITUTE 
 	db 0
 	
 DoduoEvosMoves_Alt:
@@ -1403,8 +1405,8 @@ DodrioEvosMoves_Alt:
     db 27, TRI_ATTACK
     db 30, DRILL_PECK
     db 39, BODY_SLAM
-    db 45, DOUBLE_EDGE
-    db 51, AGILITY 
+    db 45, SUBSTITUTE
+    db 51, HYPER_BEAM
 	db 0
 	
 SeelEvosMoves_Alt:
@@ -1531,7 +1533,7 @@ DrowzeeEvosMoves_Alt:
     db 29, THUNDER_WAVE
     db 32, PSYCHIC_M
     db 35, HYPNOSIS
-    db 37, PSYWAVE 
+    db 37, SEISMIC_TOSS
 	db 0
 	
 HypnoEvosMoves_Alt:
@@ -1545,7 +1547,7 @@ HypnoEvosMoves_Alt:
     db 33, THUNDER_WAVE
     db 37, PSYCHIC_M
     db 40, HYPNOSIS
-    db 43, PSYWAVE 
+    db 43, SEISMIC_TOSS
 	db 0
 	
 KrabbyEvosMoves_Alt:
@@ -1567,6 +1569,8 @@ KinglerEvosMoves_Alt:
     db 34, STOMP
     db 42, CRABHAMMER
     db 49, BODY_SLAM 
+    db 52, SWORDS_DANCE
+    db 55, HYPER_BEAM
 	db 0
 	
 VoltorbEvosMoves_Alt:
@@ -1620,7 +1624,7 @@ CuboneEvosMoves_Alt:
     db 31, FOCUS_ENERGY
     db 34, BODY_SLAM
     db 38, FIRE_BLAST
-    db 43, BONEMERANG
+    db 43, EARTHQUAKE
     db 46, BLIZZARD 
 	db 0
 	
@@ -1633,7 +1637,7 @@ MarowakEvosMoves_Alt:
     db 33, FOCUS_ENERGY
     db 37, BODY_SLAM
     db 41, FIRE_BLAST
-    db 48, BONEMERANG
+    db 48, EARTHQUAKE
     db 55, BLIZZARD 
 	db 0
 	
@@ -1642,10 +1646,11 @@ HitmonleeEvosMoves_Alt:
     db 1, MEDITATE
     db 33, MEGA_KICK
     db 38, JUMP_KICK
-    db 40, ROLLING_KICK
-    db 43, FOCUS_ENERGY
+    db 40, FOCUS_ENERGY
+    db 43, ROLLING_KICK
     db 48, HI_JUMP_KICK
-    db 53, BODY_SLAM 
+    db 53, BODY_SLAM
+    db 55, MEGA_KICK
 	db 0
 	
 HitmonchanEvosMoves_Alt:
@@ -1658,6 +1663,7 @@ HitmonchanEvosMoves_Alt:
     db 50, BODY_SLAM
     db 53, COUNTER
     db 55, SUBMISSION 
+    db 58, MEGA_KICK
 	db 0
 	
 LickitungEvosMoves_Alt:
@@ -1670,6 +1676,7 @@ LickitungEvosMoves_Alt:
     db 31, BODY_SLAM
     db 39, SWORDS_DANCE
     db 45, EARTHQUAKE 
+    db 50, HYPER_BEAM
 	db 0
 	
 KoffingEvosMoves_Alt:
@@ -1704,7 +1711,7 @@ RhyhornEvosMoves_Alt:
     db 40, ROCK_SLIDE
     db 45, EARTHQUAKE
     db 50, BODY_SLAM
-    db 55, HORN_DRILL 
+    db 55, SUBSTITUTE 
 	db 0
 	
 RhydonEvosMoves_Alt:
@@ -1717,7 +1724,7 @@ RhydonEvosMoves_Alt:
     db 40, ROCK_SLIDE
     db 48, EARTHQUAKE
     db 55, BODY_SLAM
-    db 64, HORN_DRILL 
+    db 64, SUBSTITUTE
 	db 0
 	
 ChanseyEvosMoves_Alt:
@@ -1728,8 +1735,8 @@ ChanseyEvosMoves_Alt:
     db 38, MINIMIZE
     db 41, SOFTBOILED
     db 44, THUNDER_WAVE
-    db 48, REFLECT
-    db 54, SEISMIC_TOSS 
+    db 48, ICE_BEAM
+    db 54, THUNDERBOLT
 	db 0
 	
 TangelaEvosMoves_Alt:
@@ -1741,7 +1748,7 @@ TangelaEvosMoves_Alt:
     db 36, STUN_SPORE
     db 39, SLEEP_POWDER
     db 45, MEGA_DRAIN
-    db 49, GROWTH 
+    db 49, BODY_SLAM
 	db 0
 	
 KangaskhanEvosMoves_Alt:
@@ -1751,7 +1758,7 @@ KangaskhanEvosMoves_Alt:
     db 31, COUNTER
     db 36, BODY_SLAM
     db 41, EARTHQUAKE
-    db 46, MEGA_KICK 
+    db 46, HYPER_BEAM 
 	db 0
 	
 HorseaEvosMoves_Alt:
@@ -1760,7 +1767,7 @@ HorseaEvosMoves_Alt:
     db 24, LEER
     db 30, BUBBLEBEAM
     db 34, DOUBLE_TEAM
-    db 37, AGILITY
+    db 37, SUBSTITUTE
     db 41, BLIZZARD
     db 45, HYDRO_PUMP 
 	db 0
@@ -1772,7 +1779,7 @@ SeadraEvosMoves_Alt:
     db 24, LEER
     db 30, BUBBLEBEAM
     db 36, DOUBLE_TEAM
-    db 41, AGILITY
+    db 41, SUBSTITUTE
     db 46, BLIZZARD
     db 52, HYDRO_PUMP 
 	db 0
@@ -1844,7 +1851,7 @@ ScytherEvosMoves_Alt:
     db 24, DOUBLE_TEAM
     db 29, SLASH
     db 35, SWORDS_DANCE
-    db 42, QUICK_ATTACK
+    db 42, SUBSTITUTE
     db 50, WING_ATTACK 
 	db 0
 	
@@ -1866,7 +1873,7 @@ ElectabuzzEvosMoves_Alt:
     db 34, THUNDERSHOCK
     db 37, LIGHT_SCREEN
     db 42, THUNDERPUNCH
-    db 45, SEISMIC_TOSS
+    db 45, BODY_SLAM
     db 49, THUNDER_WAVE
     db 51, THUNDERBOLT
     db 54, PSYCHIC_M 
@@ -1891,17 +1898,16 @@ PinsirEvosMoves_Alt:
     db 43, SWORDS_DANCE
     db 46, BODY_SLAM
     db 49, SLASH
-    db 52, BIDE
-    db 54, SUBMISSION 
+    db 52, SUBMISSION 
 	db 0
 	
 TaurosEvosMoves_Alt:
     db 1, TACKLE
     db 21, STOMP
     db 28, BODY_SLAM
-    db 35, HORN_DRILL
-    db 44, EARTHQUAKE
-    db 51, BLIZZARD 
+    db 35, EARTHQUAKE
+    db 44, BLIZZARD
+    db 51, HYPER_BEAM 
 	db 0
 	
 MagikarpEvosMoves_Alt:
@@ -1929,10 +1935,10 @@ LaprasEvosMoves_Alt:
     db 20, MIST
     db 25, ICE_BEAM
     db 31, CONFUSE_RAY
-    db 35, BODY_SLAM
-    db 38, THUNDERBOLT
-    db 42, SING
-    db 46, BLIZZARD 
+    db 35, THUNDERBOLT
+    db 38, SING
+    db 42, BLIZZARD
+    db 46, HYPER_BEAM 
 	db 0
 	
 DittoEvosMoves_Alt:
@@ -1990,8 +1996,8 @@ FlareonEvosMoves_Alt:
     db 40, BITE
     db 42, BODY_SLAM
     db 44, FIRE_BLAST
-    db 48, QUICK_ATTACK
-    db 54, DIG 
+    db 48, DIG
+    db 54, HYPER_BEAM 
 	db 0
 	
 PorygonEvosMoves_Alt:
@@ -2043,7 +2049,7 @@ KabutopsEvosMoves_Alt:
     db 36, BODY_SLAM
     db 39, SLASH
     db 46, SWORDS_DANCE
-    db 53, HYDRO_PUMP 
+    db 53, SURF
 	db 0
 	
 AerodactylEvosMoves_Alt:
@@ -2052,7 +2058,8 @@ AerodactylEvosMoves_Alt:
     db 33, SUPERSONIC
     db 38, FLY
     db 45, DOUBLE_EDGE
-    db 54, FIRE_BLAST 
+    db 54, SUBSTITUTE
+    db 60, HYPER_BEAM
 	db 0
 	
 SnorlaxEvosMoves_Alt:
@@ -2061,23 +2068,23 @@ SnorlaxEvosMoves_Alt:
     db 1, REST
     db 35, BODY_SLAM
     db 41, EARTHQUAKE
-    db 48, HYPER_BEAM
-    db 56, SELFDESTRUCT 
+    db 48, REFLECT
 	db 0
 	
 ArticunoEvosMoves_Alt:
     db 1, PECK
     db 1, ICE_BEAM
     db 51, BLIZZARD
-    db 55, REFLECT
-    db 60, REST 
+    db 55, DOUBLE_EDGE
+    db 60, SUBSTITUTE
+    db 64, HYPER_BEAM
 	db 0
 	
 ZapdosEvosMoves_Alt:
     db 1, THUNDERSHOCK
     db 1, DRILL_PECK
     db 51, THUNDERBOLT
-    db 55, AGILITY
+    db 55, SUBSTITUTE
     db 60, THUNDER_WAVE 
 	db 0
 	
@@ -2086,9 +2093,9 @@ MoltresEvosMoves_Alt:
     db 1, FIRE_SPIN
     db 51, SKY_ATTACK
     db 53, FIRE_BLAST
-    db 55, AGILITY
+    db 55, SUBSTITUTE
     db 57, DOUBLE_EDGE
-    db 60, FLY 
+    db 60, HYPER_BEAM
 	db 0
 	
 DratiniEvosMoves_Alt:
