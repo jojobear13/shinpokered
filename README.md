@@ -75,6 +75,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 		
 #Media
 -----------
+[![Shin Pokemon Trailer 2](https://i.ytimg.com/vi/k-7ROSI4FDI/maxresdefault.jpg](https://www.youtube.com/watch?v=k-7ROSI4FDI "Shin Pokemon Trailer 2")
 
 [![Shin Pokemon Trailer](https://img.youtube.com/vi/AIzEfIpXX_c/0.jpg)](https://www.youtube.com/watch?v=AIzEfIpXX_c "Shin Pokemon Trailer")
 
