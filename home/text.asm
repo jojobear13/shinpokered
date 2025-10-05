@@ -294,6 +294,15 @@ Char51:: ; para
 	jp PlaceNextChar_inc
 
 Char49::
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;adding GB_PRINTER
+	ld a, [hFlags_0xFFF6]
+	bit 5, a
+	jr z, .Char49
+	ld a, $4e
+	jp Char4ETest
+.Char49
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	push de
 	ld a, "▼"
 	Coorda 18, 16

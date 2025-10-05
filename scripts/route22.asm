@@ -172,14 +172,7 @@ Route22Script2:
 	ld [wJoyIgnore], a
 	SetEvent EVENT_BEAT_ROUTE22_RIVAL_1ST_BATTLE
 	
-	;joenote - set more event flags to give more information
-	CheckEvent EVENT_90C	;no need to solo if trainer scaling is turned on
-	jr nz, .next2
-	ld a, [wPartyCount]
-	cp 2
-	jr nc, .next1
-.next2
-	SetEvent EVENT_01B
+	;joenote - set event flag to indicate battle was won on hard mode
 	ld a, [wOptions]
 	bit BIT_BATTLE_HARD, a
 	jr z, .next1

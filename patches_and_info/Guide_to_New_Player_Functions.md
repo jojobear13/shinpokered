@@ -164,6 +164,10 @@ Also, it's DVs will be set to match the quantities of the first four items in yo
 
 #Engine Functions
 -----------------------------------------------
+#### Game Boy Printer  
+Game Boy Printer functions have been backported from Yellow version.  
+They can be accessed from the normal PC in any Pokemon Center.  
+
 #### Extra Options Menu  
 Press SELECT on the main options menu to go to the extra menu where several new features can be toggled.  
 
@@ -194,6 +198,18 @@ Playing as a GBC game will take advantage of the GBC's double-speed processor mo
 This feature reinstitutes a speed-running trick that makes text print with zero frame delay.  
 Toggle this on the extra options menu.  
 Please note that other text speed selections do nothing while this feature is active.  
+
+#### Enhanced Color  
+Colorizes the overworld even further when playing an a GBC.  
+Toggle this on the extra options menu.  
+
+#### Sound Test  
+Press SELECT on the extra options menu to get a sound test menu.
+This way you can listen to the game's musical tracks.  
+They even continue to play once you've backed out of the options menu.  
+
+#### Quick Cursor Run  
+When on the main battle menu, pressing B will automatically place the cursor over RUN.  
 
 
 #Difficulty Settings
@@ -234,6 +250,12 @@ But on hard mode, or against Gym Leaders, the scaling will be based on the absol
 Enemy pokemon will evolve by level if applicable (biased to higher levels).  
 Gym leaders and the Elite-4 scale slightly higher than normal trainers.  
 Warning - The difficulty will be compounded if both trainer scaling and hard mode are active.  
+
+#### Alt Trainer Moves  
+Not available in the Lite patches.  
+There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+Their moves will be more competitive at higher levels.  
 
 
 #Battle Modifiers
@@ -323,6 +345,7 @@ This will tell the game to get on your bike. You can also get off your bike the 
 #### Extra Bag Pocket  
 The bag now supports an additional item list for an extra 20 slots of space.  
 Press START while in the bag menu to hot-swap the item list that populates the active bag.  
+Press and hold LEFT or RIGHT then press START to send the item the cursor is over to the non-active bag space.  
 This also works in battle or when depositing items into the PC.  
 In general, the non-active item list gets recognized by the game's systems.  
 For example, you can enter the Cinnabar Gym even if the Secret Key is in the non-active bag space.  
@@ -719,6 +742,7 @@ So don't be shy about using TMs acquired from NPCs and exploration.
 - Added a hidden super potion in celadon city
 - Hidden Hyper Beam TM on the vermilion dock
 - Hidden nugget on the vermilion dock
+- Hidden Moon Stone on Route 4 past the Cerulean Cave entrance
 
 #### Changes to Mart Inventories  
 - Pewter city has ethers
@@ -767,7 +791,7 @@ Note: Not available in the Lite patches.
 
 - Toggle this mode in the extra options menu.  
 
-- This mode **DOES NOT** check if you have obtained pokeballs yet. It is in full effect when toggled to ON.  
+- This mode now checks if you have had access to pokeballs on the save file.  
   
 #### Rule 1: Pokemon Death  
 - A pokemon that faints is considered dead and can no longer be used.
@@ -787,8 +811,7 @@ Note: Not available in the Lite patches.
   - An "area" is defined by the name displayed on the town map.
   - You will be unable to throw balls in subsequent wild battles in that area.
   - Static wild battles count for this as well.
-  - Wild battles before you can get pokeballs also count.
-  - In light of this, you may want to delay activating nuzlocke mode until pokeballs are available.
+  - Wild battles do not count when early in the game and you have no access to pokeballs.
   - Story wild battles (Old Man tutorial, Ghost Marowak, and Tower Ghosts) do not apply.
   - Pokemon gained outside of battle (gifts, prizes, in-game trades, etc) do not apply.
   
@@ -925,6 +948,8 @@ Note: These are not applicable to the Lite patches.
   - Lvl 38 juggler in Fuchsia gym exchanges his hypno for two exeggute
   - Lvl 36 blackbelt in the dojo exchanges his primape for poliwrath
   - Dojo master increased to level 38
+  - Some cueball teams include pinsir
+  - Biker teams now include beedrill, magmar, an electrode, and more voltorbs
   
 #### Rival / Gym Leader / Elite 4 Guide  
 - Route 22 Rival
@@ -1225,8 +1250,8 @@ Pokemon that have had moves added to their learn-lists or changed levels at whic
   - L11, TAIL WHIP added
   - L13, THUNDER WAVE added
   - L25, SLAM added
-  - L31, THUNDERBOLT added
-  - L46, THUNDER added
+  - L31, THUNDER added
+  - L46, REFLECT added
   - L55, LIGHT SCREEN added
 - Tangela
   - L27, ABSORB
@@ -1237,9 +1262,9 @@ Pokemon that have had moves added to their learn-lists or changed levels at whic
   - L21, WATER GUN added
   - L26, HARDEN added
   - L31, RECOVER added
-  - L36, SWIFT added
-  - L46, BUBBLEBEAM added
-  - L51, REFLECT added
+  - L38, SWIFT added
+  - L47, HYDRO PUMP added
+  - L54, REFLECT added
 - Vaporeon
   - L8, SAND ATTACK added
   - L16, GROWL added
@@ -1313,6 +1338,29 @@ This is a throwback feature for certain Japan-only event pokemon giveaways.
 - Talk to him with Fearow or Rapidash at the top of your party, and he will offer to teach it Pay Day for 1000 yen.
 - Talk to him with Pikachu at the top of your party that has an empty move slot, and he can teach it Fly for 2000 yen.
 
+### Cheat-Move Tutors  
+These are tutors, just for fun, that teach unavailable moves to certain pokemon.  
+Make sure the pokemon is in the top party spot in order to trigger.  
+- Lickitung can learn Lick via the move-relearner in Saffron City.
+- Flareon can learn Agility and Low Kick from the Karate Master.
+- Hitmonlee can learn Agility and Quick Attack from the Pikachu in the Vermilion Fan Club.
+- Moltres can learn Flamethrower from Blaine.
+- Pidgeot and Pidgeotto can learn Drill Peck from the Fearow in the Route 16 house.
+- Ninetales can learn Hypnosis from Mr. Psychic in Saffron City.
+- Vileplume, Gloom, and Oddish can learn Leech Seed from Bill.
+- Examine the Omanyte sign in Fuschia City with one of these pokemon.
+  - Omastar will learn Rock Slide
+  - Kabutops will learn Mega Drain
+  - Aerodactyl will learn Earthquake
+- Ninja Scyther: Scyther can get a "ninja form" if you defeat Koga with it as the only member of your team.
+  - It will exchange its Flying type for Ghost type.
+  - Koga becomes a move tutor and can teach it a selection of new moves:
+	- Confuse Ray
+	- Hypnosis
+	- Light Screen
+	- Pin Missile
+	- Rolling Kick
+
 #### The Surfboard  
 The truck at the Vermilion Dock holds the Surfboard as a hidden item.  
 The surfboard substitutes for a pokemon that knows how to Surf.  
@@ -1343,5 +1391,10 @@ Here are some freshly-baked cheat codes unique to Shin Pokemon.
   - 010042DA: If your play-clock was maxed at 255 from a previous save file, this will unlock the expanded game clock.  
   - 0180C4CF: The next encounter will be a shiny pokemon.
   - 01xx21D7: Resets the options and changes the player graphics to male (xx=00) or female (xx=01).
+  - 010472D1: Erases the Nuzlocke death flag for the Pokemon in your first team slot.
 
-
+#### Force Grayscale  
+It is possible, for whatever reason, to force Shin Pokemon to play in grayscale color all the time.  
+This can be done with some hex editing directly on the rom file.  
+Change both address 0x0143 and address 0x0151 to the value of 00.  
+This will force the rom file to operate as an old DMG game with no GBC features.  

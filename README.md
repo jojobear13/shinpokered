@@ -1,12 +1,12 @@
 # Shin Pokémon Red, Blue, Green, Red-JP, & Blue-JP
 
-Version 1.24.6
+Version 1.25.0
 
 *Shin (真) - The kanji for "true".  
 Used in Japanese media to denote a remastering, updated retelling , or a "true form" of something.*  
 
-     This is an enhancement ROM hack of Pokemon Red & Blue based on the Pret team's pokered disassembly project.
-It is a mostly-vanilla hack that focuses on fixing game engine bugs and oversights from the original game.
+     This is a community enhancement patch of Pokemon Red & Blue based on the Pret team's pokered disassembly project.
+It is a mostly-vanilla mod that focuses on fixing game engine bugs and oversights from the original game.
 Additionally, trainer AI routines are improved and multiple quality-of-life enhancements have been added.
 It also acts as a kind of research-informed speculative work that presents an alternate interpretation of the games.
 Specifically, that being what the 2016 Nintendo Virtual Console re-release of Gen-1 Pokemon could have been.
@@ -22,7 +22,7 @@ Finally, the source code documents many differences and changes between the vari
 No, really, there's a TON of new options and features. You are bound to miss many of them if you do not read this guide.
 *********************************************************************************************************************************
 
-Don't like the non-vanilla changes? Prefer only the bugfixes and AI improvements? Want a codebase from which to launch your own rom hack? Then the [Lite branch](https://github.com/jojobear13/shinpokered/tree/lite) is what you want. Head on over and start compiling.
+Don't like the non-vanilla changes? Prefer only the bugfixes and AI improvements? Want a codebase from which to launch your own modding project? Then the [Lite branch](https://github.com/jojobear13/shinpokered/tree/lite) is what you want. Head on over and start compiling.
 
 Discuss Shin Pokemon in its dedicated [PokéCommunity Showcase](https://www.pokecommunity.com/showthread.php?t=427398).
 
@@ -30,10 +30,10 @@ Follow media related to Shin Pokemon on [YouTube](https://www.youtube.com/@13joj
 
 Leave a review for Shin Pokemon over at [Rom Hack Plaza](https://romhackplaza.org/romhacks/shin-pokemon-game-boy/).
 
-Find other rom hacks at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
+Find other mods and patches at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
 
 Other Social Links:
-[Discord server where I lurk](https://discord.com/invite/bGksMvxqgv).
+[Lurked Discord server](https://discord.gg/5CKzeWmZZU)
 [Twitter](https://twitter.com/13JoJoBear)
 [Bluesky](https://jojobear13.bsky.social)
 
@@ -42,7 +42,7 @@ Other Social Links:
 #Patch Info  
 -----------
 BPS patches are provided for entry into your preferred emulator, patching tool, or other accessory that supports the BPS format. 
-Download and enter a patch which corresponds to the ROM of which you own a lawful copy.  
+Download and apply a patch which corresponds to the ROM of which you own a lawful copy.  
 - **Red patches (Shin Pokemon Red, Red_origback, and Red-JP) are intended for USA Red.**
   - File/ROM SHA-1: EA9BCAE617FDF159B045185467AE58B2E4A48B9A
   - File/ROM CRC32: 9F7FDD53
@@ -75,6 +75,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 		
 #Media
 -----------
+[![Shin Pokemon Trailer 2](https://i.ytimg.com/vi/k-7ROSI4FDI/maxresdefault.jpg](https://www.youtube.com/watch?v=k-7ROSI4FDI "Shin Pokemon Trailer 2")
 
 [![Shin Pokemon Trailer](https://img.youtube.com/vi/AIzEfIpXX_c/0.jpg)](https://www.youtube.com/watch?v=AIzEfIpXX_c "Shin Pokemon Trailer")
 
@@ -91,6 +92,10 @@ Title Screens  (GBC Palettes)
 Pokemon Yellow Backported Palettes and Gym Leader Names Restored  
 ![Backported Palettes](/screenshots/bgb00022.bmp?raw=true)
 ![Gym Leader Names](/screenshots/bgb00037.bmp?raw=true)
+
+Enhanced Colors  
+![Enhanced Colors 1](/screenshots/bgb00048.bmp?raw=true)
+![Enhanced Colors 2](/screenshots/bgb00049.bmp?raw=true)
 
 Rematches  
 ![Rematches](/screenshots/bgb00003.bmp?raw=true)
@@ -176,8 +181,10 @@ It also has all the pokedex data in metric.
 
 Engine features from USA Yellow version have been backported.
 No more duochrome! Yellow's color scheme gets converted to display on the Gameboy Color.
+Or play with further enhanced colorization for the overworld.
 Attack animations are colored according to type during Gameboy Color play.
 Yellow's audio engine is backported for stereo sound support. 
+Game Boy Printer functionality has been added. 
 
 New options that can be toggled! Hit SELECT on the options screen to see an extra options menu.
 - Cycle through audio types.
@@ -188,6 +195,7 @@ New options that can be toggled! Hit SELECT on the options screen to see an extr
 - Zero-Delay Text
 - Hard Mode
 - AI Trainer Switching
+- Enhanced colorization for GBC
 
 The hard mode option increases difficulty by making the stats of trainer pokemon more on your level.
 It also doubles the effect of the X-stat items that AI trainers are fond of.
@@ -330,16 +338,21 @@ Cheats and Secrets!
 
 - **Certain emulators are known to cause bugs due to inaccuracies in replicating the original hardware**
   - An accurate emulator, preferably a GBC-dedicated emulator, is required in order to avoid unexpected bugs
-  - Goomba and Visual Boy Advance in particular are known to be problematic
-  - BGB is the supported standard due to its accuracy and debugging tools
   - There are error messages that may display on the initial menu if there is an emulator error detected
+  - Goomba, Visual Boy Advance, and VBA-M in particular are known to be problematic
+- **Known good emulators:**
+  - BGB is the supported standard due to its combination of accuracy and debugging tools
+  - mGBA also works very well
+  - The 3DS Virtual Console emulator might throw an error message but it is known to be fine
+  - Delta emulator for those on iOS devices
+  - The Gambatte or mGBA cores for Retroarch should be good for Android devices
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
   - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
   - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2.
   - Will play and save in the GB Tower of Stadium 2.
-  - Will **not work** with the GB Tower of Stadium 1.
-- Might be possible to use a save from vanilla USA red/blue with this rom hack 
+  - Will **not work** with the GB Tower of Stadium 1 due to cartridge header prerequisites.
+- Might be possible to use a save from vanilla USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
 - New builds are tested and debugged with the BGB 1.5.8 emulator and verified using original hardware
@@ -350,172 +363,71 @@ Cheats and Secrets!
   - Link battling between a lite branch build and any other non-lite branch build
   - Link battling between builds of dissimilar revisions
 - A revision control function has been added that will cancel unsupported cable links
-- Link functions via 3DS hardware and its Virtual Console emulator are not supported at this time
+- Link functions via 3DS hardware and its Virtual Console emulator are not supported
 
 
 #Changelog From the Last Full Release
 -----------
 **Note: Changelogs may contain spoilers**  
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
+[View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
-v1.24.6(hotfix 3)
-- Fixed a problem from 1.24.6hotfix where status screen type was not loading correctly from the PC box
-
-v1.24.6(hotfix 2)
-- Fixed the wrong tiles for the border of the pokedex diploma
-
-v1.24.6(hotfix)
-- Worked on emulator tests a bit more
-- Moved CalcStat function out of home bank to free up space
-- Status Screen now prints types from party struct data instead of species header
-- Undocumented secret move tutors; these are considered cheats and are just for fun
-  - Lickitung can learn Lick via the move-relearner in Saffron City
-  - Flareon can learn Agility and Low Kick from the Karate Master
-  - Hitmonlee can learn Agility and Quick Attack from the Pikachu in the Vermilion Fan Club
-  - Moltres can learn Flamethrower from Blaine
-  - Pidgeot and Pidgeotto can learn Drill Peck from the Fearow in the Route 16 house
-  - Ninetales can learn Hypnosis from Mr. Psychic in Saffron City
-  - Vileplume, Gloom, and Oddish can learn Leech Seed from Bill
-  - Examine the Omanyte sign in Fuschia city with one of these pokemon at the top of your party
-    - Omastar will learn Rock Slide
-	- Kabutops will learn Mega Drain
-	- Aerodactyl will learn Earthquake
-  - Ninja Scyther: Scyther can get a "ninja form" by defeating Koga as your sole party member
-    - Will exchange its Flying type for Ghost type
-	- Koga becomes a move tutor and can teach it a selection of new moves:
-	  - Confuse Ray
-	  - Hypnosis
-	  - Light Screen
-	  - Pin Missile
-	  - Rolling Kick
-
-v1.24.6
-- Bugfixes:
-- Fixed an issue with the title menu becoming dark when saving in rock tunnel
-- Fixed rock tunnel darkness affecting option menu
-- Fixed desync problem during link battles with Rage, Thrash, and trapping moves
-- The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
-- Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
-- Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
-- Fixed missing punctuation in Oak's pokedex evaluation
-- Corrected the text in green & red-jp pokedex entries
-- Fixed a bug in the AI that caused trainers to use poison-effect moves inaccurately
-- Fixed full randomization option not activating
-- Fixed debug damage display not updating properly for some static damage moves
-- Fixed a minor bug when blacking out of the SS Anne post-game tournament
-- Fixed some oversights with the joke dittos that can be fished in unknown dungeon 3
-  - Cannot toss balls if the wild pokemon is above the level cap
-  - Made ReadSuperRodData a predef and made it so the Unknown Dungeon 3 fishing data reverts if the randomizer is on
-- Fixed a problem with undergoing multiple evolutions when taking a pokemon out of the daycare
-- Fixed a problem where the Trapping Move Clause reads the move effect from the previous round instead of the current round
-- Wild pokemon randomizer will no longer swap a species with itself
-- Sprites will not cover the move list when forgetting moves at the daycare
-- Fixed Full Restores undoing burn/paralysis stat changes when healing a non-active pokemon
-- The rocket grunt in Cerulean city has a minor fix to the timing of when its sprite disappears
-- Fixed the cloning feature in Cinnabar Lab handling the charging of money incorrectly
-
-- Features:
-- PokeDex Area enhancements
-  - The AREA function of the PokeDex now takes the Super Rod into account
-  - It will also notify you if the Pokemon you are referencing is available on the currently loaded map
-  - If available on the current map, it will notify you if it can be found by walking, surfing, or by super rod
-  - The Cerulean Cave is an "unknown dungeon" so...
-    - Nest icons will not display for this location
-    - But the notification for the current map will still function
-- Psywave has been enhanced with a hidden mechanic
-  - Psywave will now roll for damage multiple times and use the best roll
-  - The number of times that damage is rolled is based on the target's current HP with more HP causing more re-rolls
-- Certain moves now affect catching mechanics if known by your active pokemon in battle
-  - Razor Wind & Skull Bash - additive +10 to catch rate per toss of a non-safari ball
-  - Roar & Whirlwind - additive +20 to catch rate per toss of a non-safari ball
-  - Take Down - improves the ball factor of non-safari balls by 2
-  - Egg Bomb - improves the ball factor of non-safari balls by 2 and additive +10 to catch rate per toss of a non-safari ball
-- Shiny pokemon gain a 4x multiplier for the coin guy in celadon hotel and selling to the game corner chief
-- The battle clauses between link players now sync and are applied during battles
-- The stat displays of the active pokemon in battle will display its current-time stats instead of its unmodified stats
-- After buying the Magikarp from the man in the Mt. Moon pokemon center, he will serve as a move tutor
-  - This is a throwback to certain Japan-only event pokemon giveaways
-  - Talk to him with Magikarp at the top of your party, and he will offer to teach it Dragon Rage for 5000 yen.
-  - Talk to him with Fearow or Rapidash at the top of your party, and he will offer to teach it Pay Day for 1000 yen.
-  - Talk to him with Pikachu at the top of your party that has an empty move slot, and he can teach it Fly for 2000 yen.
-- Psyduck Learning Amnesia  
-  - You must first have 151 pokemon registered as owned in your pokedex.  
-  - Place a Psyduck in your 1st party slot then go talk to the Psyduck in Mr. Fuji's house.  
-  - It will now try to learn the Amnesia move.  
-
-- Adjustments:
-- Trainer level scaling has been dampened outside of hard mode
-  - It is now based on a weighted average for regular trainers in normal difficulty
-  - Gym leaders always use the absolute level scaling regardless of difficulty
-- Rebalanced a few TMs across pokemart inventories
-- Water Gun TM has been replaced by a super repel in Mt. Moon, and it is now found in the Pewter Museum
-- Starting a new game will keep the hard mode off, but now default to fast text speed
-- Turning the nuzlocke mode on will not reset your difficulty options
-- Boosted Eevee encounter rate to 5.5%
-- Giovanni gym battle exchanges rhyhorn for kangaskhan
-- Champion Rival's charizard swaps out swords dance for fly
-- The shimmer transformation's text box no longer requires a button prompt to scroll through
-- The shimmer adds double level to the special stat exclusively for Hitmonchan
-- Tweaked NPC text for extra options
-- Made the karate dojo master act like a special trainer
- 
-v1.24.5
-- Minor text edit for SS Anne npc in post-game.
-- Minor fix for Itemfinder when there are multiple hidden items on screen.
-- Fix Psywave symmetry
-
-v1.24.4
-- Can no longer fish or surf using the right wall corner tile on the SS Anne.
-- Fixed incorrect sign text in safari area 1
-- Adjusted some city names on signs
-- Lance and the player will face each other when speaking.
-- Increased the speed of the HP bar animation
-- Cubone rarity in rock tunnel 2nd floor increased from 1.2% to 6.3%.
-- Farfetchd rarity on route 12 increased from 4.3% to 6.3%.
-- Farfetchd rarity on route 13 increased from 1.2% to 4.3%.
-- The player can now choose whether or not to generate a new Trainer ID when selecting New Game Plus.
-- Wild pokemon randomizer lists have been slightly adjusted.
-- Talking to the girl in Oak's lab allows the player to generate a new randomization seed value.  
-- Talking to the girl in Oak's lab prompts the player if full randomization is preferred.  
-- Adjusted some text for post-game world state.
-
-v1.24.3  
-- Girl trainer on route 8 has text adjusted to reflect having a Clefable
-- Failure to teach a temp field move will now prompt the player to abandon learning it
-- The bush that blocks route 9 has been replaced by a blocking event
-- Disable and static damage moves will not crit or show super/not very effectiveness
-- Fixed an issue with NPCs overlapping menu and text boxes
-- Adjusted the parity of in-game trades across versions
-- Option menu graphics tweak
-- Toggling the gamma shader in the extra options menu now automatically updates the palette
-- Moved NPC in celadon prize house two spaces to the right
-- Optimized the GBC smooth fading a little bit
-
-v1.24.2  
-- Fixed a text bug on multi-hit moves
-
-v1.24.1  
-- Optimized smooth fades to eliminate graphical jank during battle black-outs
-- Trainers will not use non-healing items if they or the player are at low HP, making them more aggressive
-- AI will not switch if its HP is below 25% as it's usually not worth it
-- Fades in or out to white in GBC mode with gamma shader enabled will no longer have a frame of incorrect color
-- The move Transform now decrements PP properly when used by the AI recursively
-- Spinner tiles animate properly without resorting to vblank-induced slowdown
-- Fixed wrong color for move animation when it comes after self-inflicted confusion damage
-- Reworked the prize mon level function and also synchronized the DVs for gift pokemon that are added to party or box
-- Fixed typed effectiveness being applied the wrong way to static damage moves
-- All the extra options on the option menu have been moved to their own separate menu
-- Add Debug Stat Reset feature
-- Fixed shiny clause so that it is now working in nuzlocke mode
-- Fixed a bug catcher on route 9 being able to walk onto a ledge
-- The message for substitute taking damage now only displays after the first attack of a multi-attack move
-- Multi-attack moves display effectiveness only on first attack instead of the last attack
-- Twineedle does not print redundant messages like other multi-hit moves
-- If active, the shimmer will always manifest on the applicable pokemon of Bruno, Agatha, and the Karate Master
-- Karate Master's pokemon increased from level 37 to 38
-- Extended shiny mercy to tower ghosts, ghost marowak, and old man battle
-- Fixed daycare sometimes prompting to learn the same move twice
-- Fixed special HUD symbols displaying during the ghost marowak encounter
+v1.25.0
+- The overworld Cut SFX now syncs up better with the animation
+- Audio Bank 4 from Yellow has been implemented to allow for more music constants
+- The unused Trading Song has been fixed up and put back into use
+- Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
+- Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
+- Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle 
+- Fixed a vanilla bug involving minor text box flicker when a pokemon learns a move after evolving
+- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
+- Game now keeps the status of the gamma shader with the save on file
+- Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
+- Fixed graphical display bug when talking to the 15th sprite on a map
+- Added missing sfx when leaving the trainer card screen
+- Increased the speed of the LoadCurrentMapView function
+- Fixed a bug where cutting grass loads the wrong palette for the animation
+- AI Layer 3 will no longer run on the turn a player switches in order to keep battle information from the AI
+- Fixed a rare infinite loop caused by a text SFX playing right at the end of an audio fadeout
+- On AI Layer 1, biased preference for exploding more towards lower HP
+- Engine now supports up to 255 predefs instead of 127
+- Rage is slightly discouraged in AI Layer 1
+- The VS pokeballs in link battles have defined palettes now instead of whatever is in memory
+- If the female trainer option is compiled, a female link partner will have corresponding graphics
+- Fixed a serial timer problem with the link cable version verification
+- Oak's five free pokeballs are now obtained based on never having caught a pokemon with a ball
+- Made japanese patches more accurate to the original, particularly the timing of the intro
+- Added a different emulator check that tests the timing of memory modification opcodes
+- Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
+- Added overflow protection to super-effective damage calculation
+- Pressing B on the main battle menu places the cursor over RUN
+- Made the trainer pokeballs red in the battle HUD
+- Fixed a minor cursor error on the town map when in route 1 or the power plant
+- Fixed text error in Vermilion gym referencing the bird type instead of flying type
+- Some hidden Game Corner coins can now be accessed when they previously were not.
+- The menu for field moves can now support up to five field moves for developer purposes.
+- All five field moves a pokemon can have will now be displayed in the field move menu.
+- If level scaling is active, traded pokemon will not become disobedient under the normal badge limits.
+- Increased text delay by half second on area pokedex screen
+- Can move items to the non-active bag space
+  - Place the cursor is over an item in the bag menu
+  - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
+- Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
+- Added some proper rematch text instead of reusing the slot machine strings
+- Assuming you start a new save, Nuzlocke mode now knows if you're early in the game and have no access to pokeballs
+- Altered the level-up move lists of Starmie and Raichu to work better with Misty and Surge
+- Fixed serial timer problem with syncing battle clauses over link cable
+- Some Cueball teams include Pinsir
+- Biker teams can now include Beedrill, Magmar, an Electrode, and more Voltorbs
+- Fixed an issue where enemy level-up moves were being skipped
+- Added a feature for Alt Trainer Moves  
+  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+  - Their moves will be more competitive at higher levels.
 
 
 #Bugfixes
@@ -527,6 +439,7 @@ v1.24.1
   - Fixed freeze that occurs in defense stat scaling (def < 4 glitch)
   - Enemy ai ignores type effectiveness for moves that have zero power
     - prevents things like spamming agility against poison pkmn
+  - Added overflow protection to super-effective damage calculation
   - Enemy ai ignores super-effectiveness for moves that do static amounts of damage
   - Fixed skipping move-learn on level-up glitch. 
     - when gaining multiple levels at a time, each in-between level is incrementally checked for moves learned
@@ -693,7 +606,13 @@ v1.24.1
   - Fixed wrong color palette being loaded for player back sprite tiles during screen shake animation
   - Fixed an issue with the title menu becoming dark when saving in rock tunnel
   - Fixed rock tunnel darkness affecting option menu
-
+  - Fixed a minor cursor error on the town map when in route 1 or the power plant
+  - Made the trainer pokeballs red in the battle HUD
+  - Fixed a bug where cutting grass loads the wrong palette for the animation
+  - Fixed graphical display bug when talking to the 15th sprite on a map
+  - Fixed a minor text box flicker when a pokemon learns a move after evolving
+  - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle
+  
 
 - Item Fixes  
   - Great ball has a ball factor of 12 now
@@ -745,6 +664,11 @@ v1.24.1
   - Meet Trainer jingle should not play before loading into the gym leader battle music
   - AI using dire hit item now plays a SFX
   - The 'bwoop' sfx now plays when registering pokemon with short names like "Onix"
+  - Added missing sfx when leaving the trainer card screen
+  - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
+  - The unused Trading Song has been fixed up and put back into use
+  - Unused Trading Song re-implemented for link trades - each game boy plays a different channel and the music syncs
+  - The overworld Cut SFX now syncs up better with the animation
   
 
 - Misc. fixes
@@ -762,6 +686,7 @@ v1.24.1
   - An unused bit is now used to determine the ghost marowak battle
   - Can't use surf/teleport/escape rope to escape from trainer encounters
   - Fixed trainer escape glitch via blacking out from a wild battle
+  - Fixed issue where interacting with a hidden item or bookshelf when a trainer spots you will freeze the game
   - Can't fish or surf in the bases of statues
   - Can no longer fish or surf using the right wall corner tile on the SS Anne
   - Seafoam islands fast current applied to the right steps on floor B3
@@ -811,7 +736,9 @@ v1.24.1
   - Fixed an underflow issue which caused trainers above the player to not see beyond 3 spaces downward
   - Lance and the player will face each other when speaking.
   - Fixed an oversight where the player does not face the Viridian Gym door during the message saying it's locked
- 
+  - Some hidden Game Corner coins can now be accessed when they previously were not.
+  - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
+  
  
 #Tweaks
 -----------
@@ -846,6 +773,7 @@ v1.24.1
   - Adjusted some city names on signs
   - Fixed incorrect sign text in safari area 1
   - Fixed missing punctuation in Oak's pokedex evaluation
+  - Fixed text error in Vermilion gym referencing the bird type instead of flying type
 - Made adjustments to the game text
   - When a pkmn is caught and fills the box, a reminder is printed that the box is full
   - PC has a text prompt to tell you if its full after depositing
@@ -961,11 +889,10 @@ v1.24.1
     - Wherein a physical move is being used on a 'mon with greater special than attack stat
   - Slightly discourage a move 25% of the time if it hits neutral with no STAB
   - The enemy is blind to the player type if considering a poisoning effect move and the player just switched
-  - 90.625% chance per damaging move that AI is blind to player type after player switches
+  - AI is blind to player type when the player switches 
     - Prevents situations where AI will always pick the ideal move against a switch-in
-    - 'Blind' in this case means the AI will act as if the move being considered has neutral effectiveness
-    - The AI might still favor a STAB move or a move that works better with its own stats
-
+    - 'Blind' in this case means the AI will act as if its moves are all equally effective
+ 
 - Trainer ai routine #4 is no longer unused. It now does rudimentary trainer switching.
   - AI will not switch if its HP is below 25% as it's ususally not worth it 
   - chance to switch based on power of incoming supereffective move
@@ -1052,6 +979,7 @@ v1.24.1
 
 - Engine changes just for developers
   - The trainer move engine has been backported from Yellow version; trainer movesets can now be fully customized
+  - Audio Bank 4 from Yellow has been implemented to allow for more music constants 
   - Improved exp calculation for developers who want a level cap between 101 and 255
     - EXP calculation routine now does math in 4 bytes instead of 3 bytes
 	- Exp calculation result is still capped to 3 bytes regardless of level cap to prevent overflow
@@ -1064,11 +992,11 @@ v1.24.1
   - The 1.5x EXP boost function now has overflow protection
   - EXP Gained can now print up to five digits instead of four
   - The "<LF>" character mapping can be used as a line-feed
-  - Added rom hack version tracking for save files
+  - Added patch version tracking for save files
     - It's a single byte in the save file that gets incremented each version
     - If the save byte does not match, the player is automatically warped back to Pallet Town
     - Helps prevent crashes and glitches when updating an older save file
-    - You will be given the choice to warp to Pallet Town if the rom hack version does not match
+    - You will be given the choice to warp to Pallet Town if the patch version does not match
   - The function that shows the dex entry for starter pokemon is now more robust
     - It now works for any pokemon (like if the starters are changed or randomized)
 	- It keeps a backup of the pokedex-owned flags instead of erasing them
@@ -1081,7 +1009,10 @@ v1.24.1
   - Item evolutions having a level requirement is now supported
   - DelayFrame now manualy calls VBlank if it runs while the LCD is disabled
   - Status Screen now prints types from party struct data instead of species header
-
+  - The menu for field moves can now support up to five field moves for developer purposes.
+  - Engine now supports up to 255 predefs instead of 127
+  - Increased the speed of the LoadCurrentMapView function
+  
 - PokeDex Area enhancements
   - The AREA function of the PokeDex now takes the Super Rod into account
   - It will also notify you if the Pokemon you are referencing is available on the currently loaded map
@@ -1165,9 +1096,9 @@ v1.24.1
     - Pokemon that evolve below level 30 will evolve at 4/3x the original level 
     - Pokemon that evolve >= level 30 will evolve at 8/7x the original level 
   - Gym leaders and the E4 scale slightly higher than normal trainers
-  - If trainer scaling is on, you do not need to beat the 1st route 22 rival solo to get oak's pokeballs
   - In hard mode, or against gym leaders, the scaling is based on the absolute highest level of your team
   - In normal difficulty against regular trainers, the scaling is based on a weighted average of your team's levels
+  - If level scaling is active, traded pokemon will not become disobedient under the normal badge limits
 - Playing on hard mode provides increased difficulty
   - Pressing RIGHT while the cursor is in the BATTLE STYLE box will toggle the feature on/off
   - Contrasting this, pressing LEFT will let you select a battle style without toggling difficulty
@@ -1182,6 +1113,10 @@ v1.24.1
   - Non-link battles in hard mode use the Stadium 1 formulas for critical hit probability
   - Warning: The difficulty will be compounded if both trainer scaling and hard mode are active
   - Oak's pokeballs will be upgraded to great balls if you beat the route 22 rival in hard mode
+- Alt Trainer Moves  
+  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
+  - Their moves will be more competitive at higher levels.
 - Added the Clause Brothers to Viridian City
   - They toggle enforcement of the item, sleep, and/or freeze clauses
   - The clauses apply to the player and AI equally
@@ -1209,6 +1144,7 @@ v1.24.1
 
 
 #Quick Keys / Options / Menu-Related
+- Game Boy Printer functions have been added, and they can be accessed from the normal PC
 - Press SELECT on the option menu to go to the extra options menu where many new options can be toggled!
 - Added built-in gamma shader for backlit LCD screens (press SELECT at the copyright screen)
   - Gamma shader defaults ON if the destination code in the rom header is set to 00 (JP)
@@ -1217,12 +1153,15 @@ v1.24.1
   - The default state of the gamma shader can be changed with any gameboy rom header editor
   - Alternately, remove the 'j' in 'cjsv' in the Makefile to compile with a JP destination code
 - Added an option to make the overworld run in 60fps
-  - Press SELECT on the opion menu to go to the extra menu, and there you can toggle 30 or 60 under "FPS"
+  - Press SELECT on the option menu to go to the extra menu, and there you can toggle 30 or 60 under "FPS"
   - This feature is more of a proof-of-concept and is still kinda rusty
   - Takes advantage of double-speed CPU mode when played as a GBC game
 - Text with zero frame delay can be toggled from the extra menu under "INST. TXT"
   - The regular text speed selecttion will be ignored while ON
   - Turning this OFF will default the text speed to FAST
+- Press SELECT on the extra options menu to get a sound test menu
+  - Listen to the game's musical tracks
+  - They even continue to play once you've backed out of the options menu
 - Softlock Warp 
   - Instantly teleport back to your mom's house if you get stuck or are unable to move after updating to a new patch
   - Sets money to at least 1000 if you have less than that
@@ -1259,6 +1198,7 @@ v1.24.1
 - You can now check DVs or stat exp by holding down a button and entering the status screen
   - hold SELECT for stat exp
   - hold START for DVs
+- Pressing B on the main battle menu places the cursor over RUN
 - In-battle way to check if enemy pokemon is owned in the pokedex
   - On the main battle menu, place the cursor over an option in the left column
   - Press the SELECT button
@@ -1273,15 +1213,15 @@ v1.24.1
     - For example, you can enter the Cinnabar Gym even if the Secret Key is in the non-active bag space
   - Certain unique systems may only recognize the active bag's item list
     - For example, the Pokemon Stadium games detect only the bag list that was active when last saved
+- Can move items to the non-active bag space
+  - Place the cursor is over an item in the bag menu
+  - Press and hold LEFT or RIGHT then press START to send it to the extra bag space
 - The player's party 'mons now have temporary field move slots for HM moves
   - Each party 'mon has 1 slot separate from its regular move list
   - A field move in this slot can be used in the overworld as normal
   - You will be asked about filling the slot when teaching a field move out of battle
   - You cannot overwrite a slot with a field move already in it
   - A slot is cleared when its 'mon leaves the party (such as being put in the PC)
-  - In the case of a 'mon with 4 regular field moves:
-    - The slotted temporary move cannot be menu-selected
-    - The slotted temporary move, if it's a HM move, can be used via quick-key
   - Teaching a TM as a field move will not consume the TM
 
  
@@ -1294,6 +1234,7 @@ v1.24.1
   - When playing in GBC-mode, move animations are colored based on their type
   - In GBC-mode, when a pokemon is caught, the resting ball now has a defined color
   - Tossing pokeballs have color in GBC mode
+- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
 - You can now play as a girl when starting a new game
   - Has front, back, walking, fishing, and cycling sprites
   - Has unique default names when starting a new game
@@ -1337,7 +1278,7 @@ v1.24.1
   - This feature was added with the intent of spicing-up subsequent Gen-1 playthroughs
 - New NPC in celadon hotel will reward coins for showing him requested pkmn
 - Move deleter/relearner added to the saffron house below COPYCAT's house
-  - Code comes from Mateo's Red++ hack. It's simply the best gen-1 implementation and I cannot come up with something better.
+  - Code comes from Mateo's Red++ patch. It's simply the best gen-1 implementation and I cannot come up with something better.
   - Talk to the little girl to delete moves.
   - Talk to her tutor to relearn moves.
   - I have expanded Mateo's code so that it also detects default level-0 moves from the baseStats header files.
@@ -1455,15 +1396,15 @@ v1.24.1
   - AI trainers can only have shinies in hard mode, so it affords more chances to find wild shinies
   - Also, shiny mercy extends to tower ghosts, ghost marowak, and the old man catching tutorial
 - Winning the SS Anne tournament with a pikachu in the party will set its catch rate to 168
-  - In this rom hack, a pikachu with this catch rate can be taught Surf via HM
+  - In this community patch, a pikachu with this catch rate can be taught Surf via HM
   - This catch rate makes it hold a gorgeous box if transferred to Gen 2
   - In case of multiple pikachus, only the first in the roster will be affected
-  - Likewise, a pikachu holding a gorgeous box can learn surf if transferred into this rom hack
+  - Likewise, a pikachu holding a gorgeous box can learn surf if transferred into this community patch
 - Defeat Lance with a Dragonite in your top spot and it will be given a catch rate of 168
   - Dragonite's cry will play to confirm that this has happened
-  - In this rom hack, a dragonite with this catch rate can be taught Fly via HM
+  - In this community patch, a dragonite with this catch rate can be taught Fly via HM
   - This catch rate makes it hold a gorgeous box if transferred to Gen 2
-  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this rom hack
+  - Likewise, a dragonite holding a gorgeous box can learn fly if transferred into this community patch
 - Added Bill's secret garden behind his house
   - Put Mew in your top spot and show Bill to gain access
   - You will encounter the starter pokemon plus some other rarer pokemon
@@ -1607,6 +1548,7 @@ v1.24.1
 - Added hidden max revive on route 11
 - Added hidden ultra ball on route 8
 - Water Gun TM has been replaced by a super repel in Mt. Moon, and it is now found in the Pewter Museum
+- Added hidden moon stone to route 4 guarded by the Lass that is near the Cerulean Cave entrance
 
 </details>
 
@@ -1617,7 +1559,7 @@ v1.24.1
   - Go to the OPTIONS screen and press SELECT to get to the extra menu.
   - Toggle this mode under "NUZLOCKE".
   
-- This mode **DOES NOT** check if you have obtained pokeballs yet. It is in full effect when toggled to ON.  
+- This mode now checks if you have had access to pokeballs on the save file.
   
 - Rule 1: A pokemon that faints is considered dead and can no longer be used.
   - Revival items cannot be used in battle.
@@ -1635,9 +1577,9 @@ v1.24.1
   - An "area" is defined by the name displayed on the town map.
   - You will be unable to throw balls in subsequent wild battles in that area.
   - Static wild battles count for this as well.
-  - Wild battles before you can get pokeballs also count.
-  - In light of this, you may want to delay activating nuzlocke mode until pokeballs are available.
+  - Wild battles do not count when early in the game and you have no access to pokeballs.
   - Story wild battles (Old Man tutorial, Ghost Marowak, and Tower Ghosts) do not apply.
+  - Pokemon gained outside of battle (gifts, prizes, in-game trades, etc) do not apply.
   
 - Rule 3 (Optional): Nickname every pokemon you obtain.
   - You will always go straight to the nickname screen without a Yes/No prompt.
@@ -1707,9 +1649,15 @@ These are things that are commonly requested but fall outside the scope of the p
 ---------------------------
 > **I'm getting an Emulator Error message at the main title menu. What does this mean?**
 
-There are a couple checks performed in the background under the assumption that some form of emulation is being used. One or more messages may be displayed to indicate failures of these checks. For example, emulators like Visual Boy Advance and Goomba allow data read/writes to VRAM during mode 3 wherein the LCD controller is utilizing it; this is not possible on a real Game Boy and may cause issues with Shin Pokemon. Another example, one where Visual Boy Advance-M fails, is in the cpu cycles required to initiate an OAM Interrupt after the LCD goes from being disabled to enabled.
+There are a couple checks performed in the background under the assumption that some form of emulation is being used. One or more messages may be displayed to indicate failures of these checks. For example, emulators like Visual Boy Advance and Goomba allow data read/writes to VRAM during mode 3 wherein the LCD controller is utilizing it; this is not possible on a real Game Boy and may cause issues with Shin Pokemon. Another example, one where Visual Boy Advance-M fails, is a test that checks multiple memory modification opcodes to make sure they execute within the correct amount of time.
+
+Reproduction and FPGA hardware (such as the Modretro Chromatic, FPGBC, and Analogue Pocket) may also display these messages depending on their design and their emulation cores.
 
 These messages are informative in nature and do not impede play. That said, it is encouraged to switch to a more accurate emulator to avoid things like graphical glitches and other weirdness. See "Compatibility Notes" for more info.
+
+> **How hard is Shin Pokemon in terms of difficulty?**
+
+It is variable. The default difficulty of Shin Pokemon is only slightly harder than the unpatched retail experience, and this is largely due to improvements in the trainer AI logic. The optional hard mode increases the challenge by giving trainer opponents proper stats so that they keep up with players' teams. The Master branch of the project also makes slight adjustments to trainer rosters and moves for variety and challenge, and it adds additional options like level-scaling and battle clauses. Shin Pokemon can provide a laid-back vanilla difficulty that surprises you once in a while, or it can be turned into a crushing uphill battle.  
 
 > **Will you do a special request just for me or make some specific patches or a ROM file for me?**
 
@@ -1719,22 +1667,27 @@ No. Such requests will be politely declined. If you think you have a good recomm
 
 The gesture is appreciated and highly flattering, but donations of any sort are politely declined.
 	
+> **I saw an online storefront selling physical cartridges of Shin Pokemon. Is that associated with you guys?**
+
+No, it is not. The members of the Shin Pokemon project do not endorse this kind of business.
+	
 > **What are the best ways to support Shin Pokemon?**
 
 There are several ways you can support the project:
-- Stream your playthrough.
-- Make a Let's Play series.
+- Post stream VODs or make a Let's Play series. 
+  - Members of the project team regularly search for these and watch them for debugging purposes.
+  - The best kind of footage for debugging avoids using emulator speedup, but we're not picky.
 - Do a review or an analysis piece.
 - Create highly detailed bug reports with an "Issues" ticket.
-- Recording and uploading your gameplay is the best resource for troubleshooting. Let's Plays and stream VODs are routinely searched for and examined. 
+- Post thoughtful feedback. Intelligent criticism has positively influenced the project over the years.
 
 > **How do you come up with with new features and their implementations?**
 
-It's primarily based on nostalgic schoolyard rumors, interesting "what if" ideas, and love for secrets and easter eggs from the 1990s gaming era.
+It's primarily based on nostalgic schoolyard rumors, interesting "what if" ideas, and love for secrets and easter eggs from the 1990s gaming era. Everyone on the team is old enough to have experienced the first wave of Pokemon-mania and largely draw upon our own memories and feelings of that time to maintain the correct vibe. 
 
 > **A separate project used code from Shin Pokemon to do such-and-such feature. Will you backport it into Shin Pokemon?**
 
-Let such projects have their own identity. Other creators need to be able to show off and be proud of what they made.
+Let such projects have their own identity. Other creators need to be able to showcase their work.
 
 > **Why did you not use the artwork of Trainer Green from the Adventures comic or the Let's Go games for the female trainer option?**
 
@@ -1743,7 +1696,7 @@ Internal debate was heated on how to proceed for a female player option, but her
 - Trainer Red was always supposed to be the player. An original female trainer was never considered until gen-2's development phase around Nov-Dec 1997.
 - Others already created original sprite art to include in their own projects, and lifting it might step on their toes or foster ill feelings.
 
-So it was decided to whip-up something simple and original that depicted a female version of Trainer Red. She also acts as a (private) dev shoutout.
+So it was decided to whip-up something simple and original that depicted a female version of Trainer Red. She also acts as a somewhat-private dev shoutout.
 
 > **Why can Bide still hit opponents in the Fly/Dig state when Pokemon Stadium fixes this?**
 
@@ -1755,8 +1708,8 @@ Shin Pokemon did do always-recharge at one point, but it was hated by *literally
 
 > **Why is there a brief white frame flash when the screen transitions on Gameboy or Gameboy Color?**
 
-It's a hardware quirk. There is a brief moment where the LCD is disabled. When it is re-enabled, the screen displays blank white for 1 frame. The LCD gets disabled because it allows writing to VRAM at any time.  
-EDIT: I believe I've found a workaround by writing to VRAM during the HBLANK and VBLANK periods. The timing is a little tricky.
+It's a hardware quirk. There is a brief moment where the LCD is disabled. When it is re-enabled, the screen displays blank white for 1 frame. The LCD gets disabled because it allows writing to VRAM without timing constraints.  
+EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLANK periods. The timing is a little tricky.
 
 
 #Credits / Special Thanks
@@ -1764,28 +1717,29 @@ EDIT: I believe I've found a workaround by writing to VRAM during the HBLANK and
 - Jojobear13's wife, for copywriting and voicework
 - The Pret team for the pokered and pokeyellow disassemblies and all the code comments that came with them
 - MoriyaFaith's pokejp project for green version assets and code referencing
-- Rangi for the tool Polished Map and the jp-style town map from Red/Blue Star
-- Exp bar coded by Danny-E 33
-- The Pokemon Prism team for the improved RNG used in this project's previous versions
-- Patrik Rak for the new xor-shift RNG code
-- Move deleter/relearner coded by TheFakeMateo for Pokemon Red++
-- Code contributions and bugfixing by wisp92
-- GLSWV for correcting the metric conversions of height and weight data 
-- SteppoBlazer for the spaceworld-style old man back sprite
-- Poketto for the spaceworld-style Trainer Red back sprite
-- SPazzzi95 for documenting localization changes
-- easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - Dracrius' pocketrgb-en project for finding corrections to jp-build inaccuracies
+- GLSWV for correcting the metric conversions of height and weight data 
+- SPazzzi95 for documenting localization changes
+- Rangi for the tool Polished Map and the jp-style town map from Red/Blue Star
+- Exp bar coded by Danny-E33
+- The Pokemon Prism team for improved RNG used in this project's previous versions
+- Patrik Rak for the new xor-shift RNG code
+- Move deleter/relearner coded by TheFakeMateo/RegularLuna for Pokemon Red++
+- SteppoBlazer for: fixed unused song and spaceworld old man back sprite
+- Poketto for the spaceworld-style Trainer Red back sprite
+- easyaspi314 for optimizations to the gamma shader and wavy-line animation bugfix
 - devolov for the bag-sorting feature
+- CreamElDudJafar for GB Printer backporting
+- Gambler Keegan for Alt Trainer Move consulting and curation
 - powderpup for box covers using Sugimori cardass art
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
-- TheFakeMateo 
+- TheFakeMateo/RegularLuna 
 - Crystal_
 - ChickasaurusGL
 - v0id19
 
-The following folks for bugfix collaboration
+The following folks for bugfix collaboration and playtesting
 - kadetPirx
 - JOBOalthor1992
 - krazsen
@@ -1796,6 +1750,39 @@ The following folks for bugfix collaboration
 - TSinnohTrainer 
 - Chirutalis 
 - coltongit
+- wisp92
+- ViWalls
+- FaintAttack
 
   
 The shinpokered repository was branched from pret/pokered at [merge pull request #185 committed on Jul 2, 2018](https://github.com/pret/pokered/tree/c8599831992c91e521cf1d467ccae3d9498e42ef)
+
+
+#Legal Mumbo Jumbo
+--------------------------
+
+Shin (真) Pokémon is an unofficial, non-commercial community patch made by fans and is unaffiliated with Nintendo/Creatures Inc./GAME FREAK inc.  
+© 2025 Pokémon. © 1995–2025 Nintendo/Creatures Inc./GAME FREAK inc.  
+Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.  
+
+The Shin Pokemon project is an educational endeavor. 
+Its source code has been made fully viewable in edification of learning assembly programming, forensically documenting bugs in the original Red and Blue games, and showcasing solutions for fixing them. 
+Members of the Shin Pokemon team make no claim of ownership over assets and code that did not originate internally. 
+Its members also encourage people to utilize the project project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
+
+The Shin Pokemon Project is open-source only in the colloquial sense, not in legal meaning, and has no open-source license. 
+There are specific works of original, self-contained, non-derivative programming code libraries within the Shin Pokemon project over which its members jointly hold all applicable intellectual property rights. 
+These works include, but are not limited to, the code library that implements the built-in gamma shader and the code library that implements enhanced colorization of background layer tiles. 
+All rights are reserved.
+
+The Shin Pokemon team does not believe in granting formal permissions or licences for its original code libraries.
+Instead, it expects that people adhere to a few simple historical guidelines common in the fan community.
+Don't be uncool by:
+- Plagiarizing code, because nobody likes a liar
+- Not giving proper credit or giving ambiguous/low-information credit
+- Copying original code and putting it into a closed-source project
+- Selling original code in any form for money, barter, favors, or putting it behind a paywall
+
+The team is not interested in playing Internet Police. 
+This is all done for free as a hobby and for stress-relief.
+Be cool.

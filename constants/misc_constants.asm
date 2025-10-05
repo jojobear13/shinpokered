@@ -1,7 +1,7 @@
 FALSE EQU 0
 TRUE  EQU 1
 
-HACK_VERSION EQU 12	;master branch is always an even number
+HACK_VERSION EQU 16	;master branch is always an even number
 
 MAX_LEVEL EQU 100
 
@@ -10,6 +10,8 @@ MAX_LEVEL EQU 100
 ;			- doing so will fix the no-encounter spaces in the forest tileset
 ENCOUNTER_TILE_COORD_X EQU 8
 ENCOUNTER_TILE_COORD_Y EQU 9
+
+NUM_FIELD_MOVES     EQU 5
 
 NUM_MOVES     EQU 4
 NUM_STATS     EQU 5
@@ -246,4 +248,6 @@ DEF BIT_BATTLE_ANIMATION 	EQU 7		 	; bit 7
 ; wUnusedD721
 DEF BIT_BATTLE_NOSWITCH		EQU 3		  	; bit 3
 DEF BATTLE_NOSWITCH  		EQU %00001000	; bit 3
+DEF BIT_ENH_GBC_COLORS		EQU 7		  	; bit 7
+DEF ENH_GBC_COLORS  		EQU %10000000	; bit 7
 

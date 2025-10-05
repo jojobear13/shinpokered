@@ -1,4 +1,8 @@
 _RunPaletteCommand:
+;GBCnote - this is for enhanced GBC colors
+	ld hl, hFlagsFFFA
+	res 4, [hl]
+
 	call GetPredefRegisters
 	ld a, b	;b holds the address of the pal command to run
 	cp $ff
@@ -181,6 +185,17 @@ SetPal_GameFreakIntro:
 
 ; uses PalPacket_Empty to build a packet based on the current map
 SetPal_Overworld:
+	ld a, [hGBC]
+	and a
+	jr z, .notGBC
+	ld a, [hFlags_0xFFF6]
+	bit 4, a		;gbcnote - check bit that indicates cable club menus are being displayed
+	jr nz, .notGBC
+	ld a, [wUnusedD721]
+	bit 7, a
+	jr nz, .enhancedGBCOverworld
+.notGBC
+
 	ld hl, PalPacket_Empty
 	ld de, wPalPacket
 	ld bc, $10
@@ -224,6 +239,39 @@ SetPal_Overworld:
 .Lorelei
 	xor a
 	jr .town
+
+;Note - this is a new bit of alternate code for GBC 
+;It loads a full BG Map Attributes table directly from w2BGMapAttributes
+;not used at the moment
+.enhancedGBCOverworld
+	ld a, SET_PAL_OVERWORLD
+	ld [wDefaultPaletteCommand], a
+
+	ld hl, hFlagsFFFA
+	set 4, [hl]
+
+;flag to not generate or transfer attributes
+	ld a, [hFlagsFFFA]
+	bit 5, a
+	jr nz, .done_attributes
+	
+
+	;first make the BG Map Attribute table
+	callba MakeOverworldBGMapAttributes
+
+	;now transfer the BG Map Attributes
+	callba TransferGBCEnhancedBGMapAttributes
+	
+.done_attributes
+	;now we've effectively done the same thing as TranslatePalPacketToBGMapAttributes
+	;now transfer the palette data to accomplish what InitGBCPalettes does
+	callba TransferGBCEnhancedOverworldPalettes	
+
+	;we don't want to go to SendSGBPackets when we return
+	;so undo the push that was done at the end of _RunPaletteCommand
+	;you only want to do this if you realy, really know what you're doing
+	pop de
+	ret
 
 ; used when a Pokemon is the only thing on the screen
 ; such as evolution, trading and the Hall of Fame
@@ -850,6 +898,15 @@ TransferBGPPals::
 	ld [de], a
 	dec c
 	jr nz, .loop
+;GBCnote - the version for non-enhanced GBC colors should white out BGP 4-7 since it is not used. prevents problems.
+	ld c, 2 * PAL_SIZE
+.loop2
+	ld a, $ff
+	ld [de], a
+	ld a, $7f
+	ld [de], a
+	dec c
+	jr nz, .loop2
 	ret
 
 TransferCurOBPData:
@@ -900,57 +957,167 @@ TransferPalColorLCDDisabled:
 	ret
 	
 _UpdateGBCPal_BGP::
+;use a different function if doing enhanced GBC overworld palettes
+	ld a, [wUnusedD721]
+	bit 7, a
+	jr z, .notEnhancedGBC
+	ld hl, hFlagsFFFA
+	bit 4, [hl]
+	jr z, .notEnhancedGBC
+	callba UpdateEnhancedGBCPal_BGP
+	ret
+.notEnhancedGBC
+	
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
+
 	;prevent the BGmap from updating during vblank 
 	;because this is going to take a frame or two in order to fully run
 	;otherwise a partial update (like during a screen whiteout) can be distracting
 	ld hl, hFlagsFFFA
 	set 1, [hl]
-index = 0
-	REPT NUM_ACTIVE_PALS
-		ld a, [wGBCBasePalPointers + index * 2]
-		ld e, a
-		ld a, [wGBCBasePalPointers + index * 2 + 1]
-		ld d, a
-		xor a ; CONVERT_BGP
-		call DMGPalToGBCPal
-		ld a, index
-		call BufferBGPPal	; Copy wGBCPal to palette indexed in wBGPPalsBuffer.
-index = index + 1
-	ENDR
+
+	ld bc, $0000	;BC is going to track the index
+.loop	
+	ld hl, wGBCBasePalPointers
+	push bc
+	rlc c
+	add hl, bc
+	ld a, [hli]
+	ld e, a
+	ld a, [hl]
+	ld d, a
+	xor a ; CONVERT_BGP
+	call DMGPalToGBCPal
+	pop bc
+	push bc
+	ld a, c
+	call BufferBGPPal	; Copy wGBCPal to palette indexed in wBGPPalsBuffer.
+	pop bc
+	inc c
+	ld a, c
+	cp NUM_ACTIVE_PALS
+	jr c, .loop
+
+; commenting this out and doing a proper loop to save space
+;index = 0
+;	REPT NUM_ACTIVE_PALS
+;		ld a, [wGBCBasePalPointers + index * 2]
+;		ld e, a
+;		ld a, [wGBCBasePalPointers + index * 2 + 1]
+;		ld d, a
+;		xor a ; CONVERT_BGP
+;		call DMGPalToGBCPal
+;		ld a, index
+;		call BufferBGPPal	; Copy wGBCPal to palette indexed in wBGPPalsBuffer.
+;index = index + 1
+;	ENDR
+
 	call TransferBGPPals	;Transfer wBGPPalsBuffer contents to rBGPD
 	ld hl, hFlagsFFFA	;re-allow BGmap updates
 	res 1, [hl]
+	
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 
 _UpdateGBCPal_OBP::
+;use a different function if doing enhanced GBC overworld palettes
+	ld a, [wUnusedD721]
+	bit 7, a
+	jr z, .notEnhancedGBC
+	ld hl, hFlagsFFFA
+	bit 4, [hl]
+	jr z, .notEnhancedGBC
+	callba UpdateEnhancedGBCPal_OBP
+	ret
+.notEnhancedGBC
+
+;;We're on a GBC and this stuff takes a while. Switch to double speed mode if not already.
+;	ld a, [rKEY1]
+;	bit 7, a
+;	ld a, $ff
+;	jr nz, .doublespeed	
+;	predef SetCPUSpeed
+;	xor a
+;.doublespeed
+;	push af
+
 ; d then c = CONVERT_OBP0 or CONVERT_OBP1
 	ld a, d
 	ld c, a
-index = 0
-	REPT NUM_ACTIVE_PALS
-		ld a, [wGBCBasePalPointers + index * 2]
-		ld e, a
-		ld a, [wGBCBasePalPointers + index * 2 + 1]
-		ld d, a
-		ld a, c
-		call DMGPalToGBCPal
-		ld a, c
-		dec a
-		rlca
-		rlca
 
-		IF index > 0
-			IF index == 1
-				inc a
-			ELSE
-				add index
-			ENDC
-		ENDC
-		;OBP0: a = 0, 1, 2, or 3
-		;OBP1: a = 4, 5, 6, or 7
-		call TransferCurOBPData
-index = index + 1
-	ENDR
+	ld de, $0000	;DE is going to track the index
+.loop
+	ld hl, wGBCBasePalPointers
+	push de
+	rlc e
+	add hl, de
+
+	ld a, [hli]
+	ld e, a
+	ld a, [hl]
+	ld d, a
+	ld a, c
+	call DMGPalToGBCPal
+	ld a, c
+	dec a
+	rlca
+	rlca
+
+	pop de
+	add e
+	;OBP0: a = 0, 1, 2, or 3
+	;OBP1: a = 4, 5, 6, or 7
+	call TransferCurOBPData	;this preserves DE
+
+	inc e
+	ld a, e
+	cp NUM_ACTIVE_PALS
+	jr c, .loop
+	
+; commenting this out and doing a proper loop to save space
+;index = 0
+;	REPT NUM_ACTIVE_PALS
+;		ld a, [wGBCBasePalPointers + index * 2]
+;		ld e, a
+;		ld a, [wGBCBasePalPointers + index * 2 + 1]
+;		ld d, a
+;		ld a, c
+;		call DMGPalToGBCPal
+;		ld a, c
+;		dec a
+;		rlca
+;		rlca
+;
+;		IF index > 0
+;			IF index == 1
+;				inc a
+;			ELSE
+;				add index
+;			ENDC
+;		ENDC
+;		;OBP0: a = 0, 1, 2, or 3
+;		;OBP1: a = 4, 5, 6, or 7
+;		call TransferCurOBPData
+;index = index + 1
+;	ENDR
+
+;	pop af
+;	inc a
+;	ret z	;return now if 2x cpu mode was already active at the start of this function
+;	;otherwise return to single cpu mode and return
+;	predef SingleCPUSpeed
 	ret
 	
 ;gbcnote - new function
@@ -1095,7 +1262,7 @@ BufferAllPokeyellowColorsGBC:
 .OBP0to3Loop
 	ld hl, wGBCFullPalBuffer+64
 	ld a, 32
-	inc de
+	inc de	;increment to the rOBP0 portion of the pattern
 .OBP0to3Loop_back
 	call .readwriteinc
 	cp 48
@@ -1105,7 +1272,7 @@ BufferAllPokeyellowColorsGBC:
 .OBP4to7Loop
 	ld hl, wGBCFullPalBuffer+96
 	ld a, 48
-	inc de
+	inc de	;already incremented to the rOBP0 portion, so now increment to the rOBP1 portion of the pattern
 .OBP4to7Loop_back
 	call .readwriteinc
 	cp 64

@@ -1130,8 +1130,8 @@ RaichuEvosMoves:
 	db 11, TAIL_WHIP
 	db 13, THUNDER_WAVE
 	db 25, SLAM
-	db 31, THUNDERBOLT
-	db 46, THUNDER
+	db 31, THUNDER
+	db 46, REFLECT
 	db 55, LIGHT_SCREEN
 	db 0
 
@@ -1843,12 +1843,12 @@ StarmieEvosMoves:
 	db 0
 ;joenote-modified for fun
 ; Learnset
-	db 21, WATER_GUN
-	db 26, HARDEN
+	db 17, WATER_GUN
+	db 22, HARDEN
 	db 31, RECOVER
-	db 36, SWIFT
-	db 46, BUBBLEBEAM
-	db 51, REFLECT
+	db 38, SWIFT
+	db 47, HYDRO_PUMP
+	db 54, REFLECT
 	db 0
 
 BulbasaurEvosMoves:

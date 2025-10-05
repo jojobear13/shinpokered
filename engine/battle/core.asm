@@ -1177,7 +1177,13 @@ AnyEnemyPokemonAliveCheck:
 ; stores whether enemy ran in Z flag
 ReplaceFaintedEnemyMon:
 	ld hl, wEnemyHPBarColor
-	ld e, $30
+;	ld e, $30	;get health bar palette of an HP bar E pixels long.
+
+	;joenote - make the trainer pokeballs red
+	ld a, HP_BAR_GREEN
+	ld [hl], a	;reset the enemy HP bar to green because GetBattleHealthBarColor only works on differing colors
+	ld e, 0	;now prepare to load the color for a 0-pixel health bar (that being red)
+
 	call GetBattleHealthBarColor
 	ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
 	ld [rOBP0], a
@@ -1814,6 +1820,11 @@ HasMonFainted:
 	ld a, [wFirstMonsNotOutYet]
 	and a
 	jr nz, .done
+
+;joenote - The side menu, if it's there, does not get erased because the screen buffers are being used
+;Let's fix that oversight by reloading the menu with a blank message box
+	call RefreshPartyMenu
+	
 	ld hl, NoWillText
 	call PrintText
 .done
@@ -2326,6 +2337,9 @@ DrawEnemyHUDAndHPBar:
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ld hl, wEnemyHPBarColor
 
+;get the current health bar color in B
+;get the new health bar color in A
+;update the health bar color if they are not the name
 GetBattleHealthBarColor:
 	ld b, [hl]
 	call GetHealthBarColor
@@ -2448,15 +2462,16 @@ DisplayBattleMenu:
 	ld a, $1
 	ld [hli], a ; wMaxMenuItem
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - adding SELECT.
-;Aim is to play enemy pokemon's cry if it has been already caught when select is pressed
-	ld [hl], D_RIGHT | A_BUTTON | SELECT ; wMenuWatchedKeys	
+;joenote - adding SELECT and B
+	ld [hl], D_RIGHT | A_BUTTON | B_BUTTON | SELECT ; wMenuWatchedKeys	
 	call HandleMenuInput
-	bit 4, a ; check if right was pressed
+	bit BIT_D_RIGHT, a ; check if right was pressed
 	jr nz, .rightColumn
-	bit 0, a ;check if A was pressed
-	;jr .AButtonPressed 
-	jr nz, .AButtonPressed 
+	bit BIT_A_BUTTON, a ;check if A was pressed
+	jr nz, .AButtonPressed
+	bit BIT_B_BUTTON, a
+	jr nz, .BButtonPressed
+.SelectButtonPressed	
 	push bc
 	push hl
 	callba CryIfOwned
@@ -2492,14 +2507,20 @@ DisplayBattleMenu:
 	inc hl
 	ld a, $1
 	ld [hli], a ; wMaxMenuItem
-	ld a, D_LEFT | A_BUTTON
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - adding B button
+	ld a, D_LEFT | A_BUTTON | B_BUTTON
 	ld [hli], a ; wMenuWatchedKeys
 	call HandleMenuInput
-	bit 5, a ; check if left was pressed
+	bit BIT_B_BUTTON, a
+	jr nz, .BButtonPressed
+	bit BIT_D_LEFT, a ; check if left was pressed
 	jp nz, .leftColumn ; if left was pressed, jump
+;else A button was pressed
 	ld a, [wCurrentMenuItem]
 	add $2 ; if we're in the right column, the actual id is +2
 	ld [wCurrentMenuItem], a
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .AButtonPressed
 	call PlaceUnfilledArrowMenuCursor
 	ld a, [wBattleType]
@@ -2515,6 +2536,13 @@ DisplayBattleMenu:
 ; item menu was selected
 	inc a ; increment a to 2
 	jr .handleMenuSelection
+
+;joenote - make it so the cursor automatically moves to RUN when pressing B
+.BButtonPressed
+	ld a, 3
+	ld [wBattleAndStartSavedMenuItem], a
+	jp DisplayBattleMenu
+
 .notItemMenu
 	cp $2 ; was the party menu selected?
 	jr nz, .handleMenuSelection
@@ -2698,10 +2726,11 @@ PartyMenuOrRockOrRun:
 	call GBPalNormal
 	jp DisplayBattleMenu
 .partyMonDeselected
-	coord hl, 11, 11
-	ld bc, 6 * SCREEN_WIDTH + 9
-	ld a, " "
-	call FillMemory
+;	joenote - this is not needed anymore because RefreshPartyMenu takes care of it
+;	coord hl, 11, 11
+;	ld bc, 6 * SCREEN_WIDTH + 9
+;	ld a, " "
+;	call FillMemory
 	xor a ; NORMAL_PARTY_MENU
 	ld [wPartyMenuTypeOrMessageID], a
 	call GoBackToPartyMenu
@@ -2780,6 +2809,11 @@ PartyMenuOrRockOrRun:
 	cp d ; check if the mon to switch to is already out
 	jr nz, .notAlreadyOut
 ; mon is already out
+
+;joenote - The side menu does not get erased because the screen buffers are being used
+;Let's fix that oversight by reloading the menu with a blank message box
+	call RefreshPartyMenu
+
 	ld hl, AlreadyOutText
 	call PrintText
 	jp .partyMonDeselected
@@ -3653,7 +3687,7 @@ PlayerCalcMoveDamage:
 	jr z, handleIfPlayerMoveMissed
 	call GetDamageVarsForPlayerAttack
 	call CalculateDamage
-	jp z, playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, skip any further damage calculation and, for now, skip MoveHitTest
+	jp z, playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
 	               ; for these moves, accuracy tests will only occur if they are called as part of the effect itself
 .static_skiphere	;joenote - skip here if a static damage move
 	call AdjustDamageForMoveType
@@ -5024,6 +5058,7 @@ GetEnemyMonStat:
 	ret
 
 CalculateDamage:
+;Basic calculation function for unmodified damage. Caps at 999 damage. Minimum 1 Damage.
 ; input:
 ;   b: attack
 ;   c: opponent defense
@@ -5051,7 +5086,7 @@ CalculateDamage:
 	cp $1e
 	jr z, .skipbp
 
-; Calculate OHKO damage based on remaining HP.
+; See if OHKO move can hit (having higher speed) and if so, input its damage.
 	cp OHKO_EFFECT
 	jp z, JumpToOHKOMoveEffect
 
@@ -5456,6 +5491,7 @@ ApplyAttackToEnemyPokemon:
 .damage_stored
 	call DrawHUDsAndHPBars
 	pop bc
+;fall through
 
 ApplyDamageToEnemyPokemon:
 	ld hl, wDamage
@@ -5572,7 +5608,8 @@ ApplyAttackToPlayerPokemon:
 .damage_stored
 	call DrawHUDsAndHPBars
 	pop bc
-	
+;fall through
+
 ApplyDamageToPlayerPokemon:
 	ld hl, wDamage
 	ld a, [hli]
@@ -5820,12 +5857,13 @@ IncrementMovePP:
 	inc [hl] ; increment PP in the party memory location
 	ret
 
-; function to adjust the base damage of an attack to account for type effectiveness
+;Function to adjust the base damage of an attack to account for type effectiveness
 ;joenote - re-writing this function to fix various bugs
 ;Effectiveness multiplier will be adjusted for both type 1 and 2 of the defender
 ;Type 1 and 2 are checked individually, so their order no longer matters
 ;Static damage moves will give a neutral multiplier if super effective or not very effective
 ;Static damage moves will obey type immunity
+;Has overflow protection for STAB modifier and 2X/4X weakness modifier
 AdjustDamageForMoveType:
 	ld a, $a
 	ld [wDamageMultipliers], a	;joenote - move this to AdjustDamageForMoveType to prevent multi-attack overflows
@@ -5878,6 +5916,7 @@ AdjustDamageForMoveType:
 	ld [wDamage], a
 	ld a, l
 	ld [wDamage + 1], a
+	call c, .overflow	;joenote - handle damage overflow
 	ld hl, wDamageMultipliers
 	set 7, [hl]
 .skipSameTypeAttackBonus
@@ -5898,7 +5937,7 @@ AdjustDamageForMoveType:
 	and $7F
 	jr z, .negate
 	
-	;static moves return neutral except for type immunity
+	;There is no type immunity at this line, so make any static moves return neutral
 	push af
 	ld a, [wUnusedC000]
 	ld b, a
@@ -5942,6 +5981,7 @@ AdjustDamageForMoveType:
 	sla [hl]
 	dec hl
 	rl [hl]
+	call c, .overflow	;joenote - handle damage overflow
 	ret
 .zerocheck
 ; if damage is 0, make the move miss
@@ -5960,6 +6000,11 @@ AdjustDamageForMoveType:
 	or $A
 	ld [wDamageMultipliers], a
 	jr .done
+.overflow	;joenote - cap damage at 65535
+	ld a, $ff
+	ld [wDamage], a
+	ld [wDamage+1], a	
+	ret
 	
 ;c = defender type 1 or 2
 TypeXEffectiveness:
@@ -6563,7 +6608,7 @@ EnemyCalcMoveDamage:
 	call GetDamageVarsForEnemyAttack
 	call SwapPlayerAndEnemyLevels
 	call CalculateDamage
-	jp z, EnemyCheckIfFlyOrChargeEffect
+	jp z, EnemyCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
 .static_skiphere	;joenote - skip here if a static damage move
 	call AdjustDamageForMoveType
 	call RandomizeDamage
@@ -7995,6 +8040,13 @@ _LoadTrainerPic:
 	and a
 	ld a, Bank(TrainerPics) ; this is where all the trainer pics are (not counting Red's)
 	jr z, .loadSprite
+IF DEF(_FPLAYER)	;joenote - support female trainer over link
+	CheckEvent EVENT_LINKED_FPLAYER
+	jr z, .next
+	ld a, bank(RedPicFFront)
+	jr .loadSprite
+.next
+ENDC
 	ld a, Bank(RedPicFront)
 .loadSprite
 	call UncompressSpriteFromDE

@@ -6,10 +6,24 @@ DisplayDiploma:
 	ld [wUpdateSpritesEnabled], a
 	ld hl, wd730
 	set 6, [hl]
+
+	call _DisplayDiploma	;adding for GB_PRINTER
+	
+	call WaitForTextScrollButtonPress
+	ld hl, wd730
+	res 6, [hl]
+	call GBPalWhiteOutWithDelay3
+	call RestoreScreenTilesAndReloadTilePatterns
+	call Delay3
+	jp GBPalNormal
+
+;all this got moved into its own function for GB_PRINTER
+_DisplayDiploma:
 	call DisableLCD
 	call DelayFrame	;joenote - the overworld sprite wobble fix makes the player sprites hidden unless a delay is added
 	ld hl, CircleTile
-	ld de, vChars2 + $700
+;	ld de, vChars2 + $700
+	ld de, vChars2 + $100	;;changing for GB_PRINTER diploma
 	ld bc, $0010
 	ld a, BANK(CircleTile)
 	call FarCopyData2
@@ -75,7 +89,14 @@ ENDC
 	jr nz, .adjustPlayerGfxLoop
 
 	call EnableLCD
+	
+	;adding GB_PRINTER
+	ld a, [wPrinterSettings]
+	bit 7, a
+	jr nz, .doneTextBoxTiles
 	callba LoadTrainerInfoTextBoxTiles
+.doneTextBoxTiles
+
 	ld b, SET_PAL_GENERIC
 	call RunPaletteCommand
 	call Delay3
@@ -83,13 +104,7 @@ ENDC
 	ld a, $90
 	ld [rOBP0], a
 	call UpdateGBCPal_OBP0
-	call WaitForTextScrollButtonPress
-	ld hl, wd730
-	res 6, [hl]
-	call GBPalWhiteOutWithDelay3
-	call RestoreScreenTilesAndReloadTilePatterns
-	call Delay3
-	jp GBPalNormal
+	ret
 
 UnusedPlayerNameLengthFunc:
 ; Unused function that does a calculation involving the length of the player's
@@ -122,7 +137,8 @@ MasterText:	;joenote - adding master text
 	db "<SHINY> #MON MASTER <SHINY>@"
 
 DiplomaText:
-	db $70,"Diploma",$70,"@"
+;	db $70,"Diploma",$70,"@"
+	db $10,"Diploma",$10,"@"	;changing for GB_PRINTER diploma
 
 DiplomaPlayer:
 	db "Player@"

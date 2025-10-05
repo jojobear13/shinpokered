@@ -124,7 +124,8 @@ _VermilionGymText_5cbf4::
 	para "He's an expert on"
 	line "electric #MON!"
 
-	para "Birds and water"
+;	para "Birds and water"	;joenote - This is a text error that was translated. Supposed to be flying not bird.
+	para "Flying and water"
 	line "#MON are at"
 	cont "risk! Beware of"
 	cont "paralysis too!"

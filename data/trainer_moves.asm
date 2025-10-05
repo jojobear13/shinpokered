@@ -79,7 +79,6 @@ SpecialTrainerMoves:
 	db MISTY,$1
 	;staryu - tackle, water gun
 	;starmie - tackle, water gun, harden, bubblebeam
-	db 2,3,HARDEN
 	db 2,4,BUBBLEBEAM
 	db 0
 	

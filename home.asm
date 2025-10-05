@@ -1138,11 +1138,15 @@ DisplayTextID::
 .spriteHandling
 ; get the text ID of the sprite
 	push hl
-	push de
-	push bc
-	callba UpdateSpriteFacingOffsetAndDelayMovement ; update the graphics of the sprite the player is talking to (to face the right direction)
-	pop bc
-	pop de
+	
+;joenote - Bugged. This only affects the 15th sprite on a map and doesn't even work correctly.
+;Pokemon yellow removed this for having issues with the following Pikachu.
+;	push de
+;	push bc
+;	callba UpdateSpriteFacingOffsetAndDelayMovement ; update the graphics of the sprite the player is talking to (to face the right direction)
+;	pop bc
+;	pop de
+
 	ld hl, wMapSpriteData ; NPC text entries
 	ld a, [hSpriteIndexOrTextID]
 	dec a
@@ -1216,12 +1220,24 @@ HoldTextDisplayOpen::
 CloseTextDisplay::
 	ld a, [wCurMap]
 	call SwitchToMapRomBank
+
+
+;GBCNote - moved these functions up here to make things update properly for enhanced GBC color
+	xor a
+	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
+	call LoadCurrentMapView
+	;The map view tiles for the normal overworld map are now loaded in wTileMap
+	;This function will make new map attributes based on the current map view
+	;And then also transfer those attributes to the vBGMap0 space
+	;That way the background is ready when the window gets slid off the screen upon writing to hWY
+	callba MakeAndTransferOverworldBGMapAttributes_CloseText
+
 	ld a, $90
 	ld [hWY], a ; move the window off the screen
 	call DelayFrame
 	call LoadGBPal
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
+;	xor a
+;	ld [H_AUTOBGTRANSFERENABLED], a ; disable continuous WRAM to VRAM transfer each V-blank
 ; loop to make sprites face the directions they originally faced before the dialogue
 	ld hl, wSpriteStateData2 + $19
 	ld c, $0f
@@ -1243,7 +1259,7 @@ CloseTextDisplay::
 	ld a, [wd732]
 	bit 3, a ; used fly warp
 	call z, LoadPlayerSpriteGraphics
-	call LoadCurrentMapView
+;	call LoadCurrentMapView
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
@@ -1274,7 +1290,7 @@ PokemartGreetingText::
 	db "@"
 
 RematchTrainerText::	;joenote - for trainer rematch
-	TX_FAR _OneMoreGoSlotMachineText
+	TX_FAR _RematchTrainerText
 	db "@"
 
 LoadItemList::
@@ -3121,6 +3137,12 @@ GetTrainerInformation::
 .linkBattle
 	ld hl, wTrainerPicPointer
 	ld de, RedPicFront
+IF DEF(_FPLAYER)	;joenote - support female trainer over link
+	CheckEvent EVENT_LINKED_FPLAYER
+	jr z, .next
+	ld de, RedPicFFront
+.next
+ENDC
 	ld [hl], e
 	inc hl
 	ld [hl], d
@@ -4571,6 +4593,17 @@ Random_DV::
 	ld a, d
 	pop de
 	pop hl
+	ret
+
+;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
+RefreshPartyMenu:
+	ld a, [wPartyMenuTypeOrMessageID]
+	push af
+	ld a, 6
+	ld [wPartyMenuTypeOrMessageID], a
+	call RedrawPartyMenu
+	pop af
+	ld [wPartyMenuTypeOrMessageID], a
 	ret
 
 StatModifierRatios:

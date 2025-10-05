@@ -40,7 +40,7 @@ StartMenu_Pokemon:
 	call DisplayTextBoxID ; display pokemon menu options
 	ld hl, wFieldMoves
 	lb bc, 2, 12 ; max menu item ID, top menu item Y
-	ld e, 5
+	ld e, NUM_FIELD_MOVES+1	;joenote - increase field moves that can be listed
 .adjustMenuVariablesLoop
 	dec e
 	jr z, .storeMenuVariables
@@ -321,8 +321,8 @@ ErasePartyMenuCursors:
 	ret
 
 ItemMenuLoop:
+	call RunDefaultPaletteCommand	;GBCNote - make sure this comes first for GBC enhanced colors
 	call LoadScreenTilesFromBuffer2DisableBGTransfer ; restore saved screen
-	call RunDefaultPaletteCommand
 
 StartMenu_Item:
 	ld a, [wLinkState]
@@ -544,9 +544,12 @@ StartMenu_TrainerInfo:
 	ld a, [wOnSGB]
 	and a
 	call z, Delay3	;joenote - If on GB-DMG, wait 3 frames for the screen to redraw each third
+;	call Delay3
 	
 	call GBPalNormal
 	call WaitForTextScrollButtonPress ; wait for button press
+	ld a, SFX_PRESS_AB	;joenote - this menu is the only one that lacks a sfx when you leave
+	call PlaySound
 	call GBPalWhiteOut
 	call LoadFontTilePatterns
 	call LoadScreenTilesFromBuffer2 ; restore saved screen
@@ -556,6 +559,7 @@ StartMenu_TrainerInfo:
 	ld a, [wOnSGB]
 	and a
 	call z, Delay3	;joenote - If on GB-DMG, wait 3 frames for the screen to redraw each third
+;	call Delay3
 	
 	;call LoadGBPal		;joenote - moved this to RedisplayStartMenu for smoother whiteout transition
 	pop af
@@ -925,7 +929,7 @@ SwapTempFieldMoves:	;joenote - for field move slot
 	ld a, [wCurrentMenuItem]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -933,7 +937,7 @@ SwapTempFieldMoves:	;joenote - for field move slot
 	ld a, [wMenuItemToSwap]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	
 	ld a, [de]

@@ -534,7 +534,11 @@ _OakVictorySpeech::
 ;;;;;;;;;;;;;;;;;;;;;;joenote - adding text for lvl scaling
 _OaksLabText_scalingON::
 	text "Need a challenge?"
-	line "I can make it so"
+	line "I can nullify the"
+	cont "badge limit for"
+	cont "traded pokemon"
+	cont "obedience. Then"
+	cont "I can make it so"
 	cont "weaker trainers"
 	cont "scale up to you."
 	done

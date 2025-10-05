@@ -28,8 +28,26 @@ ENDC
 	ld de, TownMapCursor
 	lb bc, BANK(TownMapCursor), (TownMapCursorEnd - TownMapCursor) / $8
 	call CopyVideoDataDouble
+	
+	;joenote - this fixes a minor cursor error when the player is on route 1 or the power plant
+	ld a, $01
+	ld [wWhichTownMapLocation], a
+	ld a, [wCurMap]
+	ld hl, TownMapOrder+1
+	cp [hl]
+	jr z, .townmaplocationset
+
+	ld a, (TownMapOrderEnd-TownMapOrder)-1
+	ld [wWhichTownMapLocation], a
+	ld a, [wCurMap]
+	ld hl, TownMapOrderEnd-1
+	cp [hl]
+	jr z, .townmaplocationset
+
 	xor a
 	ld [wWhichTownMapLocation], a
+
+.townmaplocationset
 	pop af
 	jr .enterLoop
 
@@ -450,7 +468,7 @@ DisplayWildLocations:
 	jr z, .nexttext1
 	ld hl, _DexAreaLand
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext1
 	ld a, [wActionResultOrTookBattleTurn]
@@ -458,7 +476,7 @@ DisplayWildLocations:
 	jr z, .nexttext2
 	ld hl, _DexAreaSurf
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext2
 	ld a, [wActionResultOrTookBattleTurn]
@@ -466,7 +484,7 @@ DisplayWildLocations:
 	jr z, .nexttext3
 	ld hl, _DexAreaSuperRod
 	call PrintText
-	ld c, 30
+	ld c, 45
 	call DelayFrames
 .nexttext3
 	ld a, [wActionResultOrTookBattleTurn]

@@ -12,9 +12,10 @@ ShowPokedexMenu:
 	ld [wd11e], a
 	ld [hJoy7], a
 .setUpGraphics
+	callab LoadPokedexTilePatterns
+.setUpPals
 	ld b, SET_PAL_GENERIC
 	call RunPaletteCommand
-	callab LoadPokedexTilePatterns
 .doPokemonListMenu
 	ld hl, wTopMenuItemY
 	ld a, 3
@@ -48,6 +49,8 @@ ShowPokedexMenu:
 	jr z, .exitPokedex ; if the player chose Quit
 	dec b
 	jr z, .doPokemonListMenu ; if pokemon not seen or player pressed B button
+	dec b
+	jr z, .setUpPals	;do not reload the tiles if exiting from GB_PRINTER
 	jp .setUpGraphics ; if pokemon data or area was shown
 
 ; handles the menu on the lower right in the pokedex screen
@@ -141,6 +144,11 @@ HandlePokedexSideMenu:
 
 ; play pokemon cry
 .choseCry
+	;adding GB_PRINTER
+	ld a, [wPrinterSettings]
+	bit 7, a
+	jr nz, .chosePrint
+	
 	ld a, [wd11e]
 	call GetCryData
 	call PlaySound
@@ -150,70 +158,101 @@ HandlePokedexSideMenu:
 	predef LoadTownMap_Nest ; display pokemon areas
 	ld b, 0
 	jr .exitSideMenu
+	
+;adding GB_PRINTER
+.chosePrint
+	ld a, [hTilesetType]
+	push af
+	xor a
+	ld [hTilesetType], a
+	ld a, [wd11e]
+	ld [wcf91], a
+	callab PrintPokedexEntry
+	xor a
+	ld [H_AUTOBGTRANSFERENABLED], a
+	call ClearScreen
+	pop af
+	ld [hTilesetType], a
+	ld b, $3
+	jr .exitSideMenu
 
+	
 ; handles the list of pokemon on the left of the pokedex screen
 ; sets carry flag if player presses A, unsets carry flag if player presses B
 HandlePokedexListMenu:
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED], a
-; draw the horizontal line separating the seen and owned amounts from the menu
-	coord hl, 15, 8
-	ld a, "─"
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	coord hl, 14, 0
-	ld [hl], $71 ; vertical line tile
-	coord hl, 14, 1
-	call DrawPokedexVerticalLine
-	coord hl, 14, 9
-	call DrawPokedexVerticalLine
-	ld hl, wPokedexSeen
-	ld b, wPokedexSeenEnd - wPokedexSeen
-	call CountSetBits
-	ld de, wNumSetBits
-	coord hl, 16, 3
-	lb bc, 1, 3
-	call PrintNumber ; print number of seen pokemon
-	ld hl, wPokedexOwned
-	ld b, wPokedexOwnedEnd - wPokedexOwned
-	call CountSetBits
-	ld de, wNumSetBits
-	coord hl, 16, 6
-	lb bc, 1, 3
-	call PrintNumber ; print number of owned pokemon
-	coord hl, 16, 2
-	ld de, PokedexSeenText
-	call PlaceString
-	coord hl, 16, 5
-	ld de, PokedexOwnText
-	call PlaceString
-	coord hl, 1, 1
-	ld de, PokedexContentsText
-	call PlaceString
-	coord hl, 16, 10
-	ld de, PokedexMenuItemsText
-	call PlaceString
-; find the highest pokedex number among the pokemon the player has seen
-	ld hl, wPokedexSeenEnd - 1
-	ld b, (wPokedexSeenEnd - wPokedexSeen) * 8 + 1
-.maxSeenPokemonLoop
-	ld a, [hld]
-	ld c, 8
-.maxSeenPokemonInnerLoop
-	dec b
-	sla a
-	jr c, .storeMaxSeenPokemon
-	dec c
-	jr nz, .maxSeenPokemonInnerLoop
-	jr .maxSeenPokemonLoop
-
-.storeMaxSeenPokemon
-	ld a, b
-	ld [wDexMaxSeenMon], a
+	call Pokedex_DrawInterface	;separated out for GB_PRINTER	
 .loop
+	call Pokedex_PlacePokemonList	;separated out for GB_PRINTER
+	call GBPalNormal
+	call HandleMenuInput
+	bit BIT_B_BUTTON, a ; was the B button pressed?
+	jp nz, .buttonBPressed
+;joenote - another input priority fix from Yellow version
+	bit BIT_A_BUTTON, a ; was the A button pressed?
+	jp nz, .buttonAPressed
+.checkIfUpPressed
+	bit BIT_D_UP, a ; was Up pressed?
+	jr z, .checkIfDownPressed
+.upPressed ; scroll up one row
+	ld a, [wListScrollOffset]
+	and a
+	jp z, .loop
+	dec a
+	ld [wListScrollOffset], a
+	jp .loop
+.checkIfDownPressed
+	bit BIT_D_DOWN, a ; was Down pressed?
+	jr z, .checkIfRightPressed
+.downPressed ; scroll down one row
+	ld a, [wDexMaxSeenMon]
+	cp 7
+	jp c, .loop ; can't if the list is shorter than 7
+	sub 7
+	ld b, a
+	ld a, [wListScrollOffset]
+	cp b
+	jp z, .loop
+	inc a
+	ld [wListScrollOffset], a
+	jp .loop
+.checkIfRightPressed
+	bit BIT_D_RIGHT, a ; was Right pressed?
+	jr z, .checkIfLeftPressed
+.rightPressed ; scroll down 7 rows
+	ld a, [wDexMaxSeenMon]
+	cp 7
+	jp c, .loop ; can't if the list is shorter than 7
+	sub 6
+	ld b, a
+	ld a, [wListScrollOffset]
+	add 7
+	ld [wListScrollOffset], a
+	cp b
+	jp c, .loop
+	dec b
+	ld a, b
+	ld [wListScrollOffset], a
+	jp .loop
+.checkIfLeftPressed ; scroll up 7 rows
+	bit BIT_D_LEFT, a ; was Left pressed?
+	jr z, .buttonAPressed
+.leftPressed
+	ld a, [wListScrollOffset]
+	sub 7
+	ld [wListScrollOffset], a
+	jp nc, .loop
+	xor a
+	ld [wListScrollOffset], a
+	jp .loop
+.buttonAPressed
+	scf
+	ret
+.buttonBPressed
+	and a
+	ret
+
+;Separated out for adding GB_PRINTER
+Pokedex_PlacePokemonList:
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	coord hl, 4, 2
@@ -281,74 +320,84 @@ HandlePokedexListMenu:
 	ld a, 01
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3
-	call GBPalNormal
-	call HandleMenuInput
-	bit BIT_B_BUTTON, a ; was the B button pressed?
-	jp nz, .buttonBPressed
-;joenote - another input priority fix from Yellow version
-	bit BIT_A_BUTTON, a ; was the A button pressed?
-	jp nz, .buttonAPressed
-.checkIfUpPressed
-	bit BIT_D_UP, a ; was Up pressed?
-	jr z, .checkIfDownPressed
-.upPressed ; scroll up one row
-	ld a, [wListScrollOffset]
-	and a
-	jp z, .loop
-	dec a
-	ld [wListScrollOffset], a
-	jp .loop
-.checkIfDownPressed
-	bit 7, a ; was Down pressed?
-	jr z, .checkIfRightPressed
-.downPressed ; scroll down one row
-	ld a, [wDexMaxSeenMon]
-	cp 7
-	jp c, .loop ; can't if the list is shorter than 7
-	sub 7
-	ld b, a
-	ld a, [wListScrollOffset]
-	cp b
-	jp z, .loop
-	inc a
-	ld [wListScrollOffset], a
-	jp .loop
-.checkIfRightPressed
-	bit 4, a ; was Right pressed?
-	jr z, .checkIfLeftPressed
-.rightPressed ; scroll down 7 rows
-	ld a, [wDexMaxSeenMon]
-	cp 7
-	jp c, .loop ; can't if the list is shorter than 7
-	sub 6
-	ld b, a
-	ld a, [wListScrollOffset]
-	add 7
-	ld [wListScrollOffset], a
-	cp b
-	jp c, .loop
-	dec b
-	ld a, b
-	ld [wListScrollOffset], a
-	jp .loop
-.checkIfLeftPressed ; scroll up 7 rows
-	bit 5, a ; was Left pressed?
-	jr z, .buttonAPressed
-.leftPressed
-	ld a, [wListScrollOffset]
-	sub 7
-	ld [wListScrollOffset], a
-	jp nc, .loop
+	ret
+	
+;separated out for GB_PRINTER	
+Pokedex_DrawInterface:
 	xor a
-	ld [wListScrollOffset], a
-	jp .loop
-.buttonAPressed
-	scf
-	ret
-.buttonBPressed
-	and a
-	ret
+	ld [H_AUTOBGTRANSFERENABLED], a
+; draw the horizontal line separating the seen and owned amounts from the menu
+	coord hl, 15, 8
+	ld a, "─"
+	ld [hli], a
+	ld [hli], a
+	ld [hli], a
+	ld [hli], a
+	ld [hli], a
+	coord hl, 14, 0
+	ld [hl], $71 ; vertical line tile
+	coord hl, 14, 1
+	call DrawPokedexVerticalLine
+	coord hl, 14, 9
+	call DrawPokedexVerticalLine
+	ld hl, wPokedexSeen
+	ld b, wPokedexSeenEnd - wPokedexSeen
+	call CountSetBits
+	ld de, wNumSetBits
+	coord hl, 16, 3
+	lb bc, 1, 3
+	call PrintNumber ; print number of seen pokemon
+	ld hl, wPokedexOwned
+	ld b, wPokedexOwnedEnd - wPokedexOwned
+	call CountSetBits
+	ld de, wNumSetBits
+	coord hl, 16, 6
+	lb bc, 1, 3
+	call PrintNumber ; print number of owned pokemon
+	coord hl, 16, 2
+	ld de, PokedexSeenText
+	call PlaceString
+	coord hl, 16, 5
+	ld de, PokedexOwnText
+	call PlaceString
+	coord hl, 1, 1
+	ld de, PokedexContentsText
+	call PlaceString
 
+;adding GB_PRINTER
+	ld a, [wPrinterSettings]
+	bit 7, a
+	jr z, .notPCPrinter
+	coord hl, 16, 10
+	ld de, PokedexMenuItemsTextPRINT
+	call PlaceString	
+	jr .donePCPrinter
+.notPCPrinter
+	coord hl, 16, 10
+	ld de, PokedexMenuItemsText
+	call PlaceString
+.donePCPrinter
+	
+; find the highest pokedex number among the pokemon the player has seen
+	ld hl, wPokedexSeenEnd - 1
+	ld b, (wPokedexSeenEnd - wPokedexSeen) * 8 + 1
+.maxSeenPokemonLoop
+	ld a, [hld]
+	ld c, 8
+.maxSeenPokemonInnerLoop
+	dec b
+	sla a
+	jr c, .storeMaxSeenPokemon
+	dec c
+	jr nz, .maxSeenPokemonInnerLoop
+	jr .maxSeenPokemonLoop
+
+.storeMaxSeenPokemon
+	ld a, b
+	ld [wDexMaxSeenMon], a
+	ret
+	
+	
 DrawPokedexVerticalLine:
 	ld c, 9 ; height of line
 	ld de, SCREEN_WIDTH
@@ -376,6 +425,13 @@ PokedexMenuItemsText:
 	next "AREA"
 	next "QUIT@"
 
+;adding GB_PRINTER
+PokedexMenuItemsTextPRINT:
+	db   "DATA"
+	next "PRNT"
+	next "AREA"
+	next "QUIT@"
+	
 ; tests if a pokemon's bit is set in the seen or owned pokemon bit fields
 ; INPUT:
 ; [wd11e] = pokedex number
@@ -406,7 +462,7 @@ ShowPokedexDataInternal:
 	ld a, $33 ; 3/7 volume
 	ld [rNR50], a
 	call GBPalWhiteOut ; zero all palettes
-	call ClearScreen
+;	call ClearScreen	;moved into DrawDexEntryOnScreen for GB_PRINTER
 	ld a, [wd11e] ; pokemon ID
 	ld [wcf91], a
 	push af
@@ -418,6 +474,28 @@ ShowPokedexDataInternal:
 	push af
 	xor a
 	ld [hTilesetType], a
+	call DrawDexEntryOnScreen	;Separated out for GB_PRINTER
+	call c, Pokedex_PrintFlavorTextAtRow11	;Separated out for GB_PRINTER
+.waitForButtonPress
+	call JoypadLowSensitivity
+	ld a, [hJoy5]
+	and A_BUTTON | B_BUTTON
+	jr z, .waitForButtonPress
+	pop af
+	ld [hTilesetType], a
+	call GBPalWhiteOut
+	call ClearScreen
+	call RunDefaultPaletteCommand
+	call LoadTextBoxTilePatterns
+	call GBPalNormal
+	ld hl, wd72c
+	res 1, [hl]
+	ld a, $77 ; max volume
+	ld [rNR50], a
+	ret
+
+DrawDexEntryOnScreen:
+	call ClearScreen
 
 	coord hl, 0, 0
 	ld de, 1
@@ -506,8 +584,15 @@ ShowPokedexDataInternal:
 	call GetMonHeader ; load pokemon picture location
 	coord hl, 1, 1
 	call LoadFlippedFrontSpriteByMonIndex ; draw pokemon picture
+
+	;adding for GB_PRINTER
+	;skip the cry if printing
+	ld a, [wPrinterSettings]
+	bit 7, a
 	ld a, [wcf91]
+	jr nz, .doneCry
 	call PlayCry ; play pokemon cry
+.doneCry
 
 	pop hl
 	pop de
@@ -516,7 +601,8 @@ ShowPokedexDataInternal:
 
 	ld a, c
 	and a
-	jp z, .waitForButtonPress ; if the pokemon has not been owned, don't print the height, weight, or description
+	ret z ; if the pokemon has not been owned, don't print the height, weight, or description
+
 	inc de ; de = address of feet (height)
 	ld a, [de] ; reads feet, but a is overwritten without being used
 	coord hl, 12, 6
@@ -577,28 +663,7 @@ ENDC
 	ld [hDexWeight], a ; restore original value of [hDexWeight]
 	pop hl
 	inc hl ; hl = address of pokedex description text
-	coord bc, 1, 11
-	ld a, 2
-	ld [hClearLetterPrintingDelayFlags], a
-	call TextCommandProcessor ; print pokedex description text
-	xor a
-	ld [hClearLetterPrintingDelayFlags], a
-.waitForButtonPress
-	call JoypadLowSensitivity
-	ld a, [hJoy5]
-	and A_BUTTON | B_BUTTON
-	jr z, .waitForButtonPress
-	pop af
-	ld [hTilesetType], a
-	call GBPalWhiteOut
-	call ClearScreen
-	call RunDefaultPaletteCommand
-	call LoadTextBoxTilePatterns
-	call GBPalNormal
-	ld hl, wd72c
-	res 1, [hl]
-	ld a, $77 ; max volume
-	ld [rNR50], a
+	scf
 	ret
 
 HeightWeightText:
@@ -621,6 +686,51 @@ PokedexDataDividerLine:
 	db $6B,$69,$6B,$69,$6A
 	db "@"
 
+;Separated out for adding GB_PRINTER
+Pokedex_PrintFlavorTextAtRow11:
+	coord bc, 1, 11
+Pokedex_PrintFlavorTextAtBC:
+	ld a, 2
+	ld [hClearLetterPrintingDelayFlags], a
+	call TextCommandProcessor ; print pokedex description text
+	xor a
+	ld [hClearLetterPrintingDelayFlags], a
+	ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;adding GB_PRINTER
+Pokedex_PrepareDexEntryForPrinting:
+	coord hl, 0, 0
+	ld de, SCREEN_WIDTH
+	lb bc, $66, $d
+	call DrawTileLine
+	coord hl, 19, 0
+	ld b, $67
+	call DrawTileLine
+	coord hl, 0, 13
+	ld de, $1
+	lb bc, $6f, SCREEN_WIDTH
+	call DrawTileLine
+	ld a, $6c
+	Coorda 0, 13
+	ld a, $6e
+	Coorda 19, 13
+	ld a, [wPrinterPokedexEntryTextPointer]
+	ld l, a
+	ld a, [wPrinterPokedexEntryTextPointer + 1]
+	ld h, a
+	coord bc, 1, 1
+	ld a, [hFlags_0xFFF6]
+	set 5, a
+	ld [hFlags_0xFFF6], a
+	call Pokedex_PrintFlavorTextAtBC
+	ld a, [hFlags_0xFFF6]
+	res 5, a
+	ld [hFlags_0xFFF6], a
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+
+	
 ; draws a line of tiles
 ; INPUT:
 ; b = tile ID

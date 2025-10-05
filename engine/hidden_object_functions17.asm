@@ -62,8 +62,9 @@ DisplayMonFrontSpriteInBox:
 	ld a, 0
 	ld [H_AUTOBGTRANSFERENABLED], a		;joenote - turn this off so the npc sprites don't overlap
 
-	xor a
-	ld [hWY], a
+;gbcnote - moving this down more
+;	xor a
+;	ld [hWY], a
 	call SaveScreenTilesToBuffer1
 	ld a, MON_SPRITE_POPUP
 	ld [wTextBoxID], a
@@ -82,9 +83,21 @@ DisplayMonFrontSpriteInBox:
 	ld [hStartTileID], a
 	coord hl, 10, 11
 	predef AnimateSendingOutMon
+
+;GBCNote - for enhanced GBC color
+	;The Map View tiles for the text display are now in vBGMap1
+	;This function will make new map attributes based on the current map view
+	;And then also transfer those attributes to the vBGMap1 space
+	;That way the window is ready when it gets slid onto the screen by writing to hWY
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+	xor a
+	ld [hWY], a
+
 	call WaitForTextScrollButtonPress
 	call LoadScreenTilesFromBuffer1
 	call Delay3
+	ld a, 0
+	ld [H_AUTOBGTRANSFERENABLED], a		;joenote - bug: remember to turn this back off
 	ld a, $90
 	ld [hWY], a
 	ret

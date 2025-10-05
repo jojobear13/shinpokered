@@ -68,22 +68,14 @@ ENDC
 	ret c
 
 ; hip
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_1
-ELSE
 	ld a, SFX_INTRO_HIP
-ENDC
 	call PlaySound
 	xor a
 	ld [wIntroNidorinoBaseTile], a
 	ld de, IntroNidorinoAnimation1
 	call AnimateIntroNidorino
 ; hop
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_4
-ELSE
 	ld a, SFX_INTRO_HOP
-ENDC
 	call PlaySound
 	ld de, IntroNidorinoAnimation2
 	call AnimateIntroNidorino
@@ -92,20 +84,12 @@ ENDC
 	ret c
 
 ; hip
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_1
-ELSE
 	ld a, SFX_INTRO_HIP
-ENDC
 	call PlaySound
 	ld de, IntroNidorinoAnimation1
 	call AnimateIntroNidorino
 ; hop
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_4
-ELSE
 	ld a, SFX_INTRO_HOP
-ENDC
 	call PlaySound
 	ld de, IntroNidorinoAnimation2
 	call AnimateIntroNidorino
@@ -132,11 +116,7 @@ ENDC
 	lb de, 16 / 2, MOVE_GENGAR_RIGHT
 	call IntroMoveMon
 ; hip
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_1
-ELSE
 	ld a, SFX_INTRO_HIP
-ENDC
 	call PlaySound
 	ld a, (FightIntroFrontMon2 - FightIntroFrontMon) / BYTES_PER_TILE
 	ld [wIntroNidorinoBaseTile], a
@@ -155,22 +135,15 @@ ENDC
 	ret c
 
 ; hip
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_1
-ELSE
 	ld a, SFX_INTRO_HIP
-ENDC
 	call PlaySound
 	xor a
 	ld [wIntroNidorinoBaseTile], a
 	ld de, IntroNidorinoAnimation4
 	call AnimateIntroNidorino
+;joenote - in jp-red and green this is a "hip", but that appears to be a small mistake corrected in jp-blue version
 ; hop
-IF DEF(_REDGREENJP)
-	ld a, SFX_SNARE_1
-ELSE
 	ld a, SFX_INTRO_HOP
-ENDC
 	call PlaySound
 	ld de, IntroNidorinoAnimation5
 	call AnimateIntroNidorino
@@ -386,6 +359,27 @@ PlayShootingStar:
 	xor $01	;invert the code (01 for JP or 00 for !JP)
 	add b ;(A = 02 for JP or 01 for !JP)
 	ld [hGBC], a	;set default shader state (02 for ON or 01 for OFF)
+	
+;check if there is a save on file, and instead load the last known gamma setting if a save is found
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, $1
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ld hl, sMainData + ($D886 - wMainDataStart)
+	bit 7, [hl]
+	jr z, .sramOff
+	ld a, 2
+	bit 6, [hl]
+	jr nz, .load2
+.load1
+	dec a
+.load2
+	ld [hGBC], a
+.sramOff
+	xor a
+	ld [MBC1SRamEnable], a
+	ld [MBC1SRamBankingMode], a
 	
 .gammaloop
 	call DelayFrame

@@ -197,7 +197,20 @@ _AddPartyMon:
 	dec de
 	xor a
 	ld [wLearningMovesFromDayCare], a
+
+	CheckEvent EVENT_8C9
+	jr z, .write_moves
+;If event set, use alternate move list
+	ld a, [wCurOpponent]
+	cp YOUNGSTER
+	jr c, .write_moves	;Must be loading the team of a trainer. YOUNGSTER or higher.
+	ld a, $FF
+	ld [wLearningMovesFromDayCare], a	;indicate a switchover to WriteMonMoves_ALT upon entering WriteMonMoves
+.write_moves
 	predef WriteMonMoves
+	xor a
+	ld [wLearningMovesFromDayCare], a	;reset wLearningMovesFromDayCare
+
 	pop de
 	ld a, [wPlayerID]  ; set trainer ID to player ID
 	inc de

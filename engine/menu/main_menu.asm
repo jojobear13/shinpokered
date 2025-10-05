@@ -56,8 +56,7 @@ MainMenu:
 	call PlaceString
 	
 ;joenote - check for emulator issues
-	call EmuCheckWriteMode3
-	call EmuCheck_OAM_Timing
+	callba EmulatorChecks
 	
 ;joenote - detect a random seed of 01 01 01 01 and do something to help correct it
 	callba RNG_Correction
@@ -207,6 +206,17 @@ MainMenu:
 	jp nz, SpecialEnterMap
 .pallet_warp
 	;doing the special warp to pallet town so update some save-able parameters
+	ld a, [wRomHackVersion]
+	and a 
+	jr nz, .updateVersion
+	;clear the ununsed spaced utilized for wTempFieldMoveSlots if coming from a really old version or vanilla
+	ld [wTempFieldMoveSlots+0], a
+	ld [wTempFieldMoveSlots+1], a
+	ld [wTempFieldMoveSlots+2], a
+	ld [wTempFieldMoveSlots+3], a
+	ld [wTempFieldMoveSlots+4], a
+	ld [wTempFieldMoveSlots+5], a
+.updateVersion
 	ld a, HACK_VERSION
 	ld [wRomHackVersion], a	;update the working ram with the current rom hack version
 	ld a, [wNumHoFTeams]
@@ -419,6 +429,16 @@ ShinPokemonHandshake:
 	;Let's send a 0 across the link to make sure the other game can communicate.
 	ld [wSerialExchangeNybbleSendData], a
 	call Serial_PrintWaitingTextAndSyncAndExchangeNybble
+	;Check wUnknownSerialCounter. If FFFF is there, then the connection timed out.
+	ld hl, wUnknownSerialCounter
+	ld a, [hli]
+	inc a
+	jr nz, .connected
+	ld a, [hl]
+	inc a
+	jr nz, .connected
+	jr .fail
+.connected
 	;wSerialExchangeNybbleReceiveData holds the nybble recieved from the other game.
 	;This defaults to FF to indicate that no information was recieved.
 	ld a, [wSerialExchangeNybbleReceiveData]
@@ -445,25 +465,51 @@ ShinPokemonHandshake:
 	inc hl	;otherwise increment to the next digit and loop.
 	jr .loop	
 .fail
+	xor a
+	ld hl, wUnknownSerialCounter
+	ld [hli], a
+	ld [hl], a
 	pop hl
 	pop af
 	jp LinkMenu.choseCancel
 .pass
+IF DEF(_FPLAYER)
+;One more thing. Exchange if you are a male or female trainer with the other game.
+	ResetEvent EVENT_LINKED_FPLAYER
+	ld a, [wUnusedD721]
+	and $0F
+	ld [wSerialExchangeNybbleSendData], a	;load the digit to be sent over link
+	ld a, $ff
+	ld [wSerialExchangeNybbleReceiveData], a	;default the recieved data to FF
+	call Serial_SyncAndExchangeNybble
+	ld a, [wSerialExchangeNybbleReceiveData]
+	cp $ff
+	jr z, .fail
+	bit 0, a	;check bit 0 that was sent to tell if other trainer is female or not
+	jr z, .pass_exchanged
+	SetEvent EVENT_LINKED_FPLAYER
+.pass_exchanged
+ENDC
+	xor a
+	ld hl, wUnknownSerialCounter
+	ld [hli], a
+	ld [hl], a
 	pop hl
 	pop af
 	jp LinkMenu.next
+	
 HandshakeList:	
 ;This serves as a version control passcode.
 ;Each digit of the passcode is one nybble.
 ;FF is used as an end-of-list marker.
 	db $1
 	db $2
-	db $4
-	db $6
+	db $5
+	db $0
 	db $a
 	db $ff
 VersionText:
-	db "v1.24.6-h3-M@"
+	db "v1.25.0M@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText
@@ -936,105 +982,4 @@ ClearHackVersion:
 	ret
 
 
-	
-;joenote - This function attempts to write and read values to VRAM during STAT mode 3.
-;On real hardware, this is not allowed because the LCD controller is accessing VRAM.
-;However, not all emulation implements this which will cause problems.
-;If the values are allowed to be written and read, an error message will display.
-;Will fail on VisualBoyAdvance-1.8.0-beta3 as well as Goomba Emulator
-;Passes on BGB, MGBA, and Delta
-EmuCheckWriteMode3:
-	ld b, 3	;give it some extra chances to pass
-.test
-	ld hl, $8000
-	ld de, $BEEF
-	call .waitMode3
-	ld a, $BE
-	cp d
-	jr nz, .pass
-	ld a, $EF
-	cp e
-	jr nz, .pass
-.fail
-	dec b
-	jr nz, .test
-	ld de, EmuFailText1
-	coord hl, $00, $09
-	call PlaceString
-	ld a, 1
-	and a
-	ret
-.pass
-	xor a
-	ret
-.waitMode3
-	di
-.waitMode3_loop
-	ldh a, [rSTAT]		;read from stat register to get the mode
-	and %11				;4 cycles
-	cp 3				;4 cycles
-	jr nz, .waitMode3_loop	;6 cycles to pass or 10 to loop
-	ld a, d
-	ld [hli], a
-	ld a, e
-	ld [hld], a
-	ld a, [hli]
-	ld d, a
-	ld a, [hld]
-	ld e, a
-	ei
-	ret
-EmuFailText1:
-	db "Emulator ERROR! Mode-3 access violation.@"
-	
-	
-;Will fail on VisualBoyAdvance-M-2.1.11 as well as VisualBoyAdvance-1.8.0-beta3
-;Passes on BGB, MGBA, and Delta
-EmuCheck_OAM_Timing:
-	di
-	call DisableLCD
-	
-	ld a, [rSTAT]
-	push af
-	ld a, %00100000	;enable Mode 2 OAM interrupt for LCDC
-	ldh [rSTAT], a
-	
-	ld a, [rIE]
-	push af
-	ld a, %00000010	;enable LCDC STAT control interrupts
-	ldh [rIE], a
-	
-	xor a
-	ldh [rIF], a
-
-	ei
-	
-	;Enable the LCD
-	ld a, [rLCDC]
-	set rLCDC_ENABLE, a
-	ld [rLCDC], a
-	
-	xor a
-REPT 200
-	inc a
-ENDR	
-	
-	di
-	pop af
-	ldh [rIE], a
-	pop af
-	ldh [rSTAT], a
-	ei
-	
-	ld a, [$FFF5]
-	cp 111
-	ret z	;pass
-	ld de, EmuFailText2	;fail
-	coord hl, $00, $0B
-	call PlaceString
-	ld a, 1
-	and a
-	ret
-EmuFailText2:
-	db "Emulator ERROR! Incorrect OAMint timing.@"
 	

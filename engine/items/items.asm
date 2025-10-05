@@ -596,6 +596,13 @@ ItemUseBall:
 	ld hl, ItemUseBallText05
 	call PrintText
 
+; Clear a flag to indicate that the player has caught a pokemon with a ball throw at least once
+	CheckEvent EVENT_01B
+	jr z, .madefirstcatchofgame
+	ResetEvent EVENT_01B
+.madefirstcatchofgame
+
+
 ; Add the caught Pokémon to the Pokédex.
 	predef IndexToPokedex
 	ld a, [wd11e]
@@ -3277,6 +3284,12 @@ WaterTilesets:
 ; for items that cause the overworld to be displayed
 ItemUseReloadOverworldData:
 	call LoadCurrentMapView
+
+;GBCNote - for enhanced GBC color
+;makes it so that the vBGMap1 space gets updated for the side menu going away
+	call DelayFrame
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+
 	call UpdateSprites
 	jp DelayFrame	;joenote - need to make sure OAM data gets updated too
 

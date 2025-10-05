@@ -288,7 +288,7 @@ LearnToFieldSlot:
 	ld a, [wWhichPokemon]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	
 	;exit if a move is already in that slot

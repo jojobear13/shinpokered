@@ -346,7 +346,7 @@ PrintStatsBox:
 	jr nz, .doregular
 	call Joypad
 	ld a, [hJoyHeld]
-	bit 2, a
+	bit BIT_SELECT, a
 	jr z, .checkstart
 	dec l	;shift alignment 2 tiles to the left
 	dec l
@@ -360,7 +360,7 @@ PrintStatsBox:
 	ld de, wLoadedMonSpecialExp
 	jp PrintNumber
 .checkstart	;joenote - print DVs if start is held
-	bit 3, a
+	bit BIT_START, a
 	jr z, .doregular
 	ld de, wUnusedD722
 	lb bc, 1, 2
@@ -651,7 +651,7 @@ PlaceTempFieldMove:	;joenote - for field move slot
 	ld a, [wWhichPokemon]
 	ld c, a
 	ld b,0
-	ld hl, wTempFieldMoveSLots
+	ld hl, wTempFieldMoveSlots
 	add hl, bc
 	ld a, [hl]
 	and a

@@ -1,3 +1,4 @@
+Music_Audio2Start::
 Music_GymLeaderBattle::
 	audio Music_GymLeaderBattle, Ch0, Ch1, Ch2
 
@@ -18,3 +19,4 @@ Music_DefeatedWildMon::
 
 Music_DefeatedGymLeader::
 	audio Music_DefeatedGymLeader, Ch0, Ch1, Ch2
+Music_Audio2End::

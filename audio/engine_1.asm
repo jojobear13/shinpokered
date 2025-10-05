@@ -1364,13 +1364,12 @@ Audio1_CalculateFrequency:
 Audio1_PlaySound::
 	ld [wSoundID], a
 	cp $ff
-	jp z, .stopAllAudio
-	cp MAX_SFX_ID
-	jp z, .playSfx
-	jp c, .playSfx
-	cp $fe
-	jr z, .playMusic
-	jp nc, .playSfx
+	jp z, .stopAllAudio			;$ff is treated as a universal command for stopping audio
+	cp MUSIC1_FIRST_ENTRY
+	jp c, .playSfx				;if the sound ID is less than the first music ID, assume it is a sfx
+	cp MUSIC1_END - 1
+	jr z, .playMusic			;if the sound ID is equal to the last music ID, play the music
+	jp nc, .playSfx				;else play the sound ID as sfx
 
 .playMusic
 	call InitMusicVariables

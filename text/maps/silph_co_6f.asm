@@ -77,7 +77,11 @@ _SilphCo6BattleText3::
 
 	para "He shouldn't have"
 	line "sent me to the"
+IF DEF(_JPTXT)
+	cont "TUNGUSKA BRANCH!"
+ELSE
 	cont "TIKSI BRANCH!"
+ENDC
 	done
 
 _SilphCo6EndBattleText3::
@@ -85,7 +89,11 @@ _SilphCo6EndBattleText3::
 	prompt
 
 _SilphCo6AfterBattleText3::
+IF DEF(_JPTXT)
+	text "TUNGUSKA BRANCH?"
+ELSE
 	text "TIKSI BRANCH?"
+ENDC
 	line "It's in Russian"
 	cont "no man's land!"
 	done

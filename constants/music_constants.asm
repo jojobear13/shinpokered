@@ -1,4 +1,5 @@
-;Notes
+;Putting Audio 4 from pokeyellow into use
+
 ;constants are lowercase notes while macros are uppercase
 	const_def
 	const c_ ; 0
@@ -36,8 +37,6 @@ REG_DUTY_SOUND_LEN  EQU 1
 REG_VOLUME_ENVELOPE EQU 2
 REG_FREQUENCY_LO    EQU 3
 
-MAX_SFX_ID EQU $B9
-
 CRY_SFX_START EQU $14
 CRY_SFX_END   EQU $86
 
@@ -60,6 +59,7 @@ MACRO music_const
 ENDM
 
 	; AUDIO_1
+	music_const MUSIC1_FIRST_ENTRY,        Music_Audio1Start
 	music_const MUSIC_PALLET_TOWN,         Music_PalletTown
 	music_const MUSIC_POKECENTER,          Music_Pokecenter
 	music_const MUSIC_GYM,                 Music_Gym
@@ -80,8 +80,10 @@ ENDM
 	music_const MUSIC_ROUTES3,             Music_Routes3
 	music_const MUSIC_ROUTES4,             Music_Routes4
 	music_const MUSIC_INDIGO_PLATEAU,      Music_IndigoPlateau
+	music_const MUSIC1_END,                Music_Audio1End
 
 	; AUDIO_2
+	music_const MUSIC2_FIRST_ENTRY,        Music_Audio2Start
 	music_const MUSIC_GYM_LEADER_BATTLE,   Music_GymLeaderBattle
 	music_const MUSIC_TRAINER_BATTLE,      Music_TrainerBattle
 	music_const MUSIC_WILD_BATTLE,         Music_WildBattle
@@ -89,8 +91,10 @@ ENDM
 	music_const MUSIC_DEFEATED_TRAINER,    Music_DefeatedTrainer
 	music_const MUSIC_DEFEATED_WILD_MON,   Music_DefeatedWildMon
 	music_const MUSIC_DEFEATED_GYM_LEADER, Music_DefeatedGymLeader
+	music_const MUSIC2_END,                Music_Audio2End
 
 	; AUDIO_3
+	music_const MUSIC3_FIRST_ENTRY,        Music_Audio3Start
 	music_const MUSIC_TITLE_SCREEN,        Music_TitleScreen
 	music_const MUSIC_CREDITS,             Music_Credits
 	music_const MUSIC_HALL_OF_FAME,        Music_HallOfFame
@@ -109,8 +113,17 @@ ENDM
 	music_const MUSIC_MEET_EVIL_TRAINER,   Music_MeetEvilTrainer
 	music_const MUSIC_MEET_FEMALE_TRAINER, Music_MeetFemaleTrainer
 	music_const MUSIC_MEET_MALE_TRAINER,   Music_MeetMaleTrainer
+	music_const MUSIC3_END,                Music_Audio3End
 
-	; AUDIO_1 AUDIO_2 AUDIO_3
+;putting the unused song back into use
+	; AUDIO_4
+	music_const MUSIC4_FIRST_ENTRY,       Music_Audio4Start
+	music_const MUSIC_UNUSED_SONG,        Music_UnusedSong
+	music_const MUSIC_UNUSED_SONG_L,      Music_UnusedSong_L
+	music_const MUSIC_UNUSED_SONG_R,      Music_UnusedSong_R
+	music_const MUSIC4_END,               Music_Audio4End
+
+	; AUDIO_1 AUDIO_2 AUDIO_3 AUDIO_4
 	music_const SFX_SNARE_1,            SFX_Snare1_1
 	music_const SFX_SNARE_2,            SFX_Snare2_1
 	music_const SFX_SNARE_3,            SFX_Snare3_1
@@ -169,6 +182,7 @@ ENDM
 	music_const SFX_CRY_24,             SFX_Cry24_1
 	music_const SFX_CRY_25,             SFX_Cry25_1
 
+	; AUDIO_1 AUDIO_2 AUDIO_3 AUDIO_4
 	music_const SFX_GET_ITEM_2,         SFX_Get_Item2_1
 	music_const SFX_TINK,               SFX_Tink_1
 	music_const SFX_HEAL_HP,            SFX_Heal_HP_1
@@ -176,9 +190,8 @@ ENDM
 	music_const SFX_START_MENU,         SFX_Start_Menu_1
 	music_const SFX_PRESS_AB,           SFX_Press_AB_1
 
-	; AUDIO_1 AUDIO_3
+	; AUDIO_1 AUDIO_3 AUDIO_4
 	music_const SFX_GET_ITEM_1,         SFX_Get_Item1_1
-
 	music_const SFX_POKEDEX_RATING,     SFX_Pokedex_Rating_1
 	music_const SFX_GET_KEY_ITEM,       SFX_Get_Key_Item_1
 	music_const SFX_POISONED,           SFX_Poisoned_1
@@ -210,12 +223,11 @@ ENDM
 	music_const SFX_SAVE,               SFX_Save_1
 
 	; AUDIO_1
-	music_const SFX_POKEFLUTE,           SFX_Pokeflute
+	music_const SFX_POKEFLUTE,          SFX_Pokeflute
 	music_const SFX_SAFARI_ZONE_PA,     SFX_Safari_Zone_PA
 
 	; AUDIO_2
 	music_const SFX_LEVEL_UP,           SFX_Level_Up
-
 	music_const SFX_BALL_TOSS,          SFX_Ball_Toss
 	music_const SFX_BALL_POOF,          SFX_Ball_Poof
 	music_const SFX_FAINT_THUD,         SFX_Faint_Thud

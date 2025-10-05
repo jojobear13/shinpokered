@@ -10,6 +10,12 @@ DisplayStartMenu::
 RedisplayStartMenu::
 	callba DrawStartMenu
 	callba PrintSafariZoneSteps ; print Safari Zone info, if in Safari Zone
+
+	;GBCNote - if using enhanced GBC color, add some extra delay
+	ld a, [wUnusedD721]
+	bit 7, a
+	call nz, Delay3
+
 	call LoadGBPal	;joenote - moved this here for smoother whiteout transition
 	call UpdateSprites
 .loop

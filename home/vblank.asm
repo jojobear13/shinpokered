@@ -71,12 +71,20 @@ VBlank::
 
 	callbs Music_DoLowHealthAlarm
 	callbs Audio1_UpdateMusic
+	call SerialFunction		;adding GB_PRINTER
 
 	callba TrackPlayTime ; keep track of time played
 
 	ld a, [hDisableJoypadPolling]
 	and a
 	call z, ReadJoypad
+
+;GBCnote - for enhanced GBC colors, do the bg map attributes for new rows/columns if required
+	ld a, [hVblankBackup]
+	and %11
+	jr z, .skip_GBCEnhancedRedrawRowOrColumn
+	callba GBCEnhancedRedrawRowOrColumn
+.skip_GBCEnhancedRedrawRowOrColumn
 
 	ld a, [wVBlankSavedROMBank]
 	ld [H_LOADEDROMBANK], a
