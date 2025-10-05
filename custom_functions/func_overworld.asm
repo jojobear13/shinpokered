@@ -71,11 +71,17 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ld [wOptions], a
 
 	ld a, [wUnusedD721]
-	and %11100111
+	and %01100111
 	ld [wUnusedD721], a
 
 	ResetEvent EVENT_910
 	ret
+
+	
+	ResetEvent EVENT_9FE
+	ResetEvent EVENT_9FF
+	ret
+
 
 	
 ;this function handles tracking of how fast to go on or off a bike

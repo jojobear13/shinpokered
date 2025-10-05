@@ -14,6 +14,18 @@ TradeCenterScript:
 	bit 0, [hl]
 	set 0, [hl]
 	ret nz
+	
+IF DEF(_FPLAYER)
+;If there is a female trainer on the other side , load her graphics
+	CheckEvent EVENT_LINKED_FPLAYER
+	jr z, .next_afterFTrainer
+	ld de, RedFSprite
+	ld hl, vNPCSprites + $C0	;player is a $8000 while other person NPC is at $80C0
+	lb bc, BANK(RedFSprite), $C	;NPC sprites are $C tiles worth of data
+	call CopyVideoData
+.next_afterFTrainer
+ENDC	
+		
 	ld hl, wSpriteStateData2 + $14
 	ld a, $8
 	ld [hli], a

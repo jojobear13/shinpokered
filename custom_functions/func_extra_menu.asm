@@ -14,11 +14,11 @@ DisplayExtraOptionMenu:
 
 ;draw text box border for lite options
 	coord hl, 0, 0
-	ld b, 6
+	ld b, 7
 	ld c, 18
 	call TextBoxBorder
 ;draw text box border for master options
-;	coord hl, 0, 8
+;	coord hl, 0, 9
 ;	ld b, 2
 ;	ld c, 18
 ;	call TextBoxBorder
@@ -31,6 +31,7 @@ DisplayExtraOptionMenu:
 	call ShowHardModeSetting	;joenote - display marker for hard mode or not
 	call ShowNoSwitchSetting	;joenote - display marker for deactivated trainer switching or not
 	call ShowGammaSetting
+	call ShowEnhancedGBCSetting
 	
 ;	call ShowBadgeCap	;joenote - show the level cap depending on badge
 ;	call ShowNuzlocke
@@ -48,7 +49,7 @@ DisplayExtraOptionMenu:
 	bit BIT_START, b ; Start button pressed?
 	jp nz, .exitMenu
 	bit BIT_SELECT, b ; Select button pressed?
-	jp nz, .exitMenu
+	jp nz, DisplaySoundTestMenu
 	bit BIT_A_BUTTON, b ; A button pressed?
 	jr nz, .cursor_section
 	jr .checkDirectionKeys	;jump if d-pad pressed
@@ -66,9 +67,11 @@ DisplayExtraOptionMenu:
 	jr z, .cursorAISwitch
 	cp $6 ;cursor over gamma shader?
 	jr z, .cursorGamma
-;	cp $9 ; cursor over lvl cap?
+	cp $7 ;cursor over enhanced gbc?
+	jr z, .cursorEnhGBC
+;	cp $A ; cursor over lvl cap?
 ;	jr z, .cursorLvlCap
-;	cp $A ; cursor over nuzlocke?
+;	cp $B ; cursor over nuzlocke?
 ;	jr z, .cursorNuzlocke
 	cp $10 ; is the cursor on Back?
 	jr z, .exitMenu
@@ -92,6 +95,9 @@ DisplayExtraOptionMenu:
 .cursorGamma
 	call ToggleGammaShader
 	jr .getJoypadStateLoop
+.cursorEnhGBC
+	call ToggleEnhancedGBCColors
+	jr .getJoypadStateLoop
 ;.cursorLvlCap
 ;	call ToggleBadgeCap
 ;	jr .getJoypadStateLoop
@@ -114,8 +120,8 @@ DisplayExtraOptionMenu:
 	cp 16
 	ld b, -15
 	jr z, .updateMenuVariables
-	cp 6
-	ld b, 10	;	ld b, 3
+	cp 7
+	ld b, 9	;	ld b, 3
 	jr z, .updateMenuVariables
 ;	cp 10
 ;	ld b, 6
@@ -127,11 +133,11 @@ DisplayExtraOptionMenu:
 	cp 1
 	ld b, 15
 	jr z, .updateMenuVariables
-;	cp 9
+;	cp 10
 ;	ld b, -3
 ;	jr z, .updateMenuVariables
 	cp 16
-	ld b, -10	;ld b, -6
+	ld b, -9	;ld b, -5
 	jr z, .updateMenuVariables
 	;else
 	ld b, -1
@@ -180,6 +186,11 @@ PlaceExtraOptionStrings:
 	coord hl, 1, 6
 	ld de, TextGamma
 	call PlaceString
+	
+;place enhanced GBC color text
+	coord hl, 1, 7
+	ld de, TextEnhancedGBC
+	call PlaceString
 
 ;place back text
 	coord hl, 1, 16
@@ -187,12 +198,12 @@ PlaceExtraOptionStrings:
 	call PlaceString
 
 ;place lvl cap text
-;	coord hl, 1, 9
+;	coord hl, 1, 10
 ;	ld de, TextAILevelCap
 ;	call PlaceString
 
 ;place nuzlocke text
-;	coord hl, 1, 10
+;	coord hl, 1, 11
 ;	ld de, TextNuzlocke
 ;	call PlaceString
 
@@ -328,6 +339,36 @@ ShowHardModeSetting:
 	ret
 
 
+;joenote - for enhanced GBC colors option
+ToggleEnhancedGBCColors:
+	ld a, [hGBC]
+	and a
+	ret z	;do nothing if on dmg or sgb
+	ld a, [wUnusedD721]
+	xor ENH_GBC_COLORS
+	ld [wUnusedD721], a
+	call RunDefaultPaletteCommand
+	;fall through
+ShowEnhancedGBCSetting:
+	ld hl, OptionMenuOnOffText
+	ld a, [hGBC]
+	and a
+	jr z, .off
+	ld a, [wUnusedD721]
+	bit BIT_ENH_GBC_COLORS, a
+	jr nz, .print
+.off
+	inc hl
+	inc hl
+.print
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	coord hl, $10, $7
+	call PlaceString
+	ret
+
+
 ;joenote - for deactivating intelligent trainer switching
 ToggleNoSwitch:
 	ld a, [wUnusedD721]
@@ -364,7 +405,13 @@ ToggleGammaShader:
 	ret z	;do nothing if on dmg or sgb
 	xor %00000011
 	ld [hGBC], a
+;GBCNote - RunDefaultPaletteCommand which messes up enhanced GBC colors
+;set a flag for prevent this from happening
+	ld hl, hFlagsFFFA
+	set 5, [hl]
 	call RunDefaultPaletteCommand
+	ld hl, hFlagsFFFA
+	res 5, [hl]
 	;fall through
 ShowGammaSetting:
 	ld hl, OptionMenuOnOffText
@@ -390,7 +437,7 @@ ShowGammaSetting:
 	; ;fall through
 ; ShowBadgeCap:
 	; ld de, OptionMenu5Spaces
-	; coord hl, $0E, $9
+	; coord hl, $0E, $A
 	; call PlaceString
 	; ld de, OptionMenu5SpacesOFF
 	; ld a, [wUnusedD721]	;check if obedience level cap is active
@@ -399,7 +446,7 @@ ShowGammaSetting:
 	; ld de, OptionMenuCapLevelText
 ; .print
 	; push af
-	; coord hl, $0E, $9
+	; coord hl, $0E, $A
 	; call PlaceString
 	; pop af
 	; ret z
@@ -408,7 +455,7 @@ ShowGammaSetting:
 	; callba GetBadgeCap
 	; ld a, d
 	; ld [wNumSetBits], a
-	; coord hl, $10, $9
+	; coord hl, $10, $A
 	; ld de, wNumSetBits
 	; lb bc, 1, 3
 	; call PrintNumber
@@ -436,7 +483,7 @@ ShowGammaSetting:
 	; jr z, .print
 	; ld de, OptionMenuTextON
 ; .print
-	; coord hl, $10, $A
+	; coord hl, $10, $B
 	; call PlaceString
 	; ret
 ; ;default to recommended settings when turned on
@@ -473,8 +520,10 @@ TextAISwitch:
 	db " AI SWAPS@"
 TextGamma:
 	db " Y SHADER@"
+TextEnhancedGBC:
+	db " ENH. COLOR@"
 TextBack:
-	db " BACK@"
+	db " BACK     SEL: OST@"
 
 ;TextAILevelCap:
 ;	db " LVL CAP@"

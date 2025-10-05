@@ -345,7 +345,8 @@ wOAMBuffer:: ; c300
 wTileMap:: ; c3a0
 ; buffer for tiles that are visible on screen (20 columns by 18 rows)
 	ds 20 * 18
-
+wTileMap_End::
+	
 wSerialPartyMonsPatchList:: ; c508
 ; list of indexes to patch with SERIAL_NO_DATA_BYTE after transfer
 
@@ -363,8 +364,94 @@ wSerialEnemyMonsPatchList:: ; c5d0
 	ds 80
 
 wTempPic::
+;wOverworldMap:: ; c6e8
+;	ds 1300
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;adding GB_PRINTER
+;wOverworldMap is 1300 bytes long and runs from c6e8 to cbfb. 
+;Printer data and TempPic data overlaps with this Overworld Map data.
+wPrinterData:: ;c6e8
+wPrinterSendState:: ; c6e8
 wOverworldMap:: ; c6e8
-	ds 1300
+	ds 1
+wPrinterRowIndex:: ; c6e9
+	ds 1
+; Printer data header runs from c6ea to c6ed
+wPrinterDataHeader:: ; c6ea
+	ds 4
+wPrinterChecksum:: ; c6ee
+	dw
+
+UNION
+wPrinterSerialReceived:: ; c6f0
+	ds 1
+wPrinterStatusReceived:: ; c6f1
+; bit 7: set if error 1 (battery low)
+; bit 6: set if error 4 (too hot or cold)
+; bit 5: set if error 3 (paper jammed or empty)
+; if this and the previous byte are both $ff: error 2 (connection error)
+	ds 1
+;These are for temporarily handling printer settings
+wc6f2:: ; c6f2
+	ds 1
+wc6f3:: ; c6f3
+	ds 13
+;filler for this section of the UNION
+; c700
+	ds $270
+NEXTU
+wPrinterSendDataSource1:: ; c6f0
+; two 20-tile buffers
+	ds $140
+wPrinterSendDataSource2::
+	ds $140
+ENDU
+wPrinterSendDataSource1End:: ; c970
+
+wPrinterHandshake:: ; c970
+	ds 1
+wPrinterStatusFlags:: ; c971
+	ds 1
+wHandshakeFrameDelay:: ; c972
+	ds 1
+wPrinterSerialFrameDelay:: ; c973
+	ds 1
+wPrinterSendByteOffset:: ; c974
+	dw
+wPrinterDataSize:: ; c976
+	dw
+wPrinterTileBuffer:: ; c978
+	ds SCREEN_HEIGHT * SCREEN_WIDTH
+wPrinterStatusIndicator:: ; cae0
+	ds 2
+;used for storing commands having to do with printer transmission
+wcae2:: ; cae2
+	ds 1
+wPrinterSettingsTempCopy:: ; cae3
+	ds 17
+wPrinterQueueLength:: ; caf4
+	ds 1
+wPrinterDataEnd:: ; caf5
+
+wPrinterPokedexEntryTextPointer:: ; caf5
+	dw
+
+; caf7
+	ds 2
+
+wPrinterPokedexMonIsOwned:: ; caf9
+	ds 227
+
+;These appear to be for handling vram during printing
+wcbdc:: ; cbdc
+	ds 14
+wcbea:: ; cbea
+	ds 2
+wcbec:: ; cbec
+	ds 16
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 wRedrawRowOrColumnSrcTiles:: ; cbfc
 ; the tiles of the row or column to be redrawn by RedrawRowOrColumn
@@ -945,7 +1032,7 @@ wSwappedMenuItem:: ; cd3d
 wHoFMonSpecies:: ; cd3d
 
 wFieldMoves:: ; cd3d
-; 4 bytes
+; 4 bytes	;joenote - extended to 5 bytes
 ; the current mon's field moves
 
 wBadgeNumberTile:: ; cd3d
@@ -1093,8 +1180,6 @@ wHiddenObjectX:: ; cd41
 wSlotMachineWinningSymbol:: ; cd41
 ; the OAM tile number of the upper left corner of the winning symbol minus 2
 
-wNumFieldMoves:: ; cd41
-
 wSlotMachineWheel1BottomTile:: ; cd41
 
 wTrainerScreenX:: ; cd41
@@ -1103,16 +1188,19 @@ wTrainerScreenX:: ; cd41
 
 wHoFTeamNo:: ; cd42
 
+wNumFieldMoves:: ; cd42	;joenote - moved to cd42 from cd41
+
 wSlotMachineWheel1MiddleTile:: ; cd42
 
-wFieldMovesLeftmostXCoord:: ; cd42
 	ds 1
-
-wLastFieldMoveID:: ; cd43
-; unused
 
 wSlotMachineWheel1TopTile:: ; cd43
+
+wFieldMovesLeftmostXCoord:: ; joenote - moved to cd43 from cd42
 	ds 1
+
+wLastFieldMoveID:: ; joenote - moved to cd44 from cd43
+; unused
 
 wSlotMachineWheel2BottomTile:: ; cd44
 	ds 1
@@ -1422,7 +1510,7 @@ wScriptedNPCWalkCounter:: ; cf18
 
 	ds 1
 
-;joenote - used for temporary GBC color control settings
+;GBCnote - used for temporary GBC color control settings
 wGBCColorControl:: ; cf1a
 	;bits 0 & 1 --> a value from 0 to 3 to select color 0 through 3
 	;bits 2, 3, & 4 --> a value from 0 to 7 to select BGP/OBP 0 through 7
@@ -1706,9 +1794,11 @@ wBattleType:: ; d05a
 wDamageMultipliers:: ; d05b
 ; bits 0-6: Effectiveness
    ;  $0 = immune
+   ;  $2 = really not very effective (quarter damage)
    ;  $5 = not very effective
    ;  $a = neutral
    ; $14 = super-effective
+   ; $28 = really super-effective (quadruple damage)
 ; bit 7: STAB
 	ds 1
 
@@ -2744,7 +2834,16 @@ wTilesetTalkingOverTiles:: ; d532
 wGrassTile:: ; d535
 	ds 1
 
-	ds 4
+;	ds 4
+;adding GB_PRINTER
+wPrinterSettings:: ; d536
+	ds 1
+wPrinterConnectionOpen:: ; d537
+	ds 1
+wPrinterOpcode:: ; d538
+	ds 1
+;leftover	
+	ds 1
 
 wNumBoxItems:: ; d53a
 	ds 1
@@ -3016,8 +3115,10 @@ wLastOBP1::
 	ds 1 
 wBGPPalsBuffer:: 
 	ds NUM_ACTIVE_PALS * PAL_SIZE ;32 bytes
-	
-	ds 5
+wUpdateGBCPal_Index::
+	ds 1
+
+	ds 4
 
 wObtainedHiddenItemsFlags::
 	ds 14
@@ -3110,7 +3211,8 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 	;bit 2 - override bit 0 for specific bank switching instances (usually reserved for _FPLAYER tagged code)
 	;bit 3 - if set, the enemy trainer AI will not use intelligent switching
 	;bit 4 - 60fps option flag
-;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores
+	;bit 7 - enhanced GBC colors toggle
+;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
 wUnusedD726:: 

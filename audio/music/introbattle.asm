@@ -1,5 +1,11 @@
+;red/green have a slightly different tempo
+;Credit Masaru2 https://github.com/Masaru2/pokejp/commit/8e16558fbfc66c24dc58646c34761a1fdc65ea0a
 Music_IntroBattle_Ch0::
+IF DEF(_REDGREENJP)
+	tempo 102	
+ELSE
 	tempo 98
+ENDC
 	volume 7, 7
 	duty 3
 	vibrato 6, 3, 4

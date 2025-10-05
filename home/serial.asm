@@ -3,6 +3,12 @@ Serial::
 	push bc
 	push de
 	push hl
+
+	;adding GB_PRINTER
+	ld a, [wPrinterConnectionOpen]
+	bit 0, a
+	jp nz, PrinterSerial_RetI
+
 	ld a, [hSerialConnectionStatus]
 	inc a
 	jr z, .connectionNotYetEstablished
@@ -310,3 +316,42 @@ Serial_TryEstablishingExternallyClockedConnection::
 	ld a, START_TRANSFER_EXTERNAL_CLOCK
 	ld [rSC], a
 	ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;adding GB_PRINTER	
+PrinterSerial_RetI::
+	call PrinterSerial
+	pop hl
+	pop de
+	pop bc
+	pop af
+	reti
+
+PrinterSerial::
+	homecall PrinterSerial_
+	ret
+
+SerialFunction::	;This needs to be called every VBLANK
+	ld a, [wPrinterConnectionOpen]
+	bit 0, a
+	ret z
+	ld a, [wPrinterOpcode]
+	and a
+	ret nz
+	ld hl, wPrinterData + 650
+	inc [hl]
+	ld a, [hl]
+	cp $6
+	ret c
+	xor a
+	ld [hl], a
+	ld a, $0c
+	ld [wPrinterOpcode], a
+	ld a, $88
+	ld [rSB], a
+	ld a, $1
+	ld [rSC], a
+	ld a, START_TRANSFER_INTERNAL_CLOCK
+	ld [rSC], a
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

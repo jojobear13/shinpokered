@@ -270,6 +270,9 @@ hMovingBGTilesCounter1 EQU $FFD8
 
 H_CURRENTSPRITEOFFSET EQU $FFDA ; multiple of $10
 
+;adding GB_PRINTER
+hCanceledPrinting EQU $FFDB
+
 hItemCounter EQU $FFDB
 
 hGymGateIndex EQU $FFDB
@@ -310,6 +313,9 @@ hCoordsInFrontOfPlayerMatch EQU $FFEA
 
 hSpriteAnimFrameCounter EQU $FFEA
 
+hVblankBackup EQU $FFEF	; added for more various uses involving enhanced GBC colors
+;bits 0 and 1 - backup of hRedrawRowOrColumnMode
+
 hRandomLast EQU $FFF0 ; FFF1	;2 bites for xor-shift rng
 
 H_WHOFIRST EQU $FFF2 ; joenote - 0 on player going first, 1 on enemy going first
@@ -323,6 +329,9 @@ hFlags_0xFFF6 EQU $FFF6	;has to do with a bunch of menu spacing and stuff
 ; bit 0: draw HP fraction to the right of bar instead of below (for party menu)
 ; bit 1: menu is double spaced
 ; bit 2: something about skipping a line when printing text
+; bit 3: LoadCurrentMapView is being called during player movement - GBCnote--> added this
+; bit 4: Menus in the cable club are being displayed - GBCnote--> added this
+; bit 5: For GB_PRINTER - If set, do not print the triangle at the end of a line and instead do a line feed 
 
 hFieldMoveMonMenuTopMenuItemX EQU $FFF7
 
@@ -331,9 +340,12 @@ hDisableJoypadPolling EQU $FFF9
 hJoyInput EQU $FFF8
 
 hFlagsFFFA EQU $FFFA	;joenote - added for various uses
-;bit 0 - PrepareOAMData and DMARoutine will not run in Vblank while this bit is set
+;bit 0 - DMARoutine will not run in Vblank while this bit is set
 ;bit 1 - BGmap update functions will not run in Vblank while this bit is set
 ;bit 2 - This gets set to indicate that a sfx is playing while printing text
 ;bit 3 - When set, the CopyData function will only copy when safe to do so for VRAM
+;bit 4 - When set, the enhanced GBC overworld BG Map Attributes are being used
+;bit 5 - When set, enhanced GBC overworld BG Map Attributes should not be done during RunDefaultPaletteCommand
+
 hRGB EQU $FFFB	; FFFB=Red, FFFC=Green, FFFD=BLUE	;3 bytes ;joenote - used to store color RGB color values
 hGBC EQU $FFFE ;gbcnote - 0 if DMG or SGB, != 0 if GBC, =2 for gamma shader

@@ -283,11 +283,21 @@ SFX_Save_3::
 SFX_Intro_Lunge::
 	audio SFX_Intro_Lunge, Ch7
 
+;Hip and Hop SFX slightly different in redjp/green/bluejp
+;Credit Masaru2 https://github.com/Masaru2/pokejp/commit/199e3a6a99664e727bb6f280fe7e4469b3ff369d
 SFX_Intro_Hip::
+IF DEF(_REDGREENJP)
+	audio SFX_Intro_Hip, Ch7
+ELSE
 	audio SFX_Intro_Hip, Ch4
+ENDC
 
 SFX_Intro_Hop::
+IF DEF(_REDGREENJP)
+	audio SFX_Intro_Hop, Ch7
+ELSE
 	audio SFX_Intro_Hop, Ch4
+ENDC
 
 SFX_Intro_Raise::
 	audio SFX_Intro_Raise, Ch7

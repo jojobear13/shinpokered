@@ -157,6 +157,7 @@ Trade_ClearTileMap:
 LoadTradingGFXAndMonNames:
 	call Trade_ClearTileMap
 	call DisableLCD
+	call GBPalNormal	;gbcnote - restore palettes for enhanced gbc color, otherwise this is redundant
 	ld hl, TradingAnimationGraphics
 	ld de, vChars2 + $310
 	ld bc, TradingAnimationGraphicsEnd - TradingAnimationGraphics

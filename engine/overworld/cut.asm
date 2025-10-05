@@ -45,9 +45,17 @@ UsedCut:
 	call RestoreScreenTilesAndReloadTilePatterns
 	ld a, SCREEN_HEIGHT_PIXELS
 	ld [hWY], a
+;	call Delay3
+;	call LoadGBPal
+;	call LoadCurrentMapView
+
+;GBCNote - arrange a bit differently for enhanced GBC colors
+	call LoadCurrentMapView
+	callba MakeAndTransferOverworldBGMapAttributes_OpenText
+	callba MakeAndTransferOverworldBGMapAttributes_CloseText
 	call Delay3
 	call LoadGBPal
-	call LoadCurrentMapView
+
 	call SaveScreenTilesToBuffer2
 	call Delay3
 	xor a
@@ -62,16 +70,27 @@ UsedCut:
 	call InitCutAnimOAM
 	ld de, CutTreeBlockSwaps
 	call ReplaceTreeTileBlock
+
+;GBCNote - RedrawMapView forces RunDefaultPaletteCommand which messes up enhanced GBC colors
+;set a flag for prevent this from happening
+	ld hl, hFlagsFFFA
+	set 5, [hl]
 	call RedrawMapView
+	ld hl, hFlagsFFFA
+	res 5, [hl]
+	
+	call .common		;joenote - consolidated a few things so they can be called from elsewhere
+	jp RedrawMapView
+.common
+	ld a, SFX_CUT
+	call PlaySound	;This was probably suppused to be here instead of after AnimCut
 	callba AnimCut
 	ld a, $1
 	ld [wUpdateSpritesEnabled], a
-	ld a, SFX_CUT
-	call PlaySound
 	ld a, $90
 	ld [hWY], a
 	call UpdateSprites
-	jp RedrawMapView
+	ret
 
 CheckCutTile:	;joenote - consolidate this into its own function
 	ld a, [wCurMapTileset]
@@ -127,7 +146,9 @@ InitCutAnimOAM:
 	ld hl, vChars1 + $7e0
 	lb bc, BANK(Overworld_GFX), $02
 	call CopyVideoData
-	jr WriteCutOrBoulderDustAnimationOAMBlock
+	ld d, 4		;specify OB pal
+	callba WriteCutOrBoulderDustAnimationOAMBlock
+	ret
 .grass
 	ld hl, vChars1 + $7c0
 	call LoadCutGrassAnimationTilePattern
@@ -137,10 +158,16 @@ InitCutAnimOAM:
 	call LoadCutGrassAnimationTilePattern
 	ld hl, vChars1 + $7f0
 	call LoadCutGrassAnimationTilePattern
-	call WriteCutOrBoulderDustAnimationOAMBlock
+	ld d, 4		;specify OB pal
+	callba WriteCutOrBoulderDustAnimationOAMBlock
 	ld hl, wOAMBuffer + $93
 	ld de, 4
-	ld a, $30
+
+;	ld a, $30	;gbcnote - This is a bug. It overrides CutOrBoulderDustAnimationTilesAndAttributes and defaults to pal 0	
+	ld a, [hl]
+	and $0F
+	or $30
+	
 	ld c, e
 .loop
 	ld [hl], a
@@ -155,62 +182,63 @@ LoadCutGrassAnimationTilePattern:
 	lb bc, BANK(AnimationTileset2), $01
 	jp CopyVideoData
 
-WriteCutOrBoulderDustAnimationOAMBlock:
-	call GetCutOrBoulderDustAnimationOffsets
-	ld a, $9
-	ld de, CutOrBoulderDustAnimationTilesAndAttributes
-	jp WriteOAMBlock
+;gbcnote -  moved elsewhere and improved
+; WriteCutOrBoulderDustAnimationOAMBlock:
+	; call GetCutOrBoulderDustAnimationOffsets
+	; ld a, $9
+	; ld de, CutOrBoulderDustAnimationTilesAndAttributes
+	; jp WriteOAMBlock
 
-CutOrBoulderDustAnimationTilesAndAttributes:
-;gbcnote - updated attributes for GBC
-	db $FC,$14,$FD,$14
-	db $FE,$14,$FF,$14
+; CutOrBoulderDustAnimationTilesAndAttributes:
+; ;gbcnote - updated attributes for GBC
+	; db $FC,$14,$FD,$14
+	; db $FE,$14,$FF,$14
 
-GetCutOrBoulderDustAnimationOffsets:
-	ld hl, wSpriteStateData1 + 4
-	ld a, [hli] ; player's sprite screen Y position
-	ld b, a
-	inc hl
-	ld a, [hli] ; player's sprite screen X position
-	ld c, a ; bc holds ypos/xpos of player's sprite
-	inc hl
-	inc hl
-	ld a, [hl] ; a holds direction of player (00: down, 04: up, 08: left, 0C: right)
-	srl a
-	ld e, a
-	ld d, $0 ; de holds direction (00: down, 02: up, 04: left, 06: right)
-	ld a, [wWhichAnimationOffsets]
-	and a
-	ld hl, CutAnimationOffsets
-	jr z, .next
-	ld hl, BoulderDustAnimationOffsets
-.next
-	add hl, de
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	ld a, b
-	add d
-	ld b, a
-	ld a, c
-	add e
-	ld c, a
-	ret
+; GetCutOrBoulderDustAnimationOffsets:
+	; ld hl, wSpriteStateData1 + 4
+	; ld a, [hli] ; player's sprite screen Y position
+	; ld b, a
+	; inc hl
+	; ld a, [hli] ; player's sprite screen X position
+	; ld c, a ; bc holds ypos/xpos of player's sprite
+	; inc hl
+	; inc hl
+	; ld a, [hl] ; a holds direction of player (00: down, 04: up, 08: left, 0C: right)
+	; srl a
+	; ld e, a
+	; ld d, $0 ; de holds direction (00: down, 02: up, 04: left, 06: right)
+	; ld a, [wWhichAnimationOffsets]
+	; and a
+	; ld hl, CutAnimationOffsets
+	; jr z, .next
+	; ld hl, BoulderDustAnimationOffsets
+; .next
+	; add hl, de
+	; ld e, [hl]
+	; inc hl
+	; ld d, [hl]
+	; ld a, b
+	; add d
+	; ld b, a
+	; ld a, c
+	; add e
+	; ld c, a
+	; ret
 
-CutAnimationOffsets:
-; Each pair represents the x and y pixels offsets from the player of where the cut tree animation should be drawn
-	db  8, 36 ; player is facing down
-	db  8,  4 ; player is facing up
-	db -8, 20 ; player is facing left
-	db 24, 20 ; player is facing right
+; CutAnimationOffsets:
+; ; Each pair represents the x and y pixels offsets from the player of where the cut tree animation should be drawn
+	; db  8, 36 ; player is facing down
+	; db  8,  4 ; player is facing up
+	; db -8, 20 ; player is facing left
+	; db 24, 20 ; player is facing right
 
-BoulderDustAnimationOffsets:
-; Each pair represents the x and y pixels offsets from the player of where the cut tree animation should be drawn
-; These offsets represent 2 blocks away from the player
-	db  8,  52 ; player is facing down
-	db  8, -12 ; player is facing up
-	db -24, 20 ; player is facing left
-	db 40,  20 ; player is facing right
+; BoulderDustAnimationOffsets:
+; ; Each pair represents the x and y pixels offsets from the player of where the cut tree animation should be drawn
+; ; These offsets represent 2 blocks away from the player
+	; db  8,  52 ; player is facing down
+	; db  8, -12 ; player is facing up
+	; db -24, 20 ; player is facing left
+	; db 40,  20 ; player is facing right
 
 ReplaceTreeTileBlock:
 ; Determine the address of the tile block that contains the tile in front of the

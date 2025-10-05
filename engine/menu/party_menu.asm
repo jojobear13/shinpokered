@@ -252,7 +252,11 @@ PartyMenuMessagePointers:
 	dw PartyMenuUseTMText
 	dw PartyMenuSwapMonText
 	dw PartyMenuItemUseText
-
+	dw PartyMenuBlankText	;joenote - it'd be helpful to be able to print a blank message
+	
+PartyMenuBlankText:
+	db "@"
+	
 PartyMenuNormalText:
 	TX_FAR _PartyMenuNormalText
 	db "@"

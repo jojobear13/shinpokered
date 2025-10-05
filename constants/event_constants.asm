@@ -27,8 +27,8 @@ const_value = 0
 	const EVENT_GOT_TOWN_MAP                         ; 018, (D74A, bit 0)
 	const EVENT_ENTERED_BLUES_HOUSE                  ; 019, (D74A, bit 1)
 	const EVENT_DAISY_WALKING                        ; 01A, (D74A, bit 2)
-	const EVENT_01B  ;beat 1st route 22 rival solo   ; 01B, (D74A, bit 3)	;joenote
-	const EVENT_01C  ;...on HARD MODE 				 ; 01C, (D74A, bit 4)
+	const EVENT_01B  ;clear = made at least 1 catch  ; 01B, (D74A, bit 3)	;joenote
+	const EVENT_01C  								 ; 01C, (D74A, bit 4)	;1st route 22 rival beaten on hard mode
 	const EVENT_01D                                  ; 01D, (D74A, bit 5)
 	const EVENT_01E                                  ; 01E, (D74A, bit 6)
 	const EVENT_01F                                  ; 01F, (D74A, bit 7)
@@ -2262,7 +2262,11 @@ const_value = 0
 	const EVENT_8D3                                  ; 8D3, (D861, bit 3)
 	const EVENT_8D4                                  ; 8D4, (D861, bit 4)
 	const EVENT_8D5                                  ; 8D5, (D861, bit 5)
+IF DEF(_FPLAYER)
+	const EVENT_LINKED_FPLAYER                       ; 8D6, (D861, bit 6)	;if set, the link cable partner is female trainer
+ELSE
 	const EVENT_8D6                                  ; 8D6, (D861, bit 6)
+ENDC
 	const EVENT_8D7                                  ; 8D7, (D861, bit 7)
 	const EVENT_8D8                                  ; 8D8, (D862, bit 0)
 	const EVENT_8D9                                  ; 8D9, (D862, bit 1)
@@ -2558,5 +2562,5 @@ const_value = 0
 	const EVENT_9FB                                  ; 9FB, (D886, bit 3)
 	const EVENT_9FC                                  ; 9FC, (D886, bit 4)
 	const EVENT_9FD                                  ; 9FD, (D886, bit 5)
-	const EVENT_9FE                                  ; 9FE, (D886, bit 6)
-	const EVENT_9FF                                  ; 9FF, (D886, bit 7)
+	const EVENT_9FE                                  ; 9FE, (D886, bit 6);joenote - reserved for gamma shader
+	const EVENT_9FF                                  ; 9FF, (D886, bit 7);joenote - reserved to indicate there is a saved game

@@ -248,6 +248,7 @@ INCLUDE "engine/battle/wild_encounters.asm"
 INCLUDE "engine/battle/moveEffects/recoil_effect.asm"
 INCLUDE "engine/battle/moveEffects/conversion_effect.asm"
 INCLUDE "engine/battle/moveEffects/haze_effect.asm"
+INCLUDE "engine/battle/moveEffects/substitute_effect.asm"	;joenote - moved this here to make room elsewhere
 INCLUDE "engine/battle/get_trainer_name.asm"
 INCLUDE "engine/random.asm"
 
@@ -307,7 +308,7 @@ INCLUDE "engine/load_pokedex_tiles.asm"
 INCLUDE "engine/overworld/map_sprites.asm"
 INCLUDE "engine/overworld/emotion_bubbles.asm"
 INCLUDE "engine/evolve_trade.asm"
-INCLUDE "engine/battle/moveEffects/substitute_effect.asm"
+;INCLUDE "engine/battle/moveEffects/substitute_effect.asm"	;joenote - moved this to rom bank 4 to make room
 INCLUDE "engine/menu/pc.asm"
 
 
@@ -1927,6 +1928,8 @@ INCLUDE "engine/in_game_trades.asm"	;joenote - moved here to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
 INCLUDE "custom_functions/func_extra_menu.asm"
+INCLUDE "custom_functions/func_soundtest.asm"
+INCLUDE "custom_functions/func_emuchecks.asm"
 
 SECTION "Pics 1", ROMX, BANK[PICS_1]
 INCLUDE "constants/pic_banks/pic1.asm"
@@ -1959,3 +1962,16 @@ ENDC
 
 INCLUDE "text/tmhm_names.asm"	;joenote - adding name list for tm and hm items
 tmhmNamesEnd:
+
+SECTION "bank32",ROMX,BANK[$32]	
+INCLUDE "custom_functions/func_enhancedcolor.asm"
+INCLUDE "engine/overworld/cut3.asm"
+
+;adding GB_PRINTER
+INCLUDE "engine/printer/serial.asm"
+INCLUDE "engine/printer/printer.asm"
+INCLUDE "engine/printer/printer2.asm"
+INCLUDE "engine/printer/printer_pc_menu.asm"
+INCLUDE "engine/printer/diploma_page2.asm"
+DiplomaPikachuGraphics:  INCBIN "gfx/printer/diploma_pikachu.2bpp"
+DiplomaPikachuGraphicsEnd:

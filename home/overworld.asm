@@ -7,8 +7,11 @@ EnterMap::
 ; Load a new map.
 	ld a, $ff
 	ld [wJoyIgnore], a
-	call LoadMapData
+;	call LoadMapData
+;	callba ClearVariablesOnEnterMap
+;GBCNote - flipping these so the enhanced gbc colors load from main menu
 	callba ClearVariablesOnEnterMap
+	call LoadMapData
 	ld hl, wd72c
 	bit 0, [hl] ; has the player already made 3 steps since the last battle?
 	jr z, .skipGivingThreeStepsOfNoRandomBattles
@@ -101,6 +104,12 @@ OverworldLoopLessDelay::
 	ld a, [wd730]
 	bit 2, a	;check if input is being ignored
 	jp nz, .noDirectionButtonsPressed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - check if trainer is wanting to battle
+	ld a, [wFlags_D733]
+	bit 3, a
+	jp nz, .noDirectionButtonsPressed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call IsPlayerCharacterBeingControlledByGame
 	jr nz, .checkForOpponent
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -657,11 +666,21 @@ MapEntryAfterBattle::
 	ld a, [wMapPalOffset]
 	and a
 	jp z, GBFadeInFromWhite
-	jp LoadGBPal
-
+	
+	;jp LoadGBPal
+	
+;GBCnote - gives a cleaner palette transition from the white screen
+	call DisableLCD
+	call LoadGBPal
+	jp EnableLCD
+	
 HandleBlackOut::
 ; For when all the player's pokemon faint.
 ; Does not print the "blacked out" message.
+
+	;pre-emptively reset to the overworld palette to prefent jank with enhanced GBC colors
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand
 
 	call GBFadeOutToBlack
 	ld a, $08
@@ -1279,6 +1298,7 @@ TilePairCollisionsWater::
 	db $FF
 
 ; this builds a tile map from the tile block map based on the current X/Y coordinates of the player's character
+; clobbers BC, HL, and DE
 LoadCurrentMapView::
 	ld a, [H_LOADEDROMBANK]
 	push af
@@ -1331,6 +1351,7 @@ LoadCurrentMapView::
 .noCarry2
 	dec b
 	jr nz, .rowLoop
+	
 	ld hl, wTileMapBackup
 	ld bc, $0000
 .adjustForYCoordWithinTileBlock
@@ -1345,28 +1366,72 @@ LoadCurrentMapView::
 	jr z, .copyToVisibleAreaBuffer
 	ld bc, $0002
 	add hl, bc
+
+;joenote - doing optimization for speed
+;saves 6 scanlines of time in GBC double speed mode
 .copyToVisibleAreaBuffer
-	coord de, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
+	ld d, h
+	ld e, l
+	di
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	ld h, d
+	ld l, e
+	ld sp, hl	
+	coord hl, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
 	ld b, SCREEN_HEIGHT
 .rowLoop2
-	ld c, SCREEN_WIDTH
+	ld c, SCREEN_WIDTH / 2
 .rowInnerLoop2
-	ld a, [hli]
-	ld [de], a
-	inc de
+	pop de
+	ld a, e
+	ld [hli], a
+	ld a, d
+	ld [hli], a
 	dec c
 	jr nz, .rowInnerLoop2
-	ld a, $04
-	add l
-	ld l, a
-	jr nc, .noCarry3
-	inc h
-.noCarry3
+	pop de
+	pop de
 	dec b
 	jr nz, .rowLoop2
+;restore the stack pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ei
+	
+;.copyToVisibleAreaBuffer
+;	coord de, 0, 0 ; base address for the tiles that are directly transferred to VRAM during V-blank
+;	ld b, SCREEN_HEIGHT
+;.rowLoop2
+;	ld c, SCREEN_WIDTH
+;.rowInnerLoop2
+;	ld a, [hli]
+;	ld [de], a
+;	inc de
+;	dec c
+;	jr nz, .rowInnerLoop2
+;	ld a, $04
+;	add l
+;	ld l, a
+;	jr nc, .noCarry3
+;	inc h
+;.noCarry3
+;	dec b
+;	jr nz, .rowLoop2
+
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a ; restore previous ROM bank
+	
+;GBCnote - use the new Tile Map to make BGMap Attributes for enhanced GBC color
+;	--> build the whole thing if the player is not advancing movement
+	callba MakeOverworldBGMapAttributes	
 	ret
 
 AdvancePlayerSprite::
@@ -1515,7 +1580,13 @@ AdvancePlayerSprite::
 	ld a, [wCurMapWidth]
 	call MoveTileBlockMapPointerNorth
 .updateMapView
+	;GBCnote - use a flag to indicate that LoadCurrentMapView is being called during player movement
+	ld hl, hFlags_0xFFF6
+	set 3, [hl]
 	call LoadCurrentMapView
+	ld hl, hFlags_0xFFF6
+	res 3, [hl]
+
 	ld a, [wSpriteStateData1 + 3] ; delta Y
 	cp $01
 	jr nz, .checkIfMovingNorth2
@@ -1728,8 +1799,20 @@ ScheduleWestColumnRedraw::
 
 ; function to write the tiles that make up a tile block to memory
 ; Input: c = tile block ID, hl = destination address
+;joenote - doing optimization for speed
+;saves 5 scanlines of time in GBC double speed mode overall when called in LoadCurrentMapView's loops
 DrawTileBlock::
-	push hl
+	ld d, h
+	ld e, l
+
+;back up the stack pointer
+	di
+	ld hl, sp + 0
+	ld a, h
+	ld [H_SPTEMP], a
+	ld a, l
+	ld [H_SPTEMP + 1], a ; save stack pinter
+	
 	ld a, [wTilesetBlocksPtr] ; pointer to tiles
 	ld l, a
 	ld a, [wTilesetBlocksPtr + 1]
@@ -1743,30 +1826,79 @@ DrawTileBlock::
 	and $0f
 	ld b, a ; bc = tile block ID * 0x10
 	add hl, bc
-	ld d, h
-	ld e, l ; de = address of the tile block's tiles
-	pop hl
+	ld sp, hl
+	; sp = address of the tile block's tiles
+	
+	ld h, d
+	ld l, e		;hl = destination address
+
 	ld c, $04 ; 4 loop iterations
 .loop ; each loop iteration, write 4 tile numbers
-	push bc
-	ld a, [de]
+	pop de
+	ld a, e
 	ld [hli], a
-	inc de
-	ld a, [de]
+	ld a, d
 	ld [hli], a
-	inc de
-	ld a, [de]
+	pop de
+	ld a, e
 	ld [hli], a
-	inc de
-	ld a, [de]
+	ld a, d
 	ld [hl], a
-	inc de
-	ld bc, $0015
-	add hl, bc
-	pop bc
+
+	ld de, $0015
+	add hl, de
 	dec c
 	jr nz, .loop
+	
+;restore the stack pointer
+	ld a, [H_SPTEMP]
+	ld h, a
+	ld a, [H_SPTEMP + 1]
+	ld l, a
+	ld sp, hl
+	ei
+	
 	ret
+
+; DrawTileBlock::
+	; push hl
+	; ld a, [wTilesetBlocksPtr] ; pointer to tiles
+	; ld l, a
+	; ld a, [wTilesetBlocksPtr + 1]
+	; ld h, a
+	; ld a, c
+	; swap a
+	; ld b, a
+	; and $f0
+	; ld c, a
+	; ld a, b
+	; and $0f
+	; ld b, a ; bc = tile block ID * 0x10
+	; add hl, bc
+	; ld d, h
+	; ld e, l ; de = address of the tile block's tiles
+	; pop hl
+	; ld c, $04 ; 4 loop iterations
+; .loop ; each loop iteration, write 4 tile numbers
+	; push bc
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hli], a
+	; inc de
+	; ld a, [de]
+	; ld [hl], a
+	; inc de
+	; ld bc, $0015
+	; add hl, bc
+	; pop bc
+	; dec c
+	; jr nz, .loop
+	; ret
 
 ; function to update joypad state and simulate button presses
 JoypadOverworld::
@@ -2281,7 +2413,7 @@ LoadMapData::
 ;joenote - No need to disable/enable lcd. Pick a spare bit to use as a flag instead.
 ;	call DisableLCD
 	ld hl, hFlagsFFFA
-	set 3, [hl]
+	set 3, [hl]	;When set, the CopyData function will only copy when safe to do so for VRAM
 
 	callba InitMapSprites ; load tile pattern data for sprites
 	call LoadTileBlockMap
@@ -2330,6 +2462,9 @@ LoadMapData::
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
+	
+;	callba TransferGBCEnhancedBGMapAttributes	;GBCnote - transfer BGMap Attributes for enhanced GBC color
+;commenting out because this is already done during the above call of RunPaletteCommand
 	ret
 
 ; function to switch to the ROM bank that a map is stored in
@@ -2400,3 +2535,14 @@ PlayThudAndLoop:
 	call PlaySound ; play collision sound (if it's not already playing)
 .jump
 	jp OverworldLoop
+
+;adding GB_PRINTER
+ReloadMapAfterPrinter::
+	ld a, [H_LOADEDROMBANK]
+	push af
+	ld a, [wCurMap]
+	call SwitchToMapRomBank
+	call LoadTileBlockMap
+	pop af
+	call BankswitchCommon
+	ret

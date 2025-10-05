@@ -9,6 +9,13 @@ CableClub_DoBattleOrTrade:
 	call LoadFontTilePatterns
 	call LoadHpBarAndStatusTilePatterns
 	call LoadTrainerInfoTextBoxTiles
+
+	ld hl, hFlags_0xFFF6
+	set 4, [hl]		;gbcnote - mark bit to signal cable club menus
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand ;gbcnote - refresh pal
+
+
 	coord hl, 3, 8
 	ld b, 2
 	ld c, 12
@@ -278,7 +285,7 @@ CableClub_DoBattleOrTradeAgain:
 	ld [wCurOpponent], a
 	call ClearScreen
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand ;gbcnote - refresh pal
 	ld hl, wOptions
 	res BIT_BATTLE_ANIMATION, [hl]
@@ -311,7 +318,7 @@ CallCurrentTradeCenterFunction:
 TradeCenter_SelectMon:
 	call ClearScreen
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call LoadTrainerInfoTextBoxTiles
 	call TradeCenter_DrawPartyLists
@@ -597,6 +604,13 @@ ReturnToCableClubRoom:
 	pop hl
 	pop af
 	ld [hl], a
+
+	ld hl, hFlags_0xFFF6
+	res 4, [hl]		;gbcnote - mark bit to signal cable club menus
+	ld b, SET_PAL_OVERWORLD
+	call RunPaletteCommand ;gbcnote - refresh pal
+	call Delay3
+
 	call GBFadeInFromWhite
 	ret
 
@@ -630,7 +644,7 @@ TradeCenter_DisplayStats:
 	predef StatusScreen
 	predef StatusScreen2
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call GBPalNormal
 	call LoadTrainerInfoTextBoxTiles
@@ -834,9 +848,23 @@ TradeCenter_Trade:
 	ld [wTradedEnemyMonSpecies], a
 	ld a, 10
 	ld [wAudioFadeOutControl], a
-	ld a, $2
+
+;	ld a, $2
+;	ld [wAudioSavedROMBank], a
+;	ld a, MUSIC_SAFARI_ZONE
+
+	ld a, BANK(Music_UnusedSong)
 	ld [wAudioSavedROMBank], a
-	ld a, MUSIC_SAFARI_ZONE
+	ld a, [hSerialConnectionStatus]
+	cp USING_INTERNAL_CLOCK
+	jr z, .playL
+.playR
+	ld a, MUSIC_UNUSED_SONG_R
+	jr .donePlay
+.playL
+	ld a, MUSIC_UNUSED_SONG_L
+.donePlay
+	
 	ld [wNewSoundID], a
 	call PlaySound
 	ld c, 100
@@ -857,7 +885,7 @@ TradeCenter_Trade:
 	call ClearScreen
 	call LoadTrainerInfoTextBoxTiles
 	call Delay3
-	ld b, $9
+	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand	;gbcnote - refresh pal
 	call Serial_PrintWaitingTextAndSyncAndExchangeNybble
 	ld c, 40
@@ -939,6 +967,12 @@ EmptyFunc3:
 
 Diploma_TextBoxBorder:
 	call GetPredefRegisters
+	
+	;adding GB_PRINTER
+	ld a, [wPrinterSettings]
+	bit 7, a
+	jp nz, PrintDiploma_TextBoxBorder
+	
 	jr CableClub_TextBoxBorder.next	;joenote - fixes a wrong tiles with the diploma border due to cable club map check
 
 ; b = height
@@ -1025,3 +1059,73 @@ LoadTrainerInfoTextBoxTiles:
 	ld hl, vChars2 + $760
 	lb bc, BANK(TrainerInfoTextBoxTileGraphics), (TrainerInfoTextBoxTileGraphicsEnd - TrainerInfoTextBoxTileGraphics) / $10
 	jp CopyVideoData
+
+	
+;adding GB_PRINTER
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PrintDiploma_DrawHorizontalLine:	;alternates between the value of A and A+1
+	ld d, c
+.loop
+	ld [hli], a
+	inc a
+	dec d
+	ld [hli], a
+	dec a
+	dec d
+	jr nz, .loop
+	ret
+
+PrintDiploma_DrawVerticalBorders:	;B must be an even number
+	push hl
+	push bc
+	ld de, 20
+	add hl, de
+.loop
+	push hl
+	ld a, $04 ; border left vertical line tile
+	ld [hli], a
+	ld a, " "
+	call CableClub_DrawHorizontalLine
+	ld [hl], $04 ; border right vertical line tile
+	pop hl
+	ld de, 40
+	add hl, de
+	dec b
+	dec b
+	jr nz, .loop
+	pop bc
+	pop hl
+.loop2
+	push hl
+	ld a, $03 ; border left vertical line tile
+	ld [hli], a
+	ld a, " "
+	call CableClub_DrawHorizontalLine
+	ld [hl], $03 ; border right vertical line tile
+	pop hl
+	ld de, 40
+	add hl, de
+	dec b
+	dec b
+	jr nz, .loop2
+	ret
+	
+PrintDiploma_TextBoxBorder:	;prints the page-1 border for yellow version's diploma
+	push hl
+	ld a, $00 ; border upper left corner tile
+	ld [hli], a
+	inc a ; border top horizontal line tile
+	call PrintDiploma_DrawHorizontalLine
+	ld a, $00 ; border upper right corner tile
+	ld [hl], a
+	pop hl
+	ld de, 20
+	add hl, de
+	call PrintDiploma_DrawVerticalBorders
+	ld a, $03 ; border lower left corner tile
+	ld [hli], a
+	ld a, " " ; border bottom horizontal line tile
+	call CableClub_DrawHorizontalLine
+	ld [hl], $03 ; border lower right corner tile
+	ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

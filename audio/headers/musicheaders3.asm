@@ -1,3 +1,4 @@
+Music_Audio3Start::
 Music_TitleScreen::
 	audio Music_TitleScreen, Ch0, Ch1, Ch2, Ch3
 
@@ -54,3 +55,4 @@ Music_MeetFemaleTrainer::
 
 Music_MeetMaleTrainer::
 	audio Music_MeetMaleTrainer, Ch0, Ch1, Ch2
+Music_Audio3End::

@@ -11,6 +11,11 @@ MtMoon3Script:
 	ld hl, CoordsData_49d37
 	call ArePlayerCoordsInArray
 	jr nc, .asm_49d31
+
+	ld hl, wd732
+	bit 3, [hl]
+	jr nz, .asm_49d31	;joenote - this is fixes a bug.
+						;If a fly warp his happening (dig, teleport, escape rope, etc) clear the no-battle bit.
 	CheckEitherEventSet EVENT_GOT_DOME_FOSSIL, EVENT_GOT_HELIX_FOSSIL
 	jr nz, .asm_49d31	;let's keep encounters on once the big moment is over
 	ld hl, wd72e

@@ -21,7 +21,7 @@ OneHitKOEffect_:
 	bit USING_X_ACCURACY, a
 	jr nz, .userCanHit
 .compareSpeed
-; set damage to 65535 and OHKO flag if the user's current speed is higher than the target's
+;check if the user's current speed is higher than the target's
 	ld a, [de]
 	dec de
 	ld b, a
@@ -33,7 +33,7 @@ OneHitKOEffect_:
 	sbc b
 	jr c, .userIsSlower
 .userCanHit
-	;user is allowed to hit with the move, so load 65535 damage
+	;user is allowed to hit with the move, so load 65535 damage and set the OHKO flag
 	ld hl, wDamage
 	ld a, $ff
 	ld [hli], a
@@ -42,7 +42,7 @@ OneHitKOEffect_:
 	ld [wCriticalHitOrOHKO], a
 	ret
 .userIsSlower
-; keep damage at 0 and set move missed flag if target's current speed is higher instead
+; user is slower than target, so keep damage at 0 and set move missed flag
 	ld a, $1
 	ld [wMoveMissed], a
 	ret
