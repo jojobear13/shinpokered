@@ -4383,8 +4383,6 @@
 07:4fdd OaksLabScript17
 07:5008 OaksLabScript18
 07:5009 OaksLabScript_RemoveParcel
-07:500f OaksLabScript_RemoveParcel.loop
-07:501b OaksLabScript_RemoveParcel.foundParcel
 07:502a OaksLabScript_1d02b
 07:5044 OaksLabScript_1d02b.asm_1d045
 07:5053 OaksLabScript_1d02b.asm_1d054
