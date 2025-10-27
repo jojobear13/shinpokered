@@ -678,24 +678,52 @@ OaksLabScript19:	;joenote - adding this function to set a flag if you beat the s
 
 
 OaksLabScript_RemoveParcel:
-	ld hl, wBagItems
-	ld bc, $0000
-.loop
-	ld a, [hli]
-	cp $ff
-	ret z
-	cp OAKS_PARCEL
-	jr z, .foundParcel
-	inc hl
-	inc c
-	jr .loop
-.foundParcel
-	ld hl, wNumBagItems
-	ld a, c
-	ld [wWhichPokemon], a
-	ld a, $1
-	ld [wItemQuantity], a
-	jp RemoveItemFromInventory
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - This function is completely decprecated by the following
+	ld a, OAKS_PARCEL
+	ld [hItemToRemoveID], a
+	callba RemoveItemByID
+	ret
+;blank space in order to keep function addresses unchanged
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	; ld hl, wBagItems
+	; ld bc, $0000
+; .loop
+	; ld a, [hli]
+	; cp $ff
+	; ret z
+	; cp OAKS_PARCEL
+	; jr z, .foundParcel
+	; inc hl
+	; inc c
+	; jr .loop
+; .foundParcel
+	; ld hl, wNumBagItems
+	; ld a, c
+	; ld [wWhichPokemon], a
+	; ld a, $1
+	; ld [wItemQuantity], a
+	; jp RemoveItemFromInventory
 
 OaksLabScript_1d02b:
 	ld a, $7c
