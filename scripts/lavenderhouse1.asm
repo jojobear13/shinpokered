@@ -248,5 +248,5 @@ CheckAmnesiaPsyduck:
 .Text1
 	text "PSYDUCK looks at"
 	line "you awkwardly."
-	done
+	prompt
 	db "@"

@@ -143,7 +143,6 @@ FuchsiaCityText24:
 	call PrintText
 	jr .asm_4343f
 .asm_3b4e8
-	call FossilTutor
 	ld hl, FuchsiaCityOmanyteText
 	call PrintText
 	ld a, OMANYTE
@@ -155,6 +154,7 @@ FuchsiaCityText24:
 .asm_81556
 	call DisplayPokedex
 .asm_4343f
+	call FossilTutor
 	jp TextScriptEnd
 
 FuchsiaCityOmanyteText:
@@ -195,6 +195,9 @@ FossilTutor:
 	call GetMoveName
 	call CopyStringToCF4B ; copy name to wcf4b
 
+	ld hl, .Text1
+	call PrintText
+
 	ld a, [wd11e]
 	push af
 	ld a, [wPartyMon1Species]
@@ -204,7 +207,7 @@ FossilTutor:
 	ld [wd11e], a
 	
 	callba CheckIfMoveIsKnown
-	jr c, .finish
+	ret c
 
 	ld hl, wFlags_D733
 	set 6, [hl]
@@ -212,17 +215,15 @@ FossilTutor:
 	predef LearnMove
 	pop hl
 	res 6, [hl]
-	ld a, b
-	and a
-	ret z	
-.finish
-	ld hl, .Text1
-	call PrintText
 	ret
+	nop	;padding to maintain function addresses
+	nop
+	nop
+	nop
 .Text1
 	text "Your #MON acts"
 	line "like it recalled"
 	cont "a memory from the"
 	cont "distant past."
-	done
+	prompt
 	db "@"
