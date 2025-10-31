@@ -372,6 +372,8 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
+dev update 10/31
+- Fixed fossil mon secret move tutor not activating of helix fossil chosen and also fixed some text issues
 dev update 10/26
 - Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
 
