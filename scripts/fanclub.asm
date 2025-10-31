@@ -196,7 +196,7 @@ PikachuTutor:
 .Text1
 	text "PIKACHU zooms"
 	line "around happily."
-	done
+	prompt
 	db "@"
 .learnmove
 	ld [wMoveNum], a

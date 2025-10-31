@@ -102,5 +102,5 @@ CheckFearowTutor:
 .Text1
 	text "FEAROW darts"
 	line "about excitedly."
-	done
+	prompt
 	db "@"
