@@ -536,7 +536,7 @@ _OaksLabText_scalingON::
 	text "Need a challenge?"
 	line "I can nullify the"
 	cont "badge limit for"
-	cont "traded pokemon"
+	cont "traded #MON"
 	cont "obedience. Then"
 	cont "I can make it so"
 	cont "weaker trainers"
