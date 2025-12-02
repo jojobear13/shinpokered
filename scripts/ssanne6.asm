@@ -6,8 +6,12 @@ SSAnne6Script:
 	jr z, .mainreturn
 	ld a, [wIsInBattle]
 	cp $ff	;don't continue the tournament if you lost
-	call nz, ContinueTournament
+	jr z, .endReturn
+	call ContinueTournament
 .mainreturn
+	ret
+.endReturn
+	ResetEvent EVENT_90D
 	ret
 
 SSAnne6TextPointers:
