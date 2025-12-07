@@ -5,7 +5,7 @@ DungeonMonsB1:;joenote - added mew
 	db 55,ELECTRODE
 IF DEF(_ENCRED)
 	db 64,ARBOK
-ELIF DEF(_ENCBLUEGREEN)
+ELSE
 	db 64,SANDSLASH
 ENDC
 	db 64,PARASECT
