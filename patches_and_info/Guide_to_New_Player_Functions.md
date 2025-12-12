@@ -1338,7 +1338,7 @@ This is a throwback feature for certain Japan-only event pokemon giveaways.
 - Talk to him with Fearow or Rapidash at the top of your party, and he will offer to teach it Pay Day for 1000 yen.
 - Talk to him with Pikachu at the top of your party that has an empty move slot, and he can teach it Fly for 2000 yen.
 
-### Cheat-Move Tutors  
+#### Cheat-Move Tutors  
 These are tutors, just for fun, that teach unavailable moves to certain pokemon.  
 Make sure the pokemon is in the top party spot in order to trigger.  
 - Lickitung can learn Lick via the move-relearner in Saffron City.
