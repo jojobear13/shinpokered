@@ -372,10 +372,16 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
-dev update 10/31
+dev update 12/06/2025
+- Fixed a missingno glitch encounter when surfing in cerulean cave bottom floor (affects master blue_jp patches only)
+
+dev update 12/02/2025
+- Fixed the ss anne tournament flag not clearing when blacking out
+
+dev update 10/31/2025
 - Fixed fossil mon secret move tutor not activating of helix fossil chosen and also fixed some text issues
 
-dev update 10/26
+dev update 10/26/2025
 - Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
 
 v1.25.0
@@ -1661,6 +1667,10 @@ Reproduction and FPGA hardware (such as the Modretro Chromatic, FPGBC, and Analo
 
 These messages are informative in nature and do not impede play. That said, it is encouraged to switch to a more accurate emulator to avoid things like graphical glitches and other weirdness. See "Compatibility Notes" for more info.
 
+> **What are some other patch projects with similar goals as Shin Pokemon?**
+
+Shin Pokemon is not like most "enhancement" projects in the Pokemon fan community. It can best be compared to other fix-it patches made by fans such as Final Fantasy VI: Revised Old Style Edition or Chrono Trigger: Bugfix and Uncensoring Patch. If you enjoy Shin Pokemon and want a similar experience for Gen 2, then the team recommends a patch called Pokemon Perfect Crystal (2020 Update).
+
 > **How hard is Shin Pokemon in terms of difficulty?**
 
 It is variable. The default difficulty of Shin Pokemon is only slightly harder than the unpatched retail experience, and this is largely due to improvements in the trainer AI logic. The optional hard mode increases the challenge by giving trainer opponents proper stats so that they keep up with players' teams. The Master branch of the project also makes slight adjustments to trainer rosters and moves for variety and challenge, and it adds additional options like level-scaling and battle clauses. Shin Pokemon can provide a laid-back vanilla difficulty that surprises you once in a while, or it can be turned into a crushing uphill battle.  
@@ -1774,20 +1784,20 @@ Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.
 The Shin Pokemon project is an educational endeavor. 
 Its source code has been made fully viewable in edification of learning assembly programming, forensically documenting bugs in the original Red and Blue games, and showcasing solutions for fixing them. 
 Members of the Shin Pokemon team make no claim of ownership over assets and code that did not originate internally. 
-Its members also encourage people to utilize the project project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
+Its members also encourage people to utilize the project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
 
 The Shin Pokemon Project is open-source only in the colloquial sense, not in legal meaning, and has no open-source license. 
 There are specific works of original, self-contained, non-derivative programming code libraries within the Shin Pokemon project over which its members jointly hold all applicable intellectual property rights. 
 These works include, but are not limited to, the code library that implements the built-in gamma shader and the code library that implements enhanced colorization of background layer tiles. 
 All rights are reserved.
 
-The Shin Pokemon team does not believe in granting formal permissions or licences for its original code libraries.
+The Shin Pokemon team does not believe in granting formal permissions or licenses for its original code libraries.
 Instead, it expects that people adhere to a few simple historical guidelines common in the fan community.
-Don't be uncool by:
-- Plagiarizing code, because nobody likes a liar
-- Not giving proper credit or giving ambiguous/low-information credit
-- Copying original code and putting it into a closed-source project
-- Selling original code in any form for money, barter, favors, or putting it behind a paywall
+The guidelines are as follows, so don't be uncool by:
+1. Plagiarizing code, because nobody likes a liar
+2. Not giving proper credit or giving ambiguous/low-information credit
+3. Copying original code and putting it into a closed-source project
+4. Selling original code in any form for money, barter, favors, or putting it behind a paywall
 
 The team is not interested in playing Internet Police. 
 This is all done for free as a hobby and for stress-relief.
