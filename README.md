@@ -1784,20 +1784,20 @@ Pokémon, Pokémon character names, and Game Boy are trademarks of Nintendo.
 The Shin Pokemon project is an educational endeavor. 
 Its source code has been made fully viewable in edification of learning assembly programming, forensically documenting bugs in the original Red and Blue games, and showcasing solutions for fixing them. 
 Members of the Shin Pokemon team make no claim of ownership over assets and code that did not originate internally. 
-Its members also encourage people to utilize the project project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
+Its members also encourage people to utilize the project to grow their own programming skills, make further technical advancements, and to enrich the community patch subculture.
 
 The Shin Pokemon Project is open-source only in the colloquial sense, not in legal meaning, and has no open-source license. 
 There are specific works of original, self-contained, non-derivative programming code libraries within the Shin Pokemon project over which its members jointly hold all applicable intellectual property rights. 
 These works include, but are not limited to, the code library that implements the built-in gamma shader and the code library that implements enhanced colorization of background layer tiles. 
 All rights are reserved.
 
-The Shin Pokemon team does not believe in granting formal permissions or licences for its original code libraries.
+The Shin Pokemon team does not believe in granting formal permissions or licenses for its original code libraries.
 Instead, it expects that people adhere to a few simple historical guidelines common in the fan community.
-Don't be uncool by:
-- Plagiarizing code, because nobody likes a liar
-- Not giving proper credit or giving ambiguous/low-information credit
-- Copying original code and putting it into a closed-source project
-- Selling original code in any form for money, barter, favors, or putting it behind a paywall
+The guidelines are as follows, so don't be uncool by:
+1. Plagiarizing code, because nobody likes a liar
+2. Not giving proper credit or giving ambiguous/low-information credit
+3. Copying original code and putting it into a closed-source project
+4. Selling original code in any form for money, barter, favors, or putting it behind a paywall
 
 The team is not interested in playing Internet Police. 
 This is all done for free as a hobby and for stress-relief.
