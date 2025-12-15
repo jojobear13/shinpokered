@@ -52,23 +52,27 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
   - Delta emulator for those on iOS devices
   - The Gambatte or mGBA cores for Retroarch should be good for Android devices
 - Compatible with original Gameboy hardware (DMG, Super, Pocket, Color, Advance, SP)
+- New builds are tested and debugged with the BGB 1.5.8 emulator and verified using original hardware
 - Potentially compatible with Pokemon Stadium 1 & 2 (using original Nintendo hardware)
-  - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work.
-  - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2.
-  - Will play and save in the GB Tower of Stadium 2.
-  - Will **not work** with the GB Tower of Stadium 1 due to cartridge header prerequisites.
-- Might be possible to use a save from vanilla USA red/blue with this community patch 
+  - Simpler flash carts (like cheap bootlegs) are recognized, but products with firmware like the EZ Flash JR. will not work
+  - Works with the save file operations (importing pokemon, item management, and box management) of both Stadium 1 and 2
+  - Will play and save in the GB Tower of Stadium 2
+  - Will **not work** with the GB Tower of Stadium 1 due to cartridge header prerequisites
+- It is possible to use a save file from the original retail USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
-- New builds are tested and debugged with the BGB 1.5.8 emulator and verified using original hardware
-- Link trading with an original retail cartridge appears to work properly on real hardware
-- Link trading between the lite and master branches appears to work properly on real hardware
-- Link battles are still largely untested, and they are unsupported in the following ways:
-  - Link battling between a master branch build and any other non-master branch build
-  - Link battling between a lite branch build and any other non-lite branch build
-  - Link battling between builds of dissimilar revisions
-- A revision control function has been added that will cancel unsupported cable links
-- Link functions via 3DS hardware and its Virtual Console emulator are not supported
+- Link Cable Connection
+  - Link trading with an original retail cartridge appears to work properly
+  - Link trading between the lite and master branches appears to work properly
+  - Link battles are still largely untested, and they are unsupported in the following ways:
+    - Link battling is not possible between a master branch build and any other non-master branch build
+    - Link battling is not possible between a lite branch build and any other non-lite branch build
+    - Link battling is not possible between builds of dissimilar revisions
+  - A revision control function has been added that will cancel unsupported cable links
+  - Link functions via 3DS hardware and its Virtual Console emulator are not supported and totally untested
+- 3DS Poké Transporter Recognition
+  - This has been confirmed to work on Shin Pokemon Red and Blue versions if configured correctly
+  - Using Shin Pokemon Green in place of the ID for the Virtual Console Pokémon Green does not work since it is based on a USA retail Blue version
 
 
 #Changelog From the Last Full Release
