@@ -47,7 +47,7 @@ GainExperience:
 
 	call BufferExpData
 	call GetNumMonsGainingExp
-	call DivideExpDataByNumMonsGainingExp
+	; call DivideExpDataByNumMonsGainingExp
 	call GiveStatExp
 	call CalculateLevelExp
 	
@@ -203,8 +203,10 @@ BufferExpData:
 	dec c
 	jr nz, .loop
 	
-	ld b, EXP_ALL
-	call IsItemInBag
+	; ld b, EXP_ALL
+	; call IsItemInBag
+	ld a, [wBoostExpByExpAll]
+	and a
 	jr z, .done
 	
 	;if exp all is in the bag, halve everything in the buffer
