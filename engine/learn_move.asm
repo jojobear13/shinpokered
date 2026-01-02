@@ -226,6 +226,7 @@ OneTwoAndText:	;joenote - fixed to switch to the correct bank when playing the p
 	TX_FAR _OneTwoAndText
 	TX_DELAY
 	TX_ASM
+	call WaitForSoundToFinish
 	ld a, 1
 	ld [wMuteAudioAndPauseMusic], a
 	ld a, [wAudioROMBank]
@@ -234,7 +235,7 @@ OneTwoAndText:	;joenote - fixed to switch to the correct bank when playing the p
 	ld [wAudioROMBank], a
 	ld [wAudioSavedROMBank], a
 	ld a, SFX_SWAP
-	call PlaySoundWaitForCurrent
+	call PlaySound
 	call WaitForSoundToFinish
 	pop af
 	ld [wAudioROMBank], a
