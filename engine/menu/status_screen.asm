@@ -51,11 +51,23 @@ DrawHP_:
 	add hl, bc
 	ld de, wLoadedMonHP
 	lb bc, 2, 3
+
+	;joenote - clear out the digit space to erase any lingering text box borders
+	ld a, " "
+	ld [hli], a
+	ld [hld], a
+
 	call PrintNumber
 	ld a, "/"
 	ld [hli], a
 	ld de, wLoadedMonMaxHP
 	lb bc, 2, 3
+
+	;joenote - clear out the digit space to erase any lingering text box borders
+	ld a, " "
+	ld [hli], a
+	ld [hld], a
+
 	call PrintNumber
 	pop hl
 	pop de
