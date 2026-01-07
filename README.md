@@ -376,17 +376,12 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
-dev update 12/06/2025
-- Fixed a missingno glitch encounter when surfing in cerulean cave bottom floor (affects master blue_jp patches only)
-
-dev update 12/02/2025
-- Fixed the ss anne tournament flag not clearing when blacking out
-
-dev update 10/31/2025
-- Fixed fossil mon secret move tutor not activating of helix fossil chosen and also fixed some text issues
-
-dev update 10/26/2025
-- Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
+Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
+- 1/6/2026 - Fixed text box border not disappearing fully on party menu in battle and slightly improved in-battle "poof" on forgetting a move
+- 12/06/2025 - Fixed a missingno glitch encounter when surfing in cerulean cave bottom floor (master blue_jp patches only)
+- 12/02/2025 - Fixed the ss anne tournament flag not clearing when blacking out
+- 10/31/2025 - Fixed fossil mon secret move tutor not activating if helix fossil chosen and also fixed some text issues
+- 10/26/2025 - Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
 
 v1.25.0
 - The overworld Cut SFX now syncs up better with the animation
