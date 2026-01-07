@@ -81,8 +81,9 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
-dev update 10/26
-- Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
+Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
+- 1/6/2026 - Fixed text box border not disappearing fully on party menu in battle and slightly improved in-battle "poof" on forgetting a move
+- 10/26/2025 - Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
 
 v1.25.0
 - The overworld Cut SFX now syncs up better with the animation
