@@ -30,12 +30,12 @@ Follow media related to Shin Pokemon on [YouTube](https://www.youtube.com/@13joj
 
 Leave a review for Shin Pokemon over at [Rom Hack Plaza](https://romhackplaza.org/romhacks/shin-pokemon-game-boy/).
 
-Find other mods and patches at [The PokeRom Codex](https://pokeromcodex.notion.site/8f188f1761b9430f9adb68833c44e5b8?v=bb31503a729442f798b4233509dacab8)
+Find other mods and patches at the Pokémon [Hackdex](https://www.hackdex.app/discover)
 
 Other Social Links:
-[Lurked Discord server](https://discord.gg/5CKzeWmZZU)
-[Twitter](https://twitter.com/13JoJoBear)
-[Bluesky](https://jojobear13.bsky.social)
+- [Rom Hack Plaza Discord server](https://discord.gg/5CKzeWmZZU)
+- [Twitter](https://twitter.com/13JoJoBear)
+- [Bluesky](https://jojobear13.bsky.social)
 
 
 
