@@ -243,9 +243,9 @@ Lab4Text3:
 	;charge 10000 money
 	xor a
 	ld [hMoney], a	
-	ld [hMoney + 1], a	
-	ld a, $01
-	ld [hMoney + 2], a  
+	ld [hMoney + 2], a	
+	ld a, $10
+	ld [hMoney + 1], a  
 	call HasEnoughMoney
 	jr nc, .enoughMoney2
 	; not enough money
@@ -255,9 +255,9 @@ Lab4Text3:
 	; Charge 10000 money
 	xor a
 	ld [wPriceTemp], a
-	ld [wPriceTemp + 1], a	
-	ld a, $01
 	ld [wPriceTemp + 2], a	
+	ld a, $10
+	ld [wPriceTemp + 1], a	
 	ld hl, wPriceTemp + 2
 	ld de, wPlayerMoney + 2
 	ld c, $3
