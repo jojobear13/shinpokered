@@ -254,10 +254,10 @@ Lab4Text3:
 .enoughMoney2
 	; Charge 10000 money
 	xor a
-	ld [wPriceTemp], a
 	ld [wPriceTemp + 2], a	
-	ld a, $10
 	ld [wPriceTemp + 1], a	
+	ld a, $01
+	ld [wPriceTemp], a
 	ld hl, wPriceTemp + 2
 	ld de, wPlayerMoney + 2
 	ld c, $3
