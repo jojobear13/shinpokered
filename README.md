@@ -377,6 +377,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
+- 2/07/2026 - Fixed Cinnabar lab cloning only costing 1000 yen instead of 10000 yen
 - 1/12/2026 - Fixed Cinnabar lab cloning only costing 1 yen instead of 10000 yen
 - 1/6/2026 - Fixed text box border not disappearing fully on party menu in battle and slightly improved in-battle "poof" on forgetting a move
 - 12/06/2025 - Fixed a missingno glitch encounter when surfing in cerulean cave bottom floor (master blue_jp patches only)
