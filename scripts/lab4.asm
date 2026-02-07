@@ -242,10 +242,10 @@ Lab4Text3:
 	
 	;charge 10000 money
 	xor a
-	ld [hMoney], a	
 	ld [hMoney + 2], a	
-	ld a, $10
 	ld [hMoney + 1], a  
+	ld a, $01
+	ld [hMoney], a	
 	call HasEnoughMoney
 	jr nc, .enoughMoney2
 	; not enough money
