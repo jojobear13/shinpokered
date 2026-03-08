@@ -64,6 +64,13 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 - Link Cable Connection
   - Link trading with an original retail cartridge appears to work properly
   - Link trading between the lite and master branches appears to work properly
+  - Link trading via the Gen-2 Time Capsule is possible but with a known issue
+    - You must go to Shin Pokemon's extra menu and change the FPS to 30 
+	- If you do not, the Gen-2 game will receive corrupted pokemon data
+  - Link trading using Game Boy Advance emulators (such as mGBA) is known to be problematic
+    - The GBA link cable and the GBC link cable are completely different protocols
+	- GBA emulators may favor the GBA-link protocol and merely ad-hoc the GBC-link onto it
+	- The result is that trade data will get corrupted
   - Link battles are still largely untested, and they are unsupported in the following ways:
     - Link battling is not possible between a master branch build and any other non-master branch build
     - Link battling is not possible between a lite branch build and any other non-lite branch build
