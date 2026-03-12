@@ -10,6 +10,11 @@ CableClubNPC:
 	call PrintText
 	jp .didNotConnect
 .receivedPokedex
+;60fps / GBCnote - There is an issue with data corruption when trading with the Gen 2 time capsule.
+;This data corruption only happens when the GBC cpu is in double-speed mode.
+;To prevent this, enforce normal CPU speed while doing cable data transfer.
+;The OverworldLoop will call the predef that sets it back
+	predef SingleCPUSpeed	
 	ld a, $1
 	ld [wMenuJoypadPollCount], a
 	ld a, 90

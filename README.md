@@ -61,7 +61,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 - It is possible to use a save file from the original retail USA red/blue with this community patch 
   - Save outside in Pallet Town before transferring over
   - Use the Softlock Warp to clear any invisible walls
-- Link Cable Connection
+- **Link Cable Connection**
   - Link trading with an original retail cartridge appears to work properly
   - Link trading between the lite and master branches appears to work properly
   - Link trading via the Gen-2 Time Capsule is possible but with a known issue
@@ -89,6 +89,7 @@ To fix this, you must use the Softlock Warp detailed below to teleport back to P
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
+- 3/12/2026 - Prevent the GBC's double-speed CPU mode from corrupting data when linked to the Gen-2 time capsule
 - 1/6/2026 - Fixed text box border not disappearing fully on party menu in battle and slightly improved in-battle "poof" on forgetting a move
 - 10/26/2025 - Oak's parcel now removed from bag via RemoveItemByID, fixing potential for item to not be removed in some cases
 
