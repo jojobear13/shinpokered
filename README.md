@@ -384,6 +384,7 @@ Cheats and Secrets!
 [View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
 
 Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
+- 3/18/2026 - Made minor adjustments to the way AI uses items in battle and made the AI slightly more aggressive
 - 3/12/2026 - Prevent the GBC's double-speed CPU mode from corrupting data when linked to the Gen-2 time capsule
 - 2/07/2026 - Fixed Cinnabar lab cloning only costing 1000 yen instead of 10000 yen
 - 1/12/2026 - Fixed Cinnabar lab cloning only costing 1 yen instead of 10000 yen
@@ -896,6 +897,10 @@ v1.25.0
     - An AI mon with three status moves will have about a 50% chance of ignoring item-use or switching
   - Discourage using fly/dig if faster than the player who is also picking fly/dig
   - If the player used and item or switched, AI is blind to the player's sleep counter when considering dream eater
+  - Slightly discourage zero-power moves (except healing) if the player's active pokemon is below 1/2 HP
+  - Rage should be highly discouraged EXCEPT in the follow scenario
+    - AI active pokemon is faster than the player's active pokemon
+    - AND the player's active pokemon is using a 2-hit or 2-5 hit move (lightly discourage instead)
 
 - Trainer ai routine #3 (choosing effective moves) has been modified
   - It now heavily discourages moves that would have no effect due to type immunity
@@ -936,7 +941,7 @@ v1.25.0
   - AI scoring imposes a very heavy penalty for potentially switching in pokemon with less than 1/4 HP
   - AI switch scoring now penalizes bad match-ups between player and enemy 'mon types
   - AI switch scoring applies an extra penalty for possibly switching a pokemon into a super-effective move
-  
+
 - Trainer ai routine #3 added to the following trainer classes
   - jr trainer M/F, engineer, rocker, juggler, tamer, birdkeeper, black belt, scientist, gentleman
   - bruno, brock, surge, blaine, sabrina, agatha, rival phase 1, chief
@@ -945,8 +950,8 @@ v1.25.0
   -jr trainer M/F, pokemaniac, hiker, cueball, psychic, tamer, black belt, rocket, cooltrainer M/F, gentleman, channeler
   -all rival phases, all gym leaders, elite-4, prof.oak, chief
   
-- Trainer switching (ai routine #4)can now toggled ON and OFF
-  - WHile OFF, trainers will not switch intelligently just like in the original retail games.
+- Trainer switching (ai routine #4) can now toggled ON and OFF
+  - While OFF, trainers will not switch intelligently just like in the original retail games.
   - Press SELECT on the option menu to go to the extra menu and toggle this option under "AI SWAPS"
   - Note that Jugglers are unaffected because their official gimmick is that they switch randomly.
 
@@ -975,6 +980,10 @@ v1.25.0
   - All trainers that use any kind of potion now use it with a 50% chance if their HP is low enough
     - Gym Leaders and mid-game Rival: below 1/5th total
     - Elite-4 and Champion: below 1/3th total
+- AI item use
+  - AI should only use X-Defend if the player is using a physical damaging move or a zero-power move or switching
+  - AI should only use X-Special if the player is using a special damaging move or a zero-power move or switching
+  - AI should only use X-Attack, X-Speed, X-Accuracy, Guard Spec, or Dire Hit if the player is using a zero-power move or switching
   
 - Adjustments to learnsets and base stats
   - Slight additions to explodo-mon movesets to play nicer with AI at higer levels
