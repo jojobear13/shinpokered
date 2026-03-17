@@ -185,10 +185,20 @@ AIMoveChoiceModification1:
 ;and dont try to use splash either
 	cp SPLASH_EFFECT	
 	jp z, .heavydiscourage
-;rage kind of sucks even though it does something, so slightly discourage it
+.checkBadMoves_rage
+;rage kind of sucks even though it does something, so slightly discourage it if it might be worth using, otherwise heavily discourage
 	cp RAGE_EFFECT
 	jr nz, .endBadMoves
-	inc [hl]
+	call StrCmpSpeed	;do a speed compare
+	jp nc, .heavydiscourage	;don't even bother if the ai pokemon does not out-speed the player
+	ld a, [wPlayerMoveEffect]
+	cp TWO_TO_FIVE_ATTACKS_EFFECT
+	jr z, .checkBadMoves_rage_okay
+	cp ATTACK_TWICE_EFFECT
+	jp nz, .heavydiscourage
+.checkBadMoves_rage_okay
+	inc [hl]	;only slightly discourage
+	jp .nextMove
 .endBadMoves
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -333,7 +343,17 @@ AIMoveChoiceModification1:
 	ld a, [wEnemyMovePower]
 	and a
 	jp nz, .nextMove	;go to next move if the current move is not zero-power
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;**************************************************************************************************************************
 ;At this line onward all moves are assumed to be zero power
+;**************************************************************************************************************************
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;joenote - slightly discourage all zero power moves if the player's pokemon has < 1/2 HP remaining
+	ld a, 2
+	call AICheckIfPlayerHPBelowFraction
+	jr nc, .end_playerHPcheck
+	inc [hl]
+.end_playerHPcheck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use haze if user has no status or neutral stat mods
@@ -1931,6 +1951,8 @@ AICureStatus:	;joenote - modified to be more robust and also undo stat changes o
 	ret
 
 AIUseXAccuracy: 
+	call AIUseItemStrategyCheck_General
+	ret nc
 	call AIPlayRestoringSFX
 	ld hl, wEnemyBattleStatus2
 	set 0, [hl]
@@ -1938,6 +1960,8 @@ AIUseXAccuracy:
 	jp AIPrintItemUse
 
 AIUseGuardSpec:
+	call AIUseItemStrategyCheck_General
+	ret nc
 	call AIPlayRestoringSFX
 	ld hl, wEnemyBattleStatus2
 	set 1, [hl]
@@ -1945,6 +1969,8 @@ AIUseGuardSpec:
 	jp AIPrintItemUse
 
 AIUseDireHit: 
+	call AIUseItemStrategyCheck_General
+	ret nc
 	call AIPlayRestoringSFX
 	ld hl, wEnemyBattleStatus2
 	set 2, [hl]
@@ -2052,21 +2078,29 @@ AICheckIfPlayerHPBelowFraction:
 	ret
 
 AIUseXAttack:
+	call AIUseItemStrategyCheck_General
+	ret nc
 	ld b, $A
 	ld a, X_ATTACK
 	jr AIIncreaseStat
 
 AIUseXDefend:
+	AIUseItemStrategyCheck_Physical
+	ret nc
 	ld b, $B
 	ld a, X_DEFEND
 	jr AIIncreaseStat
 
 AIUseXSpeed:
+	call AIUseItemStrategyCheck_General
+	ret nc
 	ld b, $C
 	ld a, X_SPEED
 	jr AIIncreaseStat
 
 AIUseXSpecial:
+	AIUseItemStrategyCheck_Special
+	ret nc
 	ld b, $D
 	ld a, X_SPECIAL
 	; fallthrough
@@ -2216,4 +2250,47 @@ AIItemsLowHPCheck:
 .return
 	ld a, b
 	pop bc
+	ret
+
+;Sets carry flag if player is using a zero-power move or is using an item or switching
+AIUseItemStrategyCheck_General:
+	ld a, [wActionResultOrTookBattleTurn]
+	and a
+	jr nz, .pass	;set carry because the player switched or used an item
+	ld a, [wPlayerMovePower]
+	and a
+	jr nz, .fail	;clear carry because the player is not using a zero-power move
+.pass 
+	scf
+	ret
+.fail
+	xor a
+	ret
+
+;Sets carry flag if player is using a zero-power move or is using an item or switching or is using a physical move
+AIUseItemStrategyCheck_Physical:
+	call AIUseItemStrategyCheck_General
+	ret c
+	ld a, [wPlayerMoveType]
+	cp FIRE
+	jr nc, .fail	;clear carry if damaging move is special
+.pass 
+	scf
+	ret
+.fail
+	xor a
+	ret
+
+;Sets carry flag if player is using a zero-power move or is using an item or switching or is using a special move
+AIUseItemStrategyCheck_Special:
+	call AIUseItemStrategyCheck_General
+	ret c
+	ld a, [wPlayerMoveType]
+	cp FIRE
+	jr nc, .pass	;set carry if damaging move is special
+.fail
+	xor a
+	ret
+.pass 
+	scf
 	ret
