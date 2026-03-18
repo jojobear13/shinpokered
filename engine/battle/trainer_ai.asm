@@ -2168,7 +2168,7 @@ AIUseXAttack:
 	jr AIIncreaseStat
 
 AIUseXDefend:
-	AIUseItemStrategyCheck_Physical
+	call AIUseItemStrategyCheck_Physical
 	ret nc
 	ld b, $B
 	ld a, X_DEFEND
@@ -2182,7 +2182,7 @@ AIUseXSpeed:
 	jr AIIncreaseStat
 
 AIUseXSpecial:
-	AIUseItemStrategyCheck_Special
+	call AIUseItemStrategyCheck_Special
 	ret nc
 	ld b, $D
 	ld a, X_SPECIAL
