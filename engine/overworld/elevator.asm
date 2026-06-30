@@ -1,5 +1,5 @@
 ShakeElevator:
-	ld de, -$20
+	ld de, -$40		;joenote: Changed from -$20. It was an oversight in the elevator shake function. This did not actually affect anything in the vanilla game, but it can cause problems when someone begins to mod things.
 	call ShakeElevatorRedrawRow
 	ld de, SCREEN_HEIGHT * $20
 	call ShakeElevatorRedrawRow
