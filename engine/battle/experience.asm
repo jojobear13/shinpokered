@@ -137,18 +137,12 @@ ENDC
 
 ;exp all is in the bag but its effect still needs to happen
 .done_doPredefAndLoop
-	ld hl, wPartyGainExpFlags
 	xor a
-	ld [hl], a ; clear gain exp flags
+	ld [wPartyGainExpFlags], a	; clear gain exp flags
+	ld [wPartyFoughtCurrentEnemyFlags], a ; clear flags for who fought the current enemy
 	ld a, [wPlayerMonNumber]
 	ld c, a
 	ld b, FLAG_SET
-	push bc
-	predef FlagActionPredef ; set the gain exp flag for the mon that is currently out
-	ld hl, wPartyFoughtCurrentEnemyFlags
-	xor a
-	ld [hl], a
-	pop bc
 	predef FlagActionPredef ; set the fought current enemy flag for the mon that is currently out
 	;initiate the exp all effect and run through this function again
 	call SetExpAllFlags
