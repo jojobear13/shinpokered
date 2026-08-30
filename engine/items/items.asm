@@ -2411,8 +2411,10 @@ ItemUsePPRestore:
 	jr nz, .skipUpdatingInBattleData
 	
 	;joenote - do not update active mon if it is transformed
+	;A = B at this line
 	ld a, [wPlayerBattleStatus3]
 	bit 3, a ; is the mon transformed?
+	ld a, b	;restore the original value of A
 	jp nz, .skipUpdatingInBattleData
 	
 	ld hl, wPartyMon1PP
