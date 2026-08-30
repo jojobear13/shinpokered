@@ -2869,6 +2869,7 @@ AddBonusPP:
 GetMaxPP:
 	ld a, [wMonDataLocation]
 	and a
+.readFromPartyData
 	ld hl, wPartyMon1Moves
 	ld bc, wPartyMon2 - wPartyMon1
 	jr z, .sourceWithMultipleMon
@@ -2882,7 +2883,16 @@ GetMaxPP:
 	ld hl, wDayCareMonMoves
 	dec a
 	jr z, .sourceWithOneMon
-	ld hl, wBattleMonMoves ; player's in-battle pokemon
+;joenote - going to do some fixes to how the battle hud displays max PP for transformed and mimic'd moves
+;If active mon is transformed, set the max PP to 5
+	ld a, [wPlayerBattleStatus3]
+	bit TRANSFORMED, a
+	ld a, 5
+	jr nz, .transformed	
+;joenote - otherwise use party data for the battle 'mon to account for mimic's max pp
+	xor a	;sets the z flag and zeros A
+	jr .readFromPartyData
+;	ld hl, wBattleMonMoves ; player's in-battle pokemon
 .sourceWithOneMon
 	call GetSelectedMoveOffset2
 	jr .next
@@ -2904,10 +2914,11 @@ GetMaxPP:
 	pop hl
 	push bc
 	ld bc, wPartyMon1PP - wPartyMon1Moves ; PP offset if not player's in-battle pokemon data
-	ld a, [wMonDataLocation]
-	cp 4 ; player's in-battle pokemon?
-	jr nz, .addPPOffset
-	ld bc, wBattleMonPP - wBattleMonMoves ; PP offset if player's in-battle pokemon data
+;joenote - not needed since battle mon is pulling from its party data now
+;	ld a, [wMonDataLocation]
+;	cp 4 ; player's in-battle pokemon?
+;	jr nz, .addPPOffset
+;	ld bc, wBattleMonPP - wBattleMonMoves ; PP offset if player's in-battle pokemon data
 .addPPOffset
 	add hl, bc
 	ld a, [hl] ; a = current PP
@@ -2923,6 +2934,7 @@ GetMaxPP:
 	call AddBonusPP ; add bonus PP from PP Ups
 	ld a, [hl]
 	and %00111111 ; mask out the PP Up count
+.transformed
 	ld [wMaxPP], a ; store max PP
 	ret
 
