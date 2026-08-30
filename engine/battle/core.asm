@@ -2970,7 +2970,10 @@ SelectMenuItem:
 	jr nz, .select
 	coord hl, 1, 14
 	ld de, WhichTechniqueString
-	call PlaceString
+	call PlaceString	;joenote - need to clear out the extraneous text
+	coord hl, 1, 16
+	ld bc, $0110
+	call ClearScreenArea
 	jr .select
 .battleselect
 	ld a, [wFlags_D733]
@@ -3045,10 +3048,10 @@ SelectMenuItem:
 	dec a
 	cp c
 	jr z, .disabled
-	ld a, [wPlayerBattleStatus3]
-	bit 3, a ; transformed
-	jr nz, .dummy ; game freak derp
-.dummy
+;	ld a, [wPlayerBattleStatus3]
+;	bit 3, a ; transformed
+;	jr nz, .dummy ; game freak derp
+;.dummy
 	ld a, [wCurrentMenuItem]
 	ld hl, wBattleMonMoves
 	ld c, a
@@ -3078,7 +3081,6 @@ MoveDisabledText:
 
 WhichTechniqueString:
 	db "WHICH TECHNIQUE?@"
-
 SelectMenuItem_CursorUp:
 	ld a, [wCurrentMenuItem]
 	and a
