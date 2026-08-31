@@ -1,4 +1,6 @@
 TransformEffect_:
+	ld a, [wBattleMonSpecies]
+	ld [wBattleMonSpeciesOriginal], a ;joenote - backup the player's species in its own dedicated ram address
 ;joenote - setting the transform bit has been moved to later on
 	ld hl, wBattleMonSpecies
 	ld de, wEnemyMonSpecies

@@ -39,7 +39,8 @@ SetPal_Battle:
 
 	bit TRANSFORMED, a
 	jr z, .transformcheck
-	ld hl, wBattleMonSpecies2	;joenote - Fixing a gamefreak typo. Needed for transformed mon's to retain their palette.
+	;ld hl, wBattleMonSpecies2	;joenote - Fixing a gamefreak typo. Needed for transformed mon's to retain their palette.
+	ld hl, wBattleMonSpeciesOriginal	; --> Moving to dedicated address. Party menu can clobber wBattleMonSpecies2.
 .transformcheck	
 	
 	call DeterminePaletteID

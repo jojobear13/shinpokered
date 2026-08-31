@@ -1746,6 +1746,7 @@ wTrainerClass:: ; d031
 
 wTrainerPicPointer:: ; d033
 	ds 2
+wBattleMonSpeciesOriginal:: ;d034	;joenote - used to backup a transformed mon's real species
 	ds 1
 
 wTempMoveNameBuffer:: ; d036
