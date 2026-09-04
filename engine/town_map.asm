@@ -460,6 +460,13 @@ DisplayWildLocations:
 	cp $19 ; Cerulean Cave's coordinates
 	jr z, .nextEntry ; skip Cerulean Cave
 	call TownMapCoordsToOAMCoords
+
+;joenote - modified the above function, so have to write to ShadowOAM here.
+	ld a, b
+	ld [hli], a
+	ld a, c
+	ld [hli], a
+
 	ld a, $4 ; nest icon tile no.
 	ld [hli], a
 	xor a
@@ -496,19 +503,20 @@ AreaUnknownText:
 TownMapCoordsToOAMCoords:
 ; in: lower nybble of a = x, upper nybble of a = y
 ; out: b and [hl] = (y * 8) + 24, c and [hl+1] = (x * 8) + 24
+;joenote - revising output to not write to [hl] & [hl+1] since this causes a write to ROM under certain calls
 	push af
 	and $f0
 	srl a
 	add 24
 	ld b, a
-	ld [hli], a
+;	ld [hli], a
 	pop af
 	and $f
 	swap a
 	srl a
 	add 24
 	ld c, a
-	ld [hli], a
+;	ld [hli], a
 	ret
 
 WritePlayerOrBirdSpriteOAM:
