@@ -1,19 +1,32 @@
 TransformEffect_:
 	ld a, [wBattleMonSpecies]
 	ld [wBattleMonSpeciesOriginal], a ;joenote - backup the player's species in its own dedicated ram address
-;joenote - setting the transform bit has been moved to later on
+;joenote - There are numerous problems here that have been fixed.
+;--> setting the transform bit has been moved to later on
+;--> H_WHOSETURN load and test has been moved so that it does not over-write the BattleStatus1 load
+;--> The BattleStatus addresses were incorrect and needed to be swapped (cannot transform into a flying/digging mon)
+;--> wPlayerMoveListIndex is an address typo and makes no sense to have here now
+
+	ld a, [H_WHOSETURN]
+	and a	;set flags for who is using the transform move
+
+;enemy turn
 	ld hl, wBattleMonSpecies
 	ld de, wEnemyMonSpecies
 ;	ld bc, wEnemyBattleStatus3
-	ld a, [wEnemyBattleStatus1]
-	ld a, [H_WHOSETURN]
-	and a
+;	ld a, [wEnemyBattleStatus1]
+	ld a, [wPlayerBattleStatus1]
+
 	jr nz, .hitTest
+
+;player turn
 	ld hl, wEnemyMonSpecies
 	ld de, wBattleMonSpecies
 ;	ld bc, wPlayerBattleStatus3
-	ld [wPlayerMoveListIndex], a
-	ld a, [wPlayerBattleStatus1]
+;	ld [wPlayerMoveListIndex], a
+;	ld a, [wPlayerBattleStatus1]
+	ld a, [wEnemyBattleStatus1]
+
 .hitTest
 	bit INVULNERABLE, a ; is mon invulnerable to typical attacks? (fly/dig)
 	jp nz, .failed
