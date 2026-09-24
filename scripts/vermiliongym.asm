@@ -33,8 +33,12 @@ VermilionGymScript_5ca6d:
 	ld a, $24
 	jr .asm_5ca7f
 .asm_5ca78
+	ld a, [wIsInBattle]	;joenote - BUG: SFX plays if you black out to Lt. Surge, so skip if the battle is still running.
+	and a
+	jr nz, .skipsfx
 	ld a, SFX_GO_INSIDE
 	call PlaySound
+.skipsfx
 	ld a, $5
 .asm_5ca7f
 	ld [wNewTileBlockID], a
