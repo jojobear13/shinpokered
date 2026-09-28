@@ -35,3 +35,12 @@ _StandByMeText::
 _TVWrongSideText::
 	text "Oops, wrong side."
 	done
+
+_WizardOfOzText::
+	text "There's a movie"
+	line "on TV. A girl"
+	cont "walks a road made"
+	cont "of yellow bricks."
+
+	para "I better go too."
+	done
