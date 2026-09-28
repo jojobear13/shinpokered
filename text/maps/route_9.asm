@@ -120,7 +120,8 @@ _Route9AfterBattleText7::
 
 _Route9BattleText8::
 	text "Hahahaha!"
-	line "Come on, dude!"
+;	line "Come on, dude!"	
+	line "Come get some!"	;joenote - making this more neutral in case the player is a girl. JP text is "Kakatte kōi!" which is more like "Come and get me!"
 	done
 
 _Route9EndBattleText8::
