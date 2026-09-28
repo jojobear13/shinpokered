@@ -36,6 +36,8 @@ _TVWrongSideText::
 	text "Oops, wrong side."
 	done
 
+;joenote - support female trainer
+IF DEF(_FPLAYER)
 _WizardOfOzText::
 	text "There's a movie"
 	line "on TV. A girl"
@@ -44,3 +46,5 @@ _WizardOfOzText::
 
 	para "I better go too."
 	done
+ENDC
+
