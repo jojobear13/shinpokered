@@ -56,6 +56,15 @@ RedsHouse1FText2: ; TV
 	ld hl, TVWrongSideText
 	jr nz, .notUp
 	ld hl, StandByMeText
+
+;joenote - support female trainer
+IF DEF(_FPLAYER)
+	ld a, [wUnusedD721]
+	bit 0, a	;check if girl
+	jr z, .notUp
+	ld hl, WizardOfOzText
+ENDC
+
 .notUp
 	call PrintText
 	jp TextScriptEnd
@@ -67,3 +76,10 @@ StandByMeText:
 TVWrongSideText:
 	TX_FAR _TVWrongSideText
 	db "@"
+
+;joenote - support female trainer
+IF DEF(_FPLAYER)
+WizardOfOzText:
+	TX_FAR _WizardOfOzText
+	db "@"
+ENDC
