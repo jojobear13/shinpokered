@@ -3505,7 +3505,19 @@ ENDC
 wdeed::
 ds 1
 
-; deee
+;holds the player's position from when they blacked out so they can return to it
+wBlackoutReturnFlag:: ; deee
+; 0 = nothing pending
+; 1 = ask the player if they want to return to where they blacked out
+; 2 = the player chose to return
+	ds 1
+wBlackoutSavedMapData:: ; deef
+; copy of wCurMap through wLastMap
+	ds 8
+wBlackoutSavedWalkBikeSurfState:: ; def7
+	ds 1
+
+; def8
 
 
 SECTION "Stack", WRAM0[$df00]

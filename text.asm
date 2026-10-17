@@ -3267,6 +3267,11 @@ _RematchTrainerText::
 	text "Offer a rematch?"
 	done
 
+_BlackoutReturnText::
+	text "Return to where"
+	line "you blacked out?"
+	done
+
 SECTION "Pokedex Text", ROMX, BANK[POKEDEX_TEXT]
 
 IF DEF(_REDGREENJP)

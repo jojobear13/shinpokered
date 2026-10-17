@@ -40,6 +40,9 @@ EnterMap::
 	set 6, [hl]
 	xor a
 	ld [wJoyIgnore], a
+;after blacking out, offer to return to where the player blacked out
+	callba BlackoutReturnPrompt
+	jp c, EnterMap ; reload the map at the position where the player blacked out
 
 OverworldLoop::
 	;call DelayFrame	;60fps

@@ -1,4 +1,5 @@
 ResetStatusAndHalveMoneyOnBlackout::
+	callba SaveBlackoutPosition	;remember where the player blacked out
 ; Reset player status on blackout.
 	xor a
 	ld [wBattleResult], a
