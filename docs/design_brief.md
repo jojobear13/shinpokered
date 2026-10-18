@@ -409,6 +409,15 @@ self-hit code became `EnemyHandleSelfConfusionDamage`, unchanged; merging it
 with `HandleSelfConfusionDamage` (which also redraws the player's HUD) is a
 possible follow-up. `tests/suites/status_checks.py` covers it.
 
+**Step D's safety net is in place.** `tests/test_pc_boxes.py` covers
+depositing and withdrawing (including round trips), full boxes and parties,
+catching with a full party, changing boxes (first change and back again), the
+day care, saving and loading party, box and day care, and detecting a corrupted
+current box. It reads and writes boxes only through `tests/boxes.py`; step D
+updates `read_current_box`, `write_current_box` and `read_day_care` there to
+read save RAM, and every test in the file must still pass. Sabotaging the box
+copy makes the box-change tests fail (12 of 12 cases), so they do test it.
+
 Steps A to C are the remaining refactors and must each compare identical.
 Step D is the one large structural change and gates every step that needs
 more than 8 bytes. Steps E to G are the new behaviour.

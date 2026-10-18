@@ -54,6 +54,14 @@ to compare them against.
   print instantly and don't wait for the player.
 - `game.patch(symbol, bytes...)` overwrites ROM; every patch is undone by
   `reset()`.
+- `game.menu_choices(0, 3, ...)` makes the next menus pick those items, as if
+  the player moved the cursor and pressed A (0 is the first item, so YES in a
+  yes/no box). It replaces `HandleMenuInput`, so the cursor UI itself isn't
+  tested, but everything the menus lead to runs normally.
+- `game.skip_sound_waits()` makes `WaitForSoundToFinish` return at once.
+- `tests/boxes.py` reads and writes the party, the current PC box, saved boxes
+  and the day care. Box tests go through it, so when the current box moves to
+  save RAM (design brief, step D) only its readers and writers change.
 - `game.queue_random(...)` makes `Random` return chosen values. Using more
   values than were queued is an error, so a test always knows how much
   randomness a routine used.

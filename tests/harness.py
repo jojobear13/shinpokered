@@ -29,13 +29,17 @@ RANDOM_STUB = 0xDF18  # replacement for Random that reads RANDOM_QUEUE
 RANDOM_INDEX = 0xDF2F
 RANDOM_QUEUE = 0xDF30  # up to 64 queued values
 RANDOM_QUEUE_LEN = 64
-HARNESS_END = 0xDF70
+MENU_INDEX = 0xDF70  # menu_choices(): next choice to hand out
+MENU_QUEUE = 0xDF71  # up to 7 queued menu choices
+MENU_QUEUE_LEN = 7
+HARNESS_END = 0xDF78
 
 H_LOADEDROMBANK = 0xFFB8
 H_JOY_PRESSED = 0xFFB3
 H_JOY_HELD = 0xFFB4
 H_JOY_5 = 0xFFB5
 A_AND_B_BUTTONS = 0x03
+A_BUTTON = 0x01
 MBC_ROM_BANK = 0x2000
 REG_IE = 0xFFFF
 
@@ -115,6 +119,7 @@ class Game:
         self.unpatch_all()
         self._random_patched = False
         self._random_queue = []
+        self._menu_patched = False
         for addr in range(LAUNCHER, HARNESS_END):
             self.memory[addr] = 0
 
@@ -201,6 +206,37 @@ class Game:
             0xE0, H_JOY_5 & 0xFF,  # ldh [hJoy5], a
             0xC9,  # ret
         )
+
+    def menu_choices(self, *items):
+        """Make the next menus pick these items, in order, as if the player
+        moved the cursor and pressed A (item 0 is the first, so YES in a
+        yes/no box). Replaces HandleMenuInput, so the cursor-moving UI itself
+        is not exercised; everything the menu leads to runs as normal. Using
+        more menus than choices were queued is an error."""
+        if len(items) > MENU_QUEUE_LEN:
+            raise HarnessError("menu queue is full")
+        self.memory[MENU_INDEX] = 0
+        for i, item in enumerate(items):
+            self.memory[MENU_QUEUE + i] = item
+        if not self._menu_patched:
+            item = self.addr("wCurrentMenuItem")
+            self.patch(
+                "HandleMenuInput",
+                0xE5,  # push hl
+                0x21, MENU_INDEX & 0xFF, MENU_INDEX >> 8,  # ld hl, MENU_INDEX
+                0x7E,  # ld a, [hl]
+                0xFE, len(items),  # cp number of choices
+                0x28, 0xFE,  # jr z, @ (out of choices: spin)
+                0x34,  # inc [hl]
+                0xC6, MENU_QUEUE & 0xFF,  # add MENU_QUEUE low byte
+                0x6F,  # ld l, a
+                0x7E,  # ld a, [hl]
+                0xEA, item & 0xFF, item >> 8,  # ld [wCurrentMenuItem], a
+                0xE1,  # pop hl
+                0x3E, A_BUTTON,  # ld a, A_BUTTON
+                0xC9,  # ret
+            )
+            self._menu_patched = True
 
     # ----------------------------------------------------------------- random
 
@@ -300,6 +336,9 @@ class Game:
             if self.regs.PC in (done, done + 1):
                 break
         else:
+            menu_bank, menu_addr = self.symbols["HandleMenuInput"]
+            if self._menu_patched and menu_addr <= self.regs.PC < menu_addr + 24:
+                raise HarnessError(f"{name} used more menus than choices were queued")
             if RANDOM_STUB <= self.regs.PC < RANDOM_INDEX:
                 raise HarnessError(f"{name} used more random values than were queued")
             raise HarnessError(
@@ -310,9 +349,10 @@ class Game:
         if [self.memory[LAUNCHER + i] for i in range(len(launcher))] != expected:
             raise HarnessError(f"{name} overwrote the harness launcher")
         current = [self.memory[a] for a in range(RANDOM_STUB, HARNESS_END)]
-        index = RANDOM_INDEX - RANDOM_STUB
-        if current[:index] + current[index + 1:] != harness_area[:index] + harness_area[index + 1:]:
-            raise HarnessError(f"{name} overwrote the harness's random queue (stack too deep?)")
+        for counter in (RANDOM_INDEX, MENU_INDEX):  # these change as queues are used
+            current[counter - RANDOM_STUB] = harness_area[counter - RANDOM_STUB]
+        if current != harness_area:
+            raise HarnessError(f"{name} overwrote the harness's queues (stack too deep?)")
 
         # the routine's a and f were pushed by the launcher
         sp = self.regs.SP
