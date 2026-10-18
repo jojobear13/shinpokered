@@ -41,6 +41,15 @@ SCRATCH = {
     # each merged battle routine sets it on entry (docs/design_brief.md,
     # decision 1)
     "hBattleSide",
+    # every predef call copies hl, de and bc here for the predef itself to
+    # read back; afterwards they are leftovers, often pointers into ROM that
+    # shift whenever code moves
+    "wPredefRegisters",
+    # the pic decompressor points these at its lookup tables in home ROM
+    # before every use; between uses they are leftovers that shift whenever
+    # home code moves
+    "wSpriteDecodeTable0Ptr",
+    "wSpriteDecodeTable1Ptr",
 }
 
 
