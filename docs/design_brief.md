@@ -383,8 +383,8 @@ and the budget table above is updated.
 **Step B as done, and where it differs from the row above.**
 
 - `SwapPlayerAndEnemyLevels` is gone from the main enemy flow (seven of nine
-  calls). The pair in the enemy's multi-hit loop stays because removing it
-  changes behaviour: see "Known bugs kept for now".
+  calls) with no behaviour change. The pair in the enemy's multi-hit loop was
+  a bug and was removed in a separate fix: see "Bugs found by the refactor".
 - `{Player,Enemy}CalcMoveDamage` are one `CalcMoveDamage`; it returns carry
   where the old code jumped to the fly/charge check.
 - `{Player,Enemy}CanExecuteMove` stay separate. Only the player's spends PP
@@ -403,22 +403,15 @@ Steps A to C are the remaining refactors and must each compare identical.
 Step D is the one large structural change and gates every step that needs
 more than 8 bytes. Steps E to G are the new behaviour.
 
-## Known bugs kept for now
+## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here
-and fixed in their own commit, with a spec test, once approved.
+and fixed in their own commit, with a spec test, once approved. Bugs that also
+exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md`.
 
-- **Enemy multi-hit moves use the player's level after the first hit.**
-  The per-hit damage recalculation in the enemy's multi-hit loop
-  (`EnemyCheckIfMirrorMoveEffect` in `engine/battle/core.asm`) still wraps
-  `GetDamageVarsForEnemyAttack` in a `SwapPlayerAndEnemyLevels` pair. That
-  pair only made sense while the whole damage calculation ran with the levels
-  swapped (removed in step B); in the loop the levels are not swapped, so the
-  pair swaps them and every hit after the first uses the player's level,
-  including for critical-hit stats. Affects Double Kick, Fury Attack, Pin
-  Missile, Twineedle and the like, Metronome calling them, and turns that
-  continue a multi-hit attack. Fix: delete the two calls (and the routine,
-  which then has no callers). Found by `tests/suites/move_execution.py`.
+- **Fixed: enemy multi-hit moves used the player's level after the first
+  hit.** A leftover `SwapPlayerAndEnemyLevels` pair in the enemy's multi-hit
+  loop. Test: `tests/test_multi_hit.py`. Recommended upstream.
 
 ## Known facts that are easy to get wrong
 

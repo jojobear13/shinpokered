@@ -4868,17 +4868,6 @@ ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3
 ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * 2
 ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * 3
 
-SwapPlayerAndEnemyLevels:
-	push bc
-	ld a, [wBattleMonLevel]
-	ld b, a
-	ld a, [wEnemyMonLevel]
-	ld [wBattleMonLevel], a
-	ld a, b
-	ld [wEnemyMonLevel], a
-	pop bc
-	ret
-
 ;joenote - the damage calculation from the player's and enemy's move execution, merged
 ; a = the attacking side (0 or BATTLE_SIDE_ENEMY)
 ; returns carry to skip the rest of the damage steps and the hit test (moves with 0 BP,
@@ -6661,14 +6650,7 @@ EnemyCheckIfMirrorMoveEffect:
 	ld hl, wUnusedD155 
 	set 0, [hl]	;don't display that the substitute took damage for subsequent attacks
 	call CriticalHitTest
-; KNOWN BUG, kept for now: this swap pair is left over from when the whole
-; damage calculation ran with the levels swapped. Here the levels are not
-; swapped, so the pair swaps them for GetDamageVars, and every hit after the
-; first of an enemy multi-hit move uses the player's level. Removing the two
-; calls fixes it; see docs/design_brief.md.
-	call SwapPlayerAndEnemyLevels
 	call GetDamageVarsForEnemyAttack
-	call SwapPlayerAndEnemyLevels
 	call CalculateDamage
 	call AdjustDamageForMoveType
 	call ApplyDamageModifiers
