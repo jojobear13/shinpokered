@@ -2,8 +2,12 @@
 
 Builds the ROM from a base git ref and from the working tree, then runs every
 suite in tests/suites on both with the same random seeds. For each case it
-compares the routine's results and, when the two builds share a RAM layout,
-every byte of WRAM and HRAM afterwards.
+compares the routine's results and every byte of WRAM and HRAM afterwards.
+
+RAM is matched by variable name, so a variable that moved is compared at its
+new address. Variables that exist in only one of the two builds are skipped
+(and listed), since there is nothing to compare them against. HRAM variables
+are constants in hram.asm rather than labels, so they are read from there.
 
     python3 tests/compare_builds.py --base master --seeds 2000
 
@@ -13,6 +17,7 @@ slash, as for make).
 
 import argparse
 import bisect
+import re
 import importlib
 import os
 import pkgutil
@@ -40,47 +45,96 @@ def build(tree, rgbds):
     return os.path.join(tree, ROM)
 
 
+HRAM_EQU = re.compile(r"^(\w+)\s+EQU\s+\$(FF[0-9A-Fa-f]{2})\b", re.IGNORECASE)
+
+
 def ram_symbols(sym_path):
-    """Name -> address for every WRAM/HRAM symbol."""
+    """Name -> address for every WRAM/HRAM variable in a build: labels from
+    the .sym file plus the HRAM constants in that tree's hram.asm."""
     out = {}
     for name, (_, addr) in load_symbols(sym_path).items():
+        if "." in name:
+            continue
         if WRAM[0] <= addr < WRAM[1] or HRAM[0] <= addr < HRAM[1]:
             out[name] = addr
+    hram_asm = os.path.join(os.path.dirname(sym_path), "hram.asm")
+    if os.path.exists(hram_asm):
+        for line in open(hram_asm, encoding="utf-8", errors="ignore"):
+            m = HRAM_EQU.match(line.strip())
+            if m:
+                addr = int(m.group(2), 16)
+                if HRAM[0] <= addr < HRAM[1]:
+                    out.setdefault(m.group(1), addr)
     return out
 
 
-def same_ram_layout(old_sym, new_sym):
-    old, new = ram_symbols(old_sym), ram_symbols(new_sym)
-    shared = old.keys() & new.keys()
-    moved = sorted(n for n in shared if old[n] != new[n])
-    return not moved, moved
+def snapshot_index(addr):
+    wram_len = WRAM[1] - WRAM[0]
+    if WRAM[0] <= addr < WRAM[1]:
+        return addr - WRAM[0]
+    return wram_len + addr - HRAM[0]
 
 
-def new_only_ram(old_sym, new_sym):
-    """Snapshot indexes of RAM variables that only exist in the new build.
+def _regions(symbols):
+    """address -> (names starting there, length up to the next variable),
+    within each of WRAM and HRAM."""
+    by_addr = {}
+    for name, addr in symbols.items():
+        by_addr.setdefault(addr, []).append(name)
+    out = {}
+    for lo, hi in (WRAM, HRAM):
+        starts = sorted(a for a in by_addr if lo <= a < hi)
+        for i, a in enumerate(starts):
+            end = starts[i + 1] if i + 1 < len(starts) else hi
+            out[a] = (sorted(by_addr[a]), end - a)
+    return out
 
-    There is nothing to compare them against, so they are skipped. Each new
-    variable is assumed to run up to the next symbol's address.
+
+def ram_pairs(old_sym, new_sym):
+    """Which old snapshot byte to compare with which new one.
+
+    Returns (pairs, skipped_old, skipped_new, moved): pairs is a list of
+    (old index, new index); the others name the variables that were skipped
+    because only one build has them, and the shared ones that moved.
     """
     old, new = ram_symbols(old_sym), ram_symbols(new_sym)
-    starts = sorted(set(new.values()))
-    skip = set()
-    for name in new.keys() - old.keys():
-        if "." in name:
-            continue
-        start = new[name]
-        if start in old.values():
-            continue  # a new name for RAM that existed before
-        nxt = next((a for a in starts if a > start), start + 1)
-        skip.update(range(start, nxt))
-    wram_len = WRAM[1] - WRAM[0]
-    indexes = set()
-    for addr in skip:
-        if WRAM[0] <= addr < WRAM[1]:
-            indexes.add(addr - WRAM[0])
-        elif HRAM[0] <= addr < HRAM[1]:
-            indexes.add(wram_len + addr - HRAM[0])
-    return indexes
+    old_regions, new_regions = _regions(old), _regions(new)
+    shared = old.keys() & new.keys()
+    moved = sorted(n for n in shared if old[n] != new[n])
+
+    pairs = []
+    covered_new = set()
+    skipped_old, skipped_new = set(), set()
+    for lo, hi in (WRAM, HRAM):
+        owner = None  # (old start, names, length) of the region an address is in
+        for addr in range(lo, hi):
+            if addr in old_regions:
+                names, length = old_regions[addr]
+                owner = (addr, names, length)
+            if owner is None:
+                target = addr  # before the first variable: compare in place
+            else:
+                start, names, length = owner
+                both = [n for n in names if n in new]
+                if not both:
+                    skipped_old.update(names)
+                    continue
+                name = both[0]
+                offset = addr - start
+                new_start = new[name]
+                new_length = new_regions[new_start][1]
+                if offset >= new_length:
+                    continue  # the variable shrank; the tail no longer exists
+                target = new_start + offset
+            pairs.append((snapshot_index(addr), snapshot_index(target)))
+            covered_new.add(target)
+
+    # new variables at addresses nothing old maps onto
+    for addr, (names, length) in new_regions.items():
+        if not any(n in old for n in names):
+            if not any(a in covered_new for a in range(addr, addr + length)):
+                skipped_new.update(names)
+    return pairs, sorted(skipped_old), sorted(skipped_new), moved
 
 
 def snapshot_addr(index):
@@ -90,7 +144,7 @@ def snapshot_addr(index):
 
 def describe(addr, sym_path, _cache={}):
     if sym_path not in _cache:
-        pairs = sorted((a, n) for n, a in ram_symbols(sym_path).items() if "." not in n)
+        pairs = sorted((a, n) for n, a in ram_symbols(sym_path).items())
         _cache[sym_path] = ([a for a, _ in pairs], [n for _, n in pairs])
     addrs, names = _cache[sym_path]
     i = bisect.bisect_right(addrs, addr) - 1
@@ -131,14 +185,14 @@ def main():
 
         old_sym = os.path.splitext(old_rom)[0] + ".sym"
         new_sym = os.path.splitext(new_rom)[0] + ".sym"
-        compare_ram, moved = same_ram_layout(old_sym, new_sym)
-        skip = new_only_ram(old_sym, new_sym) if compare_ram else set()
-        if skip:
-            names = sorted(n for n in ram_symbols(new_sym).keys() - ram_symbols(old_sym).keys() if "." not in n)
-            print(f"skipping RAM that only exists in the new build: {', '.join(names)}")
-        if not compare_ram:
-            print(f"RAM layout changed ({len(moved)} symbols moved, e.g. {', '.join(moved[:5])}); "
-                  "comparing routine results only")
+        pairs, skipped_old, skipped_new, moved = ram_pairs(old_sym, new_sym)
+        if moved:
+            print(f"{len(moved)} RAM variables moved; comparing them at their new addresses "
+                  f"(e.g. {', '.join(moved[:5])})")
+        if skipped_old:
+            print(f"skipping RAM that only exists in the base build: {', '.join(skipped_old)}")
+        if skipped_new:
+            print(f"skipping RAM that only exists in the new build: {', '.join(skipped_new)}")
 
         old, new = Game(old_rom), Game(new_rom)
         failures = 0
@@ -151,21 +205,18 @@ def main():
                         game.reset()
                         suite.setup(game, random.Random(seed))
                         out = suite.run(game, case)
-                        results.append((out, game.snapshot_ram() if compare_ram else None))
+                        results.append((out, game.snapshot_ram()))
                     (old_out, old_ram), (new_out, new_ram) = results
 
                     problems = []
                     if old_out != new_out:
                         diffs = {k: (old_out[k], new_out.get(k)) for k in old_out if old_out[k] != new_out.get(k)}
                         problems.append(f"results differ (old, new): {diffs}")
-                    if compare_ram and old_ram != new_ram:
-                        changed = [i for i, (x, y) in enumerate(zip(old_ram, new_ram)) if x != y and i not in skip]
-                    else:
-                        changed = []
+                    changed = [(i, j) for i, j in pairs if old_ram[i] != new_ram[j]]
                     if changed:
                         where = ", ".join(
-                            f"{describe(snapshot_addr(i), new_sym)} {old_ram[i]:#04x}->{new_ram[i]:#04x}"
-                            for i in changed[:6]
+                            f"{describe(snapshot_addr(j), new_sym)} {old_ram[i]:#04x}->{new_ram[j]:#04x}"
+                            for i, j in changed[:6]
                         )
                         problems.append(f"{len(changed)} RAM bytes differ: {where}")
                     if problems:
