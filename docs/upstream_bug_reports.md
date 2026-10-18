@@ -87,3 +87,52 @@ full paralysis; before the fix the enemy's `INVULNERABLE` flag stayed set in
 10 of 10 runs (the player's in 0 of 10), after it neither side keeps it.
 Against the previous build, the fix changed only 4 of 8000 random states,
 all of them with the enemy starting out invulnerable.
+
+## Accuracy and evasion changes re-apply every badge boost
+
+**Status:** fixed in this fork (`claude/practical-mayer-gyxrm5`, commit
+"Fix accuracy and evasion changes re-applying badge boosts"). Present in
+upstream as of commit `a7a9b13`.
+
+**Symptom.** Every time the player's accuracy or evasion stage changes, the
+player's active Pokémon gets all its badge boosts again: attack, defense,
+speed and special each grow by another 12.5%. Using Double Team or Minimize
+repeatedly, or being hit by Sand-Attack, Smokescreen, Kinesis or Flash,
+keeps inflating the player's stats for the rest of the time that mon is out.
+Example from testing: with all badges, one Double Team took attack 100,
+defense 120 and speed 140 to 112, 135 and 157.
+
+**Cause.** Shin already fixed Gen 1's version of this bug, where any stat-up
+move re-applied every badge boost. `StatModifierUpEffect` and
+`StatModifierDownEffect` record which stat changed (`wUnusedD71B`, the stage
+index + 1), and `ApplyBadgeStatBoosts` (`engine/battle/core.asm`,
+`.selectiveBadgeBoost`) re-applies only that stat's boost. But for accuracy
+and evasion (index + 1 of 5 or 6) it falls back to re-applying every boost:
+
+```
+	ld c, $5
+	cp c
+	ret nc 	;kick out if carry flag not set so the function will apply all normal badge boosts
+```
+
+Accuracy and evasion have no stat that gets recalculated, so no boost should
+be re-applied at all.
+
+**Fix (upstream).** Clear the badge bits in that case:
+
+```
+	ld c, $5
+	cp c
+	jr c, .selectOne
+	ld b, 0 ; accuracy or evasion: no stat was recalculated, so there is no boost to reapply
+	ret
+.selectOne
+```
+
+**How it was found and checked.** While extending the badge boosts for a split
+special stat, the accuracy/evasion branch stood out. A spec test
+(`tests/test_badge_boosts.py` in this fork) runs whole turns of Double Team
+by the player and Sand-Attack against it with every badge; before the fix the
+player's stats rose 12.5% each time, after it they are unchanged. Against
+the previous build, the fix changed 9 of 600 random whole turns, all of
+them the player's evasion rising or accuracy falling.

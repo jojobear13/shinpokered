@@ -7473,7 +7473,10 @@ ApplyBadgeStatBoosts:
 	ret z	;kick out if zero so the function will apply all normal badge boosts
 	ld c, $5	;load a value of 5 into c
 	cp c	;set carry  flag if the offset in a is < c's value (stat being affected is neither accuracy or evasion)
-	ret nc 	;kick out if carry flag not set so the function will apply all normal badge boosts
+	jr c, .selectOne
+	ld b, 0	;accuracy or evasion: no stat was recalculated, so there is no boost to reapply
+	ret
+.selectOne
 	ld c, b	;put the badge bits into c and push onto stack
 	push bc
 	ld c, a	;put the offset value into c. it should be 1, 2, 3, or 4. use it as a loop counter.
