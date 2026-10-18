@@ -568,6 +568,13 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   moves, as from Gen 2, is a separate decision.
 - **Home bank.** It was full; `RefreshPartyMenu` and the clause-check
   wrapper, each used from at most two banks, moved out to make room.
+- **Move menu.** The line that said "TYPE/" now shows the selected move's
+  category (PHYS, SPCL or STAT) on the left and its effectiveness against
+  the enemy on the right: ▴▴ 4x, ▴ 2x, nothing 1x, ▼ 1/2x, ▼▼ 1/4x, × no
+  effect, from the same calculation the AI uses. Status moves get no mark;
+  fixed-damage moves only show ×. ▴ is a new font tile at $E9, ▼ upside
+  down, in a slot the font had left unused. `tests/test_move_menu_marks.py`
+  checks every mark; in the emulator, a battle's move menu showed each case.
 - **Verified:** `tests/test_move_categories.py` checks `GetMoveCategory`
   against the table for all 256 ids and that crossover moves use their
   category's stats; the damage-stat model in `tests/test_damage_vars.py`

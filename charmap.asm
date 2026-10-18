@@ -254,6 +254,7 @@ charmap "▷", $EC
 charmap "▶", $ED
 charmap "▲", $ED
 charmap "▼", $EE
+charmap "▴", $E9 ; filled up triangle, ▼ upside down (the move menu's effectiveness mark)
 charmap "♂", $EF
 charmap "¥", $F0
 charmap "×", $F1

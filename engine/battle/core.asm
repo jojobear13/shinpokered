@@ -3335,13 +3335,8 @@ PrintMenuItem:
 	ld a, [hl]
 	and $3f
 	ld [wcd6d], a
-; print TYPE/<type> and <curPP>/<maxPP>
-	coord hl, 1, 9
-	ld de, TypeText
-	call PlaceString
+; print <curPP>/<maxPP>; the category, type and effectiveness come after
 	coord hl, 7, 11
-	ld [hl], "/"
-	coord hl, 5, 9
 	ld [hl], "/"
 	coord hl, 5, 11
 	ld de, wcd6d
@@ -3354,6 +3349,7 @@ PrintMenuItem:
 	call GetCurrentMove
 	coord hl, 2, 10
 	predef PrintMoveType
+	call PrintMoveCategoryAndEffectiveness
 .moveDisabled
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
@@ -3362,8 +3358,88 @@ PrintMenuItem:
 DisabledText:
 	db "disabled!@"
 
-TypeText:
-	db "TYPE@"
+; on the move menu, the line above the move's type: its category on the left
+; and how effective it would be against the enemy on the right: ▴▴ 4x, ▴ 2x,
+; nothing 1x, ▼ 1/2x, ▼▼ 1/4x, × no effect. Status moves get no mark, and
+; fixed-damage moves only show ×, since type only decides whether they hit.
+PrintMoveCategoryAndEffectiveness:
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	push af
+	ld de, PhysicalText
+	and a
+	jr z, .gotCategoryText
+	ld de, SpecialText
+	dec a
+	jr z, .gotCategoryText
+	ld de, StatusMoveText
+.gotCategoryText
+	coord hl, 1, 9
+	call PlaceString
+	pop af
+	cp STATUS
+	ret z
+	ld a, [wPlayerMoveEffect]
+	ld hl, SetDamageEffects
+	ld de, 1
+	call IsInArray ; carry for fixed-damage moves
+	push af
+	ld a, [wTypeEffectiveness]
+	push af
+	ld a, [wUnusedC000]
+	push af
+	set 3, a ; the player's move against the enemy's types
+	ld [wUnusedC000], a
+	call AIGetTypeEffectiveness
+	pop af
+	ld [wUnusedC000], a
+	ld a, [wTypeEffectiveness]
+	ld b, a
+	pop af
+	ld [wTypeEffectiveness], a
+	pop af
+	ld a, b
+	jr nc, .gotMultiplier
+	and a
+	ret nz ; fixed damage: only immunity matters
+.gotMultiplier
+	coord hl, 8, 9
+	and a
+	jr z, .noEffect
+	cp $05
+	jr c, .quarter
+	jr z, .half
+	cp $14
+	ret c ; neutral
+	jr z, .double
+	ld a, "▴" ; 4x
+	ld [hli], a
+	ld [hl], a
+	ret
+.double
+	inc hl
+	ld [hl], "▴"
+	ret
+.half
+	inc hl
+	ld [hl], "▼"
+	ret
+.quarter
+	ld a, "▼"
+	ld [hli], a
+	ld [hl], a
+	ret
+.noEffect
+	inc hl
+	ld [hl], "×"
+	ret
+
+PhysicalText:
+	db "PHYS@"
+SpecialText:
+	db "SPCL@"
+StatusMoveText:
+	db "STAT@"
 
 SelectEnemyMove:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
