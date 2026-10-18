@@ -28,17 +28,26 @@ ROUTINES = {
 }
 
 
-def _species_ids():
+# species ids that aren't real Pokemon: the Pokemon Tower ghost and the
+# fossil pictures can only ever be the enemy's mon
+ENEMY_ONLY_SPECIES = ("MON_GHOST", "FOSSIL_KABUTOPS", "FOSSIL_AERODACTYL")
+
+
+def _species_ids(include_enemy_only):
     path = os.path.join(REPO_ROOT, "constants", "pokemon_constants.asm")
     ids = []
     for line in open(path):
         m = re.match(r"\s*const (\w+)\s*; \$([0-9A-Fa-f]+)", line)
-        if m and not m.group(1).startswith("MISSINGNO"):
-            ids.append(int(m.group(2), 16))
+        if not m or m.group(1).startswith("MISSINGNO"):
+            continue
+        if m.group(1) in ENEMY_ONLY_SPECIES and not include_enemy_only:
+            continue
+        ids.append(int(m.group(2), 16))
     return ids
 
 
-SPECIES = _species_ids()
+SPECIES = _species_ids(include_enemy_only=False)
+ENEMY_SPECIES = _species_ids(include_enemy_only=True)
 
 # type ids that exist in the type table, including both sides of the
 # physical/special boundary at FIRE
@@ -62,7 +71,7 @@ def _fill(game, rng, symbol, length):
 
 def _battle_mon(game, rng, prefix):
     _fill(game, rng, prefix, BATTLE_STRUCT_LEN)
-    game.poke(prefix + "Species", rng.choice(SPECIES))
+    game.poke(prefix + "Species", rng.choice(ENEMY_SPECIES if prefix == "wEnemyMon" else SPECIES))
     game.poke(prefix + "Level", rng.randint(1, 100))
     for name in ("MaxHP", "Attack", "Defense", "Speed", "Special"):
         game.poke16(prefix + name, stat(rng))

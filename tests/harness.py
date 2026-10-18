@@ -32,6 +32,10 @@ RANDOM_QUEUE_LEN = 32
 HARNESS_END = 0xDF50
 
 H_LOADEDROMBANK = 0xFFB8
+H_JOY_PRESSED = 0xFFB3
+H_JOY_HELD = 0xFFB4
+H_JOY_5 = 0xFFB5
+A_AND_B_BUTTONS = 0x03
 MBC_ROM_BANK = 0x2000
 REG_IE = 0xFFFF
 
@@ -76,8 +80,8 @@ class Game:
         self.pyboy.set_emulation_speed(0)
         self.memory = self.pyboy.memory
         self.regs = self.pyboy.register_file
+        self._patches = []  # (bank, addr, original bytes), undone by reset()
         self._random_patched = False
-        self._random_original = None
         self._boot()
 
     # ------------------------------------------------------------------ setup
@@ -108,7 +112,8 @@ class Game:
     def reset(self):
         """Restore the booted machine and reinstall the harness code."""
         self._load_snapshot()
-        self._unpatch_random()
+        self.unpatch_all()
+        self._random_patched = False
         self._random_queue = []
         for addr in range(LAUNCHER, HARNESS_END):
             self.memory[addr] = 0
@@ -157,6 +162,41 @@ class Game:
         hram = bytes(self.memory[a] for a in range(*HRAM))
         return wram + hram
 
+    # ------------------------------------------------------------ ROM patches
+
+    def patch(self, where, *values):
+        """Overwrite ROM bytes at a symbol (or a (bank, addr) pair). Undone by
+        reset(), since ROM patches are not part of the saved snapshot."""
+        bank, addr = self.symbols[where] if isinstance(where, str) else where
+        original = [self.memory[bank, addr + i] for i in range(len(values))]
+        self._patches.append((bank, addr, original))
+        for i, value in enumerate(values):
+            self.memory[bank, addr + i] = value & 0xFF
+
+    def unpatch_all(self):
+        for bank, addr, original in reversed(self._patches):
+            for i, value in enumerate(original):
+                self.memory[bank, addr + i] = value
+        self._patches = []
+
+    def skip_delays(self):
+        """Make DelayFrame return at once, so routines that animate (HP bars,
+        sliding pictures) can run with interrupts off. Everything they write
+        to RAM, including the tile map, is unaffected."""
+        self.patch("DelayFrame", 0xC9)  # ret
+
+    def auto_buttons(self):
+        """Make Joypad report A and B held and newly pressed on every call, so
+        text boxes print instantly and don't wait for the player."""
+        self.patch(
+            "Joypad",
+            0x3E, A_AND_B_BUTTONS,  # ld a, A_BUTTON | B_BUTTON
+            0xE0, H_JOY_PRESSED & 0xFF,  # ldh [hJoyPressed], a
+            0xE0, H_JOY_HELD & 0xFF,  # ldh [hJoyHeld], a
+            0xE0, H_JOY_5 & 0xFF,  # ldh [hJoy5], a
+            0xC9,  # ret
+        )
+
     # ----------------------------------------------------------------- random
 
     def queue_random(self, *values):
@@ -174,27 +214,14 @@ class Game:
     def _patch_random(self):
         if self._random_patched:
             return
-        # jp RANDOM_STUB at the start of Random
-        bank, addr = self.symbols["Random"]
-        self._random_original = [self.memory[bank, addr + i] for i in range(3)]
-        self.memory[bank, addr] = 0xC3
-        self.memory[bank, addr + 1] = RANDOM_STUB & 0xFF
-        self.memory[bank, addr + 2] = RANDOM_STUB >> 8
+        self.patch("Random", 0xC3, RANDOM_STUB & 0xFF, RANDOM_STUB >> 8)  # jp RANDOM_STUB
         self._random_patched = True
 
-    def _unpatch_random(self):
-        # ROM patches are not part of the saved snapshot, so undo them by hand
-        if self._random_patched:
-            bank, addr = self.symbols["Random"]
-            for i, b in enumerate(self._random_original):
-                self.memory[bank, addr + i] = b
-        self._random_patched = False
-
     def _install_random_stub(self):
-        # push hl / ld hl, RANDOM_INDEX / ld a, [hl] / inc [hl]
-        # add RANDOM_QUEUE low byte / ld l, a / ld a, [hl] / pop hl / ret
-        # An exhausted queue reads the sentinel $ff index and spins forever,
-        # which call() reports as a timeout.
+        # push hl / ld hl, RANDOM_INDEX / ld a, [hl] / (spin if exhausted)
+        # inc [hl] / add RANDOM_QUEUE low byte / ld l, a / ld a, [hl] / pop hl / ret
+        # When the queue runs out the stub spins forever, which call()
+        # reports as an error.
         stub = [
             0xE5,
             0x21, RANDOM_INDEX & 0xFF, RANDOM_INDEX >> 8,

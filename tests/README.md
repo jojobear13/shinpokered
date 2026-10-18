@@ -44,7 +44,16 @@ to compare them against.
   them).
 - `game.call("RoutineName", a=..., bc=..., de=..., hl=...)` runs a routine with
   interrupts off and returns the registers it left behind. Routines that wait
-  for the next frame (text, animations) can't be called this way.
+  for the next frame or for input need `skip_delays()` / `auto_buttons()`
+  (below); ones that wait on sound or other interrupt-driven state can't be
+  called this way yet.
+- `game.skip_delays()` makes `DelayFrame` return at once, so routines that
+  animate (HP bars draining, sliding pictures) can be called. What they write
+  to RAM, including the tile map, is unchanged.
+- `game.auto_buttons()` makes `Joypad` report A and B held, so text boxes
+  print instantly and don't wait for the player.
+- `game.patch(symbol, bytes...)` overwrites ROM; every patch is undone by
+  `reset()`.
 - `game.queue_random(...)` makes `Random` return chosen values. Using more
   values than were queued is an error, so a test always knows how much
   randomness a routine used.
