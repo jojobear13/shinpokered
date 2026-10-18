@@ -510,6 +510,14 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   the player's mon only, so every move missed the enemy until it completed a
   Fly or Dig or switched out. Both sides now use the same mask. Test:
   `tests/test_invulnerability.py`. Recommended upstream.
+- **Found, not yet fixed: accuracy and evasion changes re-apply every badge
+  boost.** Shin fixed Gen 1's bug where any stat-up move re-applied all badge
+  boosts by re-applying only the changed stat's boost (`wUnusedD71B`), but
+  `ApplyBadgeStatBoosts` still re-applies all of them when the changed stage is
+  accuracy or evasion, whose stats are never recalculated. Each Double Team,
+  Minimize or Sand-Attack against the player therefore raises the player's
+  other stats by another 12.5% (seen in the emulator: 200 to 225 after one
+  Double Team). The fix is to re-apply nothing in that case. Awaiting approval.
 
 ## Known facts that are easy to get wrong
 
