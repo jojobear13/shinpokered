@@ -370,6 +370,30 @@ consumption) joins the suite when the first ability lands.
 check is cheap to add once the pipeline and abilities exist. It is plan step
 G.
 
+### 8. Optional rules are options, not NPCs; new mechanics live on their own branch
+
+**Chosen.** Every Shin rule that an NPC or object used to toggle (wild and
+trainer randomizers, trainer scaling, alternate trainer moves, catch-up EXP,
+the caught icon, the five battle clauses, the Safari event and the Shimmer) is
+a row on the RULES page of the extra options menu
+(`custom_functions/func_rules_menu.asm`). The NPCs that Shin added for them
+are gone; the Oak's Lab girl and aides, which are in the original game, say
+their original lines again; the Viridian house is back to its original size.
+Each rule is still the same event flag, so the code that follows a rule did
+not change. `SetDefaultNames` carries the rule flags across the event-flag wipe
+so they can be set from the title screen before NEW GAME.
+
+This branch stays the Gen 1 game plus Shin's optional rules, all off by
+default. New mechanics (decisions 3, 5 and 6 and anything else that changes
+how battles or the overworld work) go on a separate branch cut from here, so
+this one remains a mechanically untouched base to compare against. Behaviour-
+preserving refactors (plan steps E onward that change no behaviour) still
+land here first.
+
+**Costs.** Wild randomization no longer offers re-rolling the seed mid-game;
+the seed is the one chosen at NEW GAME. The Safari event is no longer locked
+until after the Elite Four.
+
 ## Plan
 
 Steps in order. Each names its verification; a step is done when that passes

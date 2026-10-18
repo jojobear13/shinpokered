@@ -14,34 +14,3 @@ _ViridianPokeCenterText3::
 	para "They don't charge"
 	line "any money either!"
 	done
-
-;joenote - text for randomized regular trainers
-_ViridianPokeCenter_RegRandomON::
-	text "Not your first"
-	line "try at a #MON"
-	cont "journey?"
-	
-	para "I can make it so"
-	line "regular trainers"
-	cont "are randomized."
-	done
-	
-_ViridianPokeCenter_RegRandomOFF::
-	text "You desire more"
-	line "structure? Hmm..."
-	
-	para "I can put regular"
-	line "trainers back to"
-	cont "normal for you."
-	done
-	
-_ViridianPokeCenter_AideQ_done::
-	text "Okay, it's done."
-	done
-	
-_ViridianPokeCenter_AideQ_reject::
-	text "No? Very well."
-	line "See me again if"
-	cont "you change your"
-	cont "mind later."
-	done

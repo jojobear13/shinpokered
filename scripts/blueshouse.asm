@@ -23,7 +23,6 @@ BluesHouseTextPointers:
 	dw BluesHouseText1
 	dw BluesHouseText2
 	dw BluesHouseText3
-	dw ShimmerToggleText
 
 BluesHouseText1:
 	TX_ASM
@@ -87,40 +86,4 @@ BluesHouseText2: ; Daisy, walking around
 
 BluesHouseText3: ; map on table
 	TX_FAR _BluesHouseText3
-	db "@"
-
-
-	
-;joenote - toggle for shimmer function and associated text
-ShimmerToggleText:
-	TX_ASM
-	CheckEvent EVENT_8C7
-	jr nz, .off
-.on
-	SetEvent EVENT_8C7
-	ld hl, _TXTShimmerON
-	jr .print
-.off
-	ResetEvent EVENT_8C7
-	ld hl, _TXTShimmerOFF
-.print
-	call PrintText
-.done
-	jp TextScriptEnd
-_TXTShimmerON:
-	text "A glass #BALL"
-	line "shimmers faintly."	
-	para "You sense that"
-	line "certain pokemon"
-	cont "may manifest some"
-	cont "hidden potential."
-	done
-	db "@"
-_TXTShimmerOFF:
-	text "A glass #BALL"
-	line "...just a nice"
-	cont "decoration."
-	para "You must have"
-	line "been mistaken."
-	done
 	db "@"

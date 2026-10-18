@@ -19,7 +19,7 @@ DisplayExtraOptionMenu:
 	call TextBoxBorder
 ;draw text box border for master options
 	coord hl, 0, 9
-	ld b, 2
+	ld b, 3
 	ld c, 18
 	call TextBoxBorder
 
@@ -73,8 +73,10 @@ DisplayExtraOptionMenu:
 	jr z, .cursorLvlCap
 	cp $B ; cursor over nuzlocke?
 	jr z, .cursorNuzlocke
+	cp $C ; cursor over rules?
+	jr z, .cursorRules
 	cp $10 ; is the cursor on Back?
-	jr z, .exitMenu
+	jp z, .exitMenu
 	jr .getJoypadStateLoop
 	
 .cursorAudio
@@ -104,6 +106,9 @@ DisplayExtraOptionMenu:
 .cursorNuzlocke
 	call ToggleNuzlocke
 	jr .getJoypadStateLoop
+.cursorRules
+	callba DisplayRulesMenu
+	jp DisplayExtraOptionMenu
 
 .checkDirectionKeys
 	ld a, [wTopMenuItemY]
@@ -123,8 +128,8 @@ DisplayExtraOptionMenu:
 	cp 7
 	ld b, 3
 	jr z, .updateMenuVariables
-	cp 11
-	ld b, 5
+	cp 12
+	ld b, 4
 	jr z, .updateMenuVariables
 	;else
 	ld b, 1
@@ -137,7 +142,7 @@ DisplayExtraOptionMenu:
 	ld b, -3
 	jr z, .updateMenuVariables
 	cp 16
-	ld b, -5
+	ld b, -4
 	jr z, .updateMenuVariables
 	;else
 	ld b, -1
@@ -205,6 +210,11 @@ PlaceExtraOptionStrings:
 ;place nuzlocke text
 	coord hl, 1, 11
 	ld de, TextNuzlocke
+	call PlaceString
+
+;place rules text
+	coord hl, 1, 12
+	ld de, TextRules
 	call PlaceString
 
 	ret
@@ -529,6 +539,8 @@ TextAILevelCap:
 	db " LVL CAP@"
 TextNuzlocke:
 	db " NUZLOCKE@"
+TextRules:
+	db " RULES@"
 	
 OptionMenuOnOffText:
 	dw OptionMenuTextON

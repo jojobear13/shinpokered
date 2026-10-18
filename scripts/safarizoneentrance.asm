@@ -17,7 +17,7 @@ SafariZoneEntranceScriptPointers:
 	ld hl, .CoordsData_75221
 	call ArePlayerCoordsInArray
 	ret nc
-	ld a, $4	;$3 joenote - shifting text scripts
+	ld a, $3
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID
 	ld a, $ff
@@ -55,7 +55,7 @@ SafariZoneEntranceScriptPointers:
 	ld [hJoyHeld], a
 	ld [wJoyIgnore], a
 	call UpdateSprites
-	ld a, $5 ;$4	joenote - shifting text scripts
+	ld a, $4
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID
 	ld a, $ff
@@ -80,7 +80,7 @@ SafariZoneEntranceScriptPointers:
 	call UpdateSprites
 	ld a, $f0
 	ld [wJoyIgnore], a
-	ld a, $7 ;$6	joenote - shifting text scripts
+	ld a, $6
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID
 	xor a
@@ -92,7 +92,7 @@ SafariZoneEntranceScriptPointers:
 	ld [wSafariZoneEntranceCurScript], a
 	jr .asm_75286
 .asm_7527f
-	ld a, $6 ;$5 joenote - shifting text scripts
+	ld a, $5
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID
 .asm_75286
@@ -143,7 +143,6 @@ SafariZoneEntranceScript_752b4:
 SafariZoneEntranceTextPointers:
 	dw .SafariZoneEntranceText1
 	dw .SafariZoneEntranceText2
-	dw .SafariZoneSpecialEventText
 	dw .SafariZoneEntranceText1
 	dw .SafariZoneEntranceText4
 	dw .SafariZoneEntranceText5
@@ -303,58 +302,5 @@ SafariZoneEntranceTextPointers:
 
 .RegularText
 	TX_FAR _SafariZoneEntranceText_753f0
-	db "@"
-
-
-	
-
-;joenote - allow for special safari settings
-;Makes safari mons have 9888 DVs at the lowest
-;Also adds random mons into areas
-;Available after the elite 4
-.SafariZoneSpecialEventText
-	TX_ASM
-	CheckEvent EVENT_908
-	ld hl, .NotReady
-	jr z, .end
-	
-	CheckEvent EVENT_90F
-	jr nz, .activeevent
-	
-	ld hl, .Ready
-	call PrintText
-	call YesNoChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	call z, .setevent
-	ld hl, SafariZoneEntranceTextPointers.SafariZoneEntranceText_753c0
-	jr .end
-
-.activeevent	
-	ld hl, .alreadyactive
-	call PrintText
-	call YesNoChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	call z, .resetevent
-	ld hl, SafariZoneEntranceTextPointers.SafariZoneEntranceText_753c0
-
-	.end
-	call PrintText
-	jp TextScriptEnd
-.setevent
-	SetEvent EVENT_90F	;turn on special safari event
-	ret
-.resetevent
-	ResetEvent EVENT_90F	;turn off special safari event
-	ret
-.NotReady
-	TX_FAR _SafariZoneEntranceTextSpecial_NotReady
-	db "@"
-.Ready
-	TX_FAR _SafariZoneEntranceTextSpecial_Ready
-	db "@"
-.alreadyactive
-	TX_FAR _SafariZoneEntranceTextSpecial_Active
 	db "@"
 	

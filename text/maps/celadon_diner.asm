@@ -57,35 +57,3 @@ _CeladonDinerText_491b7::
 	line "I was going to"
 	cont "win it back..."
 	done
-
-;joenote - add text for catch-up exp boost
-_CeladonDiner_EXPCatchUpON::
-	text "This spicy KETCHUP"
-	line "helps me CATCH-UP"
-	cont "with my studies."
-	
-	para "It can also make"
-	line "weaker #MON"
-	cont "gain more EXP."
-	cont "Want to try it?"
-	done
-	
-_CeladonDiner_EXPCatchUpOFF::
-	text "Too spicy for you?"
-	line "Or all caught-up?"
-	
-	para "I can undo the"
-	line "effect with some"
-	cont "MILK. Sound good?"
-	done
-	
-_CeladonDiner_AideQ_done::
-	text "Okay, it's done."
-	done
-	
-_CeladonDiner_AideQ_reject::
-	text "No? Very well."
-	line "See me again if"
-	cont "you change your"
-	cont "mind later."
-	done

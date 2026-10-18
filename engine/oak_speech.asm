@@ -7,6 +7,7 @@ SetDefaultNames:
 ;	push af
 	ld a, [wUnusedD721]	;joenote - preserve extra options
 	push af
+	callba SaveRuleFlags ; and the rules, which are event flags
 	ld hl, wPlayerName
 	ld bc, wMainDataEnd - wPlayerName ; the box is in save RAM now
 	xor a
@@ -15,6 +16,7 @@ SetDefaultNames:
 	ld bc, $200
 	xor a
 	call FillMemory
+	callba RestoreRuleFlags
 	pop af
 	ld [wUnusedD721], a	;joenote - restore extra options
 ;	pop af

@@ -1209,48 +1209,7 @@ OaksLabText9:
 	TX_ASM
 	ld hl, OaksLabText_1d340
 	call PrintText
-;	jp TextScriptEnd
-;joenote - dialogue for wild randomization
-	CheckEvent EVENT_8DE
-	jr z, .randOn
-	ld hl, OaksLabText_randwildOFF 
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .end
-	ResetEvent EVENT_8DE
-	ResetEvent EVENT_8D7
-	jr .print_done
-.randOn
-	ld hl, OaksLabText_randwildON
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .end
-	SetEvent EVENT_8DE
-	ResetEvent EVENT_8D7
-	ld hl, OaksLabText_randwildTrue
-	call PrintText
-	call .choose 
-	jr z, .randRegen
-	SetEvent EVENT_8D7
-.randRegen
-	ld hl, OaksLabText_randwildRegen
-	call PrintText
-	call .choose 
-	jr z, .print_done
-	call Random
-	ld [wRandomizerSeed], a
-.print_done
-	ld hl, OaksLabText_AideQ_done
-.end
-	call PrintText
 	jp TextScriptEnd
-.choose
-	call NoYesChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	ret
 
 OaksLabText_1d340:
 	TX_FAR _OaksLabText_1d340
@@ -1385,68 +1344,11 @@ OaksLabText27:
 	db "@"
 
 OaksLabText11:
+OaksLabText10:
 	TX_ASM
-	CheckEvent EVENT_90C
-	jr z, .scaleOn
-	ld hl, OaksLabText_scalingOFF 
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .end
-	ResetEvent EVENT_90C
-	jr .print_done
-.scaleOn
-	ld hl, OaksLabText_scalingON
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .end
-	SetEvent EVENT_90C
-.print_done
-	ld hl, OaksLabText_AideQ_done
-.end
-	call PrintText
-	jp TextScriptEnd
-.choose
-	call NoYesChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	ret
-	
-
-OaksLabText10:	;joenote - setting up caught and gender symbol toggle
-	TX_ASM
-	CheckEvent EVENT_GOT_POKEDEX
-	jr z, .nodex
-	CheckEvent EVENT_90E
-	jr nz, .toggleoff
-	ld hl, OaksLabText_symbolsON
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .print 
-	SetEvent EVENT_90E
-	jr .print_done
-.toggleoff
-	ld hl, OaksLabText_symbolsOFF
-	call PrintText
-	call .choose
-	ld hl, OaksLabText_AideQ_reject
-	jr z, .print
-	ResetEvent EVENT_90E
-.print_done
-	ld hl, OaksLabText_AideQ_done
-	jr .print
-.nodex
 	ld hl, OaksLabText_1d405
-.print
 	call PrintText
 	jp TextScriptEnd
-.choose
-	call NoYesChoice
-	ld a, [wCurrentMenuItem]
-	and a
-	ret
 
 OaksLabText_1d405:
 	TX_FAR _OaksLabText_1d405
@@ -1463,39 +1365,4 @@ OaksLabText_prebattle:
 	
 OakVictorySpeech:
 	TX_FAR _OakVictorySpeech
-	db "@"
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;joenote - add text for level-scaling
-OaksLabText_scalingON:
-	TX_FAR _OaksLabText_scalingON
-	db "@"
-OaksLabText_scalingOFF:
-	TX_FAR _OaksLabText_scalingOFF
-	db "@"
-	
-OaksLabText_randwildON:
-	TX_FAR _OaksLabText_randwildON
-	db "@"
-OaksLabText_randwildOFF:
-	TX_FAR _OaksLabText_randwildOFF
-	db "@"
-OaksLabText_randwildRegen:
-	TX_FAR _OaksLabText_randwildRegen
-	db "@"
-OaksLabText_randwildTrue:
-	TX_FAR _OaksLabText_randwildTrue
-	db "@"
-
-OaksLabText_symbolsON:
-	TX_FAR _OaksLabText_symbolsON
-	db "@"
-OaksLabText_symbolsOFF:
-	TX_FAR _OaksLabText_symbolsOFF
-	db "@"
-
-OaksLabText_AideQ_done:
-	TX_FAR _OaksLabText_AideQ_done
-	db "@"
-OaksLabText_AideQ_reject:
-	TX_FAR _OaksLabText_AideQ_reject
 	db "@"

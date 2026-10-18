@@ -187,6 +187,8 @@ Yellow's audio engine is backported for stereo sound support.
 Game Boy Printer functionality has been added. 
 
 New options that can be toggled! Hit SELECT on the options screen to see an extra options menu.
+Choose RULES there for the optional game rules that NPCs used to toggle (randomizers, trainer scaling, clauses and more).
+Rules can be set from the title screen's options before starting a new game.
 - Cycle through audio types.
 - Playing in GBC mode on a backlit LCD screen?
   - Press SELECT at the copyright screen to activate color correction.
@@ -235,27 +237,27 @@ You can choose RUN while holding SELECT in trainer battles to forfeit the match 
 
 There is a built-in nuzlocke mode that can be toggled from the extra options menu.
 
-The girl in Oak's lab toggles wild pokemon randomization.
+RULES > RANDOM WILD toggles wild pokemon randomization (TIER shuffles within tiers, FULL across all of them).
 If activated early enough in the game, your starter pokemon choices are randomized as well.
 
 The AREA function of the PokeDex now takes the Super Rod into account.
 It will also notify you if the Pokemon you are referencing is available in the immediate vicinity.
 It even works with the randomizer active.
 
-One of the aides in Oak's lab toggles scaling of trainer rosters to your level (evolving them if applicable).
+RULES > TRNR SCALING toggles scaling of trainer rosters to your level (evolving them if applicable).
 
 As an alternative to trainer scaling, there is now an obedience level-cap that can be toggled in the extra options menu.
 While active, the current maximum obedience level will display in the extra options menu.
 All pokemon, not just trades, will start to disobey if over the displayed level cap.
 
-The other aide in Oak's lab toggles a pokeball-caught symbol in battle after obtaining the pokedex.
+RULES > CAUGHT ICON toggles a pokeball-caught symbol in battle.
 To help with Gen 2 interaction, this also applies a gender symbol to species that can be male or female.
 
-Another aide npc is in the Viridian pokemon center. He will toggle on/off randomization of non-special trainers.
+RULES > RANDOM TRNRS toggles randomization of non-special trainers.
 
-An aide is in the Celadon Diner. He will toggle on/off a catch-up EXP boost function for under-leveled pokemon.
+RULES > CATCH-UP EXP toggles a catch-up EXP boost function for under-leveled pokemon.
 
-Item, Sleep, Freeze, Trapping, and Hyper Beam clauses can each be toggled by the Clause Brothers in Viridian City.
+Item, Sleep, Freeze, Trapping, and Hyper Beam clauses can each be toggled under RULES.
  
 The bag now supports an additional item list for an extra 20 slots of space!
 Press START on the bag menu to hot-swap the item list that populates the active bag.
@@ -447,7 +449,7 @@ v1.25.0
 - Biker teams can now include Beedrill, Magmar, an Electrode, and more Voltorbs
 - Fixed an issue where enemy level-up moves were being skipped
 - Added a feature for Alt Trainer Moves  
-  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - Toggle it under RULES > ALT. MOVES.  
   - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
   - Their moves will be more competitive at higher levels.
 
@@ -1121,7 +1123,7 @@ v1.25.0
 
 #Difficulty and scalable trainers
 - There is an option to scale trainer rosters to the level of your strongest roster pkmn
-  - Talk to the right-side aide in Oak's lab to toggle on/off
+  - Toggle it under RULES > TRNR SCALING
   - Enemy pkmn will evolve by level if applicable
     - Pokemon that evolve below level 30 will evolve at 4/3x the original level 
     - Pokemon that evolve >= level 30 will evolve at 8/7x the original level 
@@ -1144,14 +1146,14 @@ v1.25.0
   - Warning: The difficulty will be compounded if both trainer scaling and hard mode are active
   - Oak's pokeballs will be upgraded to great balls if you beat the route 22 rival in hard mode
 - Alt Trainer Moves  
-  - There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+  - Toggle it under RULES > ALT. MOVES.  
   - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
   - Their moves will be more competitive at higher levels.
-- Added the Clause Brothers to Viridian City
-  - They toggle enforcement of the item, sleep, and/or freeze clauses
+- Added battle clauses, toggled under RULES
+  - They enforce the item, sleep, and/or freeze clauses
   - The clauses apply to the player and AI equally
   - Sleep and freeze clauses work like they do in Pokemon Stadium
-- Added a fourth brother for the Trapping Move Clause
+- Added a Trapping Move Clause
   - A counter tracks if the player or the opponent use trapping moves like Wrap multiple times in a row 
   - The counter increments only if a trapping effect move is selected to be used and it does not miss
   - After the counter has incremented to 2, 
@@ -1159,7 +1161,7 @@ v1.25.0
     - this is the same priority as the move Counter
   - The counter only gets reset by switching or using a move that does not have the trapping effect 
   - Reseting the counter will restore normal priority to trapping effect moves.
-- Added a fifth Clause Brother for the hyper beam clause; hyper beam will recharge if it KOs the opponent
+- Added a hyper beam clause; hyper beam will recharge if it KOs the opponent
 - Link battles in the Colosseum now synchronize battle clauses between both players
   - The item clause is not applicable because items are not usable in link battles by default
   - There is a clipboard in the Colosseum that is used to reset and re-select your battle clauses
@@ -1279,7 +1281,7 @@ v1.25.0
   - non-sexed species have no symbol
   - The symbol is displayed for a party mon in its status screen
   - The symbol is displayed in the battle hud only for wild enemy mon (the only time it matters)
-- Oak's aid at the bottom-left of the lab toggles the caught & gender symbols after obtaining the pokedex
+- RULES > CAUGHT ICON toggles the caught & gender symbols
 - Red & Blue versions use the back sprites from spaceworld 97 so as to be cohesive with the front sprites
 - Added spaceworld-style trainer back sprites for consistency with the spaceworld 'mon back sprites 
 - The silhouette effect at the start of battle now displays when playing on a DMG gameboy
@@ -1287,7 +1289,7 @@ v1.25.0
 
 
 #Pre-E4 NPCs
-- The girl in Oak's lab toggles a built-in randomizer for wild pokemon and your starters
+- RULES > RANDOM WILD toggles a built-in randomizer for wild pokemon and your starters
   - Shuffles all pokemon that can be gained through walking, surfing, fishing, or from the game corner
   - If activated early enough, your starter pokemon options are shuffled as well
   - Randomizes using a saved seed value, so the shuffled order is always preserved between play sessions
@@ -1297,9 +1299,8 @@ v1.25.0
   - Scripted events are unaffected (gifts, in-game trades, static encounters, etc)
   - The game's five legendary pokemon are excluded from randomization
   - The AREA feature of the pokedex automatically adjusts to show the new pokemon locations
-  - Talking to the girl in Oak's lab allows the player to generate a new randomization seed value.  
-  - The girl will also ask if full randomization is preferred, which will combine the tiers into one big list.  
-- There is an Aide NPC in the viridian pokemon center that can toggle regular trainer randomization
+  - Choosing FULL instead of TIER combines the tiers into one big list.  
+- RULES > RANDOM TRNRS toggles regular trainer randomization
   - Only affects regular trainers that use one level for all 'mons and have no custom movesets
   - Will replace their roster 'mons with random non-evolved 'mons (legendaries are excluded)
   - The new mons will be swapped with their evolved forms if at a high enough level
@@ -1313,7 +1314,7 @@ v1.25.0
   - Talk to her tutor to relearn moves.
   - I have expanded Mateo's code so that it also detects default level-0 moves from the baseStats header files.
 - Catch-Up EXP Booster
-  - Talk to the aide in the Celadon Diner to toggle this feature.  
+  - Toggle it under RULES > CATCH-UP EXP.  
   - While active, EXP gained is boosted if the active pokemon's level is lower than that of the fainted enemy.  
   - The boost is 1.5x multiplied by an additional 1.5x for every 3 levels of difference.  
   - For example, a level gap of 12 results in an EXP multiplier of (1.5)^4 = 5.0625.  
@@ -1352,7 +1353,7 @@ v1.25.0
   - Sells max revives, moon stones, amber, fossils, exp all, master balls, and rare candy
   - Only opens up after beating elite 4
 - Relocated one of the rocket grunts in celadon city, and he now sells bulk coins in the post-game
-- In the safari zone gate, a new NPC can toggle on and off a special safari event after the elite 4
+- RULES > SAFARI EVENT toggles a special safari event
   - All pokemon in the safari zone will have above-average DVs
   - Also makes it so there is a rare chance for any pokemon to be encountered in the safari zone (depends on location)
 - The game corner chief will buy pokemon from the player post-e4
@@ -1467,7 +1468,7 @@ v1.25.0
   - If successful, the ball tossed will be twice as effective as normal
 
 - Added "The Shimmer", a cheat feature for those who want viability when using certain low-regarded pokemon.
-  - Toggled ON/OFF via the glass pokeball decoration in the rival's house.
+  - Toggled ON/OFF under RULES > SHIMMER.
   - Pokemon Eligible: EKANS, CATERPIE, METAPOD, WEEDLE, KAKUNA, ZUBAT, PSYDUCK, PARAS, PONYTA, RATTATA, SANDSHREW, HORSEA, GOLDEEN, VENONAT, JIGGLYPUFF, ARBOK, BEEDRILL, BUTTERFREE, DITTO, FARFETCHD, GOLBAT, GOLDUCK, HITMONCHAN, LICKITUNG, ONIX, PARASECT, PINSIR, PORYGON, RAPIDASH, RATICATE, SANDSLASH, SEADRA, SEAKING, VENOMOTH, WIGGLYTUFF
   - The shimmer factor appears randomly and secretly, being more likely to occur by training and sending out eligible 'mons.
   - The shimmer only manifests in 'mons that are fully evolved, even if their pre-evos gained the secret shimmer factor.

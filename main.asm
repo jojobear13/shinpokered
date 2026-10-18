@@ -411,8 +411,8 @@ LavenderHouse1Blocks:
 LavenderHouse2Blocks:
 CeruleanHouse1Blocks:
 PewterHouse1Blocks:
-PewterHouse2Blocks: INCBIN "maps/viridianhouse.blk"
-ViridianHouseBlocks: INCBIN "maps/viridianhouse_new.blk"	;joenote - sectioning this off
+PewterHouse2Blocks:
+ViridianHouseBlocks: INCBIN "maps/viridianhouse.blk"
 
 CeladonMansion5Blocks:
 SchoolBlocks: INCBIN "maps/school.blk"
@@ -1934,6 +1934,9 @@ INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
 INCLUDE "custom_functions/func_extra_menu.asm"
+
+SECTION "Rules Menu", ROMX
+INCLUDE "custom_functions/func_rules_menu.asm"
 INCLUDE "custom_functions/func_move_secrets.asm"
 INCLUDE "custom_functions/func_linkbattlecomms.asm"
 INCLUDE "custom_functions/func_bag.asm"

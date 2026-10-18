@@ -91,30 +91,3 @@ _SafariZoneEntranceText_753f0::
 	text "Sorry, you're a"
 	line "regular here!"
 	done
-
-;joenote - adding text for safari zone special event
-_SafariZoneEntranceTextSpecial_NotReady::
-	text "We're working on"
-	line "a special event,"
-	cont "but it won't be"
-	cont "ready until after"
-	cont "the #MON"
-	cont "League finals."
-	done
-_SafariZoneEntranceTextSpecial_Ready::
-	text "Hello CHAMPION!"
-	line "Would you like to"
-	cont "participate in a"
-	cont "special event?"
-	para "SAFARI #MON"
-	line "will be of better"
-	cont "breed, and there"
-	cont "is a rare chance"
-	cont "to encounter new"
-	cont "species!"
-	done
-_SafariZoneEntranceTextSpecial_Active::
-	text "Shall I return"
-	line "the SAFARI ZONE"
-	cont "back to normal?"
-	done
