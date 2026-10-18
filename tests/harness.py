@@ -27,9 +27,9 @@ DEFAULT_ROM = os.path.join(REPO_ROOT, "pokered.gbc")
 LAUNCHER = 0xDF00  # bank switch + call + restore + spin loop
 RANDOM_STUB = 0xDF18  # replacement for Random that reads RANDOM_QUEUE
 RANDOM_INDEX = 0xDF2F
-RANDOM_QUEUE = 0xDF30  # up to 32 queued values
-RANDOM_QUEUE_LEN = 32
-HARNESS_END = 0xDF50
+RANDOM_QUEUE = 0xDF30  # up to 64 queued values
+RANDOM_QUEUE_LEN = 64
+HARNESS_END = 0xDF70
 
 H_LOADEDROMBANK = 0xFFB8
 H_JOY_PRESSED = 0xFFB3
@@ -179,6 +179,11 @@ class Game:
                 self.memory[bank, addr + i] = value
         self._patches = []
 
+    def skip_sound_waits(self):
+        """Make WaitForSoundToFinish return at once. Sound only advances in
+        the V-blank interrupt, which is off while a routine runs."""
+        self.patch("WaitForSoundToFinish", 0xC9)  # ret
+
     def skip_delays(self):
         """Make DelayFrame return at once, so routines that animate (HP bars,
         sliding pictures) can run with interrupts off. Everything they write
@@ -276,6 +281,7 @@ class Game:
         for i, b in enumerate(launcher):
             self.memory[LAUNCHER + i] = b
         expected = [self.memory[LAUNCHER + i] for i in range(len(launcher))]
+        harness_area = [self.memory[a] for a in range(RANDOM_STUB, HARNESS_END)]
 
         self.memory[REG_IE] = 0
         # a and f go through the stack so the launcher's bank switch
@@ -303,6 +309,10 @@ class Game:
 
         if [self.memory[LAUNCHER + i] for i in range(len(launcher))] != expected:
             raise HarnessError(f"{name} overwrote the harness launcher")
+        current = [self.memory[a] for a in range(RANDOM_STUB, HARNESS_END)]
+        index = RANDOM_INDEX - RANDOM_STUB
+        if current[:index] + current[index + 1:] != harness_area[:index] + harness_area[index + 1:]:
+            raise HarnessError(f"{name} overwrote the harness's random queue (stack too deep?)")
 
         # the routine's a and f were pushed by the launcher
         sp = self.regs.SP
