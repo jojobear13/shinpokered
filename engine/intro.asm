@@ -366,7 +366,7 @@ PlayShootingStar:
 	ld a, $1
 	ld [MBC1SRamBankingMode], a
 	ld [MBC1SRamBank], a
-	ld hl, sMainData + ($D886 - wMainDataStart)
+	ld hl, sMainData + (wEventFlags + EVENT_9FF / 8 - wMainDataStart) ; the gamma shader flags, EVENT_9FE and EVENT_9FF
 	bit 7, [hl]
 	jr z, .sramOff
 	ld a, 2
