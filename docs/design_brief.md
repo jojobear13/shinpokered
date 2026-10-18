@@ -27,7 +27,7 @@ checked.
 |---|---|---|---|
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 123 bytes | Shared helpers must live here to be callable from every bank cheaply |
-| Battle engine bank ($0F) | 16 KB | 248 bytes | Was 21 before the merges started; each merge frees more |
+| Battle engine bank ($0F) | 16 KB | 494 bytes | Was 21 before the merges started; each merge frees more |
 | WRAM | 8 KB | **8 bytes** (`$def8`-`$deff`) | **The real constraint** until the current box moves to save RAM (decision 2), which frees 1122 bytes. The current box (`wBoxDataStart`-`wBoxDataEnd`) is the single largest reclaimable block |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~7.4 KB | Bank 0: 1960, bank 1: 2780, banks 2-3: 1453 each |
@@ -374,7 +374,7 @@ and the budget table above is updated.
 |---|---|---|---|
 | A (done) | `hBattleSide` (decision 1): relocate the two side bytes to `$FFE2`, update the entry-point shims. Extend `compare_builds.py` to compare RAM by name across layout changes, ignoring names that only the old build has, so the comparison stays on for this commit | `compare_builds.py` identical on results and all shared RAM; `make test`; all eight variants build | WRAM 6 → 8, HRAM 5 → 4 |
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
-| C | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
+| C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
 | E | First mechanics, one commit each with a spec test: natures (`CalcStats`), abilities (hook tables, DV-bit slot), held items (item byte, wild item table, `Mon1BCDScore` fix), weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | 1 byte (weather) |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
@@ -399,6 +399,16 @@ and the budget table above is updated.
   (the turn's only register result) and RAM; `compare_builds.py` treats
   `hBattleSide` as scratch (see its `SCRATCH` list).
 
+**Step C as done.** `Check{Player,Enemy}StatusConditions` are one
+`CheckStatusConditions` that takes the side in `hBattleSide`. Side-specific
+addresses and continuation points come from two-entry tables through
+`GetSideAddr`; the real differences (sleep text before or after the
+animation, animation numbers, the Disable predef, the self-hit routine, the
+enemy not clearing `INVULNERABLE`) are explicit side checks. The enemy's inline
+self-hit code became `EnemyHandleSelfConfusionDamage`, unchanged; merging it
+with `HandleSelfConfusionDamage` (which also redraws the player's HUD) is a
+possible follow-up. `tests/suites/status_checks.py` covers it.
+
 Steps A to C are the remaining refactors and must each compare identical.
 Step D is the one large structural change and gates every step that needs
 more than 8 bytes. Steps E to G are the new behaviour.
@@ -412,6 +422,16 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - **Fixed: enemy multi-hit moves used the player's level after the first
   hit.** A leftover `SwapPlayerAndEnemyLevels` pair in the enemy's multi-hit
   loop. Test: `tests/test_multi_hit.py`. Recommended upstream.
+- **Found, not fixed yet: an enemy fully paralyzed or hurt by confusion
+  mid-Fly or mid-Dig stays invulnerable.** When a mon can't act, the status
+  check clears its multi-turn flags; the player's side also clears
+  `INVULNERABLE` (a Shin fix for the Gen 1 invulnerability glitch), the
+  enemy's side doesn't. `MoveHitTest` makes every move miss an invulnerable
+  target, so the enemy can't be hit until it completes a Fly or Dig or
+  switches out. Confirmed in the harness (10 of 10 runs keep the flag; 0 of 10
+  for the player). Fix: use the player's mask for both sides in
+  `CheckStatusConditions.monHurtItselfOrFullyParalysed`. Recommended
+  upstream.
 
 ## Known facts that are easy to get wrong
 

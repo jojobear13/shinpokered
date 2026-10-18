@@ -3872,21 +3872,45 @@ IsGhostBattle:	;sets z flag if this is a ghost battle
 ; checks for various status conditions affecting the player mon
 ; stores whether the mon cannot use a move this turn in Z flag
 CheckPlayerStatusConditions:
-	ld hl, wBattleMonStatus
+	xor a
+	jr CheckStatusConditions
+
+CheckEnemyStatusConditions:
+	ld a, BATTLE_SIDE_ENEMY
+	; fall through
+
+; checks the conditions that can stop a mon from using its move this turn
+; hBattleSide = the side whose turn it is
+; returns z with hl = where that side's move execution continues, or nz to go ahead with the move
+CheckStatusConditions:
+	ld [hBattleSide], a
+	ld hl, StatusCheckMonStatus
+	call GetSideAddr
 	ld a, [hl]
 	and SLP ; sleep mask
 	jr z, .checkIfFrozen
 ; sleeping
 	dec a
-	ld [wBattleMonStatus], a ; decrement number of turns left
+	ld [hl], a ; decrement number of turns left
 	and a
 	jr z, .wokeUp ; if the number of turns hit 0, wake up
 ; fast asleep
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	jr z, .fastAsleepAnimation
+	ld hl, FastAsleepText ; the enemy's text comes before the animation
+	call PrintText
+.fastAsleepAnimation
 	xor a
 	ld [wAnimationType], a
-	ld a, SLP_ANIM - 1
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	add SLP_ANIM - 1 ; SLP_ANIM - 1 for the player, SLP_ANIM for the enemy
 	call PlayMoveAnimation
-	ld hl, FastAsleepText
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	jr nz, .sleepDone
+	ld hl, FastAsleepText ; the player's text comes after the animation
 	call PrintText
 	jr .sleepDone
 .wokeUp
@@ -3894,111 +3918,147 @@ CheckPlayerStatusConditions:
 	call PrintText
 	jr z, .checkIfFrozen	;joedebug - sleep won't waste turn
 .sleepDone
+	ld hl, StatusCheckUsedMove
+	call GetSideAddr
 	xor a
-	ld [wPlayerUsedMove], a
-	ld hl, ExecutePlayerMoveDone ; player can't move this turn
-	jp .returnToHL
+	ld [hl], a
+	ld hl, StatusCheckMoveDone ; can't move this turn
+	jp .returnToSideHL
 
 .checkIfFrozen
 	bit FRZ, [hl] ; frozen?
 	jr z, .checkIfTrapped
 	ld hl, IsFrozenText
 	call PrintText
+	ld hl, StatusCheckUsedMove
+	call GetSideAddr
 	xor a
-	ld [wPlayerUsedMove], a
-	ld hl, ExecutePlayerMoveDone ; player can't move this turn
-	jp .returnToHL
+	ld [hl], a
+	ld hl, StatusCheckMoveDone ; can't move this turn
+	jp .returnToSideHL
 
 .checkIfTrapped
-	ld a, [wEnemyBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; is enemy using a mult-turn move like wrap?
+	ld hl, StatusCheckOpponentStatus1
+	call GetSideAddr
+	ld a, [hl]
+	bit USING_TRAPPING_MOVE, a ; is the opponent using a multi-turn move like wrap?
 	jp z, .checkIfFlinched
 	ld hl, CantMoveText
 	call PrintText
-	ld hl, ExecutePlayerMoveDone ; player can't move this turn
-	jp .returnToHL
+	ld hl, StatusCheckMoveDone ; can't move this turn
+	jp .returnToSideHL
 
 .checkIfFlinched
-	ld hl, wPlayerBattleStatus1
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	bit FLINCHED, [hl]
 	jp z, .checkIfMustRecharge
-	res FLINCHED, [hl] ; reset player's flinch status
+	res FLINCHED, [hl] ; reset flinch status
 	ld hl, FlinchedText
 	call PrintText
-	ld hl, ExecutePlayerMoveDone ; player can't move this turn
-	jp .returnToHL
+	ld hl, StatusCheckMoveDone ; can't move this turn
+	jp .returnToSideHL
 
 .checkIfMustRecharge
-	ld hl, wPlayerBattleStatus2
+	ld hl, StatusCheckStatus2
+	call GetSideAddr
 	bit NEEDS_TO_RECHARGE, [hl]
 	jr z, .checkIfAnyMoveDisabled
-	res NEEDS_TO_RECHARGE, [hl] ; reset player's recharge status
+	res NEEDS_TO_RECHARGE, [hl] ; reset recharge status
 	ld hl, MustRechargeText
 	call PrintText
-	ld hl, ExecutePlayerMoveDone ; player can't move this turn
-	jp .returnToHL
+	ld hl, StatusCheckMoveDone ; can't move this turn
+	jp .returnToSideHL
 
 .checkIfAnyMoveDisabled
-	ld hl, wPlayerDisabledMove
+	ld hl, StatusCheckDisabledMove
+	call GetSideAddr
 	ld a, [hl]
 	and a
 	jr z, .checkIfConfused
-	
-	predef PlayerDisableHandler	;joenote - fix a rare oversight with Disable
+
+;joenote - fix a rare oversight with Disable
+; the Player and Enemy DisableHandler predefs are consecutive
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	add (PlayerDisableHandlerPredef - PredefPointers) / 3
+	call Predef
 	ld a, [hl]
-	
+
 	dec a
 	ld [hl], a
 	and $f ; did Disable counter hit 0?
 	jr nz, .checkIfConfused
 	ld [hl], a
-	ld [wPlayerDisabledMoveNumber], a
+	ld hl, StatusCheckDisabledMoveNumber
+	call GetSideAddr
+	xor a
+	ld [hl], a
 	ld hl, DisabledNoMoreText
 	call PrintText
 
 .checkIfConfused
-	ld a, [wPlayerBattleStatus1]
-	add a ; is player confused?
-	jr nc, .checkIfTriedToUseDisabledMove
-	ld hl, wPlayerConfusedCounter
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
+	ld a, [hl]
+	add a ; confused?
+	jp nc, .checkIfTriedToUseDisabledMove
+	ld hl, StatusCheckConfusedCounter
+	call GetSideAddr
 	dec [hl]
 	jr nz, .isConfused
-	ld hl, wPlayerBattleStatus1
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	res CONFUSED, [hl] ; if confused counter hit 0, reset confusion status
 	ld hl, ConfusedNoMoreText
 	call PrintText
-	jr .checkIfTriedToUseDisabledMove
+	jp .checkIfTriedToUseDisabledMove
 .isConfused
 	ld hl, IsConfusedText
 	call PrintText
 	xor a
 	ld [wAnimationType], a
-	ld a, CONF_ANIM - 1
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	add CONF_ANIM - 1 ; CONF_ANIM - 1 for the player, CONF_ANIM for the enemy
 	call PlayMoveAnimation
 	call BattleRandom
 	cp $80 ; 50% chance to hurt itself
 	jr c, .checkIfTriedToUseDisabledMove
-	ld hl, wPlayerBattleStatus1
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	ld a, [hl]
-	and 1 << CONFUSED ; if mon hurts itself, clear every other status from wPlayerBattleStatus1
+	and 1 << CONFUSED ; if mon hurts itself, clear every other status from its battle status 1
 	ld [hl], a
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	jr nz, .enemyHurtItself
 	call HandleSelfConfusionDamage
+	jr .monHurtItselfOrFullyParalysed
+.enemyHurtItself
+	call EnemyHandleSelfConfusionDamage
 	jr .monHurtItselfOrFullyParalysed
 
 .checkIfTriedToUseDisabledMove
 ; prevents a disabled move that was selected before being disabled from being used
-	ld a, [wPlayerDisabledMoveNumber]
+	ld hl, StatusCheckSelectedMove
+	call GetSideAddr
+	push hl
+	ld hl, StatusCheckDisabledMoveNumber
+	call GetSideAddr
+	ld a, [hl]
+	pop hl
 	and a
 	jr z, .checkIfParalysed
-	ld hl, wPlayerSelectedMove
 	cp [hl]
 	jr nz, .checkIfParalysed
 	call PrintMoveIsDisabledText
-	ld hl, ExecutePlayerMoveDone ; if a disabled move was somehow selected, player can't move this turn
-	jp .returnToHL
+	ld hl, StatusCheckMoveDone ; if a disabled move was somehow selected, can't move this turn
+	jp .returnToSideHL
 
 .checkIfParalysed
-	ld hl, wBattleMonStatus
+	ld hl, StatusCheckMonStatus
+	call GetSideAddr
 	bit PAR, [hl]
 	jr z, .checkIfUsingBide
 	call BattleRandom
@@ -4008,13 +4068,26 @@ CheckPlayerStatusConditions:
 	call PrintText
 
 .monHurtItselfOrFullyParalysed
-	ld hl, wPlayerBattleStatus1
-	ld a, [hl]
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	; clear bide, thrashing, charging up, and trapping moves such as warp (already cleared for confusion damage)
 	;joenote: also clear invulnerablility (fly/dig) to prevent invincibility glitch
+	; (the enemy's invulnerability is not cleared: see docs/design_brief.md)
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	ld a, [hl]
+	jr nz, .enemyHurtOrParalysed
 	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
+	jr .clearedMultiTurnStatuses
+.enemyHurtOrParalysed
+	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << USING_TRAPPING_MOVE))
+.clearedMultiTurnStatuses
 	ld [hl], a
-	ld a, [wPlayerMoveEffect]
+	push hl
+	ld hl, StatusCheckMoveEffect
+	call GetSideAddr
+	ld a, [hl]
+	pop hl
 	cp FLY_EFFECT
 	jr z, .flyOrChargeEffect
 	cp CHARGE_EFFECT
@@ -4028,41 +4101,33 @@ CheckPlayerStatusConditions:
 	call PlayMoveAnimation
 .notFlyOrChargeEffect
 	call ZeroLastDamage	;joenote - prevent Counter from working on confusion damage
-	ld hl, ExecutePlayerMoveDone
-	jp .returnToHL ; if using a two-turn move, we need to recharge the first turn
+	ld hl, StatusCheckMoveDone
+	jp .returnToSideHL ; if using a two-turn move, we need to recharge the first turn
 
 .checkIfUsingBide
-	ld hl, wPlayerBattleStatus1
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	bit STORING_ENERGY, [hl] ; is mon using bide?
 	jr z, .checkIfThrashingAbout
-;joenote - done elsewhere using PlayerBideAccum
-;	xor a
-;	ld [wPlayerMoveNum], a
-;	ld hl, wDamage
-;	ld a, [hli]
-;	ld b, a
-;	ld c, [hl]
-;	ld hl, wPlayerBideAccumulatedDamage + 1
-;	ld a, [hl]
-;	add c ; accumulate damage taken
-;	ld [hld], a
-;	ld a, [hl]
-;	adc b
-;	ld [hl], a
-	call DecAttackPlayer; did Bide counter hit 0?
+;joenote - bide damage is accumulated elsewhere, by PlayerBideAccum
+	call DecAttackSide ; did Bide counter hit 0?
 	jr z, .unleashEnergy
-	ld hl, ExecutePlayerMoveDone
-	jp .returnToHL ; unless mon unleashes energy, can't move this turn
+	ld hl, StatusCheckMoveDone
+	jp .returnToSideHL ; unless mon unleashes energy, can't move this turn
 .unleashEnergy
-	ld hl, wPlayerBattleStatus1
 	res STORING_ENERGY, [hl] ; not using bide any more
 	ld hl, UnleashedEnergyText
 	call PrintText
-	ld a, SWIFT_EFFECT
-	ld [wPlayerMoveEffect], a	;joenote - fix graphical error with bide hitting flying/digging pokemon
+	ld hl, StatusCheckMoveEffect
+	call GetSideAddr
+	ld [hl], SWIFT_EFFECT	;joenote - fix graphical error with bide hitting flying/digging pokemon
+	ld hl, StatusCheckMovePower
+	call GetSideAddr
 	ld a, 1
-	ld [wPlayerMovePower], a
-	ld hl, wPlayerBideAccumulatedDamage + 1
+	ld [hl], a
+	ld hl, StatusCheckBideAccumulatedDamage
+	call GetSideAddr
+	inc hl
 	ld a, [hld]
 	add a
 	ld b, a
@@ -4078,30 +4143,40 @@ CheckPlayerStatusConditions:
 	xor a
 	ld [hli], a
 	ld [hl], a
+	ld hl, StatusCheckMoveNum
+	call GetSideAddr
 	ld a, BIDE
-	ld [wPlayerMoveNum], a
-	ld hl, handleIfPlayerMoveMissed ; skip damage calculation, DecrementPP and MoveHitTest
-	jp .returnToHL
+	ld [hl], a
+	ld hl, StatusCheckHandleIfMoveMissed ; skip damage calculation, DecrementPP and MoveHitTest
+	jp .returnToSideHL
 
 .checkIfThrashingAbout
 	bit THRASHING_ABOUT, [hl] ; is mon using thrash or petal dance?
 	jr z, .checkIfUsingMultiturnMove
+	ld hl, StatusCheckMoveNum
+	call GetSideAddr
 	ld a, THRASH
-	ld [wPlayerMoveNum], a
+	ld [hl], a
 	ld hl, ThrashingAboutText
 	call PrintText
-	call DecAttackPlayer; did Thrashing About counter hit 0?
-	ld hl, PlayerCalcMoveDamage ; skip DecrementPP
+	ld hl, StatusCheckCalcMoveDamage ; skip DecrementPP
+	call GetSideAddr
+	call DecAttackSide ; did Thrashing About counter hit 0?
 	jp nz, .returnToHL
 	push hl
-	ld hl, wPlayerBattleStatus1
+	ld hl, StatusCheckStatus1
+	call GetSideAddr
 	res THRASHING_ABOUT, [hl] ; no longer thrashing about
 	set CONFUSED, [hl] ; confused
 	call BattleRandom
 	and 3
 	inc a
 	inc a ; confused for 2-5 turns
-	ld [wPlayerConfusedCounter], a
+	push af
+	ld hl, StatusCheckConfusedCounter
+	call GetSideAddr
+	pop af
+	ld [hl], a
 	pop hl ; skip DecrementPP
 	jp .returnToHL
 
@@ -4110,38 +4185,86 @@ CheckPlayerStatusConditions:
 	jp z, .checkIfUsingRage
 	ld hl, AttackContinuesText
 	call PrintText
-	call DecAttackPlayer; did multi-turn move end?
-	ld hl, getPlayerAnimationType ; if it didn't, skip damage calculation (deal damage equal to last hit),
-	                ; DecrementPP and MoveHitTest
+	ld hl, StatusCheckAnimationType ; skip damage calculation (deal damage equal to last hit),
+	                                ; DecrementPP and MoveHitTest
+	call GetSideAddr
+	call DecAttackSide ; did multi-turn move end?
 	jp nz, .returnToHL
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;joenote - play poof animation to signal end of trapping move
-	ld a, [wBattleMonSpecies]
+	push hl
+	ld hl, StatusCheckMonSpecies
+	call GetSideAddr
+	ld a, [hl]
+	pop hl
 	call PlayEndTrappingMove
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	jp .returnToHL
 
 .checkIfUsingRage
-	ld a, [wPlayerBattleStatus2]
+	ld hl, StatusCheckStatus2
+	call GetSideAddr
+	ld a, [hl]
 	bit USING_RAGE, a ; is mon using rage?
 	jp z, .done ; if we made it this far, mon can move normally this turn
 	ld a, RAGE
 	ld [wd11e], a
 	call GetMoveName
 	call CopyStringToCF4B
+	ld hl, StatusCheckMoveEffect
+	call GetSideAddr
 	xor a
-	ld [wPlayerMoveEffect], a
-	ld hl, PlayerCanExecuteMove
-	jp .returnToHL
-
+	ld [hl], a
+	ld hl, StatusCheckCanExecuteMove ; skip DecrementPP
+	; fall through
+.returnToSideHL
+	call GetSideAddr
 .returnToHL
-	xor a
+	xor a ; set Z flag
 	ret
 
 .done
 	ld a, $1
-	and a
+	and a ; clear Z flag
 	ret
+
+; tables indexed by the side whose turn it is: player, enemy
+StatusCheckMonStatus:
+	dw wBattleMonStatus, wEnemyMonStatus
+StatusCheckMonSpecies:
+	dw wBattleMonSpecies, wEnemyMonSpecies
+StatusCheckStatus1:
+	dw wPlayerBattleStatus1, wEnemyBattleStatus1
+StatusCheckStatus2:
+	dw wPlayerBattleStatus2, wEnemyBattleStatus2
+StatusCheckOpponentStatus1:
+	dw wEnemyBattleStatus1, wPlayerBattleStatus1
+StatusCheckUsedMove:
+	dw wPlayerUsedMove, wEnemyUsedMove
+StatusCheckSelectedMove:
+	dw wPlayerSelectedMove, wEnemySelectedMove
+StatusCheckDisabledMove:
+	dw wPlayerDisabledMove, wEnemyDisabledMove
+StatusCheckDisabledMoveNumber:
+	dw wPlayerDisabledMoveNumber, wEnemyDisabledMoveNumber
+StatusCheckConfusedCounter:
+	dw wPlayerConfusedCounter, wEnemyConfusedCounter
+StatusCheckMoveNum:
+	dw wPlayerMoveNum, wEnemyMoveNum
+StatusCheckMoveEffect:
+	dw wPlayerMoveEffect, wEnemyMoveEffect
+StatusCheckMovePower:
+	dw wPlayerMovePower, wEnemyMovePower
+StatusCheckBideAccumulatedDamage:
+	dw wPlayerBideAccumulatedDamage, wEnemyBideAccumulatedDamage
+; where each side's move execution continues
+StatusCheckMoveDone:
+	dw ExecutePlayerMoveDone, ExecuteEnemyMoveDone
+StatusCheckHandleIfMoveMissed:
+	dw handleIfPlayerMoveMissed, handleIfEnemyMoveMissed
+StatusCheckCalcMoveDamage:
+	dw PlayerCalcMoveDamage, EnemyCalcMoveDamage
+StatusCheckAnimationType:
+	dw getPlayerAnimationType, GetEnemyAnimationType
+StatusCheckCanExecuteMove:
+	dw PlayerCanExecuteMove, EnemyCanExecuteMove
 
 FastAsleepText:
 	TX_FAR _FastAsleepText
@@ -4924,6 +5047,13 @@ CalcMoveDamage:
 ; type adjustment and the random factor. There are no modifiers yet.
 ApplyDamageModifiers:
 	ret
+
+; hl = the entry for the side in bit 0 of hBattleSide in the two-entry table at hl
+; preserves bc and de
+GetSideAddr:
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	; fall through
 
 ; hl = the a'th address in the table at hl
 ; preserves bc and de
@@ -6686,115 +6816,13 @@ ExecuteEnemyMoveDone:
 
 ; checks for various status conditions affecting the enemy mon
 ; stores whether the mon cannot use a move this turn in Z flag
-CheckEnemyStatusConditions:
-	ld hl, wEnemyMonStatus
-	ld a, [hl]
-	and SLP ; sleep mask
-	jr z, .checkIfFrozen
-	dec a ; decrement number of turns left
-	ld [wEnemyMonStatus], a
-	and a
-	jr z, .wokeUp ; if the number of turns hit 0, wake up
-	ld hl, FastAsleepText
-	call PrintText
-	xor a
-	ld [wAnimationType], a
-	ld a, SLP_ANIM
-	call PlayMoveAnimation
-	jr .sleepDone
-.wokeUp
-	ld hl, WokeUpText
-	call PrintText
-	jr z, .checkIfFrozen	;joedebug - sleep won't waste turn
-.sleepDone
-	xor a
-	ld [wEnemyUsedMove], a
-	ld hl, ExecuteEnemyMoveDone ; enemy can't move this turn
-	jp .returnToHL
-.checkIfFrozen
-	bit FRZ, [hl]
-	jr z, .checkIfTrapped
-	ld hl, IsFrozenText
-	call PrintText
-	xor a
-	ld [wEnemyUsedMove], a
-	ld hl, ExecuteEnemyMoveDone ; enemy can't move this turn
-	jp .returnToHL
-.checkIfTrapped
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; is the player using a multi-turn attack like warp
-	jp z, .checkIfFlinched
-	ld hl, CantMoveText
-	call PrintText
-	ld hl, ExecuteEnemyMoveDone ; enemy can't move this turn
-	jp .returnToHL
-.checkIfFlinched
-	ld hl, wEnemyBattleStatus1
-	bit FLINCHED, [hl] ; check if enemy mon flinched
-	jp z, .checkIfMustRecharge
-	res FLINCHED, [hl]
-	ld hl, FlinchedText
-	call PrintText
-	ld hl, ExecuteEnemyMoveDone ; enemy can't move this turn
-	jp .returnToHL
-.checkIfMustRecharge
-	ld hl, wEnemyBattleStatus2
-	bit NEEDS_TO_RECHARGE, [hl] ; check if enemy mon has to recharge after using a move
-	jr z, .checkIfAnyMoveDisabled
-	res NEEDS_TO_RECHARGE, [hl]
-	ld hl, MustRechargeText
-	call PrintText
-	ld hl, ExecuteEnemyMoveDone ; enemy can't move this turn
-	jp .returnToHL
-.checkIfAnyMoveDisabled
-	ld hl, wEnemyDisabledMove
-	ld a, [hl]
-	and a
-	jr z, .checkIfConfused
-	
-	predef EnemyDisableHandler	;joenote - fix a rare oversight with Disable
-	ld a, [hl]
-	
-	dec a ; decrement disable counter
-	ld [hl], a
-	and $f ; did disable counter hit 0?
-	jr nz, .checkIfConfused
-	ld [hl], a
-	ld [wEnemyDisabledMoveNumber], a
-	ld hl, DisabledNoMoreText
-	call PrintText
-.checkIfConfused
-	ld a, [wEnemyBattleStatus1]
-	add a ; check if enemy mon is confused
-	jp nc, .checkIfTriedToUseDisabledMove
-	ld hl, wEnemyConfusedCounter
-	dec [hl]
-	jr nz, .isConfused
-	ld hl, wEnemyBattleStatus1
-	res CONFUSED, [hl] ; if confused counter hit 0, reset confusion status
-	ld hl, ConfusedNoMoreText
-	call PrintText
-	jp .checkIfTriedToUseDisabledMove
-.isConfused
-	ld hl, IsConfusedText
-	call PrintText
-	xor a
-	ld [wAnimationType], a
-	ld a, CONF_ANIM
-	call PlayMoveAnimation
-	call BattleRandom
-	cp $80
-	jr c, .checkIfTriedToUseDisabledMove
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - set the bit that indicates a pkmn hurt itself in confusion or took crash damage
+;joenote - the enemy's version of HandleSelfConfusionDamage
+; (the caller has already cleared every status but confusion from wEnemyBattleStatus1)
+EnemyHandleSelfConfusionDamage:
 	ld a, [wUnusedC000]
 	set 7, a	;setting this bit causes counter to miss
 	ld [wUnusedC000], a 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld hl, wEnemyBattleStatus1
-	ld a, [hl]
-	and 1 << CONFUSED ; if mon hurts itself, clear every other status from wEnemyBattleStatus1
-	ld [hl], a
 	ld hl, HurtItselfText
 	call PrintText
 	ld hl, wBattleMonDefense
@@ -6842,155 +6870,7 @@ CheckEnemyStatusConditions:
 	
 	ld [wUnusedD119], a
 	
-	call ApplyDamageToEnemyPokemon
-	jr .monHurtItselfOrFullyParalysed
-.checkIfTriedToUseDisabledMove
-; prevents a disabled move that was selected before being disabled from being used
-	ld a, [wEnemyDisabledMoveNumber]
-	and a
-	jr z, .checkIfParalysed
-	ld hl, wEnemySelectedMove
-	cp [hl]
-	jr nz, .checkIfParalysed
-	call PrintMoveIsDisabledText
-	ld hl, ExecuteEnemyMoveDone ; if a disabled move was somehow selected, player can't move this turn
-	jp .returnToHL
-.checkIfParalysed
-	ld hl, wEnemyMonStatus
-	bit PAR, [hl]
-	jr z, .checkIfUsingBide
-	call BattleRandom
-	cp $3f ; 25% to be fully paralysed
-	jr nc, .checkIfUsingBide
-	ld hl, FullyParalyzedText
-	call PrintText
-.monHurtItselfOrFullyParalysed
-	ld hl, wEnemyBattleStatus1
-	ld a, [hl]
-	; clear bide, thrashing about, charging up, and multi-turn moves such as warp
-	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << USING_TRAPPING_MOVE))
-	ld [hl], a
-	ld a, [wEnemyMoveEffect]
-	cp FLY_EFFECT
-	jr z, .flyOrChargeEffect
-	cp CHARGE_EFFECT
-	jr z, .flyOrChargeEffect
-	jr .notFlyOrChargeEffect
-.flyOrChargeEffect
-	xor a
-	ld [wAnimationType], a
-	ld a, STATUS_AFFECTED_ANIM
-	call PlayMoveAnimation
-.notFlyOrChargeEffect
-	call ZeroLastDamage	;joenote - prevent Counter from working on confusion damage
-	ld hl, ExecuteEnemyMoveDone
-	jp .returnToHL ; if using a two-turn move, enemy needs to recharge the first turn
-.checkIfUsingBide
-	ld hl, wEnemyBattleStatus1
-	bit STORING_ENERGY, [hl] ; is mon using bide?
-	jr z, .checkIfThrashingAbout
-;joenote - doing this elsewhere with function EnemyBideAccum
-;	xor a
-;	ld [wEnemyMoveNum], a
-;	ld hl, wDamage
-;	ld a, [hli]
-;	ld b, a
-;	ld c, [hl]
-;	ld hl, wEnemyBideAccumulatedDamage + 1
-;	ld a, [hl]
-;	add c ; accumulate damage taken
-;	ld [hld], a
-;	ld a, [hl]
-;	adc b
-;	ld [hl], a
-	call DecAttackEnemy ; did Bide counter hit 0?
-	jr z, .unleashEnergy
-	ld hl, ExecuteEnemyMoveDone
-	jp .returnToHL ; unless mon unleashes energy, can't move this turn
-.unleashEnergy
-	ld hl, wEnemyBattleStatus1
-	res STORING_ENERGY, [hl] ; not using bide any more
-	ld hl, UnleashedEnergyText
-	call PrintText
-	ld a, SWIFT_EFFECT
-	ld [wEnemyMoveEffect], a	;joenote - fix graphical error with bide hitting flying/digging pokemon
-	ld a, $1
-	ld [wEnemyMovePower], a
-	ld hl, wEnemyBideAccumulatedDamage + 1
-	ld a, [hld]
-	add a
-	ld b, a
-	ld [wDamage + 1], a
-	ld a, [hl]
-	rl a ; double the damage
-	ld [wDamage], a
-	or b
-	jr nz, .next
-	ld a, $1
-	ld [wMoveMissed], a
-.next
-	xor a
-	ld [hli], a
-	ld [hl], a
-	ld a, BIDE
-	ld [wEnemyMoveNum], a
-	ld hl, handleIfEnemyMoveMissed ; skip damage calculation, DecrementPP and MoveHitTest
-	jp .returnToHL
-.checkIfThrashingAbout
-	bit THRASHING_ABOUT, [hl] ; is mon using thrash or petal dance?
-	jr z, .checkIfUsingMultiturnMove
-	ld a, THRASH
-	ld [wEnemyMoveNum], a
-	ld hl, ThrashingAboutText
-	call PrintText
-	call DecAttackEnemy ; did Thrashing About counter hit 0?
-	ld hl, EnemyCalcMoveDamage ; skip DecrementPP
-	jp nz, .returnToHL
-	push hl
-	ld hl, wEnemyBattleStatus1
-	res THRASHING_ABOUT, [hl] ; mon is no longer using thrash or petal dance
-	set CONFUSED, [hl] ; mon is now confused
-	call BattleRandom
-	and $3
-	inc a
-	inc a ; confused for 2-5 turns
-	ld [wEnemyConfusedCounter], a
-	pop hl ; skip DecrementPP
-	jp .returnToHL
-.checkIfUsingMultiturnMove
-	bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
-	jp z, .checkIfUsingRage
-	ld hl, AttackContinuesText
-	call PrintText
-	call DecAttackEnemy ; did multi-turn move end?
-	ld hl, GetEnemyAnimationType ; if it didn't, skip damage calculation (deal damage equal to last hit),
-	                             ; DecrementPP and MoveHitTest
-	jp nz, .returnToHL
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;joenote - play poof animation to signal end of trapping move
-	ld a, [wEnemyMonSpecies]
-	call PlayEndTrappingMove
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	jp .returnToHL
-.checkIfUsingRage
-	ld a, [wEnemyBattleStatus2]
-	bit USING_RAGE, a ; is mon using rage?
-	jp z, .done ; if we made it this far, mon can move normally this turn
-	ld a, RAGE
-	ld [wd11e], a
-	call GetMoveName
-	call CopyStringToCF4B
-	xor a
-	ld [wEnemyMoveEffect], a
-	ld hl, EnemyCanExecuteMove
-	jp .returnToHL
-.returnToHL
-	xor a ; set Z flag
-	ret
-.done
-	ld a, $1
-	and a ; clear Z flag
-	ret
+	jp ApplyDamageToEnemyPokemon
 
 GetCurrentMove:
 	ld a, [H_WHOSETURN]
@@ -9887,6 +9767,15 @@ DecAttack:
 	dec [hl]
 	pop hl
 	ret
+; DecAttackPlayer or DecAttackEnemy for the side in hBattleSide; preserves hl
+DecAttackSide:
+	push hl
+	ld hl, DecAttackNumAttacksLeft
+	call GetSideAddr
+	jr DecAttack
+
+DecAttackNumAttacksLeft:
+	dw wPlayerNumAttacksLeft, wEnemyNumAttacksLeft
 
 ;Battle status2 in "a"
 ;resets the rage bit in "a" if zero flag is set

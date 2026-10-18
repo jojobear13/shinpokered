@@ -54,3 +54,32 @@ A spec test (`tests/test_multi_hit.py` in this fork) runs the same enemy
 Double Kick turn with identical random numbers at three player levels; before
 the fix the player's remaining HP differed by level (for example 952, 927 and
 900 HP at player levels 5, 50 and 100), after it they are identical.
+
+## Enemy stays invulnerable when it can't act mid-Fly or mid-Dig
+
+**Status:** found in this fork, not fixed yet. Present in upstream as of
+commit `a7a9b13`.
+
+**Symptom.** If the enemy is fully paralyzed, or hurts itself in confusion,
+on the turn it would come down from Fly or up from Dig, it stays
+invulnerable: every move the player uses misses it until it completes a Fly
+or Dig or switches out. This is the Gen 1 invulnerability glitch, which Shin
+already fixed for the player's side.
+
+**Cause.** `CheckPlayerStatusConditions` and `CheckEnemyStatusConditions`
+(`engine/battle/core.asm`, the `.MonHurtItselfOrFullyParalysed` /
+`.monHurtItselfOrFullyParalysed` blocks) clear the mon's multi-turn flags when
+it can't act. The player's mask includes `1 << INVULNERABLE` (comment: "also
+clear invulnerablility (fly/dig) to prevent invincibility glitch"); the
+enemy's mask doesn't. `MoveHitTest` then treats the enemy as untouchable.
+
+**Fix (upstream).** Add `(1 << INVULNERABLE)` to the enemy's mask:
+
+```
+	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
+```
+
+**How it was found.** While merging the two status-check routines, the masks
+differed. An emulator test that puts each side mid-Fly, paralyzed, with a
+random roll that forces full paralysis, leaves the enemy's `INVULNERABLE`
+flag set in 10 of 10 runs and the player's in 0 of 10.
