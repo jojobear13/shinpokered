@@ -4896,6 +4896,17 @@ ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3
 ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * 2
 ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * 3
 
+SwapPlayerAndEnemyLevels:
+	push bc
+	ld a, [wBattleMonLevel]
+	ld b, a
+	ld a, [wEnemyMonLevel]
+	ld [wBattleMonLevel], a
+	ld a, b
+	ld [wEnemyMonLevel], a
+	pop bc
+	ret
+
 ; hl = the a'th address in the table at hl
 ; preserves bc and de
 GetAddrFromTable:
@@ -6501,7 +6512,6 @@ EnemyCanExecuteMove:
 	call IsInArray
 	call c, JumpMoveEffect
 EnemyCalcMoveDamage:
-	call SwapPlayerAndEnemyLevels
 	ld a, [wEnemyMoveEffect]
 	ld hl, SetDamageEffects
 	ld de, $1
@@ -6525,9 +6535,7 @@ EnemyCalcMoveDamage:
 	call CriticalHitTest
 	call HandleCounterMove
 	jr z, handleIfEnemyMoveMissed
-	call SwapPlayerAndEnemyLevels
 	call GetDamageVarsForEnemyAttack
-	call SwapPlayerAndEnemyLevels
 	call CalculateDamage
 	jp z, EnemyCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
 .static_skiphere	;joenote - skip here if a static damage move
@@ -6545,7 +6553,6 @@ handleIfEnemyMoveMissed:
 	jr z, handleExplosionMiss
 	jr EnemyCheckIfFlyOrChargeEffect
 .moveDidNotMiss
-	call SwapPlayerAndEnemyLevels
 
 GetEnemyAnimationType:
 	ld a, [wEnemyMoveEffect]
@@ -6555,7 +6562,6 @@ GetEnemyAnimationType:
 	ld a, $2
 	jr playEnemyMoveAnimation
 handleExplosionMiss:
-	call SwapPlayerAndEnemyLevels
 	xor a
 playEnemyMoveAnimation:
 	push af
@@ -6578,7 +6584,6 @@ playEnemyMoveAnimation:
 	jr EnemyCheckIfMirrorMoveEffect
 
 EnemyCheckIfFlyOrChargeEffect:
-	call SwapPlayerAndEnemyLevels
 	ld c, 30
 	call DelayFrames
 	ld a, [wEnemyMoveEffect]
@@ -6656,6 +6661,11 @@ EnemyCheckIfMirrorMoveEffect:
 	ld hl, wUnusedD155 
 	set 0, [hl]	;don't display that the substitute took damage for subsequent attacks
 	call CriticalHitTest
+; KNOWN BUG, kept for now: this swap pair is left over from when the whole
+; damage calculation ran with the levels swapped. Here the levels are not
+; swapped, so the pair swaps them for GetDamageVars, and every hit after the
+; first of an enemy multi-hit move uses the player's level. Removing the two
+; calls fixes it; see docs/design_brief.md.
 	call SwapPlayerAndEnemyLevels
 	call GetDamageVarsForEnemyAttack
 	call SwapPlayerAndEnemyLevels
@@ -6941,7 +6951,6 @@ CheckEnemyStatusConditions:
 	ld [hl], a
 	ld a, BIDE
 	ld [wEnemyMoveNum], a
-	call SwapPlayerAndEnemyLevels
 	ld hl, handleIfEnemyMoveMissed ; skip damage calculation, DecrementPP and MoveHitTest
 	jp .returnToHL
 .checkIfThrashingAbout
@@ -7366,16 +7375,6 @@ DoBattleTransitionAndInitBattleVariables:
 	ret
 
 ; swaps the level values of the BattleMon and EnemyMon structs
-SwapPlayerAndEnemyLevels:
-	push bc
-	ld a, [wBattleMonLevel]
-	ld b, a
-	ld a, [wEnemyMonLevel]
-	ld [wBattleMonLevel], a
-	ld a, b
-	ld [wEnemyMonLevel], a
-	pop bc
-	ret
 
 ; loads either red back pic or old man back pic
 ; also writes OAM data and loads tile patterns for the Red or Old Man back sprite's head

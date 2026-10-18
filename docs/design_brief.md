@@ -384,6 +384,23 @@ Steps A to C are the remaining refactors and must each compare identical.
 Step D is the one large structural change and gates every step that needs
 more than 8 bytes. Steps E to G are the new behaviour.
 
+## Known bugs kept for now
+
+Refactors must not change behaviour, so bugs they uncover are recorded here
+and fixed in their own commit, with a spec test, once approved.
+
+- **Enemy multi-hit moves use the player's level after the first hit.**
+  The per-hit damage recalculation in the enemy's multi-hit loop
+  (`EnemyCheckIfMirrorMoveEffect` in `engine/battle/core.asm`) still wraps
+  `GetDamageVarsForEnemyAttack` in a `SwapPlayerAndEnemyLevels` pair. That
+  pair only made sense while the whole damage calculation ran with the levels
+  swapped (removed in step B); in the loop the levels are not swapped, so the
+  pair swaps them and every hit after the first uses the player's level,
+  including for critical-hit stats. Affects Double Kick, Fury Attack, Pin
+  Missile, Twineedle and the like, Metronome calling them, and turns that
+  continue a multi-hit attack. Fix: delete the two calls (and the routine,
+  which then has no callers). Found by `tests/suites/move_execution.py`.
+
 ## Known facts that are easy to get wrong
 
 - 16-bit values are big-endian in battle and party structures, but the HP bar
