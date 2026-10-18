@@ -218,16 +218,13 @@ class SaveTest(BoxTestCase):
                 rng, party, box = self.fresh(seed, 1 + seed % 6, seed % 21)
                 g = self.game
                 day_care = bx.random_mon(rng, SPECIES, party=False)
-                g.poke("wDayCareInUse", 1)
-                g.poke("wDayCareMon", *day_care["data"])
-                g.poke("wDayCareMonOT", *day_care["ot"])
-                g.poke("wDayCareMonName", *day_care["nick"])
+                bx.write_day_care(g, day_care)
                 self.save()
 
                 # scramble what was saved, then load it back
                 bx.write_party(g, [bx.random_mon(rng, SPECIES) for _ in range(2)])
                 bx.write_current_box(g, [bx.random_mon(rng, SPECIES, party=False)])
-                g.poke("wDayCareMon", *[0] * bx.BOX_STRUCT_LEN)
+                bx.write_day_care(g, bx.random_mon(rng, SPECIES, party=False))
                 self.assertEqual(self.load(), 2, "checksum should be good")
                 self.assertEqual(bx.read_party(g), party)
                 self.assertEqual(bx.read_current_box(g), box)

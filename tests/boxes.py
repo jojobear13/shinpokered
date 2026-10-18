@@ -127,6 +127,14 @@ def read_day_care(game):
     )
 
 
+def write_day_care(game, mon):
+    """Put a box-format mon in the day care and mark it in use."""
+    game.poke("wDayCareInUse", 1)
+    game.poke("wDayCareMon", *mon["data"])
+    game.poke("wDayCareMonOT", *mon["ot"])
+    game.poke("wDayCareMonName", *mon["nick"])
+
+
 # ------------------------------------------------------- random mons
 
 def random_name(rng):

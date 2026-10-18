@@ -132,26 +132,42 @@ class Game:
             raise HarnessError(f"unknown symbol: {name}") from None
 
     def bank(self, name):
-        return self.symbols[name][0]
+        try:
+            return self.symbols[name][0]
+        except KeyError:
+            raise HarnessError(f"unknown symbol: {name}") from None
 
     def _resolve(self, where):
-        if isinstance(where, int):
+        """Turn a symbol name (optionally "name+offset"), a flat address or a
+        (bank, address) pair into (bank, address). Save RAM symbols
+        ($a000-$bfff) keep their bank so they can be read whether or not the
+        game has SRAM enabled; everything else is addressed flat (bank None)."""
+        if isinstance(where, tuple):
             return where
+        if isinstance(where, int):
+            return None, where
         name, _, offset = where.partition("+")
-        return self.addr(name) + (int(offset, 0) if offset else 0)
+        bank = self.bank(name)
+        addr = self.addr(name) + (int(offset, 0) if offset else 0)
+        if 0xA000 <= addr < 0xC000:
+            return bank, addr
+        return None, addr
+
+    def _cell(self, bank, addr):
+        return addr if bank is None else (bank, addr)
 
     # ----------------------------------------------------------------- memory
 
     def peek(self, where, length=1):
-        base = self._resolve(where)
+        bank, base = self._resolve(where)
         if length == 1:
-            return self.memory[base]
-        return [self.memory[base + i] for i in range(length)]
+            return self.memory[self._cell(bank, base)]
+        return [self.memory[self._cell(bank, base + i)] for i in range(length)]
 
     def poke(self, where, *values):
-        base = self._resolve(where)
+        bank, base = self._resolve(where)
         for i, value in enumerate(values):
-            self.memory[base + i] = value & 0xFF
+            self.memory[self._cell(bank, base + i)] = value & 0xFF
 
     def peek16(self, where):
         """Read a big-endian 16-bit value (the game's usual byte order)."""
