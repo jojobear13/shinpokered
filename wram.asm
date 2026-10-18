@@ -3517,15 +3517,7 @@ wBlackoutSavedMapData:: ; deef
 wBlackoutSavedWalkBikeSurfState:: ; def7
 	ds 1
 
-wDamageVarsIndex:: ; def8
-; set by GetDamageVars; see DAMAGEVARS_* in constants/battle_constants.asm
-	ds 1
-
-wDamageTarget:: ; def9
-; set by ApplyAttackTo*/ApplyDamageTo*: 0 = enemy's mon, 1 = player's mon
-	ds 1
-
-; defa
+; def8
 
 
 SECTION "Stack", WRAM0[$df00]

@@ -5,8 +5,11 @@ STAT_DEFENSE EQU 3
 STAT_SPEED   EQU 4
 STAT_SPECIAL EQU 5
 
-; wDamageVarsIndex: which side is attacking and with which kind of move.
-; Tables indexed by it are ordered player physical, player special,
-; enemy physical, enemy special (the same order as the CritHitStats predefs).
-DAMAGEVARS_SPECIAL EQU 1
-DAMAGEVARS_ENEMY   EQU 2
+; hBattleSide: which side a merged player/enemy battle routine is working on.
+; Each routine documents whether that is the attacker or the target.
+; bit 0: 0 = the player's mon, 1 = the enemy's mon
+; bit 1: set by GetDamageVars for a special move
+BATTLE_SIDE_ENEMY_F   EQU 0
+BATTLE_SIDE_SPECIAL_F EQU 1
+BATTLE_SIDE_ENEMY     EQU 1 << BATTLE_SIDE_ENEMY_F
+BATTLE_SIDE_SPECIAL   EQU 1 << BATTLE_SIDE_SPECIAL_F

@@ -4767,16 +4767,16 @@ GetDamageVarsForPlayerAttack:
 	jr GetDamageVars
 
 GetDamageVarsForEnemyAttack:
-	ld a, DAMAGEVARS_ENEMY
+	ld a, BATTLE_SIDE_ENEMY
 	; fall through
 
+; hBattleSide = the attacking side
 GetDamageVars:
-	ld [wDamageVarsIndex], a
+	ld [hBattleSide], a
 	ld hl, wDamage ; damage to eventually inflict, initialise to zero
 	ld [hl], 0
 	inc hl
 	ld [hl], 0
-	srl a ; 0 = player attacking, 1 = enemy attacking
 	ld hl, .movePower
 	call GetAddrFromTable
 	ld a, [hli]
@@ -4786,10 +4786,11 @@ GetDamageVars:
 	ld a, [hl] ; a = move type
 	cp FIRE ; types >= FIRE are all special
 	jr c, .gotCategory
-	ld hl, wDamageVarsIndex
-	inc [hl] ; DAMAGEVARS_SPECIAL
+	ld a, [hBattleSide]
+	or BATTLE_SIDE_SPECIAL
+	ld [hBattleSide], a
 .gotCategory
-	ld a, [wDamageVarsIndex]
+	ld a, [hBattleSide]
 	ld hl, .defenderStat
 	call GetAddrFromTable
 	ld a, [hli]
@@ -4797,14 +4798,14 @@ GetDamageVars:
 	ld c, [hl] ; bc = defender's defense or special
 ; Reflect doubles the defender's defense, and Light Screen doubles their special
 	push hl
-	ld a, [wDamageVarsIndex]
+	ld a, [hBattleSide]
 	ld hl, .defenderStatus3
 	call GetAddrFromTable
-	ld a, [wDamageVarsIndex]
-	rrca ; carry = special move
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_SPECIAL
 	ld a, [hl]
 	pop hl
-	jr c, .checkLightScreen
+	jr nz, .checkLightScreen
 	bit HAS_REFLECT_UP, a
 	jr .checkedScreen
 .checkLightScreen
@@ -4819,37 +4820,43 @@ GetDamageVars:
 	predef BC999cap
 ;;;
 .critCheck
-	ld a, [wDamageVarsIndex]
+	ld a, [hBattleSide]
 	ld hl, .attackerStat
 	call GetAddrFromTable ; hl = attacker's attack or special
 	ld a, [wCriticalHitOrOHKO]
 	and a ; check for critical hit
 	jr z, .scaleStats
 ; in the case of a critical hit, use both mons' stats from before any stat changes
-	ld a, [wDamageVarsIndex]
+	ld a, [hBattleSide]
 	ld c, STAT_DEFENSE
-	rrca ; carry = special move, bit 0 = enemy attacking
-	jr nc, .gotDefenderStat
+	bit BATTLE_SIDE_SPECIAL_F, a
+	jr z, .gotDefenderStat
 	ld c, STAT_SPECIAL
 .gotDefenderStat
-	and 1
-	xor 1 ; nonzero if the defender is the enemy's mon
+	and BATTLE_SIDE_ENEMY
+	xor BATTLE_SIDE_ENEMY ; nonzero if the defender is the enemy's mon
 	call GetUnmodifiedStatAddr
 	ld a, [hli]
 	ld b, a
 	ld c, [hl]
 	push bc ; defender's unmodified defense or special
-	ld a, [wDamageVarsIndex]
+	ld a, [hBattleSide]
 	ld c, STAT_ATTACK
-	rrca
-	jr nc, .gotAttackerStat
+	bit BATTLE_SIDE_SPECIAL_F, a
+	jr z, .gotAttackerStat
 	ld c, STAT_SPECIAL
 .gotAttackerStat
-	and 1 ; nonzero if the attacker is the enemy's mon
+	and BATTLE_SIDE_ENEMY ; nonzero if the attacker is the enemy's mon
 	call GetUnmodifiedStatAddr ; hl = attacker's unmodified attack or special
 	pop bc
 ;joenote - adjust stats for critical hits
-	ld a, [wDamageVarsIndex]
+; the four CritHitStats predefs are ordered player physical, player special,
+; enemy physical, enemy special
+	ld a, [hBattleSide]
+	srl a ; a = 1 for a special move, carry = enemy attacking
+	jr nc, .gotCritHitStatsPredef
+	add 2
+.gotCritHitStatsPredef
 	add (CritHitStatsPlayerPhysicalPredef - PredefPointers) / 3
 	call Predef
 ; if either the offensive or defensive stat is too large to store in a byte, scale both stats by dividing them by 4
@@ -4860,8 +4867,8 @@ GetDamageVars:
 	ld b, l ; b = attacker's offensive stat (possibly scaled)
 	        ; (c already contains defender's defensive stat (possibly scaled))
 	push hl
-	ld a, [wDamageVarsIndex]
-	srl a
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
 	ld hl, .attackerLevel
 	call GetAddrFromTable
 	ld e, [hl] ; e = attacker's level
@@ -4877,17 +4884,17 @@ GetDamageVars:
 .attackerLevel
 	dw wBattleMonLevel, wEnemyMonLevel
 
-; indexed by wDamageVarsIndex
+; indexed by hBattleSide: player physical, enemy physical, player special, enemy special
 .defenderStat
-	dw wEnemyMonDefense, wEnemyMonSpecial, wBattleMonDefense, wBattleMonSpecial
+	dw wEnemyMonDefense, wBattleMonDefense, wEnemyMonSpecial, wBattleMonSpecial
 .defenderStatus3
-	dw wEnemyBattleStatus3, wEnemyBattleStatus3, wPlayerBattleStatus3, wPlayerBattleStatus3
+	dw wEnemyBattleStatus3, wPlayerBattleStatus3, wEnemyBattleStatus3, wPlayerBattleStatus3
 .attackerStat
-	dw wBattleMonAttack, wBattleMonSpecial, wEnemyMonAttack, wEnemyMonSpecial
+	dw wBattleMonAttack, wEnemyMonAttack, wBattleMonSpecial, wEnemyMonSpecial
 
-ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * DAMAGEVARS_SPECIAL
-ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * DAMAGEVARS_ENEMY
-ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * (DAMAGEVARS_ENEMY | DAMAGEVARS_SPECIAL)
+ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3
+ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * 2
+ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * 3
 
 ; hl = the a'th address in the table at hl
 ; preserves bc and de
@@ -5386,18 +5393,18 @@ HandleCounterMove:
 	xor a
 	ret
 
-; wDamageTarget: 0 = the enemy's mon is taking damage, 1 = the player's mon is
 ApplyAttackToEnemyPokemon:
-	xor a
+	ld a, BATTLE_SIDE_ENEMY
 	jr ApplyAttackToPokemon
 
 ApplyAttackToPlayerPokemon:
-	ld a, 1
+	xor a
 	; fall through
 
 ; applies the attacker's move to the target, including moves with special damage rules
+; hBattleSide = the side taking damage
 ApplyAttackToPokemon:
-	ld [wDamageTarget], a
+	ld [hBattleSide], a
 	ld hl, DamageTargetAttackerMoveEffect
 	call GetAddrFromTable
 	ld a, [hl]
@@ -5409,7 +5416,7 @@ ApplyAttackToPokemon:
 	jr z, .specialDamage
 	cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
 	call z, ClearHyperBeam
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetAttackerMovePower
 	call GetAddrFromTable
 	ld a, [hl]
@@ -5418,7 +5425,7 @@ ApplyAttackToPokemon:
 	jr ApplyDamageToPokemon
 .superFangEffect
 ; set the damage to half the target's HP
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetHP
 	call GetAddrFromTable
 	ld de, wDamage
@@ -5439,12 +5446,12 @@ ApplyAttackToPokemon:
 .specialDamage
 	push bc	;joenote - set up special damage to use 2 bytes BC in order to account for psywave
 	ld bc, $0000
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetAttackerLevel
 	call GetAddrFromTable
 	ld c, [hl] ; Seismic Toss deals damage equal to the user's level
 	push hl ; Psywave reads the level from hl
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetAttackerMoveNum
 	call GetAddrFromTable
 	ld a, [hl]
@@ -5474,18 +5481,18 @@ ApplyAttackToPokemon:
 	jr ApplyDamageToPokemon
 
 ApplyDamageToEnemyPokemon:
-	xor a
+	ld a, BATTLE_SIDE_ENEMY
 	jr ApplyDamageToTarget
 
 ApplyDamageToPlayerPokemon:
-	ld a, 1
+	xor a
 	; fall through
 
 ApplyDamageToTarget:
-	ld [wDamageTarget], a
+	ld [hBattleSide], a
 	; fall through
 
-; subtracts wDamage from the HP of the mon in wDamageTarget (or its substitute)
+; subtracts wDamage from the HP of the mon on side hBattleSide (or its substitute)
 ApplyDamageToPokemon:
 	ld hl, wDamage
 	ld a, [hli]
@@ -5493,16 +5500,17 @@ ApplyDamageToPokemon:
 	ld a, [hl]
 	or b
 	jr z, ApplyAttackToPokemonDone ; we're done if damage is 0
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetStatus2
 	call GetAddrFromTable
-	ld a, [hl]
-	bit HAS_SUBSTITUTE_UP, a ; does the target have a substitute?
-	ld a, [wDamageTarget]	;joenote - AttackSubstitute takes the target in a (used to control turn differentiation)
+	ld a, [hBattleSide]
+	xor BATTLE_SIDE_ENEMY	;joenote - AttackSubstitute takes 0 if the enemy is the target, 1 if the player is (used to control turn differentiation)
+	bit HAS_SUBSTITUTE_UP, [hl] ; does the target have a substitute?
 	jp nz, AttackSubstitute
 ; subtract the damage from the pokemon's current HP
 ; also, save the current HP at wHPBarOldHP
 	push de
+	ld a, [hBattleSide]
 	ld hl, DamageTargetHP
 	call GetAddrFromTable
 	ld d, h
@@ -5534,7 +5542,7 @@ ApplyDamageToPokemon:
 	ld [de], a
 	dec de
 .animateHpBar
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
 	ld hl, DamageTargetMaxHP
 	call GetAddrFromTable
 	ld a, [hli]
@@ -5547,32 +5555,34 @@ ApplyDamageToPokemon:
 	ld a, [de]
 	ld [wHPBarNewHP], a
 	pop de
-	ld a, [wDamageTarget]
+	ld a, [hBattleSide]
+	xor BATTLE_SIDE_ENEMY
 	ld [wHPBarType], a ; 0 = enemy's HP bar, 1 = player's
+	ld a, [hBattleSide]
 	ld hl, DamageTargetHPBarCoords
 	call GetAddrFromTable
 	predef UpdateHPBar2 ; animate the HP bar shortening
 ApplyAttackToPokemonDone:
 	jp DrawHUDsAndHPBars
 
-; tables indexed by wDamageTarget
+; tables indexed by the target's side (hBattleSide): player's mon, enemy's mon
 DamageTargetAttackerMoveNum:
-	dw wPlayerMoveNum, wEnemyMoveNum
+	dw wEnemyMoveNum, wPlayerMoveNum
 DamageTargetAttackerMoveEffect:
-	dw wPlayerMoveEffect, wEnemyMoveEffect
+	dw wEnemyMoveEffect, wPlayerMoveEffect
 DamageTargetAttackerMovePower:
-	dw wPlayerMovePower, wEnemyMovePower
+	dw wEnemyMovePower, wPlayerMovePower
 DamageTargetAttackerLevel:
-	dw wBattleMonLevel, wEnemyMonLevel
+	dw wEnemyMonLevel, wBattleMonLevel
 DamageTargetHP:
-	dw wEnemyMonHP, wBattleMonHP
+	dw wBattleMonHP, wEnemyMonHP
 DamageTargetMaxHP:
-	dw wEnemyMonMaxHP, wBattleMonMaxHP
+	dw wBattleMonMaxHP, wEnemyMonMaxHP
 DamageTargetStatus2:
-	dw wEnemyBattleStatus2, wPlayerBattleStatus2
+	dw wPlayerBattleStatus2, wEnemyBattleStatus2
 DamageTargetHPBarCoords:
-	dwcoord 2, 2
 	dwcoord 10, 9
+	dwcoord 2, 2
 
 AttackSubstitute:
 ; Unlike the two ApplyAttackToPokemon functions, Attack Substitute is shared by player and enemy.
