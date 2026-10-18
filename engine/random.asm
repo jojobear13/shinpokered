@@ -249,7 +249,7 @@ _Random_DV::	;generates four 0 to 15 DVs in DE, and rerolls 1 time for each DV b
 
 	
 RNG_Correction::
-	ld hl, $DEF0
+	ld hl, wRNGSeed
 	ld d, 4
 .seedloop
 	ld a, [hli]
@@ -267,7 +267,7 @@ RNG_Correction::
 	cp $01
 	ret nz
 	
-	ld hl, $DEF0
+	ld hl, wRNGSeed
 	
 	ld a, [rDIV]
 	ld b, a

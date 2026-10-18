@@ -3524,7 +3524,13 @@ wBlackoutSavedMapData:: ; deef
 wBlackoutSavedWalkBikeSurfState:: ; def7
 	ds 1
 
-; def8
+wRNGSeed:: ; def8
+; the four RNG bytes the game booted with (init.asm); RNG_Correction and the
+; A+SELECT seed display on the title screen read them back. These used to be
+; the literal address $def0, which overlapped wBlackoutSavedMapData.
+	ds 4
+
+; defc
 
 
 SECTION "Stack", WRAM0[$df00]
