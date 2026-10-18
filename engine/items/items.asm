@@ -140,7 +140,7 @@ ItemUseBall:
 	ld a, [wPartyCount] ; is party full?
 	cp PARTY_LENGTH
 	jr nz, .canUseBall
-	ld a, [wNumInBox] ; is box full?
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jp z, BoxFullCannotThrowBall
 
@@ -657,7 +657,7 @@ ItemUseBall:
 .printTransferredToPCText
 	call PrintText
 ;joenote - add reminder that box is now full
-	ld a, [wNumInBox] ; is box full?
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jr nz, .done
 	ld hl, BoxFullReminderTXT
@@ -2865,11 +2865,7 @@ AddBonusPP:
 ; OUTPUT:
 ; [wMaxPP] = max PP
 GetMaxPP:
-	call OpenBox ; the box and the day care are in save RAM
-	call .body
-	jp CloseBox
-
-.body
+	call OpenBox ; the box and the day care are in save RAM; closed at the end
 	ld a, [wMonDataLocation]
 	and a
 	ld hl, wPartyMon1Moves
@@ -2878,8 +2874,8 @@ GetMaxPP:
 	ld hl, wEnemyMon1Moves
 	dec a
 	jr z, .sourceWithMultipleMon
-	ld hl, wBoxMon1Moves
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMon1Moves
+	ld bc, sBoxMon2 - sBoxMon1
 	dec a
 	jr z, .sourceWithMultipleMon
 	ld hl, sDayCareMonMoves
@@ -2927,7 +2923,7 @@ GetMaxPP:
 	ld a, [hl]
 	and %00111111 ; mask out the PP Up count
 	ld [wMaxPP], a ; store max PP
-	ret
+	jp CloseBox
 
 GetSelectedMoveOffset:
 	ld a, [wWhichPokemon]
@@ -3049,7 +3045,16 @@ IsKeyItem_:
 INCLUDE "data/key_items.asm"
 
 SendNewMonToBox:
-	ld de, wNumInBox
+; The box is in save RAM (design brief, step D). The nickname is asked for
+; first, into wcd6d, so the naming screen never runs with save RAM open. It
+; stays in wcd6d for the "was transferred" texts the callers print. AskName
+; leaves wcf91 alone (AddPartyMon relies on that too).
+	ld hl, wcd6d
+	ld a, NAME_MON_SCREEN
+	ld [wNamingScreenType], a
+	predef AskName
+	call OpenBox ; closed at the end
+	ld de, sNumInBox
 	ld a, [de]
 	inc a
 	ld [de], a
@@ -3066,9 +3071,9 @@ SendNewMonToBox:
 	cp $ff
 	jr nz, .asm_e7b1
 	call GetMonHeader
-	ld hl, wBoxMonOT
+	ld hl, sBoxMonOT
 	ld bc, NAME_LENGTH
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e7ee
 	dec a
@@ -3079,7 +3084,7 @@ SendNewMonToBox:
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e7db
@@ -3097,13 +3102,13 @@ SendNewMonToBox:
 	jr nz, .asm_e7db
 .asm_e7ee
 	ld hl, wPlayerName
-	ld de, wBoxMonOT
+	ld de, sBoxMonOT
 	ld bc, NAME_LENGTH
 	call CopyData
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e82a
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 	ld bc, NAME_LENGTH
 	dec a
 	call AddNTimes
@@ -3113,7 +3118,7 @@ SendNewMonToBox:
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e817
@@ -3130,35 +3135,35 @@ SendNewMonToBox:
 	dec b
 	jr nz, .asm_e817
 .asm_e82a
-	ld hl, wBoxMonNicks
-	ld a, NAME_MON_SCREEN
-	ld [wNamingScreenType], a
-	predef AskName
-	ld a, [wNumInBox]
+	ld hl, wcd6d
+	ld de, sBoxMonNicks
+	ld bc, NAME_LENGTH
+	call CopyData
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e867
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 	dec a
 	call AddNTimes
 	push hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e854
 	push bc
 	push hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	call CopyData
 	pop hl
 	ld d, h
 	ld e, l
-	ld bc, wBoxMon1 - wBoxMon2
+	ld bc, sBoxMon1 - sBoxMon2
 	add hl, bc
 	pop bc
 	dec b
@@ -3167,7 +3172,7 @@ SendNewMonToBox:
 	ld a, [wEnemyMonLevel]
 	ld [wEnemyMonBoxLevel], a
 	ld hl, wEnemyMon
-	ld de, wBoxMon1
+	ld de, sBoxMon1
 	ld bc, wEnemyMonDVs - wEnemyMon
 	call CopyData
 	ld hl, wPlayerID
@@ -3212,7 +3217,7 @@ SendNewMonToBox:
 	ld [de], a
 	dec b
 	jr nz, .asm_e8b1
-	ret
+	jp CloseBox
 
 	
 ;joenote - replacing this with adapted code from pokemon yellow to prevent statue fishing/surfing

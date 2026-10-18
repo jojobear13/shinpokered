@@ -39,8 +39,8 @@ LoadMonData_:
 	jr z, .getMonEntry
 
 	cp 2
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 	jr z, .getMonEntry
 
 	ld hl, sDayCareMon

@@ -3471,8 +3471,9 @@ wDayCareInUse:: ; da48
 
 wMainDataEnd::
 
-; The day-care mon lives in save RAM (sDayCareMon in sram.asm) and is read
-; through OpenBox/CloseBox in home.asm. Design brief, step D.
+; The day-care mon and the current PC box live in save RAM (sLiveDataStart
+; in sram.asm) and are read through OpenBox/CloseBox in home.asm. Design
+; brief, step D.
 wBoxOpenDepth:: ; da49
 ; OpenBox calls not yet matched by a CloseBox; SRAM is disabled when it
 ; returns to zero
@@ -3480,24 +3481,18 @@ wBoxOpenDepth:: ; da49
 wSRAMCopyBanks:: ; da4a
 ; CopySRAMBanked: source bank in the low nybble, destination bank in the high
 	ds 1
-	ds DAY_CARE_DATA_LENGTH - 2 ; da4b: freed by moving the day-care mon
+wBoxListCopy:: ; da4b
+; the current box's count and species list, copied from save RAM for the PC's
+; list menu, which reads its list every frame (bills_pc.asm)
+	ds 1 + MONS_PER_BOX + 1
+; The list menu tells a party list from a box list by the low byte of its
+; address alone (home.asm, .pokemonList)
+ASSERT LOW(wBoxListCopy) != LOW(wPartyCount)
 
-
-wBoxDataStart::
-
-wNumInBox::  ds 1 ; da80
-wBoxSpecies:: ds MONS_PER_BOX + 1
-
-wBoxMons::
-wBoxMon1:: box_struct wBoxMon1 ; da96
-wBoxMon2:: ds box_struct_length * (MONS_PER_BOX + -1) ; dab7
-
-wBoxMonOT::    ds NAME_LENGTH * MONS_PER_BOX ; dd2a
-wBoxMonNicks:: ds NAME_LENGTH * MONS_PER_BOX ; de06
-wBoxMonNicksEnd:: ; dee2
-
-wBoxDataEnd::
-
+wWeightedLevelScratch:: ; da61
+; GetWeightedLevel (func_enc_gen.asm) uses the six bytes from here as
+; scratch. They overlap the EXP bar variables, as they did when this label
+; was wBoxDataEnd; both are only used outside of this routine's call.
 ;joenote - exp bar wram values
 IF DEF(_EXPBAR)
 wEXPBarPixelLength::  ds 1

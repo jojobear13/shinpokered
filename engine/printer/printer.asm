@@ -240,7 +240,7 @@ Func_e8d11:
 	ret
 
 PrintPCBox::
-	ld a, [wBoxDataStart]
+	call GetNumInBox ; the box is in save RAM
 	and a
 	jp z, Func_e8df4
 	ld a, [wUpdateSpritesEnabled]
@@ -843,7 +843,7 @@ PrintPCBox_DrawPage1:
 .placed_box_number
 	ld [hl], a
 	coord hl, 4, 9
-	ld de, wBoxSpecies
+	ld de, sBoxSpecies
 	ld c, $3
 	call PrintPCBox_PlaceBoxMonInfo
 	ret
@@ -855,11 +855,11 @@ PrintPCBox_DrawPage2:
 	call ClearScreen
 	call PrintPCBox_PlaceHorizontalLines
 	call PrintPCBox_DrawLeftAndRightBorders
-	ld a, [wBoxDataStart]
+	call GetNumInBox ; the box is in save RAM
 	cp 4
 	ret c
 	coord hl, 4, 0
-	ld de, wBoxSpecies + 3
+	ld de, sBoxSpecies + 3
 	ld c, 6
 	call PrintPCBox_PlaceBoxMonInfo
 	ret
@@ -868,11 +868,11 @@ PrintPCBox_DrawPage3:
 	call ClearScreen
 	call PrintPCBox_PlaceHorizontalLines
 	call PrintPCBox_DrawLeftAndRightBorders
-	ld a, [wBoxDataStart]
+	call GetNumInBox ; the box is in save RAM
 	cp 10
 	ret c
 	coord hl, 4, 0
-	ld de, wBoxSpecies + 9
+	ld de, sBoxSpecies + 9
 	ld c, 6
 	call PrintPCBox_PlaceBoxMonInfo
 	ret
@@ -887,16 +887,21 @@ PrintPCBox_DrawPage4:
 	ld bc, 2 * SCREEN_WIDTH
 	ld a, " "
 	call FillMemory
-	ld a, [wBoxDataStart]
+	call GetNumInBox ; the box is in save RAM
 	cp 16
 	ret c
 	coord hl, 4, 0
-	ld de, wBoxSpecies + 15
+	ld de, sBoxSpecies + 15
 	ld c, 5
 	call PrintPCBox_PlaceBoxMonInfo
 	ret
 
 PrintPCBox_PlaceBoxMonInfo:
+; de points into the box's species list, which is in save RAM
+	call OpenBox
+	call .loop
+	jp CloseBox
+
 .loop
 	ld a, c
 	and a
@@ -926,7 +931,7 @@ PrintPCBox_PlaceBoxMonInfo:
 	pop hl
 	call PlaceString
 	push hl
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 	ld bc, NAME_LENGTH
 	ld a, [wBoxNumString]
 	call AddNTimes

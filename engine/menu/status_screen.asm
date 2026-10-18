@@ -276,13 +276,13 @@ StatusScreen:
 OTPointers:
 	dw wPartyMonOT
 	dw wEnemyMonOT
-	dw wBoxMonOT
+	dw sBoxMonOT
 	dw sDayCareMonOT
 
 NamePointers2:
 	dw wPartyMonNicks
 	dw wEnemyMonNicks
-	dw wBoxMonNicks
+	dw sBoxMonNicks
 	dw sDayCareMonName
 
 Type1Text:

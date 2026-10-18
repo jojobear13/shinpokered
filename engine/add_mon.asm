@@ -375,7 +375,7 @@ _MoveMon:
 	ld hl, sDayCareMon
 	jr z, .findMonDataSrc
 	; else it's PARTY_TO_BOX
-	ld hl, wNumInBox
+	ld hl, sNumInBox
 	ld a, [hl]
 	cp MONS_PER_BOX
 	jr nz, .partyOrBoxNotFull
@@ -410,9 +410,9 @@ _MoveMon:
 	ld a, [wPartyCount]
 	jr nz, .addMonOffset
 	; if it's PARTY_TO_BOX
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1 ; $21
-	ld a, [wNumInBox]
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1 ; $21
+	ld a, [sNumInBox]
 .addMonOffset
 	dec a
 	call AddNTimes
@@ -422,8 +422,8 @@ _MoveMon:
 	ld d, h
 	ld a, [wMoveMonType]
 	and a
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1 ; $21
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1 ; $21
 	jr z, .addMonOffset2
 	cp DAYCARE_TO_PARTY
 	ld hl, sDayCareMon
@@ -436,7 +436,7 @@ _MoveMon:
 .copyMonData
 	push hl
 	push de
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	call CopyData
 	pop de
 	pop hl
@@ -445,7 +445,7 @@ _MoveMon:
 	jr z, .findOTdest
 	cp DAYCARE_TO_PARTY
 	jr z, .findOTdest
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld a, [hl] ; hl = Level
 	inc de
@@ -461,15 +461,15 @@ _MoveMon:
 	ld hl, wPartyMonOT
 	ld a, [wPartyCount]
 	jr nz, .addOToffset
-	ld hl, wBoxMonOT
-	ld a, [wNumInBox]
+	ld hl, sBoxMonOT
+	ld a, [sNumInBox]
 .addOToffset
 	dec a
 	call SkipFixedLengthTextEntries
 	ld d, h
 	ld e, l
 .findOTsrc
-	ld hl, wBoxMonOT
+	ld hl, sBoxMonOT
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addOToffset2
@@ -492,15 +492,15 @@ _MoveMon:
 	ld hl, wPartyMonNicks
 	ld a, [wPartyCount]
 	jr nz, .addNickOffset
-	ld hl, wBoxMonNicks
-	ld a, [wNumInBox]
+	ld hl, sBoxMonNicks
+	ld a, [sNumInBox]
 .addNickOffset
 	dec a
 	call SkipFixedLengthTextEntries
 	ld d, h
 	ld e, l
 .findNickSrc
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addNickOffset2
@@ -529,7 +529,7 @@ _MoveMon:
 	ld a, d
 	ld [wCurEnemyLVL], a
 	pop hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld [hli], a
 	ld d, h

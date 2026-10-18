@@ -7,7 +7,7 @@ _GivePokemon:
 	ld a, [wPartyCount]
 	cp PARTY_LENGTH
 	jr c, .addToParty
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jr nc, .boxFull
 ; add to box

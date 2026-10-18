@@ -8,7 +8,7 @@ SetDefaultNames:
 	ld a, [wUnusedD721]	;joenote - preserve extra options
 	push af
 	ld hl, wPlayerName
-	ld bc, wBoxDataEnd - wPlayerName
+	ld bc, wMainDataEnd - wPlayerName ; the box is in save RAM now
 	xor a
 	call FillMemory
 	ld hl, wSpriteStateData1

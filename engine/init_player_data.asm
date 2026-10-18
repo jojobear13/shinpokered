@@ -29,8 +29,10 @@ InitPlayerData2:
 	ld [wRandomizerSeed], a
 	
 	;write a new box terminator to empty the box list
-	ld hl, wNumInBox
+	call OpenBox ; the box is in save RAM
+	ld hl, sNumInBox
 	call InitializeEmptyList
+	call CloseBox
 .newgameplus
 	
 	ld a, $ff

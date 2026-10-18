@@ -266,7 +266,7 @@ BillsPCDeposit:
 	call PrintText
 	jp BillsPCMenu
 .partyLargeEnough
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jr nz, .boxNotFull
 	ld hl, BoxFullText
@@ -306,7 +306,7 @@ BillsPCDeposit:
 	ld hl, MonWasStoredText
 	call PrintText
 ;joenote - add reminder text for box full
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jr nz, .jumptomenu
 	ld hl, BoxFullText
@@ -315,7 +315,7 @@ BillsPCDeposit:
 	jp BillsPCMenu
 
 BillsPCWithdraw:
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	and a
 	jr nz, .boxNotEmpty
 	ld hl, NoMonText
@@ -329,14 +329,16 @@ BillsPCWithdraw:
 	call PrintText
 	jp BillsPCMenu
 .partyNotFull
-	ld hl, wNumInBox
+	call CopyBoxListForMenu
 	call DisplayMonListMenu
 	jp c, BillsPCMenu
 	call DisplayDepositWithdrawMenu
 	jp nc, BillsPCMenu
 	ld a, [wWhichPokemon]
-	ld hl, wBoxMonNicks
+	call OpenBox
+	ld hl, sBoxMonNicks
 	call GetPartyMonName
+	call CloseBox
 	ld a, [wcf91]
 	call GetCryData
 	call PlaySoundWaitForCurrent
@@ -352,14 +354,14 @@ BillsPCWithdraw:
 	jp BillsPCMenu
 
 BillsPCRelease:
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	and a
 	jr nz, .loop
 	ld hl, NoMonText
 	call PrintText
 	jp BillsPCMenu
 .loop
-	ld hl, wNumInBox
+	call CopyBoxListForMenu
 	call DisplayMonListMenu
 	jp c, BillsPCMenu
 	ld hl, OnceReleasedText
@@ -381,6 +383,19 @@ BillsPCRelease:
 BillsPCChangeBox:
 	callba ChangeBox
 	jp BillsPCMenu
+
+; The list menu reads its list on every frame, so it is given a copy of the
+; box's count and species list in WRAM rather than the save-RAM original.
+; Returns hl = the copy, for DisplayMonListMenu.
+CopyBoxListForMenu:
+	call OpenBox
+	ld hl, sNumInBox
+	ld de, wBoxListCopy
+	ld bc, 1 + MONS_PER_BOX + 1
+	call CopyData
+	call CloseBox
+	ld hl, wBoxListCopy
+	ret
 
 DisplayMonListMenu:
 	ld a, l
@@ -416,8 +431,8 @@ KnowsHMMove::
 	ld bc, wPartyMon2 - wPartyMon1
 	jr .next
 ; unreachable
-	ld hl, wBoxMon1Moves
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMon1Moves
+	ld bc, sBoxMon2 - sBoxMon1
 .next
 	ld a, [wWhichPokemon]
 	call AddNTimes

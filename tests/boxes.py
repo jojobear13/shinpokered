@@ -1,9 +1,9 @@
 """Reading and writing the party, the current PC box, saved boxes and the day
 care, for tests.
 
-Step D of the design brief moves the current box (and the day-care mon) from
-WRAM to save RAM. Only the readers and writers in this module should need to
-change when that happens; the tests use them and stay the same.
+Step D of the design brief moved the current box and the day-care mon from
+WRAM to save RAM; only the readers and writers in this module changed, and
+the tests that use them stayed the same.
 """
 
 BOX_STRUCT_LEN = 0x21
@@ -66,7 +66,11 @@ def write_party(game, mons):
 
 
 # ----------------------------------------------------------- current box
-# Step D: these read and write WRAM today and will read save RAM after.
+# Since step D the current box is in save RAM bank 0 (sBoxDataStart), read
+# and written by bank so it doesn't matter whether the game has SRAM enabled.
+
+def _at(game, name, offset=0):
+    return game.bank(name), game.addr(name) + offset
 
 def _box_layout(read, base):
     """Parse a box in the in-memory layout (count, species list, structs,
@@ -88,17 +92,17 @@ def _box_layout(read, base):
 
 
 def read_current_box(game):
-    base = game.addr("wBoxDataStart")
-    return _box_layout(lambda off, n: game.peek(base + off, n) if n > 1 else [game.peek(base + off)], base)
+    bank, base = _at(game, "sBoxDataStart")
+    return _box_layout(lambda off, n: [game.memory[bank, base + off + i] for i in range(n)], base)
 
 
 def write_current_box(game, mons):
-    game.poke("wNumInBox", len(mons))
-    game.poke("wBoxSpecies", *([m["species"] for m in mons] + [0xFF]))
+    game.poke("sNumInBox", len(mons))
+    game.poke("sBoxSpecies", *([m["species"] for m in mons] + [0xFF]))
     for i, m in enumerate(mons):
-        game.poke(game.addr("wBoxMons") + i * BOX_STRUCT_LEN, *m["data"])
-        game.poke(game.addr("wBoxMonOT") + i * NAME_LENGTH, *m["ot"])
-        game.poke(game.addr("wBoxMonNicks") + i * NAME_LENGTH, *m["nick"])
+        game.poke(_at(game, "sBoxMons", i * BOX_STRUCT_LEN), *m["data"])
+        game.poke(_at(game, "sBoxMonOT", i * NAME_LENGTH), *m["ot"])
+        game.poke(_at(game, "sBoxMonNicks", i * NAME_LENGTH), *m["nick"])
 
 
 def current_box_number(game):

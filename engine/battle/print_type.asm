@@ -58,6 +58,11 @@ PrintType_:
 ;This allows for pokemon to have "forms" where the species is the same but the type is different.
 PrintMonType_StatusScreen:
 	call GetPredefRegisters
+	call OpenBox ; box mons are in save RAM
+	call .body
+	jp CloseBox
+
+.body
 	push de
 	push hl
 	
@@ -66,8 +71,8 @@ PrintMonType_StatusScreen:
 	ld a, [wMonDataLocation]
 	cp BOX_DATA
 	jr nz, .whichMon
-	ld hl, wBoxMon1Type1
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMon1Type1
+	ld bc, sBoxMon2 - sBoxMon1
 .whichMon
 	ld a, [wWhichPokemon]
 	call AddNTimes

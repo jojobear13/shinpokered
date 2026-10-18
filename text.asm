@@ -2764,7 +2764,7 @@ _SetToBoxText::
 	text "There's no more"
 	line "room for #MON!"
 	cont "@"
-	TX_RAM wBoxMonNicks
+	TX_RAM wcd6d
 	text " was"
 	cont "sent to #MON"
 	cont "BOX @"
@@ -2841,14 +2841,14 @@ _ItemUseBallText05::
 	cont "caught!@@"
 
 _ItemUseBallText07::
-	TX_RAM wBoxMonNicks
+	TX_RAM wcd6d
 	text " was"
 	line "transferred to"
 	cont "BILL's PC!"
 	prompt
 
 _ItemUseBallText08::
-	TX_RAM wBoxMonNicks
+	TX_RAM wcd6d
 	text " was"
 	line "transferred to"
 	cont "someone's PC!"

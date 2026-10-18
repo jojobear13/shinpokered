@@ -1,11 +1,15 @@
 _RemovePokemon:
 	call ClearTempFieldMove	;joenote - for field move slot
+	call OpenBox ; the box is in save RAM
+	call .body
+	jp CloseBox
 
+.body
 	ld hl, wPartyCount
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7b74
-	ld hl, wNumInBox
+	ld hl, sNumInBox
 .asm_7b74
 	ld a, [hl]
 	dec a
@@ -30,7 +34,7 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7b97
-	ld hl, wBoxMonOT
+	ld hl, sBoxMonOT
 	ld d, $13
 .asm_7b97
 	ld a, [wWhichPokemon]
@@ -49,7 +53,7 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7bb8
-	ld bc, wBoxMonNicks
+	ld bc, sBoxMonNicks
 .asm_7bb8
 	call CopyDataUntil
 	ld hl, wPartyMons
@@ -57,8 +61,8 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7bcd
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 .asm_7bcd
 	ld a, [wWhichPokemon]
 	call AddNTimes
@@ -67,9 +71,9 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7be4
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
-	ld bc, wBoxMonOT
+	ld bc, sBoxMonOT
 	jr .asm_7beb
 .asm_7be4
 	ld bc, wPartyMon2 - wPartyMon1
@@ -81,7 +85,7 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7bfa
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 .asm_7bfa
 	ld bc, NAME_LENGTH
 	ld a, [wWhichPokemon]
@@ -94,7 +98,7 @@ _RemovePokemon:
 	ld a, [wRemoveMonFromBox]
 	and a
 	jr z, .asm_7c15
-	ld bc, wBoxMonNicksEnd
+	ld bc, sBoxMonNicksEnd
 .asm_7c15
 	jp CopyDataUntil
 

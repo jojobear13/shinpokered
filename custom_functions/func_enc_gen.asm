@@ -171,7 +171,7 @@ GetWeightedLevel:
 	push bc
 	push de
 	
-	ld hl, wBoxDataEnd+5	;need 6 bytes of working space
+	ld hl, wWeightedLevelScratch+5	;need 6 bytes of working space
 	
 	ld de, wStartBattleLevels
 	ld a, [wPartyCount]
