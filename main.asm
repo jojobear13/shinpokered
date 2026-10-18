@@ -131,8 +131,6 @@ INCLUDE "engine/overworld/wild_mons.asm"
 
 INCLUDE "engine/items/items.asm"
 
-INCLUDE "engine/menu/draw_badges.asm"
-
 INCLUDE "engine/overworld/update_map.asm"
 INCLUDE "engine/overworld/cut.asm"
 INCLUDE "engine/overworld/missable_objects.asm"
@@ -1936,6 +1934,10 @@ INCLUDE "custom_functions/func_extra_menu.asm"
 
 SECTION "Rules Menu", ROMX
 INCLUDE "custom_functions/func_rules_menu.asm"
+
+; out of bank 3, which is nearly full
+SECTION "Draw Badges", ROMX
+INCLUDE "engine/menu/draw_badges.asm"
 INCLUDE "custom_functions/func_move_secrets.asm"
 INCLUDE "custom_functions/func_linkbattlecomms.asm"
 INCLUDE "custom_functions/func_bag.asm"

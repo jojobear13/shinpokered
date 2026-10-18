@@ -611,7 +611,7 @@ ENDC
 	ld hl, GymLeaderFaceAndBadgeTileGraphics  ; gym leader face and badge tile patterns
 	ld de, vChars2 + $200
 	ld bc, $0400
-	ld a, $03
+	ld a, BANK(GymLeaderFaceAndBadgeTileGraphics)
 	call FarCopyData2
 	ld hl, TextBoxGraphics
 	ld de, $00d0
