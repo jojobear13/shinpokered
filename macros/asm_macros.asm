@@ -60,6 +60,12 @@ ENDM
 ;\2 = X
 ;\3 = Y
 ;\4 = which tilemap (optional)
+; a tilemap address in a table: dwcoord x, y
+MACRO dwcoord
+	validateCoords \1, \2
+	dw wTileMap + SCREEN_WIDTH * \2 + \1
+ENDM
+
 MACRO coord
 	validateCoords \2, \3
 	IF _NARG >= 4

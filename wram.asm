@@ -3521,7 +3521,11 @@ wDamageVarsIndex:: ; def8
 ; set by GetDamageVars; see DAMAGEVARS_* in constants/battle_constants.asm
 	ds 1
 
-; def9
+wDamageTarget:: ; def9
+; set by ApplyAttackTo*/ApplyDamageTo*: 0 = enemy's mon, 1 = player's mon
+	ds 1
+
+; defa
 
 
 SECTION "Stack", WRAM0[$df00]

@@ -5386,23 +5386,41 @@ HandleCounterMove:
 	xor a
 	ret
 
+; wDamageTarget: 0 = the enemy's mon is taking damage, 1 = the player's mon is
 ApplyAttackToEnemyPokemon:
-	ld a, [wPlayerMoveEffect]
+	xor a
+	jr ApplyAttackToPokemon
+
+ApplyAttackToPlayerPokemon:
+	ld a, 1
+	; fall through
+
+; applies the attacker's move to the target, including moves with special damage rules
+ApplyAttackToPokemon:
+	ld [wDamageTarget], a
+	ld hl, DamageTargetAttackerMoveEffect
+	call GetAddrFromTable
+	ld a, [hl]
 	cp OHKO_EFFECT
-	jr z, ApplyDamageToEnemyPokemon
+	jp z, ApplyDamageToPokemon
 	cp SUPER_FANG_EFFECT
 	jr z, .superFangEffect
 	cp SPECIAL_DAMAGE_EFFECT
 	jr z, .specialDamage
 	cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
 	call z, ClearHyperBeam
-	ld a, [wPlayerMovePower]
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetAttackerMovePower
+	call GetAddrFromTable
+	ld a, [hl]
 	and a
-	jp z, ApplyAttackToEnemyPokemonDone ; no attack to apply if base power is 0
-	jr ApplyDamageToEnemyPokemon
+	jp z, ApplyAttackToPokemonDone ; no attack to apply if base power is 0
+	jr ApplyDamageToPokemon
 .superFangEffect
 ; set the damage to half the target's HP
-	ld hl, wEnemyMonHP
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetHP
+	call GetAddrFromTable
 	ld de, wDamage
 	ld a, [hli]
 	srl a
@@ -5413,18 +5431,24 @@ ApplyAttackToEnemyPokemon:
 	rr a
 	ld [de], a
 	or b
-	jr nz, ApplyDamageToEnemyPokemon
+	jr nz, ApplyDamageToPokemon
 ; make sure Super Fang's damage is always at least 1
 	ld a, $01
 	ld [de], a
-	jr ApplyDamageToEnemyPokemon
+	jr ApplyDamageToPokemon
 .specialDamage
 	push bc	;joenote - set up special damage to use 2 bytes BC in order to account for psywave
 	ld bc, $0000
-	ld hl, wBattleMonLevel
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetAttackerLevel
+	call GetAddrFromTable
+	ld c, [hl] ; Seismic Toss deals damage equal to the user's level
+	push hl ; Psywave reads the level from hl
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetAttackerMoveNum
+	call GetAddrFromTable
 	ld a, [hl]
-	ld c, a ; Seismic Toss deals damage equal to the user's level
-	ld a, [wPlayerMoveNum]
+	pop hl
 	cp SEISMIC_TOSS
 	jr z, .storeDamage
 	cp NIGHT_SHADE
@@ -5435,7 +5459,7 @@ ApplyAttackToEnemyPokemon:
 	ld c, DRAGON_RAGE_DAMAGE ; 40
 	cp DRAGON_RAGE
 	jr z, .storeDamage
-; Psywave	
+; Psywave
 	call PsywaveDamage	;joenote - fixes all sorts of problems
 	jr .damage_stored
 .storeDamage ; store damage value at b ;joenote - changed to bc
@@ -5447,33 +5471,56 @@ ApplyAttackToEnemyPokemon:
 .damage_stored
 	call DrawHUDsAndHPBars
 	pop bc
-;fall through
+	jr ApplyDamageToPokemon
 
 ApplyDamageToEnemyPokemon:
+	xor a
+	jr ApplyDamageToTarget
+
+ApplyDamageToPlayerPokemon:
+	ld a, 1
+	; fall through
+
+ApplyDamageToTarget:
+	ld [wDamageTarget], a
+	; fall through
+
+; subtracts wDamage from the HP of the mon in wDamageTarget (or its substitute)
+ApplyDamageToPokemon:
 	ld hl, wDamage
 	ld a, [hli]
 	ld b, a
 	ld a, [hl]
 	or b
-	jr z, ApplyAttackToEnemyPokemonDone ; we're done if damage is 0
-	ld a, [wEnemyBattleStatus2]
-	bit HAS_SUBSTITUTE_UP, a ; does the enemy have a substitute?
-	ld a, $00	;joenote - preload $00 into register a before potentially jumping to AttackSubstitute (used to control turn differentiation)
+	jr z, ApplyAttackToPokemonDone ; we're done if damage is 0
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetStatus2
+	call GetAddrFromTable
+	ld a, [hl]
+	bit HAS_SUBSTITUTE_UP, a ; does the target have a substitute?
+	ld a, [wDamageTarget]	;joenote - AttackSubstitute takes the target in a (used to control turn differentiation)
 	jp nz, AttackSubstitute
 ; subtract the damage from the pokemon's current HP
 ; also, save the current HP at wHPBarOldHP
-	ld a, [hld]
-	ld b, a
-	ld a, [wEnemyMonHP + 1]
+	push de
+	ld hl, DamageTargetHP
+	call GetAddrFromTable
+	ld d, h
+	ld e, l
+	inc de ; de = target's HP (low byte)
+	ld hl, wDamage + 1
+	ld b, [hl]
+	ld a, [de]
 	ld [wHPBarOldHP], a
 	sub b
-	ld [wEnemyMonHP + 1], a
-	ld a, [hl]
-	ld b, a
-	ld a, [wEnemyMonHP]
+	ld [de], a
+	dec de
+	dec hl
+	ld b, [hl]
+	ld a, [de]
 	ld [wHPBarOldHP+1], a
 	sbc b
-	ld [wEnemyMonHP], a
+	ld [de], a
 	jr nc, .animateHpBar
 ; if more damage was done than the current HP, zero the HP and set the damage (wDamage)
 ; equal to how much HP the pokemon had before the attack
@@ -5482,142 +5529,50 @@ ApplyDamageToEnemyPokemon:
 	ld a, [wHPBarOldHP]
 	ld [hl], a
 	xor a
-	ld hl, wEnemyMonHP
-	ld [hli], a
-	ld [hl], a
-.animateHpBar
-	ld hl, wEnemyMonMaxHP
-	ld a, [hli]
-	ld [wHPBarMaxHP+1], a
-	ld a, [hl]
-	ld [wHPBarMaxHP], a
-	ld hl, wEnemyMonHP
-	ld a, [hli]
-	ld [wHPBarNewHP+1], a
-	ld a, [hl]
-	ld [wHPBarNewHP], a
-	coord hl, 2, 2
-	xor a
-	ld [wHPBarType], a
-	predef UpdateHPBar2 ; animate the HP bar shortening
-ApplyAttackToEnemyPokemonDone:
-	jp DrawHUDsAndHPBars
-
-ApplyAttackToPlayerPokemon:
-	ld a, [wEnemyMoveEffect]
-	cp OHKO_EFFECT
-	jr z, ApplyDamageToPlayerPokemon
-	cp SUPER_FANG_EFFECT
-	jr z, .superFangEffect
-	cp SPECIAL_DAMAGE_EFFECT
-	jr z, .specialDamage
-	cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
-	call z, ClearHyperBeam	
-	ld a, [wEnemyMovePower]
-	and a
-	jp z, ApplyAttackToPlayerPokemonDone
-	jr ApplyDamageToPlayerPokemon
-.superFangEffect
-; set the damage to half the target's HP
-	ld hl, wBattleMonHP
-	ld de, wDamage
-	ld a, [hli]
-	srl a
 	ld [de], a
 	inc de
-	ld b, a
-	ld a, [hl]
-	rr a
 	ld [de], a
-	or b
-	jr nz, ApplyDamageToPlayerPokemon
-; make sure Super Fang's damage is always at least 1
-	ld a, $01
-	ld [de], a
-	jr ApplyDamageToPlayerPokemon
-.specialDamage
-	push bc	;joenote - set up special damage to use 2 bytes BC in order to account for psywave
-	ld bc, $0000
-	ld hl, wEnemyMonLevel
-	ld a, [hl]
-	ld c, a ; Seismic Toss deals damage equal to the user's level
-	ld a, [wEnemyMoveNum]
-	cp SEISMIC_TOSS
-	jr z, .storeDamage
-	cp NIGHT_SHADE
-	jr z, .storeDamage
-	ld c, SONICBOOM_DAMAGE ; 20
-	cp SONICBOOM
-	jr z, .storeDamage
-	ld c, DRAGON_RAGE_DAMAGE ; 40
-	cp DRAGON_RAGE
-	jr z, .storeDamage
-; Psywave	
-	call PsywaveDamage	;joenote - fixes all sorts of problems
-	jr .damage_stored
-.storeDamage ; store damage value at b ;joenote - changed to bc
-	ld hl, wDamage
-	ld a, b ;xor a
-	ld [hli], a
-	ld a, c
-	ld [hl], a
-.damage_stored
-	call DrawHUDsAndHPBars
-	pop bc
-;fall through
-
-ApplyDamageToPlayerPokemon:
-	ld hl, wDamage
-	ld a, [hli]
-	ld b, a
-	ld a, [hl]
-	or b
-	jr z, ApplyAttackToPlayerPokemonDone ; we're done if damage is 0
-	ld a, [wPlayerBattleStatus2]
-	bit HAS_SUBSTITUTE_UP, a ; does the player have a substitute?
-	ld a, $01	;joenote - preload $01 into register a before potentially jumping to AttackSubstitute (used to control turn differentiation)
-	jp nz, AttackSubstitute
-; subtract the damage from the pokemon's current HP
-; also, save the current HP at wHPBarOldHP and the new HP at wHPBarNewHP
-	ld a, [hld]
-	ld b, a
-	ld a, [wBattleMonHP + 1]
-	ld [wHPBarOldHP], a
-	sub b
-	ld [wBattleMonHP + 1], a
-	ld [wHPBarNewHP], a
-	ld b, [hl]
-	ld a, [wBattleMonHP]
-	ld [wHPBarOldHP+1], a
-	sbc b
-	ld [wBattleMonHP], a
-	ld [wHPBarNewHP+1], a
-	jr nc, .animateHpBar
-; if more damage was done than the current HP, zero the HP and set the damage (wDamage)
-; equal to how much HP the pokemon had before the attack
-	ld a, [wHPBarOldHP+1]
-	ld [hli], a
-	ld a, [wHPBarOldHP]
-	ld [hl], a
-	xor a
-	ld hl, wBattleMonHP
-	ld [hli], a
-	ld [hl], a
-	ld hl, wHPBarNewHP
-	ld [hli], a
-	ld [hl], a
+	dec de
 .animateHpBar
-	ld hl, wBattleMonMaxHP
+	ld a, [wDamageTarget]
+	ld hl, DamageTargetMaxHP
+	call GetAddrFromTable
 	ld a, [hli]
 	ld [wHPBarMaxHP+1], a
 	ld a, [hl]
 	ld [wHPBarMaxHP], a
-	coord hl, 10, 9
-	ld a, $01
-	ld [wHPBarType], a
+	ld a, [de]
+	ld [wHPBarNewHP+1], a
+	inc de
+	ld a, [de]
+	ld [wHPBarNewHP], a
+	pop de
+	ld a, [wDamageTarget]
+	ld [wHPBarType], a ; 0 = enemy's HP bar, 1 = player's
+	ld hl, DamageTargetHPBarCoords
+	call GetAddrFromTable
 	predef UpdateHPBar2 ; animate the HP bar shortening
-ApplyAttackToPlayerPokemonDone:
+ApplyAttackToPokemonDone:
 	jp DrawHUDsAndHPBars
+
+; tables indexed by wDamageTarget
+DamageTargetAttackerMoveNum:
+	dw wPlayerMoveNum, wEnemyMoveNum
+DamageTargetAttackerMoveEffect:
+	dw wPlayerMoveEffect, wEnemyMoveEffect
+DamageTargetAttackerMovePower:
+	dw wPlayerMovePower, wEnemyMovePower
+DamageTargetAttackerLevel:
+	dw wBattleMonLevel, wEnemyMonLevel
+DamageTargetHP:
+	dw wEnemyMonHP, wBattleMonHP
+DamageTargetMaxHP:
+	dw wEnemyMonMaxHP, wBattleMonMaxHP
+DamageTargetStatus2:
+	dw wEnemyBattleStatus2, wPlayerBattleStatus2
+DamageTargetHPBarCoords:
+	dwcoord 2, 2
+	dwcoord 10, 9
 
 AttackSubstitute:
 ; Unlike the two ApplyAttackToPokemon functions, Attack Substitute is shared by player and enemy.
