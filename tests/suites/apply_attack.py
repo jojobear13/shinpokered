@@ -25,10 +25,10 @@ def _constants(filename, names):
     values = {}
     path = os.path.join(REPO_ROOT, "constants", filename)
     for line in open(path):
+        # the comments give each value in hex, with or without a "$"
         m = re.match(r"\s*const (\w+)\s*; \$?([0-9A-Fa-f]+)", line)
         if m and m.group(1) in names:
-            base = 16 if "$" in line.split(";", 1)[1] else 10
-            values[m.group(1)] = int(m.group(2), base)
+            values[m.group(1)] = int(m.group(2), 16)
     missing = set(names) - values.keys()
     assert not missing, missing
     return values
