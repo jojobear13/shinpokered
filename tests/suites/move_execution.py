@@ -120,12 +120,13 @@ def run(game, case):
         if "more random values" not in str(error):
             raise
         return {"error": "random queue exhausted", "random_used": game.random_used()}
+    # The battle loop only reads b after a move (0 = the defender fainted);
+    # everything else a turn does is in RAM, which compare_builds checks in
+    # full. The other registers are leftovers, often pointers into ROM that
+    # shift whenever code moves, so comparing them would flag layout changes
+    # as behaviour changes.
     return {
-        "a": out["a"],
-        "f": out["f"],
-        "bc": out["bc"],
-        "de": out["de"],
-        "hl": out["hl"],
+        "b": out["b"],
         "random_used": game.random_used(),
     }
 
