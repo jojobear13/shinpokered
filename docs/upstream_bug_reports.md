@@ -57,8 +57,9 @@ the fix the player's remaining HP differed by level (for example 952, 927 and
 
 ## Enemy stays invulnerable when it can't act mid-Fly or mid-Dig
 
-**Status:** found in this fork, not fixed yet. Present in upstream as of
-commit `a7a9b13`.
+**Status:** fixed in this fork (`claude/practical-mayer-gyxrm5`, commit
+"Fix the enemy staying invulnerable when it can't act mid-Fly or mid-Dig").
+Present in upstream as of commit `a7a9b13`.
 
 **Symptom.** If the enemy is fully paralyzed, or hurts itself in confusion,
 on the turn it would come down from Fly or up from Dig, it stays
@@ -79,7 +80,10 @@ enemy's mask doesn't. `MoveHitTest` then treats the enemy as untouchable.
 	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
 ```
 
-**How it was found.** While merging the two status-check routines, the masks
-differed. An emulator test that puts each side mid-Fly, paralyzed, with a
-random roll that forces full paralysis, leaves the enemy's `INVULNERABLE`
-flag set in 10 of 10 runs and the player's in 0 of 10.
+**How it was found and checked.** While merging the two status-check
+routines, the masks differed. A spec test (`tests/test_invulnerability.py` in
+this fork) puts each side mid-Fly, paralyzed, with random rolls that force
+full paralysis; before the fix the enemy's `INVULNERABLE` flag stayed set in
+10 of 10 runs (the player's in 0 of 10), after it neither side keeps it.
+Against the previous build, the fix changed only 4 of 8000 random states,
+all of them with the enemy starting out invulnerable.

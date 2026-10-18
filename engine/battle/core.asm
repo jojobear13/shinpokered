@@ -4072,16 +4072,8 @@ CheckStatusConditions:
 	call GetSideAddr
 	; clear bide, thrashing, charging up, and trapping moves such as warp (already cleared for confusion damage)
 	;joenote: also clear invulnerablility (fly/dig) to prevent invincibility glitch
-	; (the enemy's invulnerability is not cleared: see docs/design_brief.md)
-	ld a, [hBattleSide]
-	and BATTLE_SIDE_ENEMY
 	ld a, [hl]
-	jr nz, .enemyHurtOrParalysed
 	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
-	jr .clearedMultiTurnStatuses
-.enemyHurtOrParalysed
-	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << USING_TRAPPING_MOVE))
-.clearedMultiTurnStatuses
 	ld [hl], a
 	push hl
 	ld hl, StatusCheckMoveEffect

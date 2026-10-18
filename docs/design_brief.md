@@ -422,16 +422,11 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - **Fixed: enemy multi-hit moves used the player's level after the first
   hit.** A leftover `SwapPlayerAndEnemyLevels` pair in the enemy's multi-hit
   loop. Test: `tests/test_multi_hit.py`. Recommended upstream.
-- **Found, not fixed yet: an enemy fully paralyzed or hurt by confusion
-  mid-Fly or mid-Dig stays invulnerable.** When a mon can't act, the status
-  check clears its multi-turn flags; the player's side also clears
-  `INVULNERABLE` (a Shin fix for the Gen 1 invulnerability glitch), the
-  enemy's side doesn't. `MoveHitTest` makes every move miss an invulnerable
-  target, so the enemy can't be hit until it completes a Fly or Dig or
-  switches out. Confirmed in the harness (10 of 10 runs keep the flag; 0 of 10
-  for the player). Fix: use the player's mask for both sides in
-  `CheckStatusConditions.monHurtItselfOrFullyParalysed`. Recommended
-  upstream.
+- **Fixed: an enemy fully paralyzed or hurt by confusion mid-Fly or
+  mid-Dig stayed invulnerable.** The status check cleared `INVULNERABLE` for
+  the player's mon only, so every move missed the enemy until it completed a
+  Fly or Dig or switched out. Both sides now use the same mask. Test:
+  `tests/test_invulnerability.py`. Recommended upstream.
 
 ## Known facts that are easy to get wrong
 
