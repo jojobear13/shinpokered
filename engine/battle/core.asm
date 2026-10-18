@@ -4758,29 +4758,59 @@ IgnoredOrdersText:
 	TX_FAR _IgnoredOrdersText
 	db "@"
 
-; sets b, c, d, and e for the CalculateDamage routine in the case of an attack by the player mon
+; sets b, c, d, and e for the CalculateDamage routine:
+; b = attacker's offensive stat and c = defender's defensive stat (both scaled to fit in a byte)
+; d = move power, e = attacker's level
+; returns z without setting the others if the move has no power
 GetDamageVarsForPlayerAttack:
 	xor a
+	jr GetDamageVars
+
+GetDamageVarsForEnemyAttack:
+	ld a, DAMAGEVARS_ENEMY
+	; fall through
+
+GetDamageVars:
+	ld [wDamageVarsIndex], a
 	ld hl, wDamage ; damage to eventually inflict, initialise to zero
-	ldi [hl], a
-	ld [hl], a
-	ld hl, wPlayerMovePower
+	ld [hl], 0
+	inc hl
+	ld [hl], 0
+	srl a ; 0 = player attacking, 1 = enemy attacking
+	ld hl, .movePower
+	call GetAddrFromTable
 	ld a, [hli]
 	and a
 	ld d, a ; d = move power
 	ret z ; return if move power is zero
-	ld a, [hl] ; a = [wPlayerMoveType]
+	ld a, [hl] ; a = move type
 	cp FIRE ; types >= FIRE are all special
-	jr nc, .specialAttack
-.physicalAttack
-	ld hl, wEnemyMonDefense
+	jr c, .gotCategory
+	ld hl, wDamageVarsIndex
+	inc [hl] ; DAMAGEVARS_SPECIAL
+.gotCategory
+	ld a, [wDamageVarsIndex]
+	ld hl, .defenderStat
+	call GetAddrFromTable
 	ld a, [hli]
 	ld b, a
-	ld c, [hl] ; bc = enemy defense
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_REFLECT_UP, a ; check for Reflect
-	jr z, .physicalAttackCritCheck
-; if the enemy has used Reflect, double the enemy's defense
+	ld c, [hl] ; bc = defender's defense or special
+; Reflect doubles the defender's defense, and Light Screen doubles their special
+	push hl
+	ld a, [wDamageVarsIndex]
+	ld hl, .defenderStatus3
+	call GetAddrFromTable
+	ld a, [wDamageVarsIndex]
+	rrca ; carry = special move
+	ld a, [hl]
+	pop hl
+	jr c, .checkLightScreen
+	bit HAS_REFLECT_UP, a
+	jr .checkedScreen
+.checkLightScreen
+	bit HAS_LIGHT_SCREEN_UP, a
+.checkedScreen
+	jr z, .critCheck
 	sla c
 	rl b
 ; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
@@ -4788,185 +4818,111 @@ GetDamageVarsForPlayerAttack:
 ;;;;;joenote - adding in a 999 cap
 	predef BC999cap
 ;;;
-.physicalAttackCritCheck
-	ld hl, wBattleMonAttack
+.critCheck
+	ld a, [wDamageVarsIndex]
+	ld hl, .attackerStat
+	call GetAddrFromTable ; hl = attacker's attack or special
 	ld a, [wCriticalHitOrOHKO]
 	and a ; check for critical hit
 	jr z, .scaleStats
-; in the case of a critical hit, reset the player's attack and the enemy's defense to their base values
-	ld c, 3 ; defense stat
-	call GetEnemyMonStat
-	ld a, [H_PRODUCT + 2]
-	ld b, a
-	ld a, [H_PRODUCT + 3]
-	ld c, a
-	push bc
-	ld hl, wPartyMon1Attack
-	ld a, [wPlayerMonNumber]
-	ld bc, wPartyMon2 - wPartyMon1
-	call AddNTimes
-	pop bc
-	predef CritHitStatsPlayerPhysical	;joenote - adjust stats for critical hits
-	jr .scaleStats
-.specialAttack
-	ld hl, wEnemyMonSpecial
+; in the case of a critical hit, use both mons' stats from before any stat changes
+	ld a, [wDamageVarsIndex]
+	ld c, STAT_DEFENSE
+	rrca ; carry = special move, bit 0 = enemy attacking
+	jr nc, .gotDefenderStat
+	ld c, STAT_SPECIAL
+.gotDefenderStat
+	and 1
+	xor 1 ; nonzero if the defender is the enemy's mon
+	call GetUnmodifiedStatAddr
 	ld a, [hli]
 	ld b, a
-	ld c, [hl] ; bc = enemy special
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_LIGHT_SCREEN_UP, a ; check for Light Screen
-	jr z, .specialAttackCritCheck
-; if the enemy has used Light Screen, double the enemy's special
-	sla c
-	rl b
-; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
-; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
-;;;;;joenote - adding in a 999 cap
-	predef BC999cap
-;;;
-.specialAttackCritCheck
-	ld hl, wBattleMonSpecial
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .scaleStats
-; in the case of a critical hit, reset the player's and enemy's specials to their base values
-	ld c, 5 ; special stat
-	call GetEnemyMonStat
-	ld a, [H_PRODUCT + 2]
-	ld b, a
-	ld a, [H_PRODUCT + 3]
-	ld c, a
-	push bc
-	ld hl, wPartyMon1Special
-	ld a, [wPlayerMonNumber]
-	ld bc, wPartyMon2 - wPartyMon1
-	call AddNTimes
+	ld c, [hl]
+	push bc ; defender's unmodified defense or special
+	ld a, [wDamageVarsIndex]
+	ld c, STAT_ATTACK
+	rrca
+	jr nc, .gotAttackerStat
+	ld c, STAT_SPECIAL
+.gotAttackerStat
+	and 1 ; nonzero if the attacker is the enemy's mon
+	call GetUnmodifiedStatAddr ; hl = attacker's unmodified attack or special
 	pop bc
-	predef CritHitStatsPlayerSpecial	;joenote - adjust stats for critical hits
+;joenote - adjust stats for critical hits
+	ld a, [wDamageVarsIndex]
+	add (CritHitStatsPlayerPhysicalPredef - PredefPointers) / 3
+	call Predef
 ; if either the offensive or defensive stat is too large to store in a byte, scale both stats by dividing them by 4
 ; this allows values with up to 10 bits (values up to 1023) to be handled
 ; anything larger will wrap around
 .scaleStats
 	call GetDamageVarsScaleStats
-	ld b, l ; b = player's offensive stat (possibly scaled)
-	        ; (c already contains enemy's defensive stat (possibly scaled))
-	ld a, [wBattleMonLevel]
-	ld e, a ; e = level
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .done
-	;joenote - do this in damage calculation
-	;sla e ; double level if it was a critical hit
-.done
+	ld b, l ; b = attacker's offensive stat (possibly scaled)
+	        ; (c already contains defender's defensive stat (possibly scaled))
+	push hl
+	ld a, [wDamageVarsIndex]
+	srl a
+	ld hl, .attackerLevel
+	call GetAddrFromTable
+	ld e, [hl] ; e = attacker's level
+	pop hl
+	;joenote - critical hits double the level in damage calculation instead of here
 	ld a, 1
 	and a
 	ret
 
-; sets b, c, d, and e for the CalculateDamage routine in the case of an attack by the enemy mon
-GetDamageVarsForEnemyAttack:
-	ld hl, wDamage ; damage to eventually inflict, initialise to zero
-	xor a
-	ld [hli], a
-	ld [hl], a
-	ld hl, wEnemyMovePower
+; indexed by player/enemy attacking
+.movePower
+	dw wPlayerMovePower, wEnemyMovePower
+.attackerLevel
+	dw wBattleMonLevel, wEnemyMonLevel
+
+; indexed by wDamageVarsIndex
+.defenderStat
+	dw wEnemyMonDefense, wEnemyMonSpecial, wBattleMonDefense, wBattleMonSpecial
+.defenderStatus3
+	dw wEnemyBattleStatus3, wEnemyBattleStatus3, wPlayerBattleStatus3, wPlayerBattleStatus3
+.attackerStat
+	dw wBattleMonAttack, wBattleMonSpecial, wEnemyMonAttack, wEnemyMonSpecial
+
+ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * DAMAGEVARS_SPECIAL
+ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * DAMAGEVARS_ENEMY
+ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * (DAMAGEVARS_ENEMY | DAMAGEVARS_SPECIAL)
+
+; hl = the a'th address in the table at hl
+; preserves bc and de
+GetAddrFromTable:
+	add a
+	add l
+	ld l, a
+	jr nc, .noCarry
+	inc h
+.noCarry
 	ld a, [hli]
-	ld d, a ; d = move power
-	and a
-	ret z ; return if move power is zero
-	ld a, [hl] ; a = [wEnemyMoveType]
-	cp FIRE ; types >= FIRE are all special
-	jr nc, .specialAttack
-.physicalAttack
-	ld hl, wBattleMonDefense
-	ld a, [hli]
-	ld b, a
-	ld c, [hl] ; bc = player defense
-	ld a, [wPlayerBattleStatus3]
-	bit HAS_REFLECT_UP, a ; check for Reflect
-	jr z, .physicalAttackCritCheck
-; if the player has used Reflect, double the player's defense
-	sla c
-	rl b
-; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
-; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
-;;;;;joenote - adding in a 999 cap
-	predef BC999cap
-;;;
-.physicalAttackCritCheck
-	ld hl, wEnemyMonAttack
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .scaleStats
-; in the case of a critical hit, reset the player's defense and the enemy's attack to their base values
-	ld hl, wPartyMon1Defense
-	ld a, [wPlayerMonNumber]
-	ld bc, wPartyMon2 - wPartyMon1
-	call AddNTimes
-	ld a, [hli]
-	ld b, a
-	ld c, [hl]
-	push bc
-	ld c, 2 ; attack stat
-	call GetEnemyMonStat
-	ld hl, H_PRODUCT + 2
-	pop bc
-	predef CritHitStatsEnemyPhysical	;joenote - adjust stats for critical hits
-	jr .scaleStats
-.specialAttack
-	ld hl, wBattleMonSpecial
-	ld a, [hli]
-	ld b, a
-	ld c, [hl]
-	ld a, [wPlayerBattleStatus3]
-	bit HAS_LIGHT_SCREEN_UP, a ; check for Light Screen
-	jr z, .specialAttackCritCheck
-; if the player has used Light Screen, double the player's special
-	sla c
-	rl b
-; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
-; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
-;;;;;joenote - adding in a 999 cap
-	predef BC999cap
-;;;
-.specialAttackCritCheck
-	ld hl, wEnemyMonSpecial
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .scaleStats
-; in the case of a critical hit, reset the player's and enemy's specials to their base values
-	ld hl, wPartyMon1Special
-	ld a, [wPlayerMonNumber]
-	ld bc, wPartyMon2 - wPartyMon1
-	call AddNTimes
-	ld a, [hli]
-	ld b, a
-	ld c, [hl]
-	push bc
-	ld c, 5 ; special stat
-	call GetEnemyMonStat
-	ld hl, H_PRODUCT + 2
-	pop bc
-	predef CritHitStatsEnemySpecial	;joenote - adjust stats for critical hits
-; if either the offensive or defensive stat is too large to store in a byte, scale both stats by dividing them by 4
-; this allows values with up to 10 bits (values up to 1023) to be handled
-; anything larger will wrap around
-.scaleStats
-	call GetDamageVarsScaleStats
-	ld b, l ; b = enemy's offensive stat (possibly scaled)
-	        ; (c already contains player's defensive stat (possibly scaled))
-	ld a, [wEnemyMonLevel]
-	ld e, a
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .done
-	;joenote - do this in damage calculation
-	;sla e ; double level if it was a critical hit
-.done
-	ld a, $1
-	and a
-	and a
+	ld h, [hl]
+	ld l, a
 	ret
-	
+
+; hl = address of a mon's stat from before any stat changes in battle
+; a = 0 for the player's mon or nonzero for the enemy's mon, c = STAT_* constant
+GetUnmodifiedStatAddr:
+	and a
+	jr z, .playerMon
+	call GetEnemyMonStat
+	ld hl, H_PRODUCT + 2
+	ret
+.playerMon
+	ld a, c
+	dec a
+	add a
+	ld c, a
+	ld b, 0
+	ld hl, wPartyMon1MaxHP ; stats are stored in STAT_* order
+	add hl, bc
+	ld a, [wPlayerMonNumber]
+	ld bc, wPartyMon2 - wPartyMon1
+	jp AddNTimes
+
 GetDamageVarsScaleStats:	;joenote - consolidated into its own function to save space
 	ld a, [hli]
 	ld l, [hl]

@@ -3517,7 +3517,11 @@ wBlackoutSavedMapData:: ; deef
 wBlackoutSavedWalkBikeSurfState:: ; def7
 	ds 1
 
-; def8
+wDamageVarsIndex:: ; def8
+; set by GetDamageVars; see DAMAGEVARS_* in constants/battle_constants.asm
+	ds 1
+
+; def9
 
 
 SECTION "Stack", WRAM0[$df00]
