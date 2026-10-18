@@ -1,5 +1,6 @@
 # precompiled python
 *.pyc
+__pycache__/
 
 # compiled object file
 *.o
