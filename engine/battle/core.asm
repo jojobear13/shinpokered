@@ -3662,38 +3662,9 @@ PlayerCanExecuteMove:
 	call IsInArray
 	call c, JumpMoveEffect ; execute the effects of SpecialEffectsCont moves (e.g. Wrap, Thrash) but don't skip anything
 PlayerCalcMoveDamage:
-	ld a, [wPlayerMoveEffect]
-	ld hl, SetDamageEffects
-	ld de, 1
-	call IsInArray
-;;;;;;;;;;;;;;;;;;;;
-;joenote - if there is a static damage effect like superfang or seismic toss, make it obey type immunities
-	ld a, [wUnusedC000] ; get ready to set or clear static damage flag
-	;jp c, .moveHitTest ; SetDamageEffects moves (e.g. Seismic Toss and Super Fang) skip damage calculation	;joenote - not needed anymore
-	jp nc, .not_static	;skip all this if not a static damage move
-	set 4, a
-	ld [wUnusedC000], a	;a static move, so set the flag
-	ld a, $1	;set wDamage to 1 point. just need a non-zero value otherwise it counts as a miss later on.
-	ld [wDamage+1], a
 	xor a
-	ld [wCriticalHitOrOHKO], a
-	jr .static_skiphere		;skip the normal calculations for static damage moves
-.not_static
-	res 4, a
-	ld [wUnusedC000], a	;not a static move, so clear the flag
-;;;;;;;;;;;;;;;;;;;;
-	call CriticalHitTest
-	call HandleCounterMove
-	jr z, handleIfPlayerMoveMissed
-	call GetDamageVarsForPlayerAttack
-	call CalculateDamage
-	jp z, playerCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
-	               ; for these moves, accuracy tests will only occur if they are called as part of the effect itself
-.static_skiphere	;joenote - skip here if a static damage move
-	call AdjustDamageForMoveType
-	call RandomizeDamage
-.moveHitTest
-	call MoveHitTest
+	call CalcMoveDamage
+	jp c, playerCheckIfFlyOrChargeEffect
 handleIfPlayerMoveMissed:
 	ld a, [wMoveMissed]
 	and a
@@ -4906,6 +4877,56 @@ SwapPlayerAndEnemyLevels:
 	ld [wEnemyMonLevel], a
 	pop bc
 	ret
+
+;joenote - the damage calculation from the player's and enemy's move execution, merged
+; a = the attacking side (0 or BATTLE_SIDE_ENEMY)
+; returns carry to skip the rest of the damage steps and the hit test (moves with 0 BP,
+; and OHKO moves, whose accuracy test is part of their effect); otherwise the caller
+; goes on to check whether the move missed
+CalcMoveDamage:
+	ld [hBattleSide], a
+	ld hl, .moveEffect
+	call GetAddrFromTable
+	ld a, [hl]
+	ld hl, SetDamageEffects
+	ld de, 1
+	call IsInArray
+;;;;;;;;;;;;;;;;;;;;
+;joenote - if there is a static damage effect like superfang or seismic toss, make it obey type immunities
+	ld a, [wUnusedC000] ; get ready to set or clear static damage flag
+	jr nc, .not_static	;skip all this if not a static damage move
+	set 4, a
+	ld [wUnusedC000], a	;a static move, so set the flag
+	ld a, $1	;set wDamage to 1 point. just need a non-zero value otherwise it counts as a miss later on.
+	ld [wDamage+1], a
+	xor a
+	ld [wCriticalHitOrOHKO], a
+	jr .static_skiphere		;skip the normal calculations for static damage moves
+.not_static
+	res 4, a
+	ld [wUnusedC000], a	;not a static move, so clear the flag
+;;;;;;;;;;;;;;;;;;;;
+	call CriticalHitTest
+	call HandleCounterMove
+	jr z, .checkIfMissed
+	ld a, [hBattleSide]
+	call GetDamageVars
+	call CalculateDamage
+	jr z, .skipHitTest
+.static_skiphere	;joenote - skip here if a static damage move
+	call AdjustDamageForMoveType
+	call RandomizeDamage
+	call MoveHitTest
+.checkIfMissed
+	and a
+	ret
+.skipHitTest
+	scf
+	ret
+
+; indexed by the attacking side
+.moveEffect
+	dw wPlayerMoveEffect, wEnemyMoveEffect
 
 ; hl = the a'th address in the table at hl
 ; preserves bc and de
@@ -6512,38 +6533,9 @@ EnemyCanExecuteMove:
 	call IsInArray
 	call c, JumpMoveEffect
 EnemyCalcMoveDamage:
-	ld a, [wEnemyMoveEffect]
-	ld hl, SetDamageEffects
-	ld de, $1
-	call IsInArray	;set carry if a is found in array hl
-;;;;;;;;;;;;;;;;;;;;
-;joenote - if there is a static damage effect like superfang or seismic toss, make it obey type immunities
-;	jp c, EnemyMoveHitTest	;joenote - don't need this anymore
-	ld a, [wUnusedC000]	;get ready to set or reset static move flag
-	jp nc, .not_static	;skip all this if not a static damage move
-	set 4, a
-	ld [wUnusedC000], a	;static move so set the flag
-	ld a, $1	;set wDamage to 1 point. just need a non-zero value otherwise it counts as a miss later on.
-	ld [wDamage+1], a
-	xor a
-	ld [wCriticalHitOrOHKO], a
-	jr .static_skiphere		;skip the normal calculations for static damage moves
-.not_static
-	res 4, a
-	ld [wUnusedC000], a	;not a static move so reset the flag
-;;;;;;;;;;;;;;;;;;;;
-	call CriticalHitTest
-	call HandleCounterMove
-	jr z, handleIfEnemyMoveMissed
-	call GetDamageVarsForEnemyAttack
-	call CalculateDamage
-	jp z, EnemyCheckIfFlyOrChargeEffect ; for moves with 0 BP, and ohko moves, skip any further damage calculation and, for now, skip MoveHitTest
-.static_skiphere	;joenote - skip here if a static damage move
-	call AdjustDamageForMoveType
-	call RandomizeDamage
-
-EnemyMoveHitTest:
-	call MoveHitTest
+	ld a, BATTLE_SIDE_ENEMY
+	call CalcMoveDamage
+	jp c, EnemyCheckIfFlyOrChargeEffect
 handleIfEnemyMoveMissed:
 	ld a, [wMoveMissed]
 	and a
