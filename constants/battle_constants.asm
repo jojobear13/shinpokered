@@ -16,6 +16,11 @@ MOD_ACCURACY        EQU 4
 MOD_EVASION         EQU 5
 MOD_SPECIAL_DEFENSE EQU 6
 
+; move categories (data/move_categories.asm)
+PHYSICAL EQU 0
+SPECIAL  EQU 1
+STATUS   EQU 2
+
 ; bits of wObtainedBadges
 BIT_BOULDERBADGE EQU 0
 BIT_CASCADEBADGE EQU 1

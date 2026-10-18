@@ -62,6 +62,25 @@ def _species_ids(include_enemy_only):
 
 
 SPECIES = _species_ids(include_enemy_only=False)
+
+
+def _categories():
+    """Each move's category (PHYSICAL, SPECIAL or STATUS), by move id - 1."""
+    path = os.path.join(REPO_ROOT, "data", "move_categories.asm")
+    with open(path) as f:
+        return [m.group(1) for m in re.finditer(r"^\s*db (\w+)", f.read(), re.M)]
+
+
+CATEGORIES = _categories()
+
+
+def category(move_id):
+    """What GetMoveCategory returns: STATUS for ids that aren't moves."""
+    if 1 <= move_id <= len(CATEGORIES):
+        return CATEGORIES[move_id - 1]
+    return "STATUS"
+
+
 ENEMY_SPECIES = _species_ids(include_enemy_only=True)
 
 # type ids that exist in the type table, including both sides of the
@@ -105,6 +124,7 @@ def _party(game, rng, prefix):
 
 def _move(game, rng, prefix):
     _fill(game, rng, prefix + "Num", MOVE_STRUCT_LEN)
+    game.poke(prefix + "Num", rng.randint(1, len(CATEGORIES)))  # a real move, so it has a category
     power = 0 if rng.random() < 0.08 else rng.choice([rng.randint(1, 255), 40, 80, 120, 150])
     game.poke(prefix + "Power", power)
     game.poke(prefix + "Type", rng.choice(TYPES))

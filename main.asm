@@ -619,6 +619,7 @@ SECTION "Battle (bank D)", ROMX, BANK[$D]
 SECTION "bankE",ROMX,BANK[$E]
 
 INCLUDE "data/moves.asm"
+INCLUDE "data/move_categories.asm"
 BaseStats: INCLUDE "data/base_stats.asm"
 INCLUDE "data/cries.asm"
 ;INCLUDE "engine/battle/unused_stats_functions.asm" ;joenote - putting this back into use and moving to bank 2d

@@ -448,14 +448,16 @@ AIMoveChoiceModification1:
 	cp SPECIAL_DEFENSE_UP2_EFFECT ; amnesia: special defense, like light screen
 	jr nz, .do_def_check_other
 .do_def_check_special
-	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
-	cp $09
-	jp c, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp PHYSICAL
+	jp z, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
 	jr .nodefupmove
 .do_def_check_other
-	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
-	cp $14
-	jp nc, .heavydiscourage	;at this point, heavy discourage defense-boosting because player is using a special move of 10+ power
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jp z, .heavydiscourage	;at this point, heavy discourage defense-boosting because player is using a special move of 10+ power
 .nodefupmove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -616,7 +618,7 @@ AIMoveChoiceModification1:
 	ld b, a
 	ld a, 1	;force the enemy turn
 	ld [H_WHOSETURN], a
-	call HandleSlpFrzClause
+	call AIHandleSlpFrzClause
 	ld a, b
 	ld [H_WHOSETURN], a
 	pop bc
@@ -1055,9 +1057,10 @@ AIMoveChoiceModification3:
 	call StrCmpAtkSPA
 	jr z, .skipout6	;jump if stats equal
 	push af
-	ld a, [wEnemyMoveType]
-	cp FIRE
-	jr nc, .special_move
+	ld a, [wEnemyMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jr z, .special_move
 .physical_move
 	pop af
 	jp c, .lightlydiscourage	;jump if attack < special
@@ -2368,9 +2371,10 @@ AIUseItemStrategyCheck_General:
 AIUseItemStrategyCheck_Physical:
 	call AIUseItemStrategyCheck_General
 	ret c
-	ld a, [wPlayerMoveType]
-	cp FIRE
-	jr nc, .fail	;clear carry if damaging move is special
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jr z, .fail	;clear carry if damaging move is special
 .pass 
 	scf
 	ret
@@ -2379,3 +2383,14 @@ AIUseItemStrategyCheck_Physical:
 	ret
 
 
+
+; the clause check, kept in this bank so the home bank needn't hold a wrapper
+AIHandleSlpFrzClause:
+	push bc
+	push hl
+	push de
+	callba _HandleSlpFrzClause
+	pop de
+	pop hl
+	pop bc
+	ret

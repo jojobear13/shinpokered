@@ -4863,9 +4863,13 @@ GetDamageVars:
 	and a
 	ld d, a ; d = move power
 	ret z ; return if move power is zero
-	ld a, [hl] ; a = move type
-	cp FIRE ; types >= FIRE are all special
-	jr c, .gotCategory
+	ld a, [hBattleSide]
+	ld hl, .moveNum
+	call GetAddrFromTable
+	ld a, [hl]
+	call GetMoveCategory ; the move's category, not its type, picks the stats
+	cp SPECIAL
+	jr nz, .gotCategory
 	ld a, [hBattleSide]
 	or BATTLE_SIDE_SPECIAL
 	ld [hBattleSide], a
@@ -4961,6 +4965,8 @@ GetDamageVars:
 ; indexed by player/enemy attacking
 .movePower
 	dw wPlayerMovePower, wEnemyMovePower
+.moveNum
+	dw wPlayerMoveNum, wEnemyMoveNum
 .attackerLevel
 	dw wBattleMonLevel, wEnemyMonLevel
 
@@ -7503,6 +7509,29 @@ BadgeStatBoosts:
 	db MOD_SPECIAL_ATTACK + 1,  1 << BIT_VOLCANOBADGE
 	db MOD_SPECIAL_DEFENSE + 1, 1 << BIT_VOLCANOBADGE
 	db 0
+
+;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
+; (moved out of the home bank: only battle code uses it)
+HandleSlpFrzClause:
+	push bc
+	push hl
+	push de
+	callba _HandleSlpFrzClause
+	pop de
+	pop hl
+	pop bc
+	ret
+
+; (moved out of the home bank: only battle code uses it)
+RefreshPartyMenu:
+	ld a, [wPartyMenuTypeOrMessageID]
+	push af
+	ld a, 6
+	ld [wPartyMenuTypeOrMessageID], a
+	call RedrawPartyMenu
+	pop af
+	ld [wPartyMenuTypeOrMessageID], a
+	ret
 
 LoadHudAndHpBarAndStatusTilePatterns:
 	call LoadHpBarAndStatusTilePatterns

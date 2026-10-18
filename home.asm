@@ -4601,16 +4601,37 @@ SetMapTextPointer::
 	ld [wMapTextPtr + 1], a
 	ret
 	
-HandleSlpFrzClause::	;joenote - move to the main function
-	push bc
-	push hl
-	push de
-	callba _HandleSlpFrzClause
-	pop de
-	pop hl
-	pop bc
-	ret
 	
+; a = move id -> a = its category: PHYSICAL, SPECIAL or STATUS (STATUS for
+; ids that aren't moves, like the X item animations). Preserves bc, de and hl.
+GetMoveCategory::
+	and a
+	jr z, .notMove
+	cp STRUGGLE + 1
+	jr nc, .notMove
+	push hl
+	push bc
+	ld c, a
+	ld b, 0
+	ld hl, MoveCategories - 1
+	add hl, bc
+	ld a, [H_LOADEDROMBANK]
+	push af
+	ld a, BANK(MoveCategories)
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
+	ld c, [hl]
+	pop af
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
+	ld a, c
+	pop bc
+	pop hl
+	ret
+.notMove
+	ld a, STATUS
+	ret
+
 Random_BiasDV::
 ; Return random DVs in A and B, and the special defense DV in the high nybble of C,
 ; with a bias towards higher numbers
@@ -4640,16 +4661,6 @@ Random_DV::
 	pop hl
 	ret
 
-;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
-RefreshPartyMenu:
-	ld a, [wPartyMenuTypeOrMessageID]
-	push af
-	ld a, 6
-	ld [wPartyMenuTypeOrMessageID], a
-	call RedrawPartyMenu
-	pop af
-	ld [wPartyMenuTypeOrMessageID], a
-	ret
 
 StatModifierRatios:
 ; first byte is numerator, second byte is denominator

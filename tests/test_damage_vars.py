@@ -14,6 +14,9 @@ from suites import damage_vars
 
 SEEDS = range(300)
 
+TACKLE = 0x21
+FLAMETHROWER = 0x35
+
 SIDES = {
     # side: (attacker battle struct, defender battle struct, defender status 3,
     #        move prefix)
@@ -29,7 +32,7 @@ def model(game, side):
     if power == 0:
         return {"z": True, "d": 0, "wDamage": 0}
 
-    special = game.peek(move + "Type") >= damage_vars.FIRE
+    special = damage_vars.category(game.peek(move + "Num")) == "SPECIAL"
     screen_bit = damage_vars.HAS_LIGHT_SCREEN_UP if special else damage_vars.HAS_REFLECT_UP
     stat = "SpecialDefense" if special else "Defense"
     defense = game.peek16(defender + stat)
@@ -85,7 +88,7 @@ class DamageVarsTest(unittest.TestCase):
             damage_vars.setup(self.game, random.Random(1))
             self.game.poke("wCriticalHitOrOHKO", 0)
             self.game.poke(move + "Power", 50)
-            self.game.poke(move + "Type", 0)  # normal: physical
+            self.game.poke(move + "Num", TACKLE)  # physical
             self.game.poke16(attacker + "Attack", 100)
             self.game.poke16(defender + "Defense", 60)
             self.game.poke(status3, 1 << damage_vars.HAS_REFLECT_UP)
@@ -99,7 +102,7 @@ class DamageVarsTest(unittest.TestCase):
             damage_vars.setup(self.game, random.Random(2))
             self.game.poke("wCriticalHitOrOHKO", 0)
             self.game.poke(move + "Power", 90)
-            self.game.poke(move + "Type", damage_vars.FIRE)
+            self.game.poke(move + "Num", FLAMETHROWER)  # special
             self.game.poke16(attacker + "SpecialAttack", 400)
             self.game.poke16(defender + "SpecialDefense", 600)
             self.game.poke(status3, 1 << damage_vars.HAS_LIGHT_SCREEN_UP)

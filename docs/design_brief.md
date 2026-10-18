@@ -418,7 +418,7 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E (part 1 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
+| E (parts 1-2 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
@@ -546,6 +546,32 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
 - **Not verified:** link battles and trades between two copies (both sides
   run the same code and sizes come from the labels), the printer page (no
   printer in the harness).
+
+**Step E, part 2 as done: the physical/special split** (`claude/mechanics`).
+
+- **Where the category lives.** The plan said two spare bits of each move's
+  type byte, but 47 places read a move's type, and every one would have had
+  to mask them off. Instead `data/move_categories.asm` holds one byte per
+  move (`PHYSICAL`, `SPECIAL` or `STATUS`), next to the moves, and
+  `GetMoveCategory` (home bank) looks it up by move id, returning `STATUS`
+  for ids that aren't moves (the X items' animation ids). The move data and
+  everything that reads a type are unchanged.
+- **Data.** Gen 4's categories for all 165 moves, from PokeAPI's move list,
+  whose ids 1-165 are Gen 1's in the same order. 75 physical, 35 special,
+  55 status. Moves whose category differs from what their Gen 1 type gave
+  them include Crabhammer, Waterfall, the elemental punches, Razor Leaf and
+  Vine Whip (now physical) and Gust, Tri Attack, Swift and Hyper Beam (now
+  special).
+- **Readers.** `GetDamageVars` (stage S0) and the four AI checks that asked
+  "is this move special?" by type now ask by category. Gen 1's Counter still
+  counters Normal and Fighting moves by type; making it counter physical
+  moves, as from Gen 2, is a separate decision.
+- **Home bank.** It was full; `RefreshPartyMenu` and the clause-check
+  wrapper, each used from at most two banks, moved out to make room.
+- **Verified:** `tests/test_move_categories.py` checks `GetMoveCategory`
+  against the table for all 256 ids and that crossover moves use their
+  category's stats; the damage-stat model in `tests/test_damage_vars.py`
+  decides special by category, over random real moves.
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.
