@@ -8,6 +8,16 @@ sSpriteBuffer2:: ds SPRITEBUFFERSIZE ; a310
 
 sHallOfFame:: ds HOF_TEAM * HOF_TEAM_CAPACITY ; a598
 
+; Live game data that used to be in WRAM (design brief, step D). Only
+; accessed between OpenBox and CloseBox (home.asm). Saved by copying it to
+; the bank 1 snapshot below, so a reset without saving loses changes to it,
+; as it did when it was in WRAM.
+sLiveDataStart::
+sDayCareMonName:: ds NAME_LENGTH ; b858
+sDayCareMonOT::   ds NAME_LENGTH ; b863
+sDayCareMon:: box_struct sDayCareMon ; b86e
+sLiveDataEnd::
+
 
 SECTION "Save Data", SRAM, BANK[1]
 	ds $598
@@ -17,8 +27,9 @@ sMainData::    ds wMainDataEnd   - wMainDataStart ; a5a3
 sSpriteData::  ds wSpriteDataEnd - wSpriteDataStart ; ad2c
 sPartyData::   ds wPartyDataEnd  - wPartyDataStart ; af2c
 sCurBoxData::  ds wBoxDataEnd    - wBoxDataStart ; b0c0
-sTilesetType:: ds 1 ; b522
-sMainDataCheckSum:: ds 1 ; b523
+sDayCareData:: ds DAY_CARE_DATA_LENGTH ; b522, snapshot of sDayCareMonName..sLiveDataEnd
+sTilesetType:: ds 1 ; b559
+sMainDataCheckSum:: ds 1 ; b55a
 
 
 SECTION "Saved Boxes 1", SRAM, BANK[2]

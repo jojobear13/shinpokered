@@ -31,6 +31,8 @@ HOF_TEAM          EQU PARTY_LENGTH * HOF_MON
 HOF_TEAM_CAPACITY EQU 50
 
 NAME_LENGTH EQU 11
+; the day-care mon's nickname, OT name and box struct, kept together in save RAM
+DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 25 + NUM_MOVES * 2
 ITEM_NAME_LENGTH EQU 13
 
 A_BUTTON EQU %00000001

@@ -84,6 +84,37 @@ HideSprites::
 
 INCLUDE "home/copy.asm"
 
+; The day-care mon and the current PC box live in save RAM bank 0 (see
+; sLiveDataStart in sram.asm). Every access to them is bracketed by OpenBox
+; and CloseBox, which enable SRAM and select that bank. Brackets nest
+; (wBoxOpenDepth counts them) and SRAM is disabled again by the outermost
+; CloseBox. Both preserve every register and the flags.
+; Never hold a bracket open across a save or load (they select other banks
+; and disable SRAM when done) or across a picture decompression (it uses the
+; sprite buffers in the same bank and manages SRAM itself).
+OpenBox::
+	push af
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	xor a
+	ld [MBC1SRamBank], a
+	ld a, [wBoxOpenDepth]
+	inc a
+	jr CloseBox.store
+CloseBox::
+	push af
+	ld a, [wBoxOpenDepth]
+	and a
+	jr z, .disable ; an unmatched CloseBox still disables SRAM
+	dec a
+	jr nz, .store
+.disable
+	ld [MBC1SRamEnable], a ; a = SRAM_DISABLE
+.store
+	ld [wBoxOpenDepth], a
+	pop af
+	ret
+
 
 
 SECTION "Entry", ROM0 [$100]

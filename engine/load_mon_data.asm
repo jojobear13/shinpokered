@@ -7,7 +7,12 @@ LoadMonData_:
 ; Return monster id at wcf91 and its data at wLoadedMon.
 ; Also load base stats at wMonHeader for convenience.
 
-	ld a, [wDayCareMonSpecies]
+	call OpenBox ; the box and the day care are in save RAM
+	call .body
+	jp CloseBox
+
+.body
+	ld a, [sDayCareMonSpecies]
 	ld [wcf91], a
 	ld a, [wMonDataLocation]
 	and $7f
@@ -38,7 +43,7 @@ LoadMonData_:
 	ld bc, wBoxMon2 - wBoxMon1
 	jr z, .getMonEntry
 
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr .copyMonData
 
 .getMonEntry

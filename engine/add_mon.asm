@@ -359,13 +359,20 @@ _AddEnemyMonToPlayerParty:
 	ret                  ; return success
 
 _MoveMon:
+; the box and the day care are in save RAM; carry (destination full) survives
+; CloseBox
+	call OpenBox
+	call .body
+	jp CloseBox
+
+.body
 	ld a, [wMoveMonType]
 	and a   ; BOX_TO_PARTY
 	jr z, .checkPartyMonSlots
 	cp DAYCARE_TO_PARTY
 	jr z, .checkPartyMonSlots
 	cp PARTY_TO_DAYCARE
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr z, .findMonDataSrc
 	; else it's PARTY_TO_BOX
 	ld hl, wNumInBox
@@ -389,7 +396,7 @@ _MoveMon:
 	add hl, bc
 	ld a, [wMoveMonType]
 	cp DAYCARE_TO_PARTY
-	ld a, [wDayCareMon]
+	ld a, [sDayCareMon]
 	jr z, .copySpecies
 	ld a, [wcf91]
 .copySpecies
@@ -419,7 +426,7 @@ _MoveMon:
 	ld bc, wBoxMon2 - wBoxMon1 ; $21
 	jr z, .addMonOffset2
 	cp DAYCARE_TO_PARTY
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr z, .copyMonData
 	ld hl, wPartyMons
 	ld bc, wPartyMon2 - wPartyMon1 ; $2c
@@ -448,7 +455,7 @@ _MoveMon:
 .findOTdest
 	ld a, [wMoveMonType]
 	cp PARTY_TO_DAYCARE
-	ld de, wDayCareMonOT
+	ld de, sDayCareMonOT
 	jr z, .findOTsrc
 	dec a 
 	ld hl, wPartyMonOT
@@ -466,7 +473,7 @@ _MoveMon:
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addOToffset2
-	ld hl, wDayCareMonOT
+	ld hl, sDayCareMonOT
 	cp DAYCARE_TO_PARTY
 	jr z, .copyOT
 	ld hl, wPartyMonOT
@@ -479,7 +486,7 @@ _MoveMon:
 	ld a, [wMoveMonType]
 .findNickDest
 	cp PARTY_TO_DAYCARE
-	ld de, wDayCareMonName
+	ld de, sDayCareMonName
 	jr z, .findNickSrc
 	dec a
 	ld hl, wPartyMonNicks
@@ -497,7 +504,7 @@ _MoveMon:
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addNickOffset2
-	ld hl, wDayCareMonName
+	ld hl, sDayCareMonName
 	cp DAYCARE_TO_PARTY
 	jr z, .copyNick
 	ld hl, wPartyMonNicks

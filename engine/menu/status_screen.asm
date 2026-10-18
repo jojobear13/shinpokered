@@ -227,6 +227,7 @@ StatusScreen:
 	pop af
 	ld [wd0b5], a
 
+	call OpenBox ; box and day-care names are in save RAM
 	ld hl, NamePointers2
 	call .GetStringPointer
 	ld d, h
@@ -239,6 +240,7 @@ StatusScreen:
 	ld e, l
 	coord hl, 12, 16
 	call PlaceString ; OT
+	call CloseBox
 	coord hl, 12, 14
 	ld de, wLoadedMonOTID
 	lb bc, LEADING_ZEROES | 2, 5
@@ -275,13 +277,13 @@ OTPointers:
 	dw wPartyMonOT
 	dw wEnemyMonOT
 	dw wBoxMonOT
-	dw wDayCareMonOT
+	dw sDayCareMonOT
 
 NamePointers2:
 	dw wPartyMonNicks
 	dw wEnemyMonNicks
 	dw wBoxMonNicks
-	dw wDayCareMonName
+	dw sDayCareMonName
 
 Type1Text:
 	db "TYPE1/", $4e

@@ -2865,6 +2865,11 @@ AddBonusPP:
 ; OUTPUT:
 ; [wMaxPP] = max PP
 GetMaxPP:
+	call OpenBox ; the box and the day care are in save RAM
+	call .body
+	jp CloseBox
+
+.body
 	ld a, [wMonDataLocation]
 	and a
 	ld hl, wPartyMon1Moves
@@ -2877,7 +2882,7 @@ GetMaxPP:
 	ld bc, wBoxMon2 - wBoxMon1
 	dec a
 	jr z, .sourceWithMultipleMon
-	ld hl, wDayCareMonMoves
+	ld hl, sDayCareMonMoves
 	dec a
 	jr z, .sourceWithOneMon
 	ld hl, wBattleMonMoves ; player's in-battle pokemon

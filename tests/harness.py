@@ -369,6 +369,8 @@ class Game:
             current[counter - RANDOM_STUB] = harness_area[counter - RANDOM_STUB]
         if current != harness_area:
             raise HarnessError(f"{name} overwrote the harness's queues (stack too deep?)")
+        if "wBoxOpenDepth" in self.symbols and self.peek("wBoxOpenDepth"):
+            raise HarnessError(f"{name} returned with the save-RAM box still open")
 
         # the routine's a and f were pushed by the launcher
         sp = self.regs.SP

@@ -87,6 +87,12 @@ LoadSAV0:
 	ld bc, wBoxDataEnd - wBoxDataStart
 	call CopyData
 
+	ld hl, sDayCareData
+	ld de, sLiveDataStart
+	ld bc, DAY_CARE_DATA_LENGTH
+	ld a, (0 << 4) | 1 ; bank 1 to bank 0
+	call CopySRAMBanked
+
 	and a
 	jp SAVGoodChecksum
 
@@ -263,6 +269,12 @@ SaveSAVtoSRAM0:
 	ld bc, wBoxDataEnd - wBoxDataStart
 	call CopyData
 
+	ld hl, sLiveDataStart
+	ld de, sDayCareData
+	ld bc, DAY_CARE_DATA_LENGTH
+	ld a, (1 << 4) | 0 ; bank 0 to bank 1
+	call CopySRAMBanked ; leaves bank 1 selected for the checksum below
+
 	ld a, [hTilesetType]
 	ld [sTilesetType], a
 
@@ -331,6 +343,29 @@ SaveSAVtoSRAM:
 	call SaveSAVtoSRAM0
 	call SaveSAVtoSRAM1	;not needed since SaveSAVtoSRAM0 already saves the box data | left in as a redundancy
 	jp SaveSAVtoSRAM2	;not needed since SaveSAVtoSRAM0 saves full man data and now the party data | left in as a redundancy
+
+CopySRAMBanked:
+; Copy bc bytes from hl in SRAM bank (a & $f) to de in SRAM bank (a >> 4).
+; SRAM must already be enabled. Leaves the destination bank selected.
+	ld [wSRAMCopyBanks], a
+.loop
+	ld a, [wSRAMCopyBanks]
+	and $f
+	ld [MBC1SRamBank], a
+	ld a, [hli]
+	push af
+	ld a, [wSRAMCopyBanks]
+	swap a
+	and $f
+	ld [MBC1SRamBank], a
+	pop af
+	ld [de], a
+	inc de
+	dec bc
+	ld a, b
+	or c
+	jr nz, .loop
+	ret
 
 SAVCheckSum:
 ;Check Sum (result[1 byte] is complemented)

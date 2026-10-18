@@ -120,19 +120,19 @@ def read_day_care(game):
     if not game.peek("wDayCareInUse"):
         return None
     return _mon(
-        game.peek("wDayCareMonSpecies"),
-        game.peek("wDayCareMon", BOX_STRUCT_LEN),
-        _name(game, "wDayCareMonOT"),
-        _name(game, "wDayCareMonName"),
+        game.peek("sDayCareMonSpecies"),
+        game.peek("sDayCareMon", BOX_STRUCT_LEN),
+        _name(game, "sDayCareMonOT"),
+        _name(game, "sDayCareMonName"),
     )
 
 
 def write_day_care(game, mon):
     """Put a box-format mon in the day care and mark it in use."""
     game.poke("wDayCareInUse", 1)
-    game.poke("wDayCareMon", *mon["data"])
-    game.poke("wDayCareMonOT", *mon["ot"])
-    game.poke("wDayCareMonName", *mon["nick"])
+    game.poke("sDayCareMon", *mon["data"])
+    game.poke("sDayCareMonOT", *mon["ot"])
+    game.poke("sDayCareMonName", *mon["nick"])
 
 
 # ------------------------------------------------------- random mons

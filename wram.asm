@@ -6,6 +6,7 @@ MACRO flag_array
 ENDM
 
 box_struct_length EQU 25 + NUM_MOVES * 2
+ASSERT DAY_CARE_DATA_LENGTH == 2 * NAME_LENGTH + box_struct_length
 MACRO box_struct
 \1Species::    db	;+$00
 \1HP::         dw	;+$01
@@ -3468,12 +3469,18 @@ wDayCareInUse:: ; da48
 ; 1 if pokemon is in the daycare
 	ds 1
 
-wDayCareMonName:: ds NAME_LENGTH ; da49
-wDayCareMonOT::   ds NAME_LENGTH ; da54
-
-wDayCareMon:: box_struct wDayCareMon ; da5f
-
 wMainDataEnd::
+
+; The day-care mon lives in save RAM (sDayCareMon in sram.asm) and is read
+; through OpenBox/CloseBox in home.asm. Design brief, step D.
+wBoxOpenDepth:: ; da49
+; OpenBox calls not yet matched by a CloseBox; SRAM is disabled when it
+; returns to zero
+	ds 1
+wSRAMCopyBanks:: ; da4a
+; CopySRAMBanked: source bank in the low nybble, destination bank in the high
+	ds 1
+	ds DAY_CARE_DATA_LENGTH - 2 ; da4b: freed by moving the day-care mon
 
 
 wBoxDataStart::

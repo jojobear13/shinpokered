@@ -62,9 +62,11 @@ DayCareMText1:
 	jp .done
 
 .daycareInUse
+	call OpenBox ; the day-care mon is in save RAM
 	xor a
-	ld hl, wDayCareMonName
+	ld hl, sDayCareMonName
 	call GetPartyMonName
+	call CloseBox
 	ld a, DAYCARE_DATA
 	ld [wMonDataLocation], a
 	call LoadMonData
@@ -75,23 +77,27 @@ DayCareMText1:
 
 	ld d, MAX_LEVEL
 	callab CalcExperience
-	ld hl, wDayCareMonExp
+	call OpenBox
+	ld hl, sDayCareMonExp
 	ld a, [hExperience]
 	ld [hli], a
 	ld a, [hExperience + 1]
 	ld [hli], a
 	ld a, [hExperience + 2]
 	ld [hl], a
+	call CloseBox
 	ld d, MAX_LEVEL
 
 .skipCalcExp
 	xor a
 	ld [wDayCareNumLevelsGrown], a
-	ld hl, wDayCareMonBoxLevel
+	call OpenBox
+	ld hl, sDayCareMonBoxLevel
 	ld a, [hl]
 	ld [wDayCareStartLevel], a
 	cp d
 	ld [hl], d
+	call CloseBox ; keeps the flags from cp
 	ld hl, DayCareMonNeedsMoreTimeText
 	jr z, .next
 	ld a, [wDayCareStartLevel]
@@ -170,8 +176,10 @@ DayCareMText1:
 	ld a, DAYCARE_TO_PARTY
 	ld [wMoveMonType], a
 	call MoveMon
-	ld a, [wDayCareMonSpecies]
+	call OpenBox
+	ld a, [sDayCareMonSpecies]
 	ld [wcf91], a
+	call CloseBox
 	ld a, [wPartyCount]
 	dec a
 	push af
@@ -194,8 +202,10 @@ DayCareMText1:
 	call PlayCry
 	
 ;joenote - prompt move learning and evolution if possible
-	ld a, [wDayCareMonSpecies]
+	call OpenBox
+	ld a, [sDayCareMonSpecies]
 	ld [wd11e], a
+	call CloseBox
 	call DaycareMoveLearning
 	call DaycareEvolution	;returns with z flag set if evolution did not happen
 	jr z, .doneEvos
@@ -234,12 +244,19 @@ DayCareMText1:
 	ld a, [hl]
 	ld [de], a
 
+	; the returned mon is last in the party; its name goes to wcd6d for the text
+	ld a, [wPartyCount]
+	dec a
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
 	ld hl, DayCareGotMonBackText
 	jr .done
 
 .leaveMonInDayCare
 	ld a, [wDayCareStartLevel]
-	ld [wDayCareMonBoxLevel], a
+	call OpenBox
+	ld [sDayCareMonBoxLevel], a
+	call CloseBox
 
 .done
 	call PrintText
