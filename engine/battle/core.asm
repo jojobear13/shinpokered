@@ -3782,6 +3782,7 @@ MirrorMoveCheck:
 	call GetDamageVarsForPlayerAttack
 	call CalculateDamage
 	call AdjustDamageForMoveType
+	call ApplyDamageModifiers
 	call RandomizeDamage
 	pop hl
 	pop de
@@ -4915,6 +4916,7 @@ CalcMoveDamage:
 	jr z, .skipHitTest
 .static_skiphere	;joenote - skip here if a static damage move
 	call AdjustDamageForMoveType
+	call ApplyDamageModifiers
 	call RandomizeDamage
 	call MoveHitTest
 .checkIfMissed
@@ -4927,6 +4929,12 @@ CalcMoveDamage:
 ; indexed by the attacking side
 .moveEffect
 	dw wPlayerMoveEffect, wEnemyMoveEffect
+
+; Stage S3 of the damage pipeline (docs/design_brief.md, decision 3): weather,
+; held items and abilities will scale wDamage here, once, by n/16, between the
+; type adjustment and the random factor. There are no modifiers yet.
+ApplyDamageModifiers:
+	ret
 
 ; hl = the a'th address in the table at hl
 ; preserves bc and de
@@ -6663,6 +6671,7 @@ EnemyCheckIfMirrorMoveEffect:
 	call SwapPlayerAndEnemyLevels
 	call CalculateDamage
 	call AdjustDamageForMoveType
+	call ApplyDamageModifiers
 	call RandomizeDamage
 	pop hl
 	pop de
