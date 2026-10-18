@@ -26,11 +26,12 @@ checked.
 | Resource | Size | Free | Notes |
 |---|---|---|---|
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
-| ROM bank 0 (always loaded) | 16 KB | 123 bytes | Shared helpers must live here to be callable from every bank cheaply |
-| Battle engine bank ($0F) | 16 KB | 494 bytes | Was 21 before the merges started; each merge frees more |
-| WRAM | 8 KB | **8 bytes** (`$def8`-`$deff`) | **The real constraint** until the current box moves to save RAM (decision 2), which frees 1122 bytes. The current box (`wBoxDataStart`-`wBoxDataEnd`) is the single largest reclaimable block |
+| ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
+| ROM bank 3 | 16 KB | **3 bytes** | Holds the item, catching, `MoveMon`, status-screen and day-care code. Step D took 43 bytes here. The next change to this bank must free room first |
+| Battle engine bank ($0F) | 16 KB | 504 bytes | Was 21 before the merges started; each merge frees more |
+| WRAM | 8 KB | **1157 bytes** (`$da7b`-`$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes. 2 hold the save-RAM accessor's state, 22 the PC list menu's copy of the box list, and the boot RNG seed took 4 of the 8 bytes that were free before. Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
-| Save RAM | 32 KB (4 banks) | ~7.4 KB | Bank 0: 1960, bank 1: 2780, banks 2-3: 1453 each |
+| Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
 | Map IDs | 1 byte | 6 unallocated plus 22 defined-but-unused | 250 constants are defined (last is `$F7`) |
 
@@ -186,6 +187,10 @@ bytes decision 1 leaves.
   rest are one or two reads each.
 - The day-care mon (`wDayCareMon`, a 33-byte box struct just above the box)
   moves with it.
+- *As built:* the box is still copied to bank 1 when saving, and that copy,
+  not the live one, has the checksum. Keeping the box only in save RAM would
+  let a deposit outlive a reset that the party does not, which clones the
+  mon. See "Step D as done" under the plan.
 
 **Decision, part two: overlaps are proven dynamically.** Where a battle-only
 variable is to share space with overworld-only scratch, the proof is a canary
@@ -375,7 +380,7 @@ and the budget table above is updated.
 | A (done) | `hBattleSide` (decision 1): relocate the two side bytes to `$FFE2`, update the entry-point shims. Extend `compare_builds.py` to compare RAM by name across layout changes, ignoring names that only the old build has, so the comparison stays on for this commit | `compare_builds.py` identical on results and all shared RAM; `make test`; all eight variants build | WRAM 6 → 8, HRAM 5 → 4 |
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
-| D | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
+| D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
 | E | First mechanics, one commit each with a spec test: natures (`CalcStats`), abilities (hook tables, DV-bit slot), held items (item byte, wild item table, `Mon1BCDScore` fix), weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | 1 byte (weather) |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
@@ -409,18 +414,50 @@ self-hit code became `EnemyHandleSelfConfusionDamage`, unchanged; merging it
 with `HandleSelfConfusionDamage` (which also redraws the player's HUD) is a
 possible follow-up. `tests/suites/status_checks.py` covers it.
 
-**Step D's safety net is in place.** `tests/test_pc_boxes.py` covers
-depositing and withdrawing (including round trips), full boxes and parties,
-catching with a full party, changing boxes (first change and back again), the
-day care, saving and loading party, box and day care, and detecting a corrupted
-current box. It reads and writes boxes only through `tests/boxes.py`; step D
-updates `read_current_box`, `write_current_box` and `read_day_care` there to
-read save RAM, and every test in the file must still pass. Sabotaging the box
-copy makes the box-change tests fail (12 of 12 cases), so they do test it.
+**Step D as done, and where it differs from decision 2.**
 
-Steps A to C are the remaining refactors and must each compare identical.
-Step D is the one large structural change and gates every step that needs
-more than 8 bytes. Steps E to G are the new behaviour.
+- The day-care mon (name, OT name, box struct) and the current box live in
+  save RAM bank 0 after the Hall of Fame (`sLiveDataStart`-`sLiveDataEnd`,
+  `$b858`-`$bcf0`). Every access sits between `OpenBox` and `CloseBox` in
+  the home bank. They enable SRAM, select bank 0, nest (`wBoxOpenDepth`),
+  preserve every register and flag, and disable SRAM at the outermost
+  close. `GetNumInBox` reads the count. The test harness fails any call that
+  returns with the box still open.
+- **The box is still written at save time.** Decision 2 said it would not be,
+  and that its checksum would be updated on every write. That would make box
+  changes permanent without saving while party changes are not. A deposit
+  followed by a reset would leave the mon in the saved party and in the live
+  box. So saving copies the live data to a snapshot in bank 1
+  (`sLiveDataSnapshot`) with its own checksum (`sLiveDataSnapshotCheckSum`).
+  Loading checks that checksum and the main one before copying anything,
+  then copies the snapshot back. The main checksum no longer covers the box.
+  The live copy needs no checksum because every load rebuilds it.
+- **Save RAM is never left enabled across a frame**, with two changes needed
+  to keep that. `SendNewMonToBox` asks for the nickname into `wcd6d` before
+  opening the box, and the texts that name the mon print it from there. The
+  PC's list menu reads its list every frame, so it gets a 22-byte WRAM copy
+  of the count and species (`wBoxListCopy`). It reads nicknames through
+  brackets in the list-menu code. Picture decompression still leaves SRAM
+  enabled, as it always has.
+- Two preparatory commits: the boot RNG seed, written to the literal address
+  `$def0` inside `wBlackoutSavedMapData`, got its own variable (`wRNGSeed`);
+  and the unused `FarCopyData3` was removed from bank 0 to make room.
+- **Verified:** every test in `tests/test_pc_boxes.py` passes, with only the
+  readers and writers in `tests/boxes.py` changed. `tests/test_pc_menu.py` is
+  new: it withdraws, deposits and releases through the PC's own menus and
+  checks the name the list menu read from save RAM. `make test` passes and
+  all eight ROMs build. `compare_builds.py` against the previous commit
+  matches on every result. The only RAM difference is `wPredefRegisters+3`
+  in nested predef calls. It records the address of `Predef.done`, which
+  moved 12 bytes in bank 0.
+- **Not verified:** the save-and-reload check is the game's own save and load
+  routines run in the emulator by `SaveTest`, not a played session through
+  the start menu. The Game Boy Printer's box printout builds but has no
+  test, because the harness has no printer.
+
+Steps A to D, the refactors, are done, and each compared identical apart
+from the differences recorded above. Steps E to G are the new behaviour.
+WRAM no longer gates them. Bank 3's 3 free bytes may.
 
 ## Bugs found by the refactor
 
@@ -454,4 +491,13 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   into `wPlayTimeMaxed` and only bit 7 of that byte stops the count.
 - `$FF9E` is not free HRAM: `H_SAVEDNUMTOPRINT` at `$FF9C` is three bytes.
 - The main save checksum covers `sPlayerName` through the byte before
-  `sMainDataCheckSum`, which today includes the current box mirror.
+  `sMainDataCheckSum`. Since step D that excludes the box and the day care.
+  Their snapshot in bank 1 has its own checksum, and loading fails if either
+  checksum is wrong.
+- The current box and the day-care mon are in save RAM bank 0. Read them
+  only between `OpenBox` and `CloseBox`. Never hold the box open across a
+  save, a load, a box change or the naming screen, because those select
+  other banks or disable SRAM, or run for many frames.
+- The list menu tells a party list from a box list by the low byte of the
+  list's address alone; `wram.asm` asserts that `wBoxListCopy` differs from
+  `wPartyCount` there.
