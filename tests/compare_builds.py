@@ -34,6 +34,15 @@ from harness import HRAM, REPO_ROOT, WRAM, Game, load_symbols  # noqa: E402
 
 ROM = "pokered.gbc"
 
+# Variables whose value between routines means nothing, because every routine
+# that reads one sets it first. A refactor may leave a different value in
+# them, so they are not compared. Keep this list short and justified.
+SCRATCH = {
+    # each merged battle routine sets it on entry (docs/design_brief.md,
+    # decision 1)
+    "hBattleSide",
+}
+
 
 def build(tree, rgbds):
     cmd = ["make", ROM]
@@ -102,6 +111,12 @@ def ram_pairs(old_sym, new_sym):
     shared = old.keys() & new.keys()
     moved = sorted(n for n in shared if old[n] != new[n])
 
+    scratch_new = set()
+    for name in SCRATCH:
+        if name in new:
+            start = new[name]
+            scratch_new.update(range(start, start + new_regions[start][1]))
+
     pairs = []
     covered_new = set()
     skipped_old, skipped_new = set(), set()
@@ -126,11 +141,15 @@ def ram_pairs(old_sym, new_sym):
                 if offset >= new_length:
                     continue  # the variable shrank; the tail no longer exists
                 target = new_start + offset
-            pairs.append((snapshot_index(addr), snapshot_index(target)))
             covered_new.add(target)
+            if target in scratch_new:
+                continue
+            pairs.append((snapshot_index(addr), snapshot_index(target)))
 
     # new variables at addresses nothing old maps onto
     for addr, (names, length) in new_regions.items():
+        if any(n in SCRATCH for n in names):
+            continue
         if not any(n in old for n in names):
             if not any(a in covered_new for a in range(addr, addr + length)):
                 skipped_new.update(names)
@@ -193,6 +212,7 @@ def main():
             print(f"skipping RAM that only exists in the base build: {', '.join(skipped_old)}")
         if skipped_new:
             print(f"skipping RAM that only exists in the new build: {', '.join(skipped_new)}")
+        print(f"not comparing scratch variables: {', '.join(sorted(SCRATCH))}")
 
         old, new = Game(old_rom), Game(new_rom)
         failures = 0
