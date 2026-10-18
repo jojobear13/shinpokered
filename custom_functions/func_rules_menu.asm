@@ -1,9 +1,8 @@
 ; The RULES page of the extra options menu. These rules used to be toggled by
 ; talking to NPCs (the girl and aides in OAK's lab, aides in the VIRIDIAN
 ; #MON CENTER and CELADON DINER, the old man in the VIRIDIAN school, the
-; clause brothers in VIRIDIAN CITY, a guard at the SAFARI ZONE gate and a
-; glass #BALL in the rival's house). Each is still an event flag, so the code
-; that follows a rule is unchanged.
+; clause brothers in VIRIDIAN CITY and a guard at the SAFARI ZONE gate). Each
+; is still an event flag, so the code that follows a rule is unchanged.
 
 MACRO rule
 	dw \1 ; label, or 0 for a flag with no row of its own
@@ -25,7 +24,6 @@ RuleFlags:
 	rule RulesTextTrap,       EVENT_8C5 ; trapping move clause
 	rule RulesTextHyperBeam,  EVENT_8C8 ; hyper beam clause
 	rule RulesTextSafari,     EVENT_90F ; special safari zone event
-	rule RulesTextShimmer,    EVENT_8C7 ; the shimmer
 RuleFlagsRowsEnd:
 	rule 0,                   EVENT_8D7 ; full rather than tiered wild randomization
 RuleFlagsEnd:
@@ -268,8 +266,6 @@ RulesTextHyperBeam:
 	db " H.BEAM CLAUSE@"
 RulesTextSafari:
 	db " SAFARI EVENT@"
-RulesTextShimmer:
-	db " SHIMMER@"
 RulesTextBack:
 	db " BACK@"
 

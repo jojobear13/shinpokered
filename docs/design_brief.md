@@ -374,8 +374,8 @@ G.
 
 **Chosen.** Every Shin rule that an NPC or object used to toggle (wild and
 trainer randomizers, trainer scaling, alternate trainer moves, catch-up EXP,
-the caught icon, the five battle clauses, the Safari event and the Shimmer) is
-a row on the RULES page of the extra options menu
+the caught icon, the five battle clauses and the Safari event) is a row on
+the RULES page of the extra options menu
 (`custom_functions/func_rules_menu.asm`). The NPCs that Shin added for them
 are gone; the Oak's Lab girl and aides, which are in the original game, say
 their original lines again; the Viridian house is back to its original size.
@@ -389,6 +389,10 @@ how battles or the overworld work) go on a separate branch cut from here, so
 this one remains a mechanically untouched base to compare against. Behaviour-
 preserving refactors (plan steps E onward that change no behaviour) still
 land here first.
+
+The Shimmer (a cheat toggled by a glass Poké Ball in the rival's house) was
+removed outright rather than made an option: it stored its hidden factor in
+the catch-rate byte, which decision 6 reserves for the held item.
 
 **Costs.** Wild randomization no longer offers re-rolling the seed mid-game;
 the seed is the one chosen at NEW GAME. The Safari event is no longer locked

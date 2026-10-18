@@ -1875,7 +1875,6 @@ IF DEF(_EXPBAR)
 INCLUDE "engine/battle/exp_bar_print.asm"	
 ENDC
 INCLUDE "custom_functions/fisher_yates.asm"
-INCLUDE "custom_functions/func_transformations.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 TradingAnimationGraphics:

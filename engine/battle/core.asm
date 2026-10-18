@@ -1996,14 +1996,6 @@ LoadBattleMonFromParty:
 	ld bc, NAME_LENGTH
 	call CopyData
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Transformation hook-in point.
-; If you wanted to do some adjustments on the active pokemon battle struct, 
-; such as for some kind of ability or implementing a transformation, 
-; then this point is a good place to handle the player active pokemon.
-	predef ShimmerTransformationPlayer
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-
 	ld hl, wBattleMonLevel
 	ld de, wPlayerMonUnmodifiedLevel ; block of memory used for unmodified stats
 	ld bc, 1 + NUM_STATS * 2
@@ -7159,15 +7151,6 @@ LoadEnemyMonData:
 	ld hl, wPokedexSeen
 	predef FlagActionPredef ; mark this mon as seen in the pokedex
 .skip_seen
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;Transformation hook-in point.
-; If you wanted to do some adjustments on the enemy stats battle struct, 
-; such as for some kind of ability or implementing a transformation, 
-; then this point is a good place to handle the enemy pokemon.
-; But remember that this section gets run before battle if the enemy mon is wild.
-	predef ShimmerTransformationEnemy
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	ld hl, wEnemyMonLevel
 	ld de, wEnemyMonUnmodifiedLevel
