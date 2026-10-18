@@ -125,6 +125,17 @@ _Random_BiasDV::
 	or e
 	ld d, a
 	ld e, b
+
+	;special defense DV, in the high nybble of L: the higher of two rolls
+	call Random
+	and $F0
+	ld l, a
+	call Random
+	and $F0
+	cp l
+	jr c, .gotSpclDef
+	ld l, a
+.gotSpclDef
 	
 	;if gym leader or champion music playing, make it so values cannot be below 8
 	ld a, [wChannelSoundIDs]
@@ -155,9 +166,13 @@ _Random_BiasDV::
 	ld a, e
 	or $88
 	ld e, a
+	ld a, l
+	or $80
+	ld l, a
 	ret
 	
-_Random_DV::	;generates four 0 to 15 DVs in DE, and rerolls 1 time for each DV below the value placed in L
+_Random_DV::	;generates four 0 to 15 DVs in DE and the special defense DV in the high nybble of L,
+	;and rerolls 1 time for each DV below the value placed in L
 	ld l, 0
 	
 	ld a, [wOptions]	;load game options
@@ -170,10 +185,23 @@ _Random_DV::	;generates four 0 to 15 DVs in DE, and rerolls 1 time for each DV b
 	ld d, a
 	call Random
 	ld e, a
+	call Random
+	and $F0
+	ld h, a ; special defense DV
 	
 	ld a, l
 	and a
-	ret z
+	jr z, .done
+
+	;check special defense dv
+	ld a, h
+	swap a
+	cp l
+	jr nc, .spclDefDone
+	call Random
+	and $F0
+	ld h, a
+.spclDefDone
 	
 	ld bc, $FFFF
 	
@@ -244,7 +272,9 @@ _Random_DV::	;generates four 0 to 15 DVs in DE, and rerolls 1 time for each DV b
 	and c
 	or e
 	ld e, a
-	
+
+.done
+	ld l, h
 	ret
 
 	

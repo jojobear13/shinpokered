@@ -14,9 +14,10 @@ ENCOUNTER_TILE_COORD_Y EQU 9
 NUM_FIELD_MOVES     EQU 5
 
 NUM_MOVES     EQU 4
-NUM_STATS     EQU 5
+NUM_STATS     EQU 6 ; HP, attack, defense, speed, special attack, special defense
+NUM_STAT_EXPS EQU 5 ; special attack and special defense share one, as in Gen 2
 NUM_STAT_MODS EQU 8
-NUM_DVS       EQU 2
+NUM_DVS       EQU 3 ; bytes: attack/defense, speed/special attack, special defense/spare
 
 PARTY_LENGTH EQU 6
 
@@ -32,7 +33,7 @@ HOF_TEAM_CAPACITY EQU 50
 
 NAME_LENGTH EQU 11
 ; the day-care mon's nickname, OT name and box struct, kept together in save RAM
-DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 25 + NUM_MOVES * 2
+DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 23 + NUM_DVS + NUM_MOVES * 2
 ITEM_NAME_LENGTH EQU 13
 
 A_BUTTON EQU %00000001

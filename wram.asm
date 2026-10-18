@@ -5,7 +5,7 @@ MACRO flag_array
 	ds ((\1) + 7) / 8
 ENDM
 
-box_struct_length EQU 25 + NUM_MOVES * 2
+box_struct_length EQU 23 + NUM_DVS + NUM_MOVES * 2
 ASSERT DAY_CARE_DATA_LENGTH == 2 * NAME_LENGTH + box_struct_length
 MACRO box_struct
 \1Species::    db	;+$00
@@ -23,9 +23,9 @@ MACRO box_struct
 \1AttackExp::  dw	;+$13
 \1DefenseExp:: dw	;+$15
 \1SpeedExp::   dw	;+$17
-\1SpecialExp:: dw	;+$19
-\1DVs::        ds 2	;+$1B
-\1PP::         ds NUM_MOVES	;+$1D
+\1SpecialExp:: dw	;+$19 special attack and special defense share it
+\1DVs::        ds NUM_DVS	;+$1B
+\1PP::         ds NUM_MOVES	;+$1E
 ENDM
 
 ;		 - <stat>Exp is MSB while <stat>Exp+1 is LSB
@@ -33,13 +33,14 @@ ENDM
 
 MACRO party_struct
 	box_struct \1
-\1Level::      db	;+$21
+\1Level::      db	;+$22
 \1Stats::
-\1MaxHP::      dw	;+$22
-\1Attack::     dw	;+$24
-\1Defense::    dw	;+$26
-\1Speed::      dw	;+$28
-\1Special::    dw	;+$2A
+\1MaxHP::      dw	;+$23
+\1Attack::     dw	;+$25
+\1Defense::    dw	;+$27
+\1Speed::      dw	;+$29
+\1SpecialAttack::  dw	;+$2B
+\1SpecialDefense:: dw	;+$2D
 ENDM
 
 MACRO battle_struct
@@ -53,14 +54,15 @@ MACRO battle_struct
 \1Type2::      db
 \1CatchRate::  db
 \1Moves::      ds NUM_MOVES
-\1DVs::        ds 2	
+\1DVs::        ds NUM_DVS
 \1Level::      db
 \1Stats::
 \1MaxHP::      dw
 \1Attack::     dw
 \1Defense::    dw
 \1Speed::      dw
-\1Special::    dw
+\1SpecialAttack::  dw
+\1SpecialDefense:: dw
 \1PP::         ds NUM_MOVES
 ENDM
 
@@ -797,7 +799,7 @@ wSafariBaitFactor:: ; cce9
 	ds 1
 
 wTransformedEnemyMonOriginalDVs:: ; cceb
-	ds 2
+	ds NUM_DVS
 
 wMonIsDisobedient:: ds 1 ; cced
 
@@ -868,7 +870,9 @@ wPlayerMonUnmodifiedDefense:: ; cd14
 	ds 2
 wPlayerMonUnmodifiedSpeed:: ; cd16
 	ds 2
-wPlayerMonUnmodifiedSpecial:: ; cd18
+wPlayerMonUnmodifiedSpecialAttack:: ; cd18
+	ds 2
+wPlayerMonUnmodifiedSpecialDefense::
 	ds 2
 
 ; stat modifiers for the player's current pokemon
@@ -882,7 +886,7 @@ wPlayerMonDefenseMod:: ; cd1b
 	ds 1
 wPlayerMonSpeedMod:: ; cd1c
 	ds 1
-wPlayerMonSpecialMod:: ; cd1d
+wPlayerMonSpecialAttackMod:: ; cd1d
 	ds 1
 
 wInGameTradeReceiveMonName:: ; cd1e
@@ -891,8 +895,11 @@ wPlayerMonAccuracyMod:: ; cd1e
 	ds 1
 wPlayerMonEvasionMod:: ; cd1f
 	ds 1
+; after the original six so that accuracy and evasion keep their indices
+wPlayerMonSpecialDefenseMod::
+	ds 1
 
-	ds 3
+	ds 2
 
 wEnemyMonUnmodifiedLevel:: ; cd23
 	ds 1
@@ -908,11 +915,13 @@ wInGameTradeMonNick:: ; cd29
 
 wEnemyMonUnmodifiedSpeed:: ; cd2a
 	ds 2
-wEnemyMonUnmodifiedSpecial:: ; cd2c
+wEnemyMonUnmodifiedSpecialAttack:: ; cd2c
 	ds 1
 
 wEngagedTrainerClass:: ; cd2d
 	ds 1
+wEnemyMonUnmodifiedSpecialDefense::
+	ds 2
 wEngagedTrainerSet:: ; cd2e
 ;	ds 1
 
@@ -927,7 +936,7 @@ wEnemyMonDefenseMod:: ; cd2f
 	ds 1
 wEnemyMonSpeedMod:: ; cd30
 	ds 1
-wEnemyMonSpecialMod:: ; cd31
+wEnemyMonSpecialAttackMod:: ; cd31
 	ds 1
 wEnemyMonAccuracyMod:: ; cd32
 	ds 1
@@ -935,6 +944,8 @@ wEnemyMonEvasionMod:: ; cd33
 	ds 1
 
 wInGameTradeReceiveMonSpecies::
+; after the original six so that accuracy and evasion keep their indices
+wEnemyMonSpecialDefenseMod::
 	ds 1
 
 	ds 2
@@ -1732,7 +1743,7 @@ wEnemyMonNick:: ds NAME_LENGTH ; cfda
 
 wEnemyMon:: battle_struct wEnemyMon ; cfe5
 
-wEnemyMonBaseStats:: ds 5
+wEnemyMonBaseStats:: ds NUM_STATS
 wEnemyMonActualCatchRate:: ds 1
 wEnemyMonBaseExp:: ds 1
 
@@ -1833,7 +1844,8 @@ wPlayerStatsToDouble:: ; d060
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wPlayerStatsToHalve:: ; d061
@@ -1843,7 +1855,8 @@ wPlayerStatsToHalve:: ; d061
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wPlayerBattleStatus1:: ; d062
@@ -1883,7 +1896,8 @@ wEnemyStatsToDouble:: ; d065
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wEnemyStatsToHalve:: ; d066
@@ -1893,7 +1907,8 @@ wEnemyStatsToHalve:: ; d066
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wEnemyBattleStatus1:: ; d067
@@ -2209,7 +2224,9 @@ wMonHBaseDefense:: ; d0bb
 	ds 1
 wMonHBaseSpeed:: ; d0bc
 	ds 1
-wMonHBaseSpecial:: ; d0bd
+wMonHBaseSpecialAttack:: ; d0bd
+	ds 1
+wMonHBaseSpecialDefense::
 	ds 1
 
 wMonHTypes:: ; d0be
@@ -3170,8 +3187,8 @@ wFossilItem:: ; d70f
 wFossilMon:: ; d710
 ; mon that will result from the item
 	ds 1
-wFossilMonDVs::	;d711 (2 bytes)	;joenote - added to store some values
-	ds 2
+wFossilMonDVs::	;d711	;joenote - added to store some values
+	ds NUM_DVS
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200
@@ -3240,7 +3257,7 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 ;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
-wUnusedD726:: 
+wUnusedD726:: ; the status screen's HP DV, then its special defense DV
 	ds 2
 ;;;;;;;;;;;;;;
 wd728:: ; d728

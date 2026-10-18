@@ -554,6 +554,8 @@ ItemUseBall:
 	ld a, [wEnemyMonDVs]
 	ld [hli], a
 	ld a, [wEnemyMonDVs + 1]
+	ld [hli], a
+	ld a, [wEnemyMonDVs + 2]
 	ld [hl], a
 
 .skip6
@@ -2070,7 +2072,7 @@ ItemUsePokeflute:
 ; OUTPUT:
 ; [wWereAnyMonsAsleep]: set to 1 if any pokemon were asleep
 WakeUpEntireParty:
-	ld de, 44
+	ld de, wPartyMon2 - wPartyMon1
 	ld c, 6
 .loop
 	ld a, [hl]
@@ -3197,13 +3199,16 @@ SendNewMonToBox:
 	ld [de], a
 	inc de
 	xor a
-	ld b, NUM_STATS * 2
+	ld b, NUM_STAT_EXPS * 2
 .asm_e89f
 	ld [de], a
 	inc de
 	dec b
 	jr nz, .asm_e89f
 	ld hl, wEnemyMonDVs
+	ld a, [hli]
+	ld [de], a
+	inc de
 	ld a, [hli]
 	ld [de], a
 	inc de
@@ -3492,6 +3497,9 @@ UseCustomMedicine:
 	ld [hli], a
 	ld a, b
 	or $88
+	ld [hli], a
+	ld a, c
+	or $80
 	ld [hl], a
 	pop hl
 	;fall through
@@ -3511,12 +3519,15 @@ UseCustomMedicine:
 	push hl
 	ld bc, wPartyMon1DVs - wPartyMon1
 	add hl, bc ; hl now points to DVs
-	ld b, 2
+	ld b, 3
 	ld a, [hli]
 	add 1
 	call c, .decB
-	ld a, [hld]
+	ld a, [hli]
 	add 1
+	call c, .decB
+	ld a, [hl] ; special defense DV in the high nybble
+	add $10
 	call c, .decB
 	ld a, b
 	sub 1
@@ -3528,6 +3539,9 @@ UseCustomMedicine:
 	add hl, bc ; hl now points to DVs
 	ld a, $ff
 	ld [hli], a
+	ld [hli], a
+	ld a, [hl]
+	or $F0
 	ld [hl], a
 	pop hl
 	ret

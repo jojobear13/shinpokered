@@ -15,8 +15,7 @@ _TM29ExplanationText::
 	text "TM29 is PSYCHIC!"
 
 	para "It can lower the"
-	line "target's SPECIAL"
-	cont "abilities."
+	line "target's SPCL.DEF."
 	done
 
 _TM29NoRoomText::

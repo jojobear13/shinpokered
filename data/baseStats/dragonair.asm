@@ -3,7 +3,8 @@ db 61 ; base hp
 db 84 ; base attack
 db 65 ; base defense
 db 70 ; base speed
-db 70 ; base special
+db 70 ; base special attack
+db 70 ; base special defense
 db DRAGON ; species type 1
 db DRAGON ; species type 2
 db 45 ; catch rate

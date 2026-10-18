@@ -3,7 +3,8 @@ db 55 ; base hp
 db 47 ; base attack
 db 52 ; base defense
 db 41 ; base speed
-db 40 ; base special
+db 40 ; base special attack
+db 40 ; base special defense
 db POISON ; species type 1
 db POISON ; species type 2
 db 235 ; catch rate

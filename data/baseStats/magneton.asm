@@ -3,7 +3,8 @@ db 50 ; base hp
 db 60 ; base attack
 db 95 ; base defense
 db 70 ; base speed
-db 120 ; base special
+db 120 ; base special attack
+db 70 ; base special defense
 db ELECTRIC ; species type 1
 db ELECTRIC ; species type 2
 db 60 ; catch rate

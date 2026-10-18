@@ -27,9 +27,9 @@ checked.
 |---|---|---|---|
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
-| ROM bank 3 | 16 KB | 1264 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Step D took 43 bytes here; moving `DrawBadges` and its badge graphics to their own section freed 1261 |
-| Battle engine bank ($0F) | 16 KB | 504 bytes | Was 21 before the merges started; each merge frees more |
-| WRAM | 8 KB | **1157 bytes** (`$da7b`-`$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes. 2 hold the save-RAM accessor's state, 22 the PC list menu's copy of the box list, and the boot RNG seed took 4 of the 8 bytes that were free before. Still allocate new state through this table |
+| ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
+| Battle engine bank ($0F) | 16 KB | 445 bytes | Was 21 before the merges started; the special split took 59 |
+| WRAM | 8 KB | **1104 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -418,7 +418,7 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
+| E (part 1 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
@@ -491,6 +491,61 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   routines run in the emulator by `SaveTest`, not a played session through
   the start menu. The Game Boy Printer's box printout builds but has no
   test, because the harness has no printer.
+
+**Step E, part 1 as done: the special split** (`claude/mechanics` only).
+
+- **Data.** Base stats gain special defense right after special, with Gen 2's
+  special attack and special defense for all 151 (MissingNo. keeps 128 for
+  both). HP, attack, defense and speed already matched Gen 2. The Gen 2 split
+  is the official one: 43 species' special attack differs from their Gen 1
+  special (Chansey 105 to 35, Charizard 85 to 109).
+- **Layout.** The DVs are 3 bytes (`NUM_DVS`); the third's high nybble is the
+  special defense DV and its low nybble is spare and always 0. The HP DV is
+  unchanged (the low bits of the other four), and so are Gen 2's shiny and
+  gender rules, which only read the first two bytes. Box structs are 34 bytes,
+  party structs 47, battle structs 32. `NUM_STATS` is 6; `NUM_STAT_EXPS` is 5,
+  because special attack and special defense share the special stat exp,
+  which gains the defeated mon's base special attack, as in Gen 2.
+- **Stat stages.** Special defense's stage is the seventh slot (`MOD_*` in
+  `constants/battle_constants.asm`), after accuracy and evasion, so the
+  original six keep their indices; `StatModToStat` maps a stage to its stat.
+  The old Special effects now mean special attack (Growth, X Special, also in
+  hard mode). Two new effects use free ids: `SPECIAL_DEFENSE_UP2_EFFECT` ($4E,
+  Amnesia) and `SPECIAL_DEFENSE_DOWN_SIDE_EFFECT` ($48, Psychic), the latter
+  in the slot Gen 1 already routed to the stat-down code.
+- **Battle.** Special moves use the attacker's special attack against the
+  defender's special defense, critical hits included; Light Screen doubles
+  special defense. The Volcano Badge boosts both specials. The AI uses X
+  Special like X Attack (it raises special attack only now), counts Amnesia
+  among stat-up moves, and treats it like Light Screen against physical
+  attackers.
+- **DVs everywhere they are made.** Wild mons roll the special defense DV
+  with the others (rerolled once below 4 in hard mode); normal-mode trainers'
+  is 8; hard-mode and boss rolls keep their biases; gifts get at least 8; the
+  Cinnabar Lab passes one parent's on whole; the M.Gene and Mist Stone handle
+  it.
+- **Display.** The status screen lists five stats in rows 8-17 without a box,
+  as Gen 2 does, with a divider before the types box; holding START shows
+  five DVs, SELECT the stat exp (special twice). The level-up box, the trade
+  center's stats view and the printer page show five stats. Stat-change
+  text says SPCL.ATK and SPCL.DEF; TM29's and the Cinnabar Lab book's text
+  changed to match.
+- **Hidden layout assumptions fixed on the way:** struct offsets written as
+  numbers in the AI (`func_ai.asm`), the poison/burn max HP offset, the
+  party size in `WakeUpEntireParty`, `MoveMon`'s offset back to stat exp, the
+  link cable's party data length, and the stat-exp zeroing and DV skipping
+  in `AddPartyMon` and when sending a caught mon to the box. The gamma
+  setting's save address and the trainer card's badge graphics bank, also
+  hard-coded, were fixed on the base branch first.
+- **Verified:** `tests/test_special_split.py` checks the stat formula for all
+  151 species against a model, the Gen 2 values, Amnesia, Growth and Psychic
+  as whole turns, the Volcano Badge, stat exp gains and wild DVs. The other
+  suites now take struct sizes and offsets from the symbols. In the emulator: a
+  trainer battle with a level-up (the five-stat box, recalculated stats
+  checked by hand), the status screen's three views, and save and continue.
+- **Not verified:** link battles and trades between two copies (both sides
+  run the same code and sizes come from the labels), the printer page (no
+  printer in the harness).
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.

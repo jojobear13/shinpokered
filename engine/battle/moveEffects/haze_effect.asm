@@ -67,7 +67,7 @@ CureVolatileStatuses:
 	ret
 
 ResetStatMods:
-	ld b, $8
+	ld b, NUM_STAT_MODS
 .loop
 	ld [hli], a
 	dec b
@@ -75,7 +75,7 @@ ResetStatMods:
 	ret
 
 ResetStats:
-	ld b, $8
+	ld b, (NUM_STATS - 1) * 2
 .loop
 	ld a, [hli]
 	ld [de], a

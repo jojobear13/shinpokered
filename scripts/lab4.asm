@@ -197,6 +197,16 @@ Lab4Text3:
 	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
 	
+	; the special defense DV is a single gene: inherit one parent's at random
+	call Random
+	rrca
+	ld a, [wPartyMon1DVs+2]
+	jr c, .gotSpclDefDV
+	ld a, [wPartyMon2DVs+2]
+.gotSpclDefDV
+	and $F0
+	ld [wFossilMonDVs+2], a
+
 	ld a, [wPartyMon1DVs]
 	ld b, a
 	ld a, [wPartyMon1DVs+1]
@@ -304,6 +314,8 @@ Lab4Text3:
 	ld a, [wFossilMonDVs]
 	ld [hli], a
 	ld a, [wFossilMonDVs+1]
+	ld [hli], a
+	ld a, [wFossilMonDVs+2]
 	ld [hl], a
 
 	ResetEvents EVENT_2E3, EVENT_2E4

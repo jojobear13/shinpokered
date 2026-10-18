@@ -161,11 +161,18 @@ _CalcStat:
 	ld e, a
 	pop hl
 	push hl
-	sla c
 	ld a, d
 	and a
 	jr z, .statExpDone  ; consider stat exp?
+	push bc
+	ld a, c
+	cp STAT_SPECIAL_DEFENSE
+	jr nz, .gotStatExp
+	dec c ; special defense shares the special stat exp, as in Gen 2
+.gotStatExp
+	sla c
 	add hl, bc          ; skip to corresponding stat exp value
+	pop bc ; c = the stat again, b = 0
 .statExpLoop            ; calculates ceil(Sqrt(stat exp)) in b
 	xor a
 	ld [H_MULTIPLICAND], a
@@ -187,10 +194,10 @@ _CalcStat:
 	sbc d               ; test if (current stat exp bonus)^2 < stat exp
 	jr c, .statExpLoop
 .statExpDone
-	srl c
 	pop hl
 	push bc
 	ld bc, wPartyMon1DVs - (wPartyMon1HPExp - 1) ; also wEnemyMonDVs - wEnemyMonHP beause the structures are the same size
+	ASSERT wPartyMon1DVs - (wPartyMon1HPExp - 1) == wEnemyMonDVs - wEnemyMonHP
 	add hl, bc
 	pop bc
 	ld a, c
@@ -202,6 +209,8 @@ _CalcStat:
 	jr z, .getSpeedIV
 	cp $5
 	jr z, .getSpecialIV
+	cp $6
+	jr z, .getSpecialDefenseIV
 .getHpIV
 	push bc
 	ld a, [hl]  ; Atk IV
@@ -246,6 +255,13 @@ _CalcStat:
 .getSpecialIV
 	inc hl
 	ld a, [hl]
+	and $f
+	jr .calcStatFromIV
+.getSpecialDefenseIV
+	inc hl
+	inc hl
+	ld a, [hl]
+	swap a
 	and $f
 .calcStatFromIV
 	ld d, $0

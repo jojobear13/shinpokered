@@ -200,8 +200,15 @@ _Lab4Text_Book2B::
 	para "Respectively they"
 	line "affect ATTACK," 
 	cont "DEFENSE, SPEED,"
-	cont "and SPECIAL in"
+	cont "and SPCL.ATK in"
 	cont "that order."
+
+	para "SPCL.DEF has a"
+	line "third gene of its"
+	cont "own, passed down"
+	cont "whole from one"
+	cont "parent or the"
+	cont "other."
 	done
 
 _Lab4Text_Book3A::

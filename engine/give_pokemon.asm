@@ -26,6 +26,10 @@ _GivePokemon:
 	or $98
 	ld [hli], a
 	ld [hl], b
+	inc hl
+	ld a, [hl]
+	or $80
+	ld [hl], a
 	;joenote - make sure to heal up to the new HP value based on the new DVs
 	ld de, wEnemyMonMaxHP
 	ld hl, wEnemyMonHP

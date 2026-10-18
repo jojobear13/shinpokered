@@ -4612,24 +4612,28 @@ HandleSlpFrzClause::	;joenote - move to the main function
 	ret
 	
 Random_BiasDV::
-; Return a random number 0-15 in A and B with a bias towards higher numbers
+; Return random DVs in A and B, and the special defense DV in the high nybble of C,
+; with a bias towards higher numbers
 	push hl
 	push de
 	push bc
 	callba _Random_BiasDV
 	pop bc
+	ld c, l
 	ld b, e
 	ld a, d
 	pop de
 	pop hl
 	ret
 Random_DV::
-; Return a random number 0-15 in A and B with a adjustments for being a wild pokemon DV
+; Return random DVs in A and B, and the special defense DV in the high nybble of C,
+; with adjustments for being a wild pokemon DV
 	push hl
 	push de
 	push bc
 	callba _Random_DV
 	pop bc
+	ld c, l
 	ld b, e
 	ld a, d
 	pop de

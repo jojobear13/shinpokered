@@ -3,7 +3,8 @@ db 35 ; base hp
 db 55 ; base attack
 db 30 ; base defense
 db 90 ; base speed
-db 50 ; base special
+db 50 ; base special attack
+db 40 ; base special defense
 db ELECTRIC ; species type 1
 db ELECTRIC ; species type 2
 db 163 ; catch rate ;joenote - adjusted from 190 to match yellow's starter pikachu

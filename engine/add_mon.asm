@@ -77,6 +77,7 @@ _AddPartyMon:
 	and $f
 	ld a, $98     ; set enemy trainer mon IVs to fixed average values
 	ld b, $88
+	ld c, $80     ; special defense 8
 	jr nz, .next4
 
 ; If the mon is being added to the player's party, update the pokedex.
@@ -117,6 +118,9 @@ _AddPartyMon:
 	ld a, b
 	or $88
 	ld b, a
+	ld a, c
+	or $80
+	ld c, a
 	pop af
 	or $98
 	
@@ -128,8 +132,10 @@ _AddPartyMon:
 	add hl, bc
 	pop bc
 	ld [hli], a
-	ld [hl], b         ; write IVs
-	ld bc, (wPartyMon1HPExp - 1) - (wPartyMon1DVs + 1)
+	ld a, b
+	ld [hli], a
+	ld [hl], c         ; write IVs
+	ld bc, (wPartyMon1HPExp - 1) - (wPartyMon1DVs + 2)
 	add hl, bc
 	ld a, 1
 	ld c, a
@@ -154,6 +160,8 @@ _AddPartyMon:
 	ld a, [wEnemyMonDVs] ; copy IVs from cur enemy mon
 	ld [hli], a
 	ld a, [wEnemyMonDVs + 1]
+	ld [hli], a
+	ld a, [wEnemyMonDVs + 2]
 	ld [hl], a
 	ld a, [wEnemyMonHP]    ; copy HP from cur enemy mon
 	ld [de], a
@@ -233,14 +241,15 @@ _AddPartyMon:
 	ld a, [hExperience + 2]
 	ld [de], a
 	xor a
-	ld b, NUM_STATS * 2
+	ld b, NUM_STAT_EXPS * 2
 .writeEVsLoop              ; set all EVs to 0
 	inc de
 	ld [de], a
 	dec b
 	jr nz, .writeEVsLoop
+REPT NUM_DVS ; skip the DVs, already written
 	inc de
-	inc de
+ENDR
 	pop hl
 	call AddPartyMon_WriteMovePP
 	inc de
@@ -251,7 +260,7 @@ _AddPartyMon:
 	dec a
 	jr nz, .calcFreshStats
 	ld hl, wEnemyMonMaxHP
-	ld bc, $a
+	ld bc, NUM_STATS * 2
 	call CopyData          ; copy stats of cur enemy mon
 	pop hl
 	jr .done
@@ -406,12 +415,12 @@ _MoveMon:
 	ld a, [wMoveMonType]
 	dec a
 	ld hl, wPartyMons
-	ld bc, wPartyMon2 - wPartyMon1 ; $2c
+	ld bc, wPartyMon2 - wPartyMon1
 	ld a, [wPartyCount]
 	jr nz, .addMonOffset
 	; if it's PARTY_TO_BOX
 	ld hl, sBoxMons
-	ld bc, sBoxMon2 - sBoxMon1 ; $21
+	ld bc, sBoxMon2 - sBoxMon1
 	ld a, [sNumInBox]
 .addMonOffset
 	dec a
@@ -423,13 +432,13 @@ _MoveMon:
 	ld a, [wMoveMonType]
 	and a
 	ld hl, sBoxMons
-	ld bc, sBoxMon2 - sBoxMon1 ; $21
+	ld bc, sBoxMon2 - sBoxMon1
 	jr z, .addMonOffset2
 	cp DAYCARE_TO_PARTY
 	ld hl, sDayCareMon
 	jr z, .copyMonData
 	ld hl, wPartyMons
-	ld bc, wPartyMon2 - wPartyMon1 ; $2c
+	ld bc, wPartyMon2 - wPartyMon1
 .addMonOffset2
 	ld a, [wWhichPokemon]
 	call AddNTimes
@@ -534,7 +543,7 @@ _MoveMon:
 	ld [hli], a
 	ld d, h
 	ld e, l
-	ld bc, -18
+	ld bc, (wPartyMon1HPExp - 1) - wPartyMon1MaxHP
 	add hl, bc
 	ld b, $1
 	call CalcStats

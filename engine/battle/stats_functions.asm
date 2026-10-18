@@ -10,7 +10,7 @@ DoubleSelectedStats:
 	ld a, [wEnemyStatsToDouble]
 	ld hl, wEnemyMonAttack
 .notEnemyTurn
-	ld c, 4
+	ld c, NUM_STATS - 1 ; bit 0 attack ... bit 4 special defense
 	ld b, a
 .loop
 	srl b
@@ -64,7 +64,7 @@ HalveSelectedStats:
 	ld a, [wEnemyStatsToHalve]
 	ld hl, wEnemyMonAttack
 .notEnemyTurn
-	ld c, 4
+	ld c, NUM_STATS - 1 ; bit 0 attack ... bit 4 special defense
 	ld b, a
 .loop
 	srl b
@@ -252,13 +252,20 @@ CalculateModifiedStats:
 	jr nz, .loop
 	ret
 
-; calculate modified stat for stat c (0 = attack, 1 = defense, 2 = speed, 3 = special)
+; calculate modified stat for stat c (0 = attack, 1 = defense, 2 = speed,
+; 3 = special attack, 4 = special defense)
 CalculateModifiedStat:
 	push bc
 	push bc
+	ld a, c
+	cp STAT_SPECIAL_DEFENSE - STAT_ATTACK
+	jr nz, .gotStatMod
+	ld a, MOD_SPECIAL_DEFENSE ; its stage comes after accuracy and evasion
+.gotStatMod
+	ld d, a
 	ld a, [wCalculateWhoseStats]
 	and a
-	ld a, c
+	ld a, d
 	ld hl, wBattleMonAttack
 	ld de, wPlayerMonUnmodifiedAttack
 	ld bc, wPlayerMonStatMods
@@ -457,13 +464,13 @@ CritHitStatsCommon:
 	ld hl, wBattleMonAttack
 	cp 1
 	ret z
-	ld hl, wBattleMonSpecial
+	ld hl, wBattleMonSpecialAttack
 	cp 2
 	ret z
 	ld hl, wEnemyMonAttack
 	cp 3
 	ret z
-	ld hl, wEnemyMonSpecial
+	ld hl, wEnemyMonSpecialAttack
 	ret
 .restoreStats
 	call Get_modified_defense
@@ -478,9 +485,9 @@ Get_modified_defense:
 	cp 3
 	jr z, .playerDef
 .playerSpec
-	ld a, [wBattleMonSpecial]
+	ld a, [wBattleMonSpecialDefense]
 	ld b, a
-	ld a, [wBattleMonSpecial + 1]
+	ld a, [wBattleMonSpecialDefense + 1]
 	ld c, a
 	ld a, [wPlayerBattleStatus3]
 	bit HAS_LIGHT_SCREEN_UP, a
@@ -496,9 +503,9 @@ Get_modified_defense:
 	ret z
 	jr .adjust_and_finish
 .enemySpec
-	ld a, [wEnemyMonSpecial]
+	ld a, [wEnemyMonSpecialDefense]
 	ld b, a
-	ld a, [wEnemyMonSpecial + 1]
+	ld a, [wEnemyMonSpecialDefense + 1]
 	ld c, a
 	ld a, [wEnemyBattleStatus3]
 	bit HAS_LIGHT_SCREEN_UP, a

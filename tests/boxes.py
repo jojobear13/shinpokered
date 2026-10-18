@@ -6,8 +6,8 @@ WRAM to save RAM; only the readers and writers in this module changed, and
 the tests that use them stayed the same.
 """
 
-BOX_STRUCT_LEN = 0x21
-PARTY_STRUCT_LEN = 0x2C
+BOX_STRUCT_LEN = 0x22   # 33 bytes before the special split gave the DVs a third byte
+PARTY_STRUCT_LEN = 0x2F
 NAME_LENGTH = 11
 MONS_PER_BOX = 20
 PARTY_LENGTH = 6
@@ -21,10 +21,12 @@ BOX_LEVEL = 0x03
 MOVES = 0x08
 OT_ID = 0x0C
 EXP = 0x0E
-DVS = 0x1B
-PP = 0x1D
-LEVEL = 0x21  # party struct only
-STATS = 0x22  # party struct only: max HP, attack, defense, speed, special
+DVS = 0x1B    # 3 bytes: attack/defense, speed/special attack, special defense/spare
+NUM_DVS = 3
+PP = 0x1E
+LEVEL = 0x22  # party struct only
+STATS = 0x23  # party struct only: max HP, attack, defense, speed, special attack, special defense
+NUM_STATS = 6
 
 BOX_TO_PARTY = 0
 PARTY_TO_BOX = 1
@@ -164,4 +166,5 @@ def random_mon(rng, species_pool, party=True):
         data[STATS], data[STATS + 1] = max_hp >> 8, max_hp & 0xFF
         hp = rng.randint(0, max_hp)
         data[HP], data[HP + 1] = hp >> 8, hp & 0xFF
+    data[DVS + 2] &= 0xF0  # the third DV byte's low nybble is spare and always 0
     return _mon(species, data, random_name(rng), random_name(rng))

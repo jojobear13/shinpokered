@@ -11,7 +11,7 @@ import os
 import re
 
 from harness import REPO_ROOT, HarnessError
-from suites.damage_vars import BATTLE_STRUCT_LEN, ENEMY_SPECIES, SPECIES
+from suites.damage_vars import battle_struct_len, ENEMY_SPECIES, SPECIES
 
 NAME = "apply_attack"
 
@@ -69,7 +69,7 @@ def _hp(rng):
 
 
 def _mon(game, rng, prefix, nick):
-    game.poke(prefix, *[rng.randint(0, 255) for _ in range(BATTLE_STRUCT_LEN)])
+    game.poke(prefix, *[rng.randint(0, 255) for _ in range(battle_struct_len(game))])
     game.poke(prefix + "Species", rng.choice(ENEMY_SPECIES if prefix == "wEnemyMon" else SPECIES))
     game.poke(prefix + "Level", rng.randint(1, 100))
     max_hp = max(_hp(rng), 1)

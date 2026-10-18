@@ -82,7 +82,7 @@ class DepositWithdrawTest(BoxTestCase):
                 # the box data comes across unchanged; level and stats are recalculated
                 self.assertEqual(new["data"][:bx.BOX_STRUCT_LEN], mon["data"])
                 self.assertTrue(1 <= new["data"][bx.LEVEL] <= 100)
-                self.assertNotEqual(new["data"][bx.STATS:bx.STATS + 10], [0] * 10)
+                self.assertNotEqual(new["data"][bx.STATS:bx.STATS + 2 * bx.NUM_STATS], [0] * 2 * bx.NUM_STATS)
                 self.assertEqual(bx.read_current_box(self.game), box[:which] + box[which + 1:])
 
     def test_deposit_then_withdraw_keeps_the_mon(self):
@@ -126,7 +126,7 @@ class CatchTest(BoxTestCase):
                 species = rng.choice(SPECIES)
                 level = rng.randint(2, 100)
                 moves = [rng.randint(1, 165) for _ in range(4)]
-                dvs = [rng.randint(0, 255), rng.randint(0, 255)]
+                dvs = [rng.randint(0, 255), rng.randint(0, 255), rng.randint(0, 15) << 4]
                 g.poke("wcf91", species)
                 g.poke("wEnemyMonSpecies", species)
                 g.poke("wEnemyMonLevel", level)
@@ -141,7 +141,7 @@ class CatchTest(BoxTestCase):
                 self.assertEqual(caught["species"], species)
                 self.assertEqual(caught["data"][bx.BOX_LEVEL], level)
                 self.assertEqual(caught["data"][bx.MOVES:bx.MOVES + 4], moves)
-                self.assertEqual(caught["data"][bx.DVS:bx.DVS + 2], dvs)
+                self.assertEqual(caught["data"][bx.DVS:bx.DVS + bx.NUM_DVS], dvs)
                 self.assertEqual(caught["ot"], g.peek("wPlayerName", bx.NAME_LENGTH))
                 self.assertEqual(after[1:], box)
                 self.assertEqual(bx.read_party(g), party)

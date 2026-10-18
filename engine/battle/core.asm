@@ -49,6 +49,7 @@ ResidualEffects2:
 	db DEFENSE_UP2_EFFECT
 	db SPEED_UP2_EFFECT
 	db SPECIAL_UP2_EFFECT
+	db SPECIAL_DEFENSE_UP2_EFFECT
 	db ACCURACY_UP2_EFFECT
 	db EVASION_UP2_EFFECT
 	db ATTACK_DOWN2_EFFECT
@@ -807,7 +808,7 @@ HurtByLeechSeedText:
 HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 	push hl
 	push hl
-	ld bc, $e      ; skip to max HP
+	ld bc, wBattleMonMaxHP - wBattleMonHP ; skip to max HP
 	add hl, bc
 	ld a, [hli]    ; load max HP
 	ld [wHPBarMaxHP+1], a
@@ -4894,7 +4895,7 @@ GetDamageVars:
 	sla c
 	rl b
 ; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
-; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special has used Light Screen
+; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special Defense has used Light Screen
 ;;;;;joenote - adding in a 999 cap
 	predef BC999cap
 ;;;
@@ -4910,7 +4911,7 @@ GetDamageVars:
 	ld c, STAT_DEFENSE
 	bit BATTLE_SIDE_SPECIAL_F, a
 	jr z, .gotDefenderStat
-	ld c, STAT_SPECIAL
+	ld c, STAT_SPECIAL_DEFENSE
 .gotDefenderStat
 	and BATTLE_SIDE_ENEMY
 	xor BATTLE_SIDE_ENEMY ; nonzero if the defender is the enemy's mon
@@ -4923,7 +4924,7 @@ GetDamageVars:
 	ld c, STAT_ATTACK
 	bit BATTLE_SIDE_SPECIAL_F, a
 	jr z, .gotAttackerStat
-	ld c, STAT_SPECIAL
+	ld c, STAT_SPECIAL_ATTACK
 .gotAttackerStat
 	and BATTLE_SIDE_ENEMY ; nonzero if the attacker is the enemy's mon
 	call GetUnmodifiedStatAddr ; hl = attacker's unmodified attack or special
@@ -4965,11 +4966,11 @@ GetDamageVars:
 
 ; indexed by hBattleSide: player physical, enemy physical, player special, enemy special
 .defenderStat
-	dw wEnemyMonDefense, wBattleMonDefense, wEnemyMonSpecial, wBattleMonSpecial
+	dw wEnemyMonDefense, wBattleMonDefense, wEnemyMonSpecialDefense, wBattleMonSpecialDefense
 .defenderStatus3
 	dw wEnemyBattleStatus3, wPlayerBattleStatus3, wEnemyBattleStatus3, wPlayerBattleStatus3
 .attackerStat
-	dw wBattleMonAttack, wEnemyMonAttack, wBattleMonSpecial, wEnemyMonSpecial
+	dw wBattleMonAttack, wEnemyMonAttack, wBattleMonSpecialAttack, wEnemyMonSpecialAttack
 
 ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3
 ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * 2
@@ -5105,7 +5106,7 @@ GetDamageVarsScaleStats:	;joenote - consolidated into its own function to save s
 	ret
 
 ; get stat c of enemy mon
-; c: stat to get (HP=1,Attack=2,Defense=3,Speed=4,Special=5)
+; c: stat to get (HP=1,Attack=2,Defense=3,Speed=4,Special Attack=5,Special Defense=6)
 GetEnemyMonStat:
 	push de
 	push bc
@@ -6900,6 +6901,8 @@ LoadEnemyMonData:
 	ld hl, wTransformedEnemyMonOriginalDVs ; original DVs before transforming
 	ld a, [hli]
 	ld b, [hl]
+	inc hl
+	ld c, [hl]
 	jr nz, .storeDVs
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
@@ -6910,6 +6913,7 @@ LoadEnemyMonData:
 ; fixed DVs for trainer mon
 	ld a, $98
 	ld b, $88
+	ld c, $80
 	jr z, .storeDVs	;joenote - store the fixed DVs if shift battle style
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;joenote - going to randomly determine trainer DVs (values of 8 to 15)
 ;load whatever default DVs are already there for the pkmn
@@ -6920,6 +6924,9 @@ LoadEnemyMonData:
 	ld a, [hl]
 	inc hl
 	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	dec hl
 	dec hl
 ;lets see if it's been sent out before
 	push bc
@@ -6940,6 +6947,9 @@ LoadEnemyMonData:
 	;save DVs to the party data structure, to which hl is still pointing, so that they can be recalled on a switch-in
 	ld [hli], a
 	ld [hl], b
+	inc hl
+	ld [hl], c
+	dec hl
 	dec hl
 	jr .storeDVs
 .nottrainer
@@ -6961,6 +6971,8 @@ LoadEnemyMonData:
 	ld hl, wEnemyMonDVs
 	ld [hli], a
 	ld [hl], b
+	inc hl
+	ld [hl], c
 .wildDVstored
 	ld de, wEnemyMonLevel
 	ld a, [wCurEnemyLVL]
@@ -7416,23 +7428,38 @@ ApplyBadgeStatBoosts:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, [wObtainedBadges]
 	ld b, a
-	call .selectiveBadgeBoost	;joenote - jump down and run new section
 	ld hl, wBattleMonAttack
-	ld c, $4
-; the boost is applied for badges whose bit position is even
-; the order of boosts matches the order they are laid out in RAM
-; Boulder (bit 0) - attack
-; Thunder (bit 2) - defense
-; Soul (bit 4) - speed
-; Volcano (bit 6) - special
+	ld de, BadgeStatBoosts
+; joenote - after a stat stage changes, only that stat was recalculated, so only
+; its boost is reapplied (wUnusedD71B holds its MOD_* index + 1). An accuracy or
+; evasion change reapplies every boost, as before the special split.
 .loop
-	srl b
-	call c, .applyBoostToStat
+	ld a, [de]
+	inc de
+	and a
+	jr z, .return
+	ld c, a ; MOD_* + 1 of the stat at hl
+	ld a, [wUnusedD71B]
+	and a
+	jr z, .checkBadge ; boost every stat
+	cp MOD_ACCURACY + 1
+	jr z, .checkBadge
+	cp MOD_EVASION + 1
+	jr z, .checkBadge
+	cp c
+	jr nz, .next
+.checkBadge
+	ld a, [de]
+	and b
+	jr z, .next
+	push de
+	call .applyBoostToStat
+	pop de
+.next
+	inc de
 	inc hl
 	inc hl
-	srl b
-	dec c
-	jr nz, .loop
+	jr .loop
 .return	;joenote - clear out stat mod address offset backup
 	xor a
 	ld [wUnusedD71B], a
@@ -7465,31 +7492,18 @@ ApplyBadgeStatBoosts:
 	ld a, 999 % $100
 	ld [hld], a
 	ret
-;joenote - check for backed up stat mod address offset to selectively apply badge boosts
-.selectiveBadgeBoost
-	;b holds the obtained badge bits that are used to apply boosts
-	ld a, [wUnusedD71B]	;get the backed-up offset into 'a'
-	and a
-	ret z	;kick out if zero so the function will apply all normal badge boosts
-	ld c, $5	;load a value of 5 into c
-	cp c	;set carry  flag if the offset in a is < c's value (stat being affected is neither accuracy or evasion)
-	ret nc 	;kick out if carry flag not set so the function will apply all normal badge boosts
-	ld c, b	;put the badge bits into c and push onto stack
-	push bc
-	ld c, a	;put the offset value into c. it should be 1, 2, 3, or 4. use it as a loop counter.
-	ld a, $80	;set an initial bit that gets rolled around
-.selectloop
-	rla
-	rla
-	dec c
-	jr nz, .selectloop
-	pop bc	;get the badge bits back into c
-	ld b, a	;put the selected badge boost into b
-	ld a, c ;put badge bits into 'a'
-	and b	;AND a with b to clear the badge boost if you don't have that badge
-	ld b, a	;store it back into b
-	ret
-	
+
+; for each stat from attack on, in wBattleMon order: its MOD_* index + 1 and the
+; badge that boosts it. The Volcano Badge boosts both specials, as the Glacier
+; Badge does in Gen 2.
+BadgeStatBoosts:
+	db MOD_ATTACK + 1,          1 << BIT_BOULDERBADGE
+	db MOD_DEFENSE + 1,         1 << BIT_THUNDERBADGE
+	db MOD_SPEED + 1,           1 << BIT_SOULBADGE
+	db MOD_SPECIAL_ATTACK + 1,  1 << BIT_VOLCANOBADGE
+	db MOD_SPECIAL_DEFENSE + 1, 1 << BIT_VOLCANOBADGE
+	db 0
+
 LoadHudAndHpBarAndStatusTilePatterns:
 	call LoadHpBarAndStatusTilePatterns
 
@@ -8035,13 +8049,13 @@ MoveEffectPointerTable:
 	 dw StatModifierDownEffect    ; DEFENSE_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; SPEED_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; SPECIAL_DOWN_SIDE_EFFECT
-	 dw StatModifierDownEffect    ; unused effect
+	 dw StatModifierDownEffect    ; SPECIAL_DEFENSE_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; unused effect
 	 dw StatModifierDownEffect    ; unused effect
 	 dw StatModifierDownEffect    ; unused effect
 	 dw ConfusionSideEffect       ; CONFUSION_SIDE_EFFECT
 	 dw TwoToFiveAttacksEffect    ; TWINEEDLE_EFFECT
-	 dw $0000                     ; unused effect
+	 dw StatModifierUpEffect      ; SPECIAL_DEFENSE_UP2_EFFECT
 	 dw SubstituteEffect          ; SUBSTITUTE_EFFECT
 	 dw HyperBeamEffect           ; HYPER_BEAM_EFFECT
 	 dw RageEffect                ; RAGE_EFFECT
@@ -8404,11 +8418,15 @@ StatModifierUpEffect:
 	ld de, wEnemyMoveEffect
 .statModifierUpEffect
 	ld a, [de]
+	cp SPECIAL_DEFENSE_UP2_EFFECT
+	ld a, MOD_SPECIAL_DEFENSE
+	jr z, .incrementStatMod
+	ld a, [de]
 	sub ATTACK_UP1_EFFECT
 	cp EVASION_UP1_EFFECT + $3 - ATTACK_UP1_EFFECT ; covers all +1 effects
 	jr c, .incrementStatMod
 	sub ATTACK_UP2_EFFECT - ATTACK_UP1_EFFECT ; map +2 effects to equivalent +1 effect
-.incrementStatMod
+.incrementStatMod ; a = index of the stat's stage (MOD_*)
 	ld c, a
 	ld b, $0
 	inc a ;joenote - backup the address offset for the stat mod 
@@ -8430,8 +8448,8 @@ StatModifierUpEffect:
 .ok
 	ld [hl], b
 	ld a, c
-	cp $4
-	jr nc, UpdateStatDone ; jump if mod affected is evasion/accuracy
+	call StatModToStat
+	jr c, UpdateStatDone ; jump if mod affected is evasion/accuracy
 	push hl
 	ld hl, wBattleMonAttack + 1
 	ld de, wPlayerMonUnmodifiedAttack
@@ -8442,6 +8460,9 @@ StatModifierUpEffect:
 	ld de, wEnemyMonUnmodifiedAttack
 .pointToStats
 	push bc
+	ld a, c
+	call StatModToStat
+	ld c, a
 	sla c
 	ld b, $0
 	add hl, bc ; hl = modified stat
@@ -8647,7 +8668,10 @@ StatModifierDownEffect:
 	cp $55 ; 85/256 chance for side effects
 	jp nc, CantLowerAnymore
 	ld a, [de]
-	sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3
+	sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3, and 4 for special defense
+	cp SPECIAL_DEFENSE_DOWN_SIDE_EFFECT - ATTACK_DOWN_SIDE_EFFECT
+	jr nz, .decrementStatMod
+	ld a, MOD_SPECIAL_DEFENSE
 	jr .decrementStatMod
 .nonSideEffect ; non-side effects only
 	push hl
@@ -8688,8 +8712,8 @@ StatModifierDownEffect:
 .ok
 	ld [hl], b ; save modified mod
 	ld a, c
-	cp $4
-	jr nc, UpdateLoweredStatDone ; jump for evasion/accuracy
+	call StatModToStat
+	jr c, UpdateLoweredStatDone ; jump for evasion/accuracy
 	push hl
 	push de
 	ld hl, wEnemyMonAttack + 1
@@ -8701,6 +8725,9 @@ StatModifierDownEffect:
 	ld de, wPlayerMonUnmodifiedAttack
 .pointToStat
 	push bc
+	ld a, c
+	call StatModToStat
+	ld c, a
 	sla c
 	ld b, $0
 	add hl, bc ; hl = modified stat
@@ -8874,13 +8901,27 @@ PrintStatText:
 	ld bc, $a
 	jp CopyData
 
-StatsTextStrings:
+StatsTextStrings: ; in MOD_* order
 	db "ATTACK@"
 	db "DEFENSE@"
 	db "SPEED@"
-	db "SPECIAL@"
+	db "SPCL.ATK@"
 	db "ACCURACY@"
 	db "EVADE@"
+	db "SPCL.DEF@"
+
+; a = MOD_* index -> a = the stat's index after HP (0 = attack ... 4 = special
+; defense); carry for accuracy and evasion, which have no stat
+StatModToStat:
+	cp MOD_ACCURACY
+	ccf
+	ret nc ; attack, defense, speed and special attack line up
+	cp MOD_SPECIAL_DEFENSE
+	scf
+	ret nz
+	ld a, STAT_SPECIAL_DEFENSE - STAT_ATTACK
+	and a
+	ret
 
 BideEffect:
 	ld hl, wPlayerBattleStatus1

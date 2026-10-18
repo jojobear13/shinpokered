@@ -429,6 +429,8 @@ AIMoveChoiceModification1:
 	cp DEFENSE_UP1_EFFECT	
 	jr z, .do_def_check
 	cp DEFENSE_UP2_EFFECT
+	jr z, .do_def_check
+	cp SPECIAL_DEFENSE_UP2_EFFECT
 	jr nz, .nodefupmove
 .do_def_check
 	ld a, [wPlayerMoveEffect]
@@ -442,7 +444,10 @@ AIMoveChoiceModification1:
 .do_def_check_lightscreen
 	ld a, [wEnemyMoveEffect]	;get the move effect
 	cp LIGHT_SCREEN_EFFECT
+	jr z, .do_def_check_special
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; amnesia: special defense, like light screen
 	jr nz, .do_def_check_other
+.do_def_check_special
 	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
 	cp $09
 	jp c, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
@@ -487,6 +492,10 @@ AIMoveChoiceModification1:
 	jp .heavydiscourage
 .nostatdownmod
 	;check for stat up effects
+	ld a, [wEnemyMoveEffect]	;get the move effect
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; outside the ranges below
+	ld a, MOD_SPECIAL_DEFENSE
+	jr z, .statupcheck
 	ld a, [wEnemyMoveEffect]	;get the move effect
 	cp ATTACK_UP1_EFFECT
 	jr c, .endstatmod	;if value is < the ATTACK_UP1_EFFECT value, jump out
@@ -796,6 +805,8 @@ AIMoveChoiceModification2:
 	jr c, .nextMove
 	cp POISON_EFFECT
 	jr c, .preferMove
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; amnesia, outside the ranges above
+	jr z, .preferMove
 	jr .nextMove
 .preferMove
 	dec [hl] ; slightly encourage this move
@@ -1203,7 +1214,10 @@ AIMoveChoiceModification4:	;this unused routine now handles intelligent trainer 
 	ld a, [wEnemyMonSpeedMod]
 	cp b
 	call c, CondLDBA	;if a < b, then load a into b
-	ld a, [wEnemyMonSpecialMod]
+	ld a, [wEnemyMonSpecialAttackMod]
+	cp b
+	call c, CondLDBA	;if a < b, then load a into b
+	ld a, [wEnemyMonSpecialDefenseMod]
 	cp b
 	call c, CondLDBA	;if a < b, then load a into b
 	ld a, [wEnemyMonAccuracyMod]
@@ -2181,8 +2195,8 @@ AIUseXSpeed:
 	ld a, X_SPEED
 	jr AIIncreaseStat
 
-AIUseXSpecial:
-	call AIUseItemStrategyCheck_Special
+AIUseXSpecial: ; special attack only since the special split, so used like X Attack
+	call AIUseItemStrategyCheck_General
 	ret nc
 	ld b, $D
 	ld a, X_SPECIAL
@@ -2257,7 +2271,7 @@ StrCmpAtkSPA:	;joenote - function for AI to its attack and special stats
 	push de
 	push hl
 	ld de, wEnemyMonAttack 
-	ld hl, wEnemyMonSpecial
+	ld hl, wEnemyMonSpecialAttack
 	ld c, $2	;bytes to copy
 .spdcmploop	
 	ld a, [de]	
@@ -2364,16 +2378,4 @@ AIUseItemStrategyCheck_Physical:
 	xor a
 	ret
 
-;Sets carry flag if player is using a zero-power move or is using an item or switching or is using a special move
-AIUseItemStrategyCheck_Special:
-	call AIUseItemStrategyCheck_General
-	ret c
-	ld a, [wPlayerMoveType]
-	cp FIRE
-	jr nc, .pass	;set carry if damaging move is special
-.fail
-	xor a
-	ret
-.pass 
-	scf
-	ret
+

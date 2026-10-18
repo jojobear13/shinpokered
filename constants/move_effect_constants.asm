@@ -17,7 +17,7 @@ const_value = 0
 	const ATTACK_UP1_EFFECT          ; $0A
 	const DEFENSE_UP1_EFFECT         ; $0B
 	const SPEED_UP1_EFFECT           ; $0C
-	const SPECIAL_UP1_EFFECT         ; $0D
+	const SPECIAL_UP1_EFFECT         ; $0D special attack (the Special effects all mean special attack)
 	const ACCURACY_UP1_EFFECT        ; $0E
 	const EVASION_UP1_EFFECT         ; $0F
 	const PAY_DAY_EFFECT             ; $10
@@ -76,13 +76,13 @@ const_value = 0
 	const DEFENSE_DOWN_SIDE_EFFECT   ; $45
 	const SPEED_DOWN_SIDE_EFFECT     ; $46
 	const SPECIAL_DOWN_SIDE_EFFECT   ; $47
-	const UNUSED_EFFECT_48           ; $48
+	const SPECIAL_DEFENSE_DOWN_SIDE_EFFECT ; $48 with the other stat-down side effects
 	const UNUSED_EFFECT_49           ; $49
 	const UNUSED_EFFECT_4A           ; $4A
 	const UNUSED_EFFECT_4B           ; $4B
 	const CONFUSION_SIDE_EFFECT      ; $4C
 	const TWINEEDLE_EFFECT           ; $4D
-	const UNUSED_EFFECT_4E           ; $4E
+	const SPECIAL_DEFENSE_UP2_EFFECT ; $4E
 	const SUBSTITUTE_EFFECT          ; $4F
 	const HYPER_BEAM_EFFECT          ; $50
 	const RAGE_EFFECT                ; $51

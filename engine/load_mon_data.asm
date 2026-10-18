@@ -77,7 +77,7 @@ LoadMonData_:
 	
 	ld hl, wBattleMonAttack
 	ld de, wLoadedMonAttack
-	ld bc, wBattleMonSpecial - wBattleMonMaxHP
+	ld bc, wBattleMonSpecialDefense + 2 - wBattleMonAttack
 	jp CopyData
 	
 	

@@ -31,11 +31,11 @@ def model(game, side):
 
     special = game.peek(move + "Type") >= damage_vars.FIRE
     screen_bit = damage_vars.HAS_LIGHT_SCREEN_UP if special else damage_vars.HAS_REFLECT_UP
-    stat = "Special" if special else "Defense"
+    stat = "SpecialDefense" if special else "Defense"
     defense = game.peek16(defender + stat)
     if game.peek(status3) & (1 << screen_bit):
         defense = min((defense << 1) & 0xFFFF, 999)
-    attack = game.peek16(attacker + ("Special" if special else "Attack"))
+    attack = game.peek16(attacker + ("SpecialAttack" if special else "Attack"))
 
     # stats over 255 can't fit in a byte, so both are divided by 4
     if attack >> 8 or defense >> 8:
@@ -92,7 +92,7 @@ class DamageVarsTest(unittest.TestCase):
             out = damage_vars.run(self.game, side)
             self.assertEqual((out["b"], out["c"]), (100, 120), side)
 
-    def test_light_screen_doubles_special_and_caps_at_999(self):
+    def test_light_screen_doubles_special_defense_and_caps_at_999(self):
         for side in SIDES:
             attacker, defender, status3, move = SIDES[side]
             self.game.reset()
@@ -100,8 +100,8 @@ class DamageVarsTest(unittest.TestCase):
             self.game.poke("wCriticalHitOrOHKO", 0)
             self.game.poke(move + "Power", 90)
             self.game.poke(move + "Type", damage_vars.FIRE)
-            self.game.poke16(attacker + "Special", 400)
-            self.game.poke16(defender + "Special", 600)
+            self.game.poke16(attacker + "SpecialAttack", 400)
+            self.game.poke16(defender + "SpecialDefense", 600)
             self.game.poke(status3, 1 << damage_vars.HAS_LIGHT_SCREEN_UP)
             out = damage_vars.run(self.game, side)
             # 600 doubled is capped at 999, then both stats are divided by 4

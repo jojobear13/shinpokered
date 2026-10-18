@@ -12,10 +12,25 @@ from harness import REPO_ROOT
 
 NAME = "damage_vars"
 
-BATTLE_STRUCT_LEN = 0x1D
-PARTY_STRUCT_LEN = 0x2C
 PARTY_LENGTH = 6
 MOVE_STRUCT_LEN = 6
+NUM_MOVES = 4
+# attack, defense, speed, special attack, accuracy, evasion, special defense
+NUM_USED_STAT_MODS = 7
+STATS = ("MaxHP", "Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense")
+
+
+# struct sizes and offsets come from the symbols, so they follow layout changes
+def battle_struct_len(game):
+    return game.addr("wBattleMonPP") + NUM_MOVES - game.addr("wBattleMon")
+
+
+def party_struct_len(game):
+    return game.addr("wPartyMon2") - game.addr("wPartyMon1")
+
+
+def party_offset(game, field):
+    return game.addr("wPartyMon1" + field) - game.addr("wPartyMon1")
 
 FIRE = 0x14
 HAS_LIGHT_SCREEN_UP = 1
@@ -70,21 +85,22 @@ def _fill(game, rng, symbol, length):
 
 
 def _battle_mon(game, rng, prefix):
-    _fill(game, rng, prefix, BATTLE_STRUCT_LEN)
+    _fill(game, rng, prefix, battle_struct_len(game))
     game.poke(prefix + "Species", rng.choice(ENEMY_SPECIES if prefix == "wEnemyMon" else SPECIES))
     game.poke(prefix + "Level", rng.randint(1, 100))
-    for name in ("MaxHP", "Attack", "Defense", "Speed", "Special"):
+    for name in STATS:
         game.poke16(prefix + name, stat(rng))
 
 
 def _party(game, rng, prefix):
+    length = party_struct_len(game)
     for i in range(PARTY_LENGTH):
-        base = game.addr(prefix) + i * PARTY_STRUCT_LEN
-        game.poke(base, *[rng.randint(0, 255) for _ in range(PARTY_STRUCT_LEN)])
+        base = game.addr(prefix) + i * length
+        game.poke(base, *[rng.randint(0, 255) for _ in range(length)])
         game.poke(base, rng.choice(SPECIES))
-        game.poke(base + 0x21, rng.randint(1, 100))
-        for offset in (0x22, 0x24, 0x26, 0x28, 0x2A):
-            game.poke16(base + offset, stat(rng))
+        game.poke(base + party_offset(game, "Level"), rng.randint(1, 100))
+        for name in STATS:
+            game.poke16(base + party_offset(game, name), stat(rng))
 
 
 def _move(game, rng, prefix):
@@ -109,8 +125,8 @@ def setup(game, rng):
             game.poke(f"{side}{i}", rng.randint(0, 255))
         screens = rng.choice([0, 1 << HAS_LIGHT_SCREEN_UP, 1 << HAS_REFLECT_UP, 0b110])
         game.poke(f"{side}3", (rng.randint(0, 255) & ~0b110) | screens)
-    _fill(game, rng, "wPlayerMonAttackMod", 6)
-    _fill(game, rng, "wEnemyMonAttackMod", 6)
+    _fill(game, rng, "wPlayerMonAttackMod", NUM_USED_STAT_MODS)
+    _fill(game, rng, "wEnemyMonAttackMod", NUM_USED_STAT_MODS)
 
     game.poke("wCriticalHitOrOHKO", rng.choice([0, 0, 1]))
     game.poke("wPlayerMonNumber", rng.randint(0, PARTY_LENGTH - 1))
@@ -123,7 +139,7 @@ def setup(game, rng):
     # trainer battles read stat exp through this pointer (HPExp - 1 of the
     # enemy's party mon)
     pos = rng.randint(0, PARTY_LENGTH - 1)
-    ptr = game.addr("wEnemyMons") + pos * PARTY_STRUCT_LEN + 0x11 - 1
+    ptr = game.addr("wEnemyMons") + pos * party_struct_len(game) + party_offset(game, "HPExp") - 1
     game.poke16("wUnusedD153", ptr)
 
     game.poke16("wDamage", rng.randint(0, 0xFFFF))

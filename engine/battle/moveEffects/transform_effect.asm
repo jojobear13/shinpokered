@@ -91,6 +91,10 @@ TransformEffect_:
 	inc de
 	ld a, [de]
 	ld [wTransformedEnemyMonOriginalDVs + 1], a
+	inc de
+	ld a, [de]
+	ld [wTransformedEnemyMonOriginalDVs + 2], a
+	dec de
 	dec de
 .next
 	ld a, [bc]
@@ -112,20 +116,19 @@ TransformEffect_:
 .undo_disable_end
 	
 ; DVs
+REPT NUM_DVS
 	ld a, [hli]
 	ld [de], a
 	inc de
-	ld a, [hli]
-	ld [de], a
-	inc de
-; Attack, Defense, Speed, and Special stats
+ENDR
+; Attack, Defense, Speed, Special Attack and Special Defense stats
 	inc hl
 	inc hl
 	inc hl
 	inc de
 	inc de
 	inc de
-	ld bc, $8
+	ld bc, (NUM_STATS - 1) * 2
 	call CopyData
 	ld bc, wBattleMonMoves - wBattleMonPP
 	add hl, bc ; ld hl, wBattleMonMoves

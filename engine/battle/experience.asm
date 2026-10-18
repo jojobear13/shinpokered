@@ -368,7 +368,7 @@ GiveStatExp:
 	srl c
 	jr nc, .nextPartyMonStatExp	;if not flagged, go to next mon
 
-	ld c, NUM_STATS
+	ld c, NUM_STAT_EXPS ; the special stat exp gains base special attack, as in Gen 2
 	ld de, wBuffer	
 .loopPartyMonStatExp_subloop
 	ld a, [de]

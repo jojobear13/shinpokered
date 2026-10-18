@@ -103,6 +103,9 @@ DetermineWildMonDVs:
 	CheckEvent EVENT_10E
 	jr nz, .do_random	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	call Random
+	and $F0
+	ld c, a ; any special defense DV: Gen 2's shiny rule doesn't involve it
 	ld b, $AA
 	call Random	;get random number into a
 	or $20	;set only bit 5
@@ -124,6 +127,8 @@ DetermineWildMonDVs:
 	ld hl, wEnemyMonDVs
 	ld [hli], a
 	ld [hl], b
+	inc hl
+	ld [hl], c
 	pop hl
 	ld a, [wFontLoaded]
 	res 7, a 

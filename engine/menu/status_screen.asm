@@ -333,16 +333,22 @@ PrintStatsBox:
 	push af	;joenote - going to use this later
 	
 	jr nz, .DifferentBox
-	coord hl, 0, 8
-	ld b, 8
-	ld c, 8
-	call TextBoxBorder ; Draws the box
-	coord hl, 1, 9 ; Start printing stats from here
+; five stats at two rows each fill rows 8-17, so there is no room for a box;
+; as in Gen 2, they stand alone, with a line separating them from the types box
+	coord hl, 9, 8
+	ld de, SCREEN_WIDTH
+	ld b, 10
+.divider
+	ld [hl], $78 ; │
+	add hl, de
+	dec b
+	jr nz, .divider
+	coord hl, 1, 8 ; Start printing stats from here
 	ld bc, $0019 ; Number offset
 	jr .PrintStats
 .DifferentBox
 	coord hl, 9, 2
-	ld b, 8
+	ld b, 2 * (NUM_STATS - 1)
 	ld c, 9
 	call TextBoxBorder
 	coord hl, 11, 3
@@ -371,6 +377,8 @@ PrintStatsBox:
 	call PrintStat
 	ld de, wLoadedMonSpeedExp
 	call PrintStat
+	ld de, wLoadedMonSpecialExp ; shared by special attack and special defense
+	call PrintStat
 	ld de, wLoadedMonSpecialExp
 	jp PrintNumber
 .checkstart	;joenote - print DVs if start is held
@@ -384,6 +392,8 @@ PrintStatsBox:
 	ld de, wUnusedD722 + 2
 	call PrintStat
 	ld de, wUnusedD722 + 3
+	call PrintStat
+	ld de, wUnusedD726 + 1 ; special defense DV (wUnusedD726 is the HP DV)
 	jp PrintNumber
 .doregular
 	ld de, wLoadedMonAttack
@@ -393,7 +403,9 @@ PrintStatsBox:
 	call PrintStat
 	ld de, wLoadedMonSpeed
 	call PrintStat
-	ld de, wLoadedMonSpecial	
+	ld de, wLoadedMonSpecialAttack
+	call PrintStat
+	ld de, wLoadedMonSpecialDefense
 	jp PrintNumber
 PrintStat:
 	push hl
@@ -407,7 +419,8 @@ StatsText:
 	db   "ATTACK"
 	next "DEFENSE"
 	next "SPEED"
-	next "SPECIAL@"
+	next "SPCL.ATK"
+	next "SPCL.DEF@"
 
 StatusScreen2:
 	ld a, [hTilesetType]
@@ -652,7 +665,13 @@ DVParse:
 	ld b, a
 
 	ld [hl], b	;load hp dv
-	
+	inc hl
+
+	ld a, [wLoadedMonDVs + 2]	;get special defense dv (not part of the hp dv)
+	swap a
+	and $0F
+	ld [hl], a
+
 	pop bc
 	pop hl
 	ret

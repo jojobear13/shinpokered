@@ -9,8 +9,8 @@ options; delays, sound waits and button presses are skipped.
 
 from harness import HarnessError
 from suites.apply_attack import H_WHOSETURN, NAME_LENGTH, TERMINATOR, _hp
-from suites.damage_vars import (BATTLE_STRUCT_LEN, ENEMY_SPECIES, PARTY_LENGTH, SPECIES, TYPES,
-                                _party, stat)
+from suites.damage_vars import (battle_struct_len, ENEMY_SPECIES, NUM_USED_STAT_MODS, PARTY_LENGTH,
+                                SPECIES, TYPES, _party, stat)
 
 NAME = "move_execution"
 
@@ -18,14 +18,6 @@ NUM_MOVES = 4
 NUM_ATTACKS = 165  # moves 1-165; STRUGGLE (165) included
 BATTLE_ANIMATION_OFF = 1 << 7  # wOptions
 TEXT_SPEED_FAST = 1
-
-# offsets into the battle struct
-SPECIES_OFFSET = 0x00
-STATUS_OFFSET = 0x04
-TYPE1_OFFSET = 0x05
-MOVES_OFFSET = 0x08
-LEVEL_OFFSET = 0x0E
-PP_OFFSET = 0x19
 
 ROUTINES = {"player": "ExecutePlayerMove", "enemy": "ExecuteEnemyMove"}
 
@@ -45,15 +37,15 @@ def _battle_flags(rng):
 
 def _mon(game, rng, prefix, nick, species_pool):
     base = game.addr(prefix)
-    game.poke(base, *[rng.randint(0, 255) for _ in range(BATTLE_STRUCT_LEN)])
-    game.poke(base + SPECIES_OFFSET, rng.choice(species_pool))
-    game.poke(base + LEVEL_OFFSET, rng.randint(2, 100))
-    game.poke(base + STATUS_OFFSET, _status(rng))
-    game.poke(base + TYPE1_OFFSET, rng.choice(TYPES), rng.choice(TYPES))
+    game.poke(base, *[rng.randint(0, 255) for _ in range(battle_struct_len(game))])
+    game.poke(prefix + "Species", rng.choice(species_pool))
+    game.poke(prefix + "Level", rng.randint(2, 100))
+    game.poke(prefix + "Status", _status(rng))
+    game.poke(prefix + "Type1", rng.choice(TYPES), rng.choice(TYPES))
     moves = [rng.randint(1, NUM_ATTACKS) for _ in range(NUM_MOVES)]
-    game.poke(base + MOVES_OFFSET, *moves)
-    game.poke(base + PP_OFFSET, *[rng.choice([0, 1, rng.randint(1, 40)]) for _ in range(NUM_MOVES)])
-    for name in ("Attack", "Defense", "Speed", "Special"):
+    game.poke(prefix + "Moves", *moves)
+    game.poke(prefix + "PP", *[rng.choice([0, 1, rng.randint(1, 40)]) for _ in range(NUM_MOVES)])
+    for name in ("Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense"):
         game.poke16(prefix + name, min(stat(rng), 999) or 1)
     max_hp = max(_hp(rng), 1)
     game.poke16(prefix + "MaxHP", max_hp)
@@ -77,7 +69,7 @@ def setup(game, rng):
         for i in (1, 2, 3):
             game.poke(f"{side}{i}", _battle_flags(rng))
     for name in ("wPlayerMonAttackMod", "wEnemyMonAttackMod"):
-        game.poke(name, *[rng.choice([7, 7, 7, rng.randint(1, 13)]) for _ in range(6)])
+        game.poke(name, *[rng.choice([7, 7, 7, rng.randint(1, 13)]) for _ in range(NUM_USED_STAT_MODS)])
     for name in ("wPlayerSubstituteHP", "wEnemySubstituteHP", "wPlayerDisabledMove", "wEnemyDisabledMove",
                  "wPlayerNumAttacksLeft", "wEnemyNumAttacksLeft", "wPlayerConfusedCounter",
                  "wEnemyConfusedCounter", "wPlayerToxicCounter", "wEnemyToxicCounter",

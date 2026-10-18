@@ -84,7 +84,7 @@ Printer_GetMonStats:
 	lb bc, $80 | 2, 5
 	call PrintNumber
 
-	coord hl, 9, 8
+	coord hl, 9, 7 ; five stats fit above the moves box from row 7
 	ld de, .Stats
 	ldh a, [hFlags_0xFFF6]
 	set 2, a
@@ -94,9 +94,9 @@ Printer_GetMonStats:
 	res 2, a
 	ldh [hFlags_0xFFF6], a
 
-	coord hl, 16, 8
+	coord hl, 16, 7
 	ld de, wLoadedMonAttack
-	ld a, 4
+	ld a, NUM_STATS - 1
 .loop
 	push af
 	push de
@@ -173,7 +173,8 @@ Printer_GetMonStats:
 	db   "ATTACK"
 	next "DEFENSE"
 	next "SPEED"
-	next "SPECIAL@"
+	next "SPCL.ATK"
+	next "SPCL.DEF@"
 
 .Blank:
 	db "--------------@"

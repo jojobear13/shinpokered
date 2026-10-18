@@ -1,5 +1,5 @@
 ;This is a debug feature that will set a pokemon's stat exp all to zero 
-;and set its DVs according to the quantity of the first four items slots in the bag
+;and set its DVs according to the quantity of the first five items slots in the bag
 
 DebugStatReset:
 ;make it not work for inside the cable club
@@ -28,7 +28,7 @@ DebugStatReset:
 	ld a, [wWhichPokemon]
 	call AddNTimes
 	
-	ld b, 5
+	ld b, NUM_STAT_EXPS
 	sla b
 	xor a
 .loop
@@ -54,6 +54,10 @@ DebugStatReset:
 	inc bc
 	dec d
 	jr nz, .loop2
+	ld a, [bc] ; the fifth slot is the special defense DV
+	and $0f
+	swap a
+	ld [hl], a
 	pop de
 	
 	call WaitForSoundToFinish

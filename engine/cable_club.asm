@@ -136,7 +136,7 @@ CableClub_DoBattleOrTradeAgain:
 	ld [de], a
 	ld hl, wSerialPlayerDataBlock
 	ld de, wSerialEnemyDataBlock
-	ld bc, $1a8
+	ld bc, wPartyDataEnd - wSerialPlayerDataBlock + 3 ; the party data, then 3 bytes of padding
 	call Serial_ExchangeBytes
 	ld a, SERIAL_NO_DATA_BYTE
 	ld [de], a
