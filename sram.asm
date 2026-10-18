@@ -37,16 +37,16 @@ sPlayerName::  ds NAME_LENGTH ; a598
 sMainData::    ds wMainDataEnd   - wMainDataStart ; a5a3
 sSpriteData::  ds wSpriteDataEnd - wSpriteDataStart ; ad2c
 sPartyData::   ds wPartyDataEnd  - wPartyDataStart ; af2c
-sTilesetType:: ds 1 ; b0c0
-sMainDataCheckSum:: ds 1 ; b0c1, covers sPlayerName up to here
+sTilesetType:: ds 1 ; b089
+sMainDataCheckSum:: ds 1 ; b08a, covers sPlayerName up to here
 
 ; The live day care and current box (sLiveDataStart, bank 0) as of the last
 ; save, in the same layout, with their own checksum. Loading copies this back.
-sLiveDataSnapshot:: ; b0c2
+sLiveDataSnapshot:: ; b08b
 sDayCareData:: ds DAY_CARE_DATA_LENGTH
-sCurBoxData::  ds sBoxDataEnd - sBoxDataStart ; b0f9
+sCurBoxData::  ds sBoxDataEnd - sBoxDataStart ; b0c2
 sLiveDataSnapshotEnd::
-sLiveDataSnapshotCheckSum:: ds 1 ; b55b
+sLiveDataSnapshotCheckSum:: ds 1 ; b524
 ASSERT sCurBoxData - sLiveDataSnapshot == sBoxDataStart - sLiveDataStart
 ASSERT sLiveDataSnapshotEnd - sLiveDataSnapshot == sLiveDataEnd - sLiveDataStart
 

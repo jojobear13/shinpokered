@@ -3508,24 +3508,24 @@ wdeed::
 ds 1
 
 ;holds the player's position from when they blacked out so they can return to it
-wBlackoutReturnFlag:: ; deee
+wBlackoutReturnFlag:: ; da6d
 ; 0 = nothing pending
 ; 1 = ask the player if they want to return to where they blacked out
 ; 2 = the player chose to return
 	ds 1
-wBlackoutSavedMapData:: ; deef
+wBlackoutSavedMapData:: ; da6e
 ; copy of wCurMap through wLastMap
 	ds 8
-wBlackoutSavedWalkBikeSurfState:: ; def7
+wBlackoutSavedWalkBikeSurfState:: ; da76
 	ds 1
 
-wRNGSeed:: ; def8
+wRNGSeed:: ; da77
 ; the four RNG bytes the game booted with (init.asm); RNG_Correction and the
 ; A+SELECT seed display on the title screen read them back. These used to be
 ; the literal address $def0, which overlapped wBlackoutSavedMapData.
 	ds 4
 
-; defc
+; da7b: free up to the stack at $df00
 
 
 SECTION "Stack", WRAM0[$df00]
