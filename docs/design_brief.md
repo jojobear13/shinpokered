@@ -282,8 +282,9 @@ is a table change, not a rewrite.
 ### 5. Day/night: a 24-minute play-time day, computed on demand, no clock hardware
 
 **Decision.** One in-game day is 24 minutes of the play-time clock. The
-minute-of-day is `(hours & 1) × 12 + minutes`, minus 24 if 24 or more
-(because 60 mod 24 is 12), so no division. A 24-entry table in ROM maps the
+minute-of-day is `(hours & 1) × 12 + minutes` (because 60 mod 24 is 12),
+which ranges 0-71, then minus 24 while it is 24 or more (at most twice), so
+no division. A 24-entry table in ROM maps the
 minute to a phase:
 
 | Phase | Minutes | DMG look | GBC/SGB look | Encounter table |
