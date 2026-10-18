@@ -224,14 +224,11 @@ AIMoveChoiceModification1:
 	ld a, [wPlayerMovePower]
 	and a
 	jp z, .heavydiscourage	;heavily discourage counter if enemy is using zero-power move
-	ld a, [wPlayerMoveType]
-	cp NORMAL
-	jr z, .countercheck_end	; continue on if countering a normal move
-	cp FIGHTING
-	jr z, .countercheck_end	; continue on if countering a fighting move
-	cp BIRD
-	jr z, .countercheck_end	; continue on if countering STRUGGLE or other typeless move
-	jp .heavydiscourage	;else heavily discourage since the player move type is not applicable to counter
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp PHYSICAL
+	jr z, .countercheck_end	; continue on if countering a physical move
+	jp .heavydiscourage	;else heavily discourage since counter only strikes back at physical moves
 .countercheck_end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

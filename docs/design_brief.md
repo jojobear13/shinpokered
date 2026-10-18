@@ -563,16 +563,19 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   Vine Whip (now physical) and Gust, Tri Attack, Swift and Hyper Beam (now
   special).
 - **Readers.** `GetDamageVars` (stage S0) and the four AI checks that asked
-  "is this move special?" by type now ask by category. Gen 1's Counter still
-  counters Normal and Fighting moves by type; making it counter physical
-  moves, as from Gen 2, is a separate decision.
+  "is this move special?" by type now ask by category. Counter strikes back at
+  physical moves whatever their type, as from Gen 2 (it was Normal and
+  Fighting moves), and the AI's Counter check agrees; tested in
+  `tests/test_move_categories.py`.
 - **Home bank.** It was full; `RefreshPartyMenu` and the clause-check
   wrapper, each used from at most two banks, moved out to make room.
 - **Move menu.** The line that said "TYPE/" now shows the selected move's
   category (PHYS, SPCL or STAT) on the left and its effectiveness against
   the enemy on the right: ▴▴ 4x, ▴ 2x, nothing 1x, ▼ 1/2x, ▼▼ 1/4x, × no
   effect, from the same calculation the AI uses. Status moves get no mark;
-  fixed-damage moves only show ×. ▴ is a new font tile at $E9, ▼ upside
+  fixed-damage moves only show ×. There is no mark against a ghost the
+  Silph Scope hasn't identified, so the marks can't hint at what it is. ▴ is
+  a new font tile at $E9, ▼ upside
   down, in a slot the font had left unused. `tests/test_move_menu_marks.py`
   checks every mark; in the emulator, a battle's move menu showed each case.
 - **Verified:** `tests/test_move_categories.py` checks `GetMoveCategory`

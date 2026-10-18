@@ -3362,6 +3362,7 @@ DisabledText:
 ; and how effective it would be against the enemy on the right: ▴▴ 4x, ▴ 2x,
 ; nothing 1x, ▼ 1/2x, ▼▼ 1/4x, × no effect. Status moves get no mark, and
 ; fixed-damage moves only show ×, since type only decides whether they hit.
+; There is no mark against a ghost the Silph Scope hasn't identified.
 PrintMoveCategoryAndEffectiveness:
 	ld a, [wPlayerMoveNum]
 	call GetMoveCategory
@@ -3379,6 +3380,8 @@ PrintMoveCategoryAndEffectiveness:
 	pop af
 	cp STATUS
 	ret z
+	call IsGhostBattle
+	ret z ; an unidentified ghost: no hint at what it really is
 	ld a, [wPlayerMoveEffect]
 	ld hl, SetDamageEffects
 	ld de, 1
@@ -5579,21 +5582,15 @@ HandleCounterMove:
 	ld a, [de]
 	and a
 	ret z ; miss if the opponent's last selected move's Base Power is 0.
-; check if the move the target last selected was Normal or Fighting type
-	inc de
-	ld a, [de]
-;;;;;;;;;joenote - counter will work on BIRD type since it's now typeless for STRUGGLE instead of normal type
-	and a ; normal type
-	jr z, .counterableType
-	cp FIGHTING
-	jr z, .counterableType
-	cp BIRD
-	jr z, .counterableType
-;;;;;;;;;
-; if the move wasn't a valid counterable type, miss
+; as from Gen 2, Counter strikes back at physical moves, whatever their type
+	ld a, [hl]
+	call GetMoveCategory
+	cp PHYSICAL
+	jr z, .counterableMove
+; if the move wasn't physical, miss
 	xor a
 	ret
-.counterableType
+.counterableMove
 	ld hl, wDamage
 	ld a, [hli]
 	or [hl]

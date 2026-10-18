@@ -32,6 +32,8 @@ def _constants(path, pattern):
 
 
 MOVES = _constants("constants/move_constants.asm", r"\s*const (\w+)\s*; ([0-9a-f]{2})\s*$")
+MAPS = _constants("constants/map_constants.asm", r"\s*mapconst (\w+),.*; \$([0-9A-F]{2})")
+ITEMS = _constants("constants/item_constants.asm", r"\s*const (\w+)\s*; \$([0-9A-F]{2})")
 EFFECTS = _constants("constants/move_effect_constants.asm", r"\s*const (\w+)\s*; \$([0-9A-F]{2})")
 
 CASES = [
@@ -66,12 +68,36 @@ class MoveMenuMarksTest(unittest.TestCase):
                 g.poke("wEnemyMonType1", *enemy_types)
                 g.poke("wTypeEffectiveness", 0x5A)
                 g.poke("wUnusedC000", 0)
+                g.poke("wIsInBattle", 2)  # a trainer battle: never a ghost battle
                 g.call("PrintMoveCategoryAndEffectiveness")
                 self.assertEqual(g.peek(row + 1, 4), [TEXT[c] for c in text])
                 self.assertEqual(tuple(g.peek(row + 8, 2)), mark)
                 # the routine borrows these and puts them back
                 self.assertEqual(g.peek("wTypeEffectiveness"), 0x5A)
                 self.assertEqual(g.peek("wUnusedC000"), 0)
+
+    def test_no_mark_against_an_unidentified_ghost(self):
+        g = self.game
+        row = g.addr("wTileMap") + 9 * SCREEN_WIDTH
+        for scope in (False, True):
+            with self.subTest(silph_scope=scope):
+                g.reset()
+                g.poke(row, *[SPACE] * SCREEN_WIDTH)
+                g.poke("wPlayerMoveNum", MOVES["LICK"])
+                g.poke("wPlayerMoveEffect", EFFECTS["NO_ADDITIONAL_EFFECT"])
+                g.poke("wPlayerMoveType", GHOST)
+                g.poke("wEnemyMonType1", NORMAL, NORMAL)
+                g.poke("wIsInBattle", 1)
+                g.poke("wCurMap", MAPS["POKEMONTOWER_3"])
+                if scope:
+                    g.poke("wNumBagItems", 1)
+                    g.poke("wBagItems", ITEMS["SILPH_SCOPE"], 1, 0xFF)
+                else:
+                    g.poke("wNumBagItems", 0)
+                    g.poke("wBagItems", 0xFF)
+                g.call("PrintMoveCategoryAndEffectiveness")
+                self.assertEqual(g.peek(row + 1, 4), [TEXT[c] for c in "PHYS"])
+                self.assertEqual(tuple(g.peek(row + 8, 2)), (SPACE, CROSS) if scope else (SPACE, SPACE))
 
 
 if __name__ == "__main__":
