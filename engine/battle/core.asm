@@ -7431,8 +7431,8 @@ ApplyBadgeStatBoosts:
 	ld hl, wBattleMonAttack
 	ld de, BadgeStatBoosts
 ; joenote - after a stat stage changes, only that stat was recalculated, so only
-; its boost is reapplied (wUnusedD71B holds its MOD_* index + 1). An accuracy or
-; evasion change reapplies every boost, as before the special split.
+; its boost is reapplied (wUnusedD71B holds its MOD_* index + 1). Accuracy and
+; evasion have no stat, so changing them reapplies nothing.
 .loop
 	ld a, [de]
 	inc de
@@ -7443,9 +7443,9 @@ ApplyBadgeStatBoosts:
 	and a
 	jr z, .checkBadge ; boost every stat
 	cp MOD_ACCURACY + 1
-	jr z, .checkBadge
+	jr z, .return
 	cp MOD_EVASION + 1
-	jr z, .checkBadge
+	jr z, .return
 	cp c
 	jr nz, .next
 .checkBadge
