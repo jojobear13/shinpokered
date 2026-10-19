@@ -2077,56 +2077,6 @@ LoadEnemyMonFromParty:	;function for link battles
 	ld [wEnemyMonPartyPos], a
 	jpab LoadEnemyAbility
 
-; a = 0 for the player's mon or 1 for the enemy's -> a = its ability, after
-; Neutralizing Gas (which stops every ability but itself), and z if none
-; preserves bc, de and hl
-GetSideAbility:
-	push hl
-	push bc
-	ld hl, wPlayerAbility
-	ld b, [hl]
-	inc hl
-	ld c, [hl]
-	and a
-	jr z, .gotSide
-	ld a, b
-	ld b, c
-	ld c, a
-.gotSide ; b = this side's, c = the other side's
-	ld a, c
-	cp NEUTRALIZING_GAS
-	ld a, b
-	jr nz, .done
-	cp NEUTRALIZING_GAS
-	jr z, .done
-	xor a ; NO_ABILITY
-.done
-	pop bc
-	pop hl
-	and a
-	ret
-
-; the ability of the mon whose turn it is
-UserAbility:
-	ld a, [H_WHOSETURN]
-	jr GetSideAbility
-
-; the ability of the other mon
-TargetAbility:
-	ld a, [H_WHOSETURN]
-	xor 1
-	jr GetSideAbility
-
-; the target's ability where the user's move meets it: none if the user has
-; Mold Breaker. Abilities that react to a hit after it lands (Static and the
-; like) use TargetAbility, since Mold Breaker doesn't stop them
-TargetAbilityForMove:
-	call UserAbility
-	cp MOLD_BREAKER
-	jr nz, TargetAbility
-	xor a
-	ret
-
 SendOutMon:
 	;joenote - reset AI switching tracker since the player is sending out a new pokemon
 	ld a, [wUnusedD366]
@@ -3772,6 +3722,8 @@ PlayerCanExecuteMove:
 	ld de, wPlayerSelectedMove ; pointer to the move just used
 	ld b, BANK(DecrementPP)
 	call Bankswitch
+	callab AbilityBlocksMove
+	jp c, ExecutePlayerMoveDone
 	ld a, [wPlayerMoveEffect] ; effect of the move just used
 	ld hl, ResidualEffects1
 	ld de, 1
@@ -5166,7 +5118,7 @@ CalcMoveDamage:
 ; held items and abilities will scale wDamage here, once, by n/16, between the
 ; type adjustment and the random factor. There are no modifiers yet.
 ApplyDamageModifiers:
-	ret
+	jpab AbilityDamageModifiers
 
 ; hl = the entry for the side in bit 0 of hBattleSide in the two-entry table at hl
 ; preserves bc and de
@@ -6116,6 +6068,7 @@ AdjustDamageForMoveType:
 .skipSameTypeAttackBonus
 
 ;now to check move type effectiveness against defender's type 1 and 2
+	callab ScrappyTypes ; keeps de
 	ld c, d 	;start by checking against type 1
 	call TypeXEffectiveness
 	;make sure that there is a type 2 to even look at
@@ -6763,6 +6716,8 @@ EnemyCanExecuteMove:
 	xor a
 	ld [wMonIsDisobedient], a
 	call PrintMonName1Text
+	callab AbilityBlocksMove
+	jp c, ExecuteEnemyMoveDone
 	ld a, [wEnemyMoveEffect]
 	ld hl, ResidualEffects1
 	ld de, $1

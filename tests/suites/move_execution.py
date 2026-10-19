@@ -77,6 +77,9 @@ def setup(game, rng):
         if name in game.symbols:
             game.poke(name, 0 if rng.random() < 0.7 else rng.randint(0, 5))
 
+    for name in ("wPlayerAbility", "wEnemyAbility", "wAbilityFlags"):
+        if name in game.symbols:  # no abilities: those have their own tests
+            game.poke(name, 0)
     game.poke("wObtainedBadges", 0xFF)  # otherwise mons over level 10 disobey
     game.poke("wPlayerMonNumber", rng.randint(0, PARTY_LENGTH - 1))
     game.poke("wPartyCount", PARTY_LENGTH)

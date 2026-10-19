@@ -3548,6 +3548,8 @@ wCalcStatNature:: ; the nature of the mon _CalcStat is working on
 ; the abilities of the mons in battle, set when each is sent out
 wPlayerAbility:: ds 1
 wEnemyAbility:: ds 1
+wAbilityFlags:: ; what abilities have set up in battle (FLASH_FIRE_*_F)
+	ds 1
 
 ; free up to the stack at $df00
 

@@ -28,8 +28,8 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 213 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest, and the abilities' send-out hooks and side helpers 64 |
-| WRAM | 8 KB | **1101 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 2 (each side's ability in battle). Still allocate new state through this table |
+| Battle engine bank ($0F) | 16 KB | 224 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks (send-out, the move gate, S2's Scrappy, S3) |
+| WRAM | 8 KB | **1101 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 3 (each side's ability in battle, and Flash Fire's state). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -373,7 +373,8 @@ identically. Derived values (natures, abilities, held items) travel inside the
 party data the link already exchanges, so they agree by construction; time
 and weather do not exist in link battles (decision 5). A mirror test (run the
 same turn on two harness instances with sides swapped and compare random
-consumption) joins the suite when the first ability with an effect lands.
+consumption) joins the suite when the first ability that uses randomness
+lands (Static, Shed Skin and the like; the abilities so far use none).
 
 **Why last.** Nothing in this brief depends on link play, and the per-turn
 check is cheap to add once the pipeline and abilities exist. It is plan step
@@ -649,8 +650,59 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   from each generator, the send-out hooks for the player, a link enemy and
   a trainer, Neutralizing Gas and Mold Breaker, and the status screen. In the
   emulator: a trainer battle's Rattatas (the player's with slot 1 had Guts,
-  the trainer's Run Away) and page 2 of a Chansey's status screen. The
-  abilities do nothing yet; the next commits add their effects.
+  the trainer's Run Away) and page 2 of a Chansey's status screen.
+
+**Step E, part 4 continued: abilities that stop moves or change damage.**
+
+- **Stopping a move.** `AbilityBlocksMove` runs once a move is announced
+  (after "used ...!" and PP), before anything else the move does, which is
+  Gen 5's place: after the check for a target in the air or underground,
+  before accuracy. It returns carry and the move ends, as a miss would.
+  Levitate takes Ground attacks; Volt Absorb, Water Absorb and Dry Skin heal
+  1/4 of max HP from Electric, Water and Water moves; Lightning Rod raises
+  Special Attack a stage from Electric moves; Flash Fire takes Fire moves and
+  powers up its own; Soundproof takes Growl, Roar, Sing, Supersonic and
+  Screech. Type-based ones take damaging moves and Thunder Wave, the only
+  status move of those types that targets the foe (so Water Absorb leaves
+  Withdraw alone). The messages are "<mon>'s <ABILITY>!" followed by the
+  outcome ("It doesn't affect ...", "... regained health!", "...'s
+  SPCL.ATK rose!", "...'s FIRE moves powered up!"). All of these are
+  ignored by Mold Breaker.
+- **Damage (S3).** `ApplyDamageModifiers`, the stage the refactor left
+  empty, now far-calls `AbilityDamageModifiers`: each applicable ability
+  scales the damage by a ratio (damage x n / d, at least 1, at most
+  $ffff), the user's first, then the target's. User: Technician (power 60
+  or less, x3/2), Iron Fist (punches, x6/5), Reckless (recoil and crash
+  moves, not Struggle, x6/5), Adaptability (x4/3 on top of the same-type
+  bonus, making it 2), Tinted Lens (not very effective, x2), Sniper
+  (critical hits, x3/2), Guts (physical moves with a status condition,
+  x3/2, and x2 more when burned, undoing burn's halving except on critical
+  hits, which use stats from before the burn), Overgrow, Blaze, Torrent and
+  Swarm (their type at 1/3 HP or less, x3/2) and an active Flash Fire
+  (Fire, x3/2). Target: Thick Fat (Fire and Ice, x1/2), Filter (super
+  effective, x3/4) and Dry Skin (Fire, x5/4). Fixed-damage moves are left
+  alone. Gen 9 applies some of these to power or stats instead; the
+  difference is rounding.
+- **Scrappy (S2).** Before effectiveness, a Ghost type of the defender
+  counts as its other type (or as Fire, neutral to both, for a pure Ghost)
+  against a Scrappy user's Normal and Fighting moves.
+- **Stat stages.** `ChangeStatStage` raises or lowers any stage and
+  recalculates the stat the way stat moves do, with the player's badge
+  boost reapplied to that stat; Lightning Rod is its first user, and the
+  entry abilities (Intimidate, Download) will use it.
+- **Move flags.** `data/move_flags.asm` gives each move Gen 9's contact,
+  punch and sound flags (generated with the ability data).
+- **Not yet.** The trainer AI doesn't know about abilities, and the move
+  menu's effectiveness marks stay type-only (they shouldn't reveal the
+  foe's ability anyway). Transform copying the ability comes with Trace.
+- **Verified:** `tests/test_ability_damage.py` checks each damage ability
+  and its conditions on both sides, Mold Breaker and Neutralizing Gas,
+  rounding and the cap; each blocking ability on both sides (healing,
+  capping at max HP, the +6 limit, Flash Fire's flag) and what gets
+  through (an airborne target, Mold Breaker, other types); a whole turn of
+  Earthquake into Levitate; and Scrappy against Ghost and Ghost/Poison. In
+  the emulator: a trainer battle where Thunderbolt hit Volt Absorb and
+  Earthquake hit Levitate, with the messages above.
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.
