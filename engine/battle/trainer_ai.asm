@@ -1950,6 +1950,9 @@ AISwitchIfEnoughMons:
 	ret
 
 SwitchEnemyMon:
+	callab EnemyTrapped ; Arena Trap: no switch, so no action
+	ccf
+	ret nc
 	callba DoEnemyShinybit ;joenote - reset shiny checker bits
 ;joenote - if player using trapping move, then end their move
 	ld a, [wPlayerBattleStatus1]

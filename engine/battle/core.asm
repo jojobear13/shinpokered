@@ -471,6 +471,7 @@ EnemyRanText:
 	db "@"
 
 MainInBattleLoop:
+	call RunEntryAbilities
 ;joenote - zero the damage from last round if not using a trapping move
 	ld a, [wEnemyBattleStatus1]
 	bit USING_TRAPPING_MOVE, a
@@ -719,14 +720,24 @@ MainInBattleLoop:
 
 ; a move, then what abilities do after it (H_WHOSETURN is still the attacker)
 ExecutePlayerMoveThenAbilities:
+	call RunEntryAbilities ; a mon just switched in comes first
 	call ExecutePlayerMove
 	jr AfterMoveAbilities
 ExecuteEnemyMoveThenAbilities:
+	call RunEntryAbilities
 	call ExecuteEnemyMove
 AfterMoveAbilities:
 	push bc ; b = 0 if the target fainted
 	callab AbilityAfterMove
 	pop bc
+	ret
+
+; what a mon's ability does as it comes in, once both mons are out
+RunEntryAbilities:
+	ld a, [wAbilityFlags]
+	and ENTRY_PENDING_PLAYER | ENTRY_PENDING_ENEMY
+	ret z
+	callab EntryAbilities
 	ret
 
 HandlePoisonBurnLeechSeed:
@@ -1869,7 +1880,14 @@ TryRunningFromBattle:
 	jp z, .canEscape
 	ld a, [wIsInBattle]
 	dec a
-	jr nz, .trainerBattle ; jump if it's a trainer battle
+	jp nz, .trainerBattle ; jump if it's a trainer battle
+	push hl
+	push de
+	callab RunAwayOrTrapped
+	pop de
+	pop hl
+	jp c, .canEscape ; Run Away
+	jr nz, .cantEscape ; Arena Trap
 	ld a, [wNumRunAttempts]
 	inc a
 	ld [wNumRunAttempts], a
@@ -1932,7 +1950,7 @@ TryRunningFromBattle:
 	cp b
 	jr nc, .canEscape ; if the random value was less than or equal to the quotient
 	                  ; plus 30 times the number of attempts, the player can escape
-; can't escape
+.cantEscape
 	ld a, $1
 	ld [wActionResultOrTookBattleTurn], a ; you lose your turn when you can't escape
 	ld hl, CantEscapeText
@@ -2833,6 +2851,13 @@ PartyMenuOrRockOrRun:
 .notAlreadyOut
 	call HasMonFainted
 	jp z, .partyMonDeselected ; can't switch to fainted mon
+	callab PlayerTrapped ; Arena Trap
+	jr nc, .notTrapped
+	call RefreshPartyMenu
+	ld hl, CantEscapeText
+	call PrintText
+	jp .partyMonDeselected
+.notTrapped
 	ld a, $A	;joenote - load $A instead of 1 so signify that the player is switching
 	ld [wActionResultOrTookBattleTurn], a
 	call GBPalWhiteOut

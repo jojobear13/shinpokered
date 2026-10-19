@@ -28,7 +28,7 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 194 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
+| Battle engine bank ($0F) | 16 KB | 130 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
 | WRAM | 8 KB | **1088 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
@@ -419,7 +419,7 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E (parts 1-3 done; part 4 in progress) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
+| E (parts 1-4 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
@@ -803,6 +803,52 @@ abilities.**
   the stat penalties. `harness.clear_random()` lets a test replace the
   queued random numbers mid-test. In the emulator: Thunder Wave into a
   Synchronize foe paralyzed the user back, with its messages.
+
+**Step E, part 4 done: entry, contact and field abilities.**
+
+- **Entry.** Sending a mon out sets a pending flag for its side;
+  `EntryAbilities` runs the pending ones at the start of each turn and just
+  before each move (so a mon switched in mid-turn acts before the foe's
+  move), the faster first, once both mons are out. Intimidate: the foe's
+  Attack falls a stage, unless it's behind a substitute or mist, or its
+  ability stops it (Gen 9: Hyper Cutter, Clear Body, Oblivious, Inner
+  Focus, Own Tempo, Scrappy); Competitive answers it. Download: Attack up
+  if the foe's Defense is the lower, else Special Attack. Trace copies the
+  foe's ability (not Trace or none), which then acts as if it had just come
+  in. Forewarn names the foe's strongest move (one-hit KOs as 150, Counter
+  120, other fixed damage 80). Pressure, Mold Breaker and Neutralizing Gas
+  announce themselves. Neutralizing Gas keeps the foe's from acting.
+- **Contact.** Static, Poison Point, Flame Body (30%) and Effect Spore (11%
+  sleep, 9% poison, 10% paralysis; Grass types are immune) act through
+  `AbilityAfterMove` when a move with Gen 9's contact flag hit for damage.
+  `GiveUserStatus`, shared with Synchronize, applies Gen 9's type
+  immunities, the attacker's own ability, and the stat penalties. Effect
+  Spore's sleep ignores the sleep clause option.
+- **Field.** Arena Trap keeps the foe from fleeing or switching (player:
+  "Can't escape!" from RUN and the party menu; trainer AI: no switch,
+  so it uses a move) unless it's a Flying or Ghost type or has Levitate; not
+  in link battles, where each side's game decides for its own player. Run
+  Away always gets away from wild battles.
+- **Rivalry**: x5/4 against the same gender, x3/4 against the other, from
+  the fork's `DetermineMonGender` (species and Attack DV). **Transform**
+  copies the target's ability, as from Gen 3.
+- **Still not done**: the trainer AI ignores abilities when choosing moves
+  and switches, and the move menu's marks ignore them by design.
+- **Verified:** `tests/test_ability_entry.py` checks Intimidate both ways
+  and everything that stops it, Competitive's answer, both sides entering
+  in speed order and only pending sides acting, Download's comparison
+  (including ties and 255 against 256), Trace and what it can't copy,
+  Forewarn's powers, the announcements changing nothing; each contact
+  ability's chance, Effect Spore's bands, immunities by type and ability,
+  and nothing without damage; Arena Trap's exceptions and Run Away; Rivalry
+  for single-gender, genderless and DV-gendered species; Transform. In the
+  emulator: a foe's Intimidate acting just before its move, with its
+  messages.
+
+Every ability the 151 species have that works without weather, held items,
+infatuation or the Steel type now does what it does in Gen 9 (with the
+differences noted above); the ten that need those are empty slots in
+`data/mon_abilities.asm` until they exist.
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.

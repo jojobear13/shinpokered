@@ -26,12 +26,14 @@ GetMonAbility:
 LoadPlayerAbility:
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_PLAYER_F, [hl]
+	set ENTRY_PENDING_PLAYER_F, [hl]
 	ld de, wBattleMon
 	ld hl, wPlayerAbility
 	jr LoadBattleMonAbility
 LoadEnemyAbility:
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_ENEMY_F, [hl]
+	set ENTRY_PENDING_ENEMY_F, [hl]
 	ld de, wEnemyMon
 	ld hl, wEnemyAbility
 LoadBattleMonAbility:
@@ -866,6 +868,7 @@ UserDamageAbilities:
 	dbw TORRENT, .torrent
 	dbw SWARM, .swarm
 	dbw FLASH_FIRE, .flashFire
+	dbw RIVALRY, .rivalry
 	db 0
 
 .technician
@@ -973,6 +976,23 @@ UserDamageAbilities:
 	sbc h
 	ret c ; 3 x HP > max HP
 	jr .oneAndAHalf
+.rivalry ; x5/4 against the same gender, x3/4 against the other, nothing if
+         ; either has none
+	xor a
+	call GetBattleMonGender
+	and a
+	ret z
+	push af
+	ld a, 1
+	call GetBattleMonGender
+	pop bc ; b = the player's mon's gender
+	and a
+	ret z
+	cp b
+	lb bc, 5, 4
+	jp z, ScaleDamage
+	lb bc, 3, 4
+	jp ScaleDamage
 .flashFire
 	ld a, e
 	cp FIRE
@@ -1645,6 +1665,7 @@ AbilityAfterMove:
 	call Synchronize
 	call Competitive
 	call Stench
+	call ContactAbilities
 	xor a
 	ld [wAbilitySnapshot], a
 	ret
@@ -1756,11 +1777,6 @@ Synchronize:
 	ld a, [wAbilitySnapshot + 3] ; the status before the move
 	and a
 	ret nz
-	call UserFainted
-	ret z
-	call GetUserStatus
-	and a
-	ret nz ; the foe has a status already
 	ld hl, wEnemyMonStatus
 	ld a, [H_WHOSETURN]
 	and a
@@ -1768,7 +1784,39 @@ Synchronize:
 	ld hl, wBattleMonStatus
 .gotTargetStatus
 	ld a, [hl]
-	ld e, a ; e = the new status
+	and (1 << PSN) | (1 << BRN) | (1 << PAR)
+	ret z
+	ld e, [hl] ; e = the new status
+; Toxic's bad poison is passed on as bad poison
+	bit PSN, e
+	jr z, GiveUserStatus
+	ld hl, wEnemyBattleStatus3
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotHolder
+	ld hl, wPlayerBattleStatus3
+.gotHolder
+	bit BADLY_POISONED, [hl]
+	jr z, GiveUserStatus
+	set GIVE_BAD_POISON_F, e
+	; fall through
+
+; The target's ability (d) gives the mon whose turn it is the status e (poison,
+; burn, paralysis or sleep; with GIVE_BAD_POISON_F, bad poison), if it can have
+; it: it isn't fainted or statused already, and neither its types nor its
+; ability keep it off. With "<target>'s <ability>!" and the status's message.
+GiveUserStatus:
+	call UserFainted
+	ret z
+	call GetUserStatus
+	and a
+	ret nz ; the foe has a status already
+	ld a, e
+	ld b, EFFECT_KIND_SLEEP
+	ld c, -1
+	and SLP
+	jr nz, .gotKind
+	ld a, e
 	ld b, EFFECT_KIND_POISON
 	ld c, POISON
 	bit PSN, a
@@ -1781,7 +1829,7 @@ Synchronize:
 	ld c, ELECTRIC
 	bit PAR, a
 	ret z
-.gotKind ; b = the kind, c = the type that can't have it
+.gotKind ; b = the kind, c = the type that can't have it (-1 for none)
 	ld hl, wBattleMonType1
 	ld a, [H_WHOSETURN]
 	and a
@@ -1809,10 +1857,15 @@ Synchronize:
 	jr z, .gotFoeStatus
 	ld hl, wBattleMonStatus
 .gotFoeStatus
-	ld [hl], e
+	ld a, e
+	res GIVE_BAD_POISON_F, a
+	ld [hl], a
 	push de
 	call PrintUserAbilityActivated
 	pop de
+	ld a, e
+	and SLP
+	jr nz, .asleep
 	ld a, e
 	bit PSN, a
 	jr nz, .poisoned
@@ -1825,24 +1878,23 @@ Synchronize:
 	callab HalveAttackDueToBurn
 	ld hl, SynchronizeBurnedText
 	jr .print
+.asleep
+	ld hl, FellAsleepAbilityText
+	jr .print
 .poisoned
-; Toxic's bad poison is passed on as bad poison
-	ld hl, wPlayerBattleStatus3
-	ld bc, wEnemyBattleStatus3
+	bit GIVE_BAD_POISON_F, e
+	ld hl, SynchronizePoisonedText
+	jr z, .print
+; the foe is the mon whose turn it isn't
+	ld hl, wEnemyBattleStatus3
 	ld de, wEnemyToxicCounter
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .gotToxic
-	ld hl, wEnemyBattleStatus3
-	ld bc, wPlayerBattleStatus3
+	ld hl, wPlayerBattleStatus3
 	ld de, wPlayerToxicCounter
-.gotToxic ; hl = the holder's, bc and de = the foe's
-	bit BADLY_POISONED, [hl]
-	ld hl, SynchronizePoisonedText
-	jr z, .print
-	ld a, [bc]
-	set BADLY_POISONED, a
-	ld [bc], a
+.gotToxic
+	set BADLY_POISONED, [hl]
 	xor a
 	ld [de], a
 	ld hl, SynchronizeBadlyPoisonedText
@@ -1854,6 +1906,85 @@ AbilitySwapTurn:
 	ld a, [H_WHOSETURN]
 	xor 1
 	ld [H_WHOSETURN], a
+	ret
+
+; Static, Poison Point, Flame Body, Effect Spore: a 30% chance that a move
+; making contact gives its user a status
+ContactAbilities:
+	call TargetWasDamaged
+	ret z
+	xor a ; the move
+	call GetUserMoveField
+	call GetMoveFlags
+	bit MOVE_CONTACT_F, a
+	ret z
+	call TargetAbility
+	ld d, a
+	ld e, 1 << PAR
+	cp STATIC
+	jr z, .roll
+	ld e, 1 << PSN
+	cp POISON_POINT
+	jr z, .roll
+	ld e, 1 << BRN
+	cp FLAME_BODY
+	jr z, .roll
+	cp EFFECT_SPORE
+	ret nz
+; Effect Spore: 11% sleep, 9% poison, 10% paralysis (of 100: the 30%), and
+; nothing for Grass types, which powders don't touch
+	ld hl, wBattleMonType1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotTypes
+	ld hl, wEnemyMonType1
+.gotTypes
+	ld a, [hli]
+	cp GRASS
+	ret z
+	ld a, [hl]
+	cp GRASS
+	ret z
+	call AbilityRandom
+	ld e, 3 ; asleep for 3 turns
+	cp 28 ; 11%
+	jp c, GiveUserStatus
+	ld e, 1 << PSN
+	cp 28 + 23 ; 9%
+	jp c, GiveUserStatus
+	ld e, 1 << PAR
+	cp 28 + 23 + 26 ; 10%
+	jp c, GiveUserStatus
+	ret
+.roll
+	call AbilityRandom
+	cp 77 ; 30%
+	ret nc
+	jp GiveUserStatus
+
+; a = 0 for the player's mon or 1 for the enemy's -> a = 0 genderless,
+; 1 male, 2 female (from its species and attack DV, as the status screen shows)
+GetBattleMonGender:
+	ld hl, wBattleMonSpecies
+	and a
+	jr z, .gotMon
+	ld hl, wEnemyMonSpecies
+.gotMon
+	ld d, [hl]
+	ld bc, wBattleMonDVs - wBattleMonSpecies
+	add hl, bc
+	ld a, [hl]
+	swap a
+	and $f
+	ld e, a ; attack DV
+	callba DetermineMonGender
+	ld a, d
+	and a
+	ret z
+	cp $ef ; the male symbol
+	ld a, 1
+	ret z
+	inc a
 	ret
 
 ; Competitive: a foe's move lowering any of its stats raises its special
@@ -1928,6 +2059,361 @@ Stench:
 	callab ClearHyperBeam
 	ret
 
+; What abilities do as their mon comes in (Intimidate, Download, Trace,
+; Forewarn, and the announcements), once both mons are out: for each side
+; whose mon has come in since, the faster first
+EntryAbilities:
+	ld a, [H_WHOSETURN]
+	push af
+.loop
+	ld a, [wAbilityFlags]
+	and ENTRY_PENDING_PLAYER | ENTRY_PENDING_ENEMY
+	jr z, .done
+	cp ENTRY_PENDING_PLAYER | ENTRY_PENDING_ENEMY
+	jr nz, .oneSide
+; both: the faster first (the player's on a tie)
+	ld hl, wEnemyMonSpeed + 1
+	ld a, [wBattleMonSpeed + 1]
+	sub [hl]
+	dec hl
+	ld a, [wBattleMonSpeed]
+	sbc [hl]
+	ld a, ENTRY_PENDING_PLAYER
+	jr nc, .oneSide
+	ld a, ENTRY_PENDING_ENEMY
+.oneSide
+	ld hl, wAbilityFlags
+	cp ENTRY_PENDING_PLAYER
+	ld a, 0
+	jr z, .gotSide
+	inc a
+.gotSide
+	ld [H_WHOSETURN], a
+	and a
+	jr nz, .enemy
+	res ENTRY_PENDING_PLAYER_F, [hl]
+	jr .cleared
+.enemy
+	res ENTRY_PENDING_ENEMY_F, [hl]
+.cleared
+	call EntryAbility
+	jr .loop
+.done
+	pop af
+	ld [H_WHOSETURN], a
+	ret
+
+; the entry ability of the mon whose turn it is (H_WHOSETURN), against the other
+EntryAbility:
+	call UserFainted
+	ret z
+	call GetTargetHP
+	ld a, b
+	or c
+	ret z ; no foe out
+	call UserAbility
+	ret z
+	ld d, a
+	ld hl, EntryAbilityHandlers
+.find
+	ld a, [hli]
+	and a
+	ret z
+	cp d
+	jr z, .found
+	inc hl
+	inc hl
+	jr .find
+.found
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+
+EntryAbilityHandlers:
+	dbw INTIMIDATE, Intimidate
+	dbw DOWNLOAD, Download
+	dbw TRACE, Trace
+	dbw FOREWARN, Forewarn
+	dbw PRESSURE, .pressure
+	dbw MOLD_BREAKER, .moldBreaker
+	dbw NEUTRALIZING_GAS, .neutralizingGas
+	db 0
+.pressure
+	ld hl, ExertingPressureText
+	jp PrintText
+.moldBreaker
+	ld hl, BreaksTheMoldText
+	jp PrintText
+.neutralizingGas
+	ld hl, NeutralizingGasText
+	jp PrintText
+
+; Intimidate: the foe's attack falls a stage, unless it's behind a substitute or
+; mist, or its ability stops it (Gen 9: Hyper Cutter and Clear Body, which keep
+; stats up, and Oblivious, Inner Focus, Own Tempo and Scrappy)
+Intimidate:
+	call PrintUserAbilityActivated
+	call TargetAbility
+	ld d, a
+	ld hl, IntimidateImmunities
+	ld de, 1
+	call IsInArray
+	jr c, .prevented
+	ld a, [H_WHOSETURN]
+	and a
+	ld a, [wEnemyBattleStatus2]
+	jr z, .gotTargetStatus
+	ld a, [wPlayerBattleStatus2]
+.gotTargetStatus
+	and (1 << HAS_SUBSTITUTE_UP) | (1 << PROTECTED_BY_MIST)
+	jr nz, .notLowered
+	ld a, [H_WHOSETURN]
+	xor 1
+	lb bc, -1, MOD_ATTACK
+	call ChangeStatStage
+	jr c, .notLowered
+	ld hl, TargetAttackFellText
+	call PrintText
+; Competitive answers it
+	call TargetAbility
+	cp COMPETITIVE
+	ret nz
+	ld a, [H_WHOSETURN]
+	xor 1
+	lb bc, 2, MOD_SPECIAL_ATTACK
+	call ChangeStatStage
+	ret c
+	ld d, COMPETITIVE
+	call PrintAbilityActivated
+	ld hl, SpecialAttackGreatlyRoseText
+	jp PrintText
+.prevented
+	call TargetAbility
+	ld d, a
+	call PrintAbilityActivated
+.notLowered
+	ld hl, TargetAttackNotLoweredText
+	jp PrintText
+
+IntimidateImmunities:
+	db HYPER_CUTTER, CLEAR_BODY, OBLIVIOUS, INNER_FOCUS, OWN_TEMPO, SCRAPPY
+	db -1
+
+; Download: raises attack a stage if the foe's defense is lower than its
+; special defense, else special attack
+Download:
+	call PrintUserAbilityActivated
+	ld hl, wEnemyMonDefense
+	ld de, wEnemyMonSpecialDefense
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotFoe
+	ld hl, wBattleMonDefense
+	ld de, wBattleMonSpecialDefense
+.gotFoe
+	ld a, [hli]
+	ld b, a
+	ld c, [hl] ; bc = defense
+	ld a, [de]
+	ld h, a
+	inc de
+	ld a, [de]
+	ld l, a ; hl = special defense
+	ld a, c
+	sub l
+	ld a, b
+	sbc h
+	ld c, MOD_ATTACK
+	ld hl, UserAttackRoseText
+	jr c, .gotStat ; defense is the lower
+	ld c, MOD_SPECIAL_ATTACK
+	ld hl, UserSpecialAttackRoseText
+.gotStat
+	push hl
+	ld a, [H_WHOSETURN]
+	ld b, 1
+	call ChangeStatStage
+	pop hl
+	ret c
+	jp PrintText
+
+; Trace: copies the foe's ability, which then acts as it came in
+Trace:
+	ld hl, wEnemyAbility
+	ld de, wPlayerAbility
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotAbilities
+	ld hl, wPlayerAbility
+	ld de, wEnemyAbility
+.gotAbilities
+	ld a, [hl]
+	and a
+	ret z
+	cp TRACE
+	ret z
+	ld [de], a
+	call GetAbilityName
+	ld hl, TracedText
+	call PrintText
+	jp EntryAbility
+
+; Forewarn: names the foe's strongest move (one-hit KOs count as 150,
+; Counter as 120 and other fixed-damage moves as 80)
+Forewarn:
+	ld hl, wEnemyMonMoves
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotMoves
+	ld hl, wBattleMonMoves
+.gotMoves
+	lb bc, 0, NUM_MOVES ; b = the best power so far
+	ld e, 0 ; e = its move
+.loop
+	ld a, [hli]
+	and a
+	jr z, .next
+	push hl
+	push bc
+	push de
+	ld d, a
+	push de
+	call ForewarnPower
+	pop de
+	ld l, d ; the move
+	pop de
+	pop bc
+	cp b
+	jr c, .notBetter
+	jr z, .notBetter
+	ld b, a
+	ld e, l
+.notBetter
+	pop hl
+.next
+	dec c
+	jr nz, .loop
+	ld a, e
+	and a
+	ret z ; only status moves, or none
+	ld [wd11e], a
+	call GetMoveName
+	ld d, FOREWARN
+	call PrintUserAbilityActivated
+	ld hl, ForewarnText
+	jp PrintText
+
+; a = move -> a = its power for Forewarn
+ForewarnPower:
+	ld hl, Moves
+	ld bc, MoveEnd - Moves
+	dec a
+	call AddNTimes
+	ld de, wAbilitySnapshot + 4 ; free between moves
+	ld bc, 3 ; number, effect, power
+	ld a, BANK(Moves)
+	call FarCopyData
+	ld hl, wAbilitySnapshot + 4
+	ld a, [hli]
+	cp COUNTER
+	jr z, .counter
+	ld a, [hli]
+	cp OHKO_EFFECT
+	jr z, .ohko
+	ld a, [hl]
+	cp 1
+	ret nz
+	ld a, 80 ; other fixed damage
+	ret
+.counter
+	ld a, 120
+	ret
+.ohko
+	ld a, 150
+	ret
+
+; Arena Trap: the mon whose turn it isn't (a = which) can't flee or switch out
+; unless it's a Flying or Ghost type, or has Levitate. a = 0 for the player's
+; mon, 1 for the enemy's; carry if trapped. Not in link battles, where each
+; side's own game decides
+SideTrapped:
+	ld e, a
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jr z, .free
+	ld a, e
+	xor 1
+	call GetSideAbility
+	cp ARENA_TRAP
+	jr nz, .free
+	ld a, e
+	call GetSideAbility
+	cp LEVITATE
+	jr z, .free
+	ld hl, wBattleMonType1
+	ld a, e
+	and a
+	jr z, .gotTypes
+	ld hl, wEnemyMonType1
+.gotTypes
+	ld a, [hli]
+	call .canLeave
+	jr z, .free
+	ld a, [hl]
+	call .canLeave
+	jr z, .free
+	scf
+	ret
+.free
+	and a
+	ret
+.canLeave
+	cp FLYING
+	ret z
+	cp GHOST
+	ret
+
+PlayerTrapped:
+	xor a
+	jr SideTrapped
+EnemyTrapped:
+	ld a, 1
+	jr SideTrapped
+
+; Running from a wild battle: carry if Run Away lets the player go, else nz if
+; Arena Trap keeps it (z to try as usual)
+RunAwayOrTrapped:
+	xor a
+	call GetSideAbility
+	cp RUN_AWAY
+	jr z, .runAway
+	call PlayerTrapped
+	jr c, .trapped
+	xor a
+	ret
+.trapped
+	or 1 ; nz, carry clear
+	ret
+.runAway
+	scf
+	ret
+
+; Transform copies the target's ability too (the mon whose turn it is
+; transformed)
+TransformAbility:
+	ld hl, wEnemyAbility
+	ld de, wPlayerAbility
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .copy
+	ld hl, wPlayerAbility
+	ld de, wEnemyAbility
+.copy
+	ld a, [hl]
+	ld [de], a
+	ret
+
 ; Scrappy: the user's Normal and Fighting moves hit Ghost types as if they
 ; weren't Ghost. d and e = the defender's types, changed in place
 ScrappyTypes:
@@ -1979,6 +2465,61 @@ SuckedUpOozeTargetText:
 SuckedUpOozeUserText:
 	text "<USER> sucked"
 	line "up the ooze!"
+	prompt
+
+FellAsleepAbilityText:
+	TX_FAR _FellAsleepText
+	db "@"
+
+ExertingPressureText:
+	text "<USER> is"
+	line "exerting its"
+	cont "PRESSURE!"
+	prompt
+
+BreaksTheMoldText:
+	text "<USER> breaks"
+	line "the mold!"
+	prompt
+
+NeutralizingGasText:
+	text "Neutralizing gas"
+	line "filled the area!"
+	prompt
+
+TargetAttackFellText:
+	text "<TARGET>'s"
+	line "ATTACK fell!"
+	prompt
+
+TargetAttackNotLoweredText:
+	text "<TARGET>'s ATTACK"
+	line "wasn't lowered!"
+	prompt
+
+UserAttackRoseText:
+	text "<USER>'s"
+	line "ATTACK rose!"
+	prompt
+
+UserSpecialAttackRoseText:
+	text "<USER>'s"
+	line "SPCL.ATK rose!"
+	prompt
+
+TracedText:
+	text "<USER> traced"
+	line "<TARGET>'s"
+	cont "@"
+	TX_RAM wcd6d
+	text "!"
+	prompt
+
+ForewarnText:
+	text "It was alerted to"
+	line "@"
+	TX_RAM wcd6d
+	text "!"
 	prompt
 
 AbilityCuredUserText:

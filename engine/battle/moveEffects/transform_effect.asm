@@ -195,6 +195,7 @@ ENDR
 	ld hl, wEnemyMonStatMods
 	ld de, wPlayerMonStatMods
 	call .copyBasedOnTurn ; stat mods
+	callab TransformAbility ; and its ability, as from Gen 3
 	ld hl, TransformedText
 	jp PrintText
 

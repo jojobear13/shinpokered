@@ -85,10 +85,17 @@ BATTLE_SIDE_SPECIAL   EQU 1 << BATTLE_SIDE_SPECIAL_F
 FLASH_FIRE_PLAYER_F EQU 0 ; the player's mon's Flash Fire has taken a fire move
 FLASH_FIRE_ENEMY_F  EQU 1
 STURDY_ENDURED_F    EQU 2 ; the target's Sturdy left it 1 HP this move
+ENTRY_PENDING_PLAYER_F EQU 3 ; the player's mon came in; its ability hasn't acted yet
+ENTRY_PENDING_ENEMY_F  EQU 4
+ENTRY_PENDING_PLAYER EQU 1 << ENTRY_PENDING_PLAYER_F
+ENTRY_PENDING_ENEMY  EQU 1 << ENTRY_PENDING_ENEMY_F
 
 ; wAbilitySnapshot flags
 SNAPSHOT_TAKEN_F   EQU 0 ; a move started
 SNAPSHOT_DAMAGED_F EQU 1 ; it hit the target for damage
+
+; GiveUserStatus: bad poison, not just poison (a bit the status byte doesn't use)
+GIVE_BAD_POISON_F EQU 7
 
 ; what a move effect does to the target, for the abilities that keep it off
 EFFECT_KIND_SLEEP     EQU 1 << 0
