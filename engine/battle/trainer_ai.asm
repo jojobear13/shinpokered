@@ -1963,6 +1963,7 @@ SwitchEnemyMon:
 	ld [wPlayerSelectedMove], a
 .preparewithdraw
 ; prepare to withdraw the active monster:
+	callab NaturalCureEnemy
 
 	ld a, [wEnemyMonPartyPos]
 	ld hl, wEnemyMon1HP

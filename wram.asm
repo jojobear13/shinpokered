@@ -3552,6 +3552,9 @@ wAbilityFlags:: ; what abilities have set up in battle (FLASH_FIRE_*_F, ...)
 	ds 1
 wSideEffectChance:: ; a side effect's chance out of 256, as abilities change it
 	ds 1
+wAbilitySnapshot:: ; before a move: flags (SNAPSHOT_*_F), the target's HP,
+	; status and stat stages, for the abilities that react to the move
+	ds 1 + 2 + 1 + NUM_STAT_MODS
 
 ; free up to the stack at $df00
 

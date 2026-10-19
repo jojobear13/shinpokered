@@ -28,8 +28,8 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 206 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
-| WRAM | 8 KB | **1101 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 4 (each side's ability in battle, a flags byte, and a side effect's chance as abilities change it). Still allocate new state through this table |
+| Battle engine bank ($0F) | 16 KB | 194 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
+| WRAM | 8 KB | **1088 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -760,6 +760,49 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   armor against a guaranteed critical hit; and Rest under Insomnia. In the
   emulator: a foe's Sturdy holding at 1 HP against a 999-Attack Tackle,
   with its messages.
+
+**Step E, part 4 continued: abilities that react, and turn and switch
+abilities.**
+
+- **The snapshot.** When a move starts (the move gate), the target's HP,
+  status and stat stages are saved; `AbilityAfterMove` compares them with
+  what the move left, so one hook after the move serves every ability that
+  reacts to "was hit", "was statused" or "had a stat lowered", whatever
+  code path the move took. Nothing happens to a target that fainted.
+- **Reactions.** Anger Point: a critical hit maxes its Attack. Cursed Body:
+  a 30% chance to disable the move that hit it for 4 turns. Synchronize: a
+  foe that burns, poisons (badly, for Toxic) or paralyzes it gets the same,
+  unless its type (Gen 9's: Fire, Poison, Electric) or ability keeps it
+  off, with the stat penalty. Competitive: any stat lowered by a foe's move
+  (not Haze) raises its Special Attack two stages. Stench: a 10% chance of
+  flinching for damaging moves without a flinch effect, past Inner Focus and
+  Shield Dust.
+- **Each turn**, with the residual damage: Shed Skin, a 1/3 chance to shed
+  its status (before poison or burn hurts it), undoing burn's and
+  paralysis's stat penalties; Early Bird takes a second turn off its sleep
+  count, never the last.
+- **Switching out**: Natural Cure cures its status, for the player's and a
+  trainer's mon. (Not at the end of a battle: that code is in bank 4, which
+  has 1 byte.)
+- **Pressure**: a move aimed at its holder (`MoveTargetsFoe`: damaging
+  moves, status moves that do something to the target, Leech Seed, Disable,
+  Mimic, Transform, Roar, Whirlwind) costs one more PP, for both sides.
+- **Randomness.** `AbilityRandom` is `BattleRandom` in bank 9 (a far call
+  can't return a value in a), drawing from the shared list in link battles,
+  so both games stay in step.
+- **Stat stages.** `ChangeStatStage` now keeps burn's and paralysis's
+  penalties on the recalculated stat, as the fork's stat moves do.
+- **Two register bugs** caught by the tests: `PrintText` clobbers `de`, so
+  values in `d` or `e` must be saved or reloaded across a message.
+- **Verified:** `tests/test_ability_reactions.py` checks each reaction on
+  both sides, including the random thresholds, the types and abilities that
+  stop Synchronize, Toxic passed on as bad poison, Haze not counting for
+  Competitive, and that nothing happens without a move; Shed Skin's chance
+  and its timing before poison damage; Early Bird's count; Natural Cure;
+  Pressure for damaging, status and self-targeting moves and at 0 PP; and
+  the stat penalties. `harness.clear_random()` lets a test replace the
+  queued random numbers mid-test. In the emulator: Thunder Wave into a
+  Synchronize foe paralyzed the user back, with its messages.
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.

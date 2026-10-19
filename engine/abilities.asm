@@ -173,6 +173,8 @@ PrintStatusScreenAbility:
 ; move is chosen and announced; returns carry if the target's ability took the
 ; move, having said so and done what the ability does.
 AbilityBlocksMove:
+	call TakeMoveSnapshot
+	call PressureCostsPP
 ; Damp, on either mon, stops Explosion and Self-Destruct
 	ld a, wPlayerMoveEffect - wPlayerMoveNum
 	call GetUserMoveField
@@ -650,7 +652,7 @@ ChangeStatStage:
 	cp MOD_SPECIAL_DEFENSE
 	jr z, .specialDefense
 	cp MOD_ACCURACY
-	jr nc, .noStat
+	jp nc, .noStat
 	jr .gotStat
 .specialDefense
 	ld a, STAT_SPECIAL_DEFENSE - STAT_ATTACK
@@ -715,6 +717,41 @@ ChangeStatStage:
 	ld a, 999 % $100
 	ld [H_QUOTIENT + 3], a
 .notCapped
+; burn halves attack and paralysis quarters speed, as when the stat was made
+	pop af
+	push af
+	push hl
+	ld hl, wBattleMonStatus
+	jr z, .gotStatus
+	ld hl, wEnemyMonStatus
+.gotStatus
+	ld b, [hl]
+	pop hl
+	ld a, c
+	and a ; attack
+	jr nz, .notAttack
+	bit BRN, b
+	jr z, .gotPenalty
+	ld b, 1
+	jr .penalty
+.notAttack
+	cp STAT_SPEED - STAT_ATTACK
+	jr nz, .noPenalty
+	bit PAR, b
+	jr z, .noPenalty
+	ld b, 2
+.penalty
+	ld a, [H_QUOTIENT + 2]
+	srl a
+	ld [H_QUOTIENT + 2], a
+	ld a, [H_QUOTIENT + 3]
+	rra
+	ld [H_QUOTIENT + 3], a
+	dec b
+	jr nz, .penalty
+	jr .gotPenalty
+.noPenalty
+.gotPenalty
 	ld a, [H_QUOTIENT + 2]
 	ld [hli], a
 	ld b, a
@@ -1123,6 +1160,151 @@ CalcHitChance_:
 	ld [hl], a
 	ret
 
+; Before a move: the target's HP, status and stat stages, for the abilities
+; that react to what the move did (AbilityAfterMove)
+TakeMoveSnapshot:
+	ld de, wAbilitySnapshot
+	ld a, 1 << SNAPSHOT_TAKEN_F
+	ld [de], a
+	inc de
+	ld hl, wEnemyMonHP
+	ld bc, wEnemyMonStatMods
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotTarget
+	ld hl, wBattleMonHP
+	ld bc, wPlayerMonStatMods
+.gotTarget
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hli]
+	ld [de], a
+	inc de
+	inc hl ; party position
+	ld a, [hl] ; status
+	ld [de], a
+	inc de
+	ld h, b
+	ld l, c
+	ld bc, NUM_STAT_MODS
+	jp CopyData
+
+; Pressure: a move aimed at it costs one more PP
+PressureCostsPP:
+	call TargetAbility
+	cp PRESSURE
+	ret nz
+	call MoveTargetsFoe
+	ret nc
+	xor a ; the move
+	call GetUserMoveField
+	cp STRUGGLE
+	ret z
+	ld a, [H_WHOSETURN]
+	and a
+	jr nz, .enemy
+	ld a, [wPlayerMoveListIndex]
+	ld c, a
+	ld b, 0
+	ld hl, wBattleMonPP
+	add hl, bc
+	ld a, [hl]
+	and %00111111 ; without PP Ups
+	ret z
+	ld de, wPlayerSelectedMove
+	callab DecrementPP
+	ret
+.enemy
+	ld a, [wEnemyMoveListIndex]
+	ld c, a
+	ld b, 0
+	ld hl, wEnemyMonPP
+	add hl, bc
+	ld a, [hl]
+	and a
+	ret z
+	dec [hl]
+	ret
+
+; carry if the user's move is aimed at the foe: a damaging move, a status
+; move that does something to it, or one of the few that act on it
+MoveTargetsFoe:
+	ld a, wPlayerMovePower - wPlayerMoveNum
+	call GetUserMoveField
+	and a
+	jr nz, .yes
+	ld a, wPlayerMoveEffect - wPlayerMoveNum
+	call GetUserMoveField
+	ld e, a
+	call GetEffectKind
+	ld a, b
+	and a
+	jr nz, .yes
+	ld a, e
+	ld hl, FoeTargetingEffects
+	ld de, 1
+	call IsInArray
+	ret c
+	xor a ; the move
+	call GetUserMoveField
+	cp ROAR
+	jr z, .yes
+	cp WHIRLWIND
+	jr z, .yes
+	and a
+	ret
+.yes
+	scf
+	ret
+
+FoeTargetingEffects:
+	db LEECH_SEED_EFFECT, DISABLE_EFFECT, MIMIC_EFFECT, TRANSFORM_EFFECT
+	db -1
+
+; a random number, the way the battle draws them (BattleRandom: in a link
+; battle, from the shared list)
+AbilityRandom:
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jp nz, Random
+	push hl
+	push bc
+	ld a, [wLinkBattleRandomNumberListIndex]
+	ld c, a
+	ld b, 0
+	ld hl, wLinkBattleRandomNumberList
+	add hl, bc
+	inc a
+	ld [wLinkBattleRandomNumberListIndex], a
+	cp 9
+	ld a, [hl]
+	pop bc
+	pop hl
+	ret c
+; the last of the nine: make the next nine
+	push hl
+	push bc
+	push af
+	xor a
+	ld [wLinkBattleRandomNumberListIndex], a
+	ld hl, wLinkBattleRandomNumberList
+	ld b, 9
+.loop
+	ld a, [hl]
+	ld c, a
+	add a
+	add a
+	add c
+	inc a
+	ld [hli], a
+	dec b
+	jr nz, .loop
+	pop af
+	pop bc
+	pop hl
+	ret
+
 ; carry if either mon has No Guard
 NoGuardActive:
 	xor a
@@ -1196,6 +1378,50 @@ AbilityResidual:
 	call UserAbility
 	cp MAGIC_GUARD
 	jr z, .magicGuard
+	cp SHED_SKIN
+	jr z, .shedSkin
+	cp EARLY_BIRD
+	jr z, .earlyBird
+.done
+	and a
+	ret
+; Shed Skin: a 1/3 chance each turn to shed its status
+.shedSkin
+	ld d, a
+	call GetUserStatus
+	and a
+	ret z ; carry clear
+	call AbilityRandom
+	cp 85 + 1 ; 1/3
+	jr nc, .done
+	callab UndoBurnParStats ; while the status still says which
+	call GetUserStatus
+	ld [hl], 0
+	ld hl, wPlayerBattleStatus3
+	ld de, wPlayerToxicCounter
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotToxic
+	ld hl, wEnemyBattleStatus3
+	ld de, wEnemyToxicCounter
+.gotToxic
+	res BADLY_POISONED, [hl]
+	xor a
+	ld [de], a
+	ld d, SHED_SKIN
+	call PrintUserAbilityActivated
+	ld hl, AbilityCuredUserText
+	call PrintText
+	and a
+	ret
+; Early Bird: wakes up twice as fast (one more turn off the count, never the
+; last one, so it wakes up as usual)
+.earlyBird
+	call GetUserStatus
+	and SLP
+	cp 2
+	jr c, .done
+	dec [hl]
 	and a
 	ret
 .magicGuard
@@ -1208,6 +1434,41 @@ AbilityResidual:
 	ld a, [hli]
 	or [hl]
 	scf
+	ret
+
+; a = the status of the mon whose turn it is, hl = its address
+GetUserStatus:
+	ld hl, wBattleMonStatus
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotStatus
+	ld hl, wEnemyMonStatus
+.gotStatus
+	ld a, [hl]
+	ret
+
+; Natural Cure: leaving the battle cures its status. Called as the player's or
+; the enemy's mon is withdrawn, before its status goes back to the party
+NaturalCurePlayer:
+	xor a
+	call GetSideAbility
+	cp NATURAL_CURE
+	ret nz
+	xor a
+	ld [wBattleMonStatus], a
+	ld a, [wPlayerMonNumber]
+	ld hl, wPartyMon1Status
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	ld [hl], 0
+	ret
+NaturalCureEnemy:
+	ld a, 1
+	call GetSideAbility
+	cp NATURAL_CURE
+	ret nz
+	xor a
+	ld [wEnemyMonStatus], a
 	ret
 
 ; Leech Seed on a mon with Liquid Ooze hurts the seeder by what it would have
@@ -1350,13 +1611,322 @@ RestPrevented:
 AbilityAfterMove:
 	ld hl, wAbilityFlags
 	bit STURDY_ENDURED_F, [hl]
-	ret z
+	jr z, .notEndured
 	res STURDY_ENDURED_F, [hl]
 	call TargetAbility
 	ld d, a
 	call PrintAbilityActivated
 	ld hl, EnduredTheHitText
+	call PrintText
+.notEndured
+	ld hl, wAbilitySnapshot
+	bit SNAPSHOT_TAKEN_F, [hl]
+	ret z ; the mon didn't get to use a move
+	ld [hl], 0
+	ld a, [wEscapedFromBattle]
+	and a
+	ret nz
+	call GetTargetHP
+	ld a, b
+	or c
+	ret z ; it fainted: nothing more happens to it
+	ld hl, wAbilitySnapshot + 2
+	ld a, c
+	sub [hl]
+	dec hl
+	ld a, b
+	sbc [hl]
+	jr nc, .gotDamaged
+	dec hl
+	set SNAPSHOT_DAMAGED_F, [hl] ; the move hit it for damage
+.gotDamaged
+	call AngerPoint
+	call CursedBody
+	call Synchronize
+	call Competitive
+	call Stench
+	xor a
+	ld [wAbilitySnapshot], a
+	ret
+
+; bc = the target's HP (the mon whose turn it isn't)
+GetTargetHP:
+	ld hl, wEnemyMonHP
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotHP
+	ld hl, wBattleMonHP
+.gotHP
+	ld a, [hli]
+	ld b, a
+	ld c, [hl]
+	ret
+
+; z if the mon whose turn it is has fainted
+UserFainted:
+	ld hl, wBattleMonHP
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotHP
+	ld hl, wEnemyMonHP
+.gotHP
+	ld a, [hli]
+	or [hl]
+	ret
+
+; nz if the move hit the target for damage
+TargetWasDamaged:
+	ld a, [wAbilitySnapshot]
+	and 1 << SNAPSHOT_DAMAGED_F
+	ret
+
+; Anger Point: a critical hit maxes its attack
+AngerPoint:
+	call TargetAbility
+	cp ANGER_POINT
+	ret nz
+	ld d, a
+	call TargetWasDamaged
+	ret z
+	ld a, [wCriticalHitOrOHKO]
+	dec a
+	ret nz
+	ld a, [H_WHOSETURN]
+	xor 1
+	lb bc, 12, MOD_ATTACK
+	call ChangeStatStage
+	ret c ; already maxed
+	ld d, ANGER_POINT
+	call PrintAbilityActivated
+	ld hl, MaxedAttackText
 	jp PrintText
+
+; Cursed Body: a 30% chance to disable the move that hit it, for 4 turns
+CursedBody:
+	call TargetAbility
+	cp CURSED_BODY
+	ret nz
+	ld d, a
+	call TargetWasDamaged
+	ret z
+	call UserFainted
+	ret z
+	xor a ; the move
+	call GetUserMoveField
+	cp STRUGGLE
+	ret z
+	ld e, a ; e = the move
+	ld hl, wPlayerDisabledMove
+	ld bc, wPlayerMoveListIndex
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotUser
+	ld hl, wEnemyDisabledMove
+	ld bc, wEnemyMoveListIndex
+.gotUser
+	ld a, [hl]
+	and a
+	ret nz ; it already has a move disabled
+	call AbilityRandom
+	cp 77 ; 30%
+	ret nc
+	ld a, [bc]
+	inc a
+	swap a
+	or 4 + 8 ; 4 turns, in the disable count's encoding (turns + 8)
+	ld [hl], a
+	ld hl, wPlayerDisabledMoveNumber
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotNumber
+	inc hl ; wEnemyDisabledMoveNumber
+.gotNumber
+	ld [hl], e
+	call PrintAbilityActivated
+	ld hl, UserMoveDisabledText
+	jp PrintText
+
+; Synchronize: a foe that burns, poisons or paralyzes it gets the same, if it
+; can have it
+Synchronize:
+	call TargetAbility
+	cp SYNCHRONIZE
+	ret nz
+	ld d, a
+	ld a, [wAbilitySnapshot + 3] ; the status before the move
+	and a
+	ret nz
+	call UserFainted
+	ret z
+	call GetUserStatus
+	and a
+	ret nz ; the foe has a status already
+	ld hl, wEnemyMonStatus
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotTargetStatus
+	ld hl, wBattleMonStatus
+.gotTargetStatus
+	ld a, [hl]
+	ld e, a ; e = the new status
+	ld b, EFFECT_KIND_POISON
+	ld c, POISON
+	bit PSN, a
+	jr nz, .gotKind
+	ld b, EFFECT_KIND_BURN
+	ld c, FIRE
+	bit BRN, a
+	jr nz, .gotKind
+	ld b, EFFECT_KIND_PARALYSIS
+	ld c, ELECTRIC
+	bit PAR, a
+	ret z
+.gotKind ; b = the kind, c = the type that can't have it
+	ld hl, wBattleMonType1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotUserTypes
+	ld hl, wEnemyMonType1
+.gotUserTypes
+	ld a, [hli]
+	cp c
+	ret z
+	ld a, [hl]
+	cp c
+	ret z
+	push de
+	call UserAbility
+	ld d, a
+	ld c, -1
+	call AbilityPreventsEffect
+	pop de
+	ret c
+; the foe takes it, as the mon whose turn it isn't, for the texts and penalties
+	call AbilitySwapTurn
+	ld hl, wEnemyMonStatus
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotFoeStatus
+	ld hl, wBattleMonStatus
+.gotFoeStatus
+	ld [hl], e
+	push de
+	call PrintUserAbilityActivated
+	pop de
+	ld a, e
+	bit PSN, a
+	jr nz, .poisoned
+	bit BRN, a
+	jr nz, .burned
+	callab QuarterSpeedDueToParalysis
+	ld hl, SynchronizeParalyzedText
+	jr .print
+.burned
+	callab HalveAttackDueToBurn
+	ld hl, SynchronizeBurnedText
+	jr .print
+.poisoned
+; Toxic's bad poison is passed on as bad poison
+	ld hl, wPlayerBattleStatus3
+	ld bc, wEnemyBattleStatus3
+	ld de, wEnemyToxicCounter
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotToxic
+	ld hl, wEnemyBattleStatus3
+	ld bc, wPlayerBattleStatus3
+	ld de, wPlayerToxicCounter
+.gotToxic ; hl = the holder's, bc and de = the foe's
+	bit BADLY_POISONED, [hl]
+	ld hl, SynchronizePoisonedText
+	jr z, .print
+	ld a, [bc]
+	set BADLY_POISONED, a
+	ld [bc], a
+	xor a
+	ld [de], a
+	ld hl, SynchronizeBadlyPoisonedText
+.print
+	call PrintText
+	; fall through
+
+AbilitySwapTurn:
+	ld a, [H_WHOSETURN]
+	xor 1
+	ld [H_WHOSETURN], a
+	ret
+
+; Competitive: a foe's move lowering any of its stats raises its special
+; attack two stages
+Competitive:
+	call TargetAbility
+	cp COMPETITIVE
+	ret nz
+	ld d, a
+	ld a, wPlayerMoveEffect - wPlayerMoveNum
+	call GetUserMoveField
+	cp HAZE_EFFECT
+	ret z ; Haze resets stages, it doesn't lower them
+	ld hl, wEnemyMonStatMods
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotMods
+	ld hl, wPlayerMonStatMods
+.gotMods
+	ld de, wAbilitySnapshot + 4
+	ld b, NUM_STAT_MODS
+.loop
+	ld a, [de]
+	cp [hl]
+	jr z, .next
+	jr nc, .lowered
+.next
+	inc de
+	inc hl
+	dec b
+	jr nz, .loop
+	ret
+.lowered
+	ld a, [H_WHOSETURN]
+	xor 1
+	lb bc, 2, MOD_SPECIAL_ATTACK
+	call ChangeStatStage
+	ret c
+	ld d, COMPETITIVE
+	call PrintAbilityActivated
+	ld hl, SpecialAttackGreatlyRoseText
+	jp PrintText
+
+; Stench: a 10% chance to make the target flinch, for moves that can't already
+Stench:
+	call UserAbility
+	cp STENCH
+	ret nz
+	call TargetWasDamaged
+	ret z
+	ld a, wPlayerMoveEffect - wPlayerMoveNum
+	call GetUserMoveField
+	cp FLINCH_SIDE_EFFECT1
+	ret z
+	cp FLINCH_SIDE_EFFECT2
+	ret z
+	call TargetAbilityForMove
+	cp INNER_FOCUS
+	ret z
+	cp SHIELD_DUST
+	ret z
+	call AbilityRandom
+	cp 26 ; 10%
+	ret nc
+	ld hl, wEnemyBattleStatus1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotTarget
+	ld hl, wPlayerBattleStatus1
+.gotTarget
+	set FLINCHED, [hl]
+	callab ClearHyperBeam
+	ret
 
 ; Scrappy: the user's Normal and Fighting moves hit Ghost types as if they
 ; weren't Ghost. d and e = the defender's types, changed in place
@@ -1410,6 +1980,46 @@ SuckedUpOozeUserText:
 	text "<USER> sucked"
 	line "up the ooze!"
 	prompt
+
+AbilityCuredUserText:
+	text "<USER>"
+	line "was cured!"
+	prompt
+
+MaxedAttackText:
+	text "<TARGET> maxed"
+	line "its ATTACK!"
+	prompt
+
+UserMoveDisabledText:
+	text "<USER>'s"
+	line "@"
+	TX_RAM wcf4b
+	text " was"
+	cont "disabled!"
+	prompt
+
+SpecialAttackGreatlyRoseText:
+	text "<TARGET>'s"
+	line "SPCL.ATK greatly"
+	cont "rose!"
+	prompt
+
+SynchronizePoisonedText:
+	TX_FAR _PoisonedText
+	db "@"
+
+SynchronizeBadlyPoisonedText:
+	TX_FAR _BadlyPoisonedText
+	db "@"
+
+SynchronizeBurnedText:
+	TX_FAR _BurnedText
+	db "@"
+
+SynchronizeParalyzedText:
+	TX_FAR _ParalyzedMayNotAttackText
+	db "@"
 
 EnduredTheHitText:
 	text "<TARGET>"

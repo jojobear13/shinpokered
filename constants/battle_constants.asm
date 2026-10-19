@@ -86,6 +86,10 @@ FLASH_FIRE_PLAYER_F EQU 0 ; the player's mon's Flash Fire has taken a fire move
 FLASH_FIRE_ENEMY_F  EQU 1
 STURDY_ENDURED_F    EQU 2 ; the target's Sturdy left it 1 HP this move
 
+; wAbilitySnapshot flags
+SNAPSHOT_TAKEN_F   EQU 0 ; a move started
+SNAPSHOT_DAMAGED_F EQU 1 ; it hit the target for damage
+
 ; what a move effect does to the target, for the abilities that keep it off
 EFFECT_KIND_SLEEP     EQU 1 << 0
 EFFECT_KIND_POISON    EQU 1 << 1

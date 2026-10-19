@@ -2844,6 +2844,7 @@ PartyMenuOrRockOrRun:
 ; fall through to SwitchPlayerMon
 
 SwitchPlayerMon:	;joedebug - this is where the player switches
+	callab NaturalCurePlayer
 	callba DoPlayerShinybit ;joenote - reset shiny checker bits
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if enemy using trapping move, then end their move

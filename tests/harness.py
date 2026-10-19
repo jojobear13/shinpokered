@@ -300,6 +300,14 @@ class Game:
         for i, v in enumerate(self._random_queue):
             self.memory[RANDOM_QUEUE + i] = v
 
+    def clear_random(self):
+        """Forget the values queued so far: the next ones queued come first,
+        and until then any call to Random fails."""
+        self._random_queue = []
+        self.memory[RANDOM_INDEX] = 0
+        if self._random_patched:
+            self._install_random_stub()
+
     def random_used(self):
         """How many queued random values the last call consumed."""
         return self.memory[RANDOM_INDEX]
