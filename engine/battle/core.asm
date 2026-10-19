@@ -6990,9 +6990,9 @@ LoadEnemyMonData:
 	ld a, [wOptions]	;load game options
 	bit BIT_BATTLE_HARD, a			;check battle style
 ; fixed DVs for trainer mon
-	ld a, $98
-	ld b, $88
-	ld c, $80
+	ld a, TRAINER_DVS_ATK_DEF
+	ld b, TRAINER_DVS_SPD_SPC
+	ld c, TRAINER_DVS_SPCLDEF
 	jr z, .storeDVs	;joenote - store the fixed DVs if shift battle style
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;joenote - going to randomly determine trainer DVs (values of 8 to 15)
 ;load whatever default DVs are already there for the pkmn

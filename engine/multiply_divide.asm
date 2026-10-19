@@ -146,6 +146,81 @@ _Divide:
 	ret
 
 	
+; hl = a mon's DVs -> a and wCalcStatNature = its nature (HARDY ... QUIRKY): the
+; three DV bytes as one number (without the spare low nybble), plus
+; NATURE_OFFSET, mod 25. Preserves bc, de
+; and hl. Other banks can callab it and read wCalcStatNature.
+GetNatureFromDVs:
+	push hl
+	push bc
+	ld bc, NUM_DVS << 8 ; b = bytes left, c = remainder so far
+.loop
+	ld a, c ; remainder * 256 = remainder * 6 (mod 25)
+	add a
+	add c
+	add a
+	ld c, a
+	ld a, b
+	cp 1
+	ld a, [hli]
+	jr nz, .gotByte
+	and $F0 ; the third byte's low nybble is spare (the ability slot will go there)
+.gotByte
+	call .mod25
+	add c ; at most 6 * 24 + 24
+	call .mod25
+	ld c, a
+	dec b
+	jr nz, .loop
+	add NATURE_OFFSET
+	call .mod25
+	ld [wCalcStatNature], a
+	pop bc
+	pop hl
+	ret
+.mod25
+	cp NUM_NATURES
+	ret c
+	sub NUM_NATURES
+	jr .mod25
+
+; scale stat c, in H_MULTIPLICAND+1 and +2, by the nature in wCalcStatNature:
+; x 1.1 if the nature raises it, x 0.9 if it lowers it (rounded down, as from
+; Gen 3). HP and neutral natures are left alone.
+ApplyNature:
+	ld a, c
+	cp STAT_ATTACK
+	ret c ; HP
+	ld a, [wCalcStatNature]
+	ld b, STAT_ATTACK
+.divideBy5
+	cp 5
+	jr c, .gotStats
+	sub 5
+	inc b
+	jr .divideBy5
+.gotStats
+	add STAT_ATTACK ; a = the lowered stat, b = the raised one
+	cp b
+	ret z ; neutral
+	ld d, 90
+	cp c
+	jr z, .scale
+	ld a, b
+	cp c
+	ret nz
+	ld d, 110
+.scale
+	xor a
+	ld [H_MULTIPLICAND], a
+	ld a, d
+	ld [H_MULTIPLIER], a
+	call Multiply
+	ld a, 100
+	ld [H_DIVISOR], a
+	ld b, 4
+	jp Divide ; the result is back in H_MULTIPLICAND+1 and +2
+
 _CalcStat:
 	call GetPredefRegisters
 	push hl
@@ -200,6 +275,7 @@ _CalcStat:
 	ASSERT wPartyMon1DVs - (wPartyMon1HPExp - 1) == wEnemyMonDVs - wEnemyMonHP
 	add hl, bc
 	pop bc
+	call GetNatureFromDVs
 	ld a, c
 	cp $2
 	jr z, .getAttackIV
@@ -323,6 +399,7 @@ _CalcStat:
 	inc a                    ; non-HP: (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100 + 5
 	ld [H_MULTIPLICAND+1], a ; HP: (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100 + Level + 10
 .noCarry4
+	call ApplyNature
 	ld a, [H_MULTIPLICAND+1] ; check for overflow (>999)
 	cp 999 / $100 + 1
 	jr nc, .overflow

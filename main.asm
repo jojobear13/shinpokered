@@ -602,6 +602,7 @@ INCLUDE "engine/battle/link_battle_versus_text.asm"
 INCLUDE "engine/slot_machine.asm"
 INCLUDE "engine/overworld/pewter_guys.asm"
 INCLUDE "engine/multiply_divide.asm"
+INCLUDE "engine/menu/natures.asm"
 INCLUDE "engine/game_corner_slots.asm"
 
 SECTION "Battle (bank A)", ROMX, BANK[$A]

@@ -3542,7 +3542,10 @@ wRNGSeed:: ; da77
 ; the literal address $def0, which overlapped wBlackoutSavedMapData.
 	ds 4
 
-; da7b: free up to the stack at $df00
+wCalcStatNature:: ; the nature of the mon _CalcStat is working on
+	ds 1
+
+; free up to the stack at $df00
 
 
 SECTION "Stack", WRAM0[$df00]

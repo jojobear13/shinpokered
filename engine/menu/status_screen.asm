@@ -247,6 +247,7 @@ StatusScreen:
 	call PrintNumber ; ID Number
 	ld d, $0
 	call PrintStatsBox
+	callab PrintStatusScreenNature
 	call Delay3
 	call GBPalNormal
 	coord hl, 1, 0

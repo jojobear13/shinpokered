@@ -59,14 +59,31 @@ def model_stats(base, level, dvs, exps):
     hp = (attack & 1) << 3 | (defense & 1) << 2 | (speed & 1) << 1 | (special_attack & 1)
     stat_dvs = (hp, attack, defense, speed, special_attack, special_defense)
     stat_exps = list(exps) + [exps[4]]
+    raised, lowered = divmod(nature(dvs), 5)
     out = []
     for i in range(6):
         exp = stat_exps[i]
         root = min(max(math.isqrt(exp - 1) + 1, 1) if exp else 1, 255)
         value = ((base[i] + stat_dvs[i]) * 2 + root // 4) * level // 100
         value += level + 10 if i == 0 else 5
+        if i and raised != lowered:
+            if i - 1 == raised:
+                value = value * 110 // 100
+            elif i - 1 == lowered:
+                value = value * 90 // 100
         out.append(min(value, 999))
     return out
+
+
+TRAINER_DVS = (0x98, 0x88, 0x80)
+
+
+def nature(dvs):
+    """0-24 in Gen 3's order (5 * raised + lowered, from attack): the DVs as one
+    number without the spare low nybble, offset so the trainer DVs are HARDY."""
+    def value(d):
+        return d[0] << 16 | d[1] << 8 | (d[2] & 0xF0)
+    return (value(dvs) - value(TRAINER_DVS)) % 25
 
 
 def badge_boost(value):
@@ -119,9 +136,11 @@ class CalcStatsTest(unittest.TestCase):
         low = self.calc(species, 100, [0, 0, 0x00], [0] * 5)
         high = self.calc(species, 100, [0, 0, 0xF0], [0] * 5)
         spare = self.calc(species, 100, [0, 0, 0x0F], [0] * 5)
-        self.assertEqual(high[5] - low[5], 30)  # 15 * 2 at level 100
-        self.assertEqual(high[:5], low[:5])
-        self.assertEqual(spare, low, "the low nybble is spare")
+        base = base_stats("MEWTWO")
+        self.assertEqual(low, model_stats(base, 100, [0, 0, 0x00], [0] * 5))
+        self.assertEqual(high, model_stats(base, 100, [0, 0, 0xF0], [0] * 5))
+        self.assertNotEqual(high[5], low[5])
+        self.assertEqual(spare, low, "the low nybble is spare and doesn't change the nature")
 
 
 class StatStageMoveTest(unittest.TestCase):
