@@ -84,3 +84,13 @@ BATTLE_SIDE_SPECIAL   EQU 1 << BATTLE_SIDE_SPECIAL_F
 ; wAbilityFlags
 FLASH_FIRE_PLAYER_F EQU 0 ; the player's mon's Flash Fire has taken a fire move
 FLASH_FIRE_ENEMY_F  EQU 1
+STURDY_ENDURED_F    EQU 2 ; the target's Sturdy left it 1 HP this move
+
+; what a move effect does to the target, for the abilities that keep it off
+EFFECT_KIND_SLEEP     EQU 1 << 0
+EFFECT_KIND_POISON    EQU 1 << 1
+EFFECT_KIND_BURN      EQU 1 << 2
+EFFECT_KIND_PARALYSIS EQU 1 << 3
+EFFECT_KIND_CONFUSION EQU 1 << 4
+EFFECT_KIND_FLINCH    EQU 1 << 5
+EFFECT_KIND_STAT_DROP EQU 1 << 6

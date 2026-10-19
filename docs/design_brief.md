@@ -28,8 +28,8 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 224 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks (send-out, the move gate, S2's Scrappy, S3) |
-| WRAM | 8 KB | **1101 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 3 (each side's ability in battle, and Flash Fire's state). Still allocate new state through this table |
+| Battle engine bank ($0F) | 16 KB | 206 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
+| WRAM | 8 KB | **1101 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 4 (each side's ability in battle, a flags byte, and a side effect's chance as abilities change it). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -695,7 +695,7 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
 - **Not yet.** The trainer AI doesn't know about abilities, and the move
   menu's effectiveness marks stay type-only (they shouldn't reveal the
   foe's ability anyway). Transform copying the ability comes with Trace.
-- **Verified:** `tests/test_ability_damage.py` checks each damage ability
+- **Verified (part 2):** `tests/test_ability_damage.py` checks each damage ability
   and its conditions on both sides, Mold Breaker and Neutralizing Gas,
   rounding and the cap; each blocking ability on both sides (healing,
   capping at max HP, the +6 limit, Flash Fire's flag) and what gets
@@ -703,6 +703,63 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   Earthquake into Levitate; and Scrappy against Ghost and Ghost/Poison. In
   the emulator: a trainer battle where Thunderbolt hit Volt Absorb and
   Earthquake hit Levitate, with the messages above.
+
+**Step E, part 4 continued: abilities that protect, and accuracy and HP.**
+
+- **Status moves.** The move gate also stops status moves whose effect the
+  target's ability keeps off: Insomnia and Vital Spirit (sleep), Immunity
+  (poison), Limber (paralysis), Own Tempo (confusion), Clear Body (any stat
+  drop), Hyper Cutter (attack drops), Keen Eye and Illuminate (accuracy
+  drops), with "<mon>'s <ABILITY>!" and "It doesn't affect ...". Gen 9
+  checks these after accuracy, so a status move that would have missed shows
+  the ability instead of "missed"; the difference is the message. Rest fails
+  under Insomnia and Vital Spirit.
+- **Side effects.** Every side-effect roll (burn, freeze, paralysis, poison,
+  flinch, confusion, stat drops) now goes through `RollSideEffect`, which
+  lets `AbilitySideEffectChance` change the chance before the one random
+  number is drawn, so randomness is consumed as before: none past Shield
+  Dust or an ability that keeps the effect off (the ones above, plus Water
+  Veil for burns and Inner Focus for flinching), twice the chance with
+  Serene Grace. `GetEffectKind` maps a move effect to what it does, for both
+  the gate and the rolls.
+- **Damp** on either mon stops Explosion and Self-Destruct before they go
+  off ("<mon> can't use EXPLOSION!"); the user doesn't faint. **Sturdy**
+  stops one-hit KO moves and, at full HP, survives a foe's hit that would
+  knock it out with 1 HP ("... endured the hit!", printed after the move by
+  `AbilityAfterMove`). Not its own recoil, crash or confusion damage.
+- **Accuracy.** `CalcHitChance` moved to bank 9 as `CalcHitChance_` (bank
+  $0F keeps an 8-byte stub, a net gain of 60 bytes there) and gained:
+  Keen Eye and Illuminate ignore the target's raised evasion, Compound Eyes
+  x13/10, Tangled Feet halves accuracy against its confused holder, and No
+  Guard on either mon sets the hit chance to 255, which the fork's roll
+  never misses; No Guard also hits a target in the air or underground.
+- **Critical hits.** Battle Armor and Shell Armor stop them, in the
+  critical-hit-rate predef. **Skill Link** makes two-to-five-hit moves hit
+  five times (without the rolls).
+- **HP.** Magic Guard: no damage from poison, burn, Leech Seed, recoil or
+  Jump Kick's crash. Rock Head: no recoil, except Struggle's. Liquid Ooze:
+  drain moves and Leech Seed hurt the drainer by what it would have healed
+  ("... sucked up the ooze!"). `HealMon` and `HurtMon` change any mon's HP
+  with the HP bar animation.
+- **After the move.** `AbilityAfterMove` runs after each mon's move (a
+  wrapper around `ExecutePlayerMove` and `ExecuteEnemyMove` in the turn
+  loop), for what abilities do once a move is over; Sturdy's message is its
+  first user.
+- **A bug class found.** `cp X` / `ret nz` returns with carry set whenever
+  the ability's id is below X, so routines whose carry is their answer must
+  clear it (`and a`) on the "no" path; two did not, and the tests caught it.
+- **Verified:** `tests/test_ability_protection.py` checks the gate for every
+  protected status move and what still gets through (side effects aren't
+  blocked whole, Mold Breaker, Neutralizing Gas), Damp both ways, Sturdy
+  against one-hit KOs; each side-effect immunity, Shield Dust, Serene Grace
+  and the cap, and that a roll still draws one random number and preserves
+  registers; the moved accuracy calculation against Gen 1's formula over
+  random stages, and each accuracy ability; No Guard through Fly; Sturdy's
+  endurance (and not at 199/200, not against Mold Breaker, not for its own
+  crash); Magic Guard, Liquid Ooze, Rock Head and Struggle; Skill Link;
+  armor against a guaranteed critical hit; and Rest under Insomnia. In the
+  emulator: a foe's Sturdy holding at 1 HP against a 999-Attack Tackle,
+  with its messages.
 
 Steps A to D, the refactors, are done, and each compared identical apart
 from the differences recorded above. Steps E to G are the new behaviour.

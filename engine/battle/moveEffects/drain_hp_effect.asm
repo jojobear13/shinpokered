@@ -1,4 +1,6 @@
 DrainHPEffect_:
+	callab LiquidOozeDrain ; hurts the user instead
+	ret c
 	ld hl, wDamage
 	ld a, [hl]
 	srl a ; divide damage by 2

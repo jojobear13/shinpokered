@@ -651,7 +651,7 @@ MainInBattleLoop:
 	ld [H_WHOFIRST], a	;joenote - let's track this for general problem solving
 	callab TrainerAI
 	jr c, .AIActionUsedEnemyFirst
-	call ExecuteEnemyMove
+	call ExecuteEnemyMoveThenAbilities
 	ld a, [wEscapedFromBattle]
 	and a ; was Teleport, Road, or Whirlwind used to escape from battle?
 	ret nz ; if so, return
@@ -662,7 +662,7 @@ MainInBattleLoop:
 	call HandlePoisonBurnLeechSeed
 	jp z, HandleEnemyMonFainted
 	call DrawHUDsAndHPBars
-	call ExecutePlayerMove
+	call ExecutePlayerMoveThenAbilities
 	ld a, [wEscapedFromBattle]
 	and a ; was Teleport, Road, or Whirlwind used to escape from battle?
 	ret nz ; if so, return
@@ -683,7 +683,7 @@ MainInBattleLoop:
 	callab TrainerAI
 	call c, SetEnemyActedBit	;if carry was set from TrainerAI, set the bit indicating the ai trainer switched or used an item
 ;#2 - handle player using a move
-	call ExecutePlayerMove	;note: this function writes zero to H_WHOSETURN
+	call ExecutePlayerMoveThenAbilities	;note: this function writes zero to H_WHOSETURN
 	ld a, [wEscapedFromBattle]
 	and a ; was Teleport, Road, or Whirlwind used to escape from battle?
 	ret nz ; if so, return
@@ -702,7 +702,7 @@ MainInBattleLoop:
 	call CheckandResetEnemyActedBit	;check to see if ai trainer already acted this turn
 	jr nz, .AIActionUsedPlayerFirst	;skip executing enemy move if it already acted
 	;else execute the enemy move
-	call ExecuteEnemyMove	;this function does not write 1 to H_WHOSETURN
+	call ExecuteEnemyMoveThenAbilities	;this function does not write 1 to H_WHOSETURN
 	ld a, [wEscapedFromBattle]
 	and a ; was Teleport, Road, or Whirlwind used to escape from battle?
 	ret nz ; if so, return
@@ -716,8 +716,22 @@ MainInBattleLoop:
 	call CheckNumAttacksLeft
 	jp MainInBattleLoop
 
-	
+
+; a move, then what abilities do after it (H_WHOSETURN is still the attacker)
+ExecutePlayerMoveThenAbilities:
+	call ExecutePlayerMove
+	jr AfterMoveAbilities
+ExecuteEnemyMoveThenAbilities:
+	call ExecuteEnemyMove
+AfterMoveAbilities:
+	push bc ; b = 0 if the target fainted
+	callab AbilityAfterMove
+	pop bc
+	ret
+
 HandlePoisonBurnLeechSeed:
+	callab AbilityResidual
+	ret c ; Magic Guard: no residual damage (z if fainted anyway)
 	ld hl, wBattleMonHP
 	ld de, wBattleMonStatus
 	ld a, [H_WHOSETURN]
@@ -883,6 +897,12 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 ; adds bc to enemy HP
 ; bc isn't updated if HP subtracted was capped to prevent overkill
 HandlePoisonBurnLeechSeed_IncreaseEnemyHP:
+	push hl
+	push bc
+	callab LiquidOozeLeechSeed
+	pop bc
+	pop hl
+	ret c
 	push hl
 	ld hl, wEnemyMonMaxHP
 	ld a, [H_WHOSETURN]
@@ -4659,6 +4679,8 @@ PrintMoveFailureText:
 	ld a, [de]
 	cp JUMP_KICK_EFFECT
 	ret nz
+	callab MagicGuardUser
+	ret c
 
 	; if you get here, the mon used jump kick or hi jump kick and missed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -5735,6 +5757,7 @@ ApplyDamageToPokemon:
 ; subtract the damage from the pokemon's current HP
 ; also, save the current HP at wHPBarOldHP
 	push de
+	callab SturdyEndure ; may leave the target 1 HP
 	ld a, [hBattleSide]
 	ld hl, DamageTargetHP
 	call GetAddrFromTable
@@ -6435,7 +6458,10 @@ MoveHitTest:
 	jp z, .moveMissed
 .checkForDigOrFlyStatus
 	bit INVULNERABLE, [hl]
-	jp nz, .moveMissed
+	jr z, .notInvulnerable
+	callab NoGuardActive ; No Guard hits it anyway
+	jp nc, .moveMissed
+.notInvulnerable
 	ld a, [H_WHOSETURN]
 	and a
 	jr nz, .enemyTurn
@@ -6551,76 +6577,10 @@ MoveHitTest:
 	ret
 
 ; values for player turn
+; scales the move's accuracy by the attacker's accuracy and the target's
+; evasion, and by abilities (in bank 9 with them)
 CalcHitChance:
-	ld hl, wPlayerMoveAccuracy
-	ld a, [H_WHOSETURN]
-	and a
-	ld a, [wPlayerMonAccuracyMod]
-	ld b, a
-	ld a, [wEnemyMonEvasionMod]
-	ld c, a
-	jr z, .next
-; values for enemy turn
-	ld hl, wEnemyMoveAccuracy
-	ld a, [wEnemyMonAccuracyMod]
-	ld b, a
-	ld a, [wPlayerMonEvasionMod]
-	ld c, a
-.next
-	ld a, $0e
-	sub c
-	ld c, a ; c = 14 - EVASIONMOD (this "reflects" the value over 7, so that an increase in the target's evasion
-	       ; decreases the hit chance instead of increasing the hit chance)
-; zero the high bytes of the multiplicand
-	xor a
-	ld [H_MULTIPLICAND], a
-	ld [H_MULTIPLICAND + 1], a
-	ld a, [hl]
-	ld [H_MULTIPLICAND + 2], a ; set multiplicand to move accuracy
-	push hl
-	ld d, $02 ; loop has two iterations
-; loop to do the calculations, the first iteration multiplies by the accuracy ratio and
-; the second iteration multiplies by the evasion ratio
-.loop
-	push bc
-	ld hl, StatModifierRatios  ; stat modifier ratios
-	dec b
-	sla b
-	ld c, b
-	ld b, $00
-	add hl, bc ; hl = address of stat modifier ratio
-	pop bc
-	ld a, [hli]
-	ld [H_MULTIPLIER], a ; set multiplier to the numerator of the ratio
-	call Multiply
-	ld a, [hl]
-	ld [H_DIVISOR], a ; set divisor to the the denominator of the ratio
-	                 ; (the dividend is the product of the previous multiplication)
-	ld b, $04 ; number of bytes in the dividend
-	call Divide
-	ld a, [H_QUOTIENT + 3]
-	ld b, a
-	ld a, [H_QUOTIENT + 2]
-	or b
-	jp nz, .nextCalculation
-; make sure the result is always at least one
-	ld [H_QUOTIENT + 2], a
-	ld a, $01
-	ld [H_QUOTIENT + 3], a
-.nextCalculation
-	ld b, c
-	dec d
-	jr nz, .loop
-	ld a, [H_QUOTIENT + 2]
-	and a ; is the calculated hit chance over 0xFF?
-	ld a, [H_QUOTIENT + 3]
-	jr z, .storeAccuracy
-; if calculated hit chance over 0xFF
-	ld a, $ff ; set the hit chance to 0xFF
-.storeAccuracy
-	pop hl
-	ld [hl], a ; store the hit chance in the move accuracy variable
-	ret
+	jpab CalcHitChance_
 
 ; multiplies damage by a random percentage from ~85% to 100%
 RandomizeDamage:
@@ -8278,8 +8238,7 @@ PoisonEffect:
 	jr nz, .didntAffect
 	jr .inflictPoison
 .sideEffectTest
-	call BattleRandom
-	cp b ; was side effect successful?
+	call RollSideEffect ; was side effect successful?
 	ret nc
 .inflictPoison
 	dec hl
@@ -8383,8 +8342,7 @@ FreezeBurnParalyzeEffect:
 	sub $1e ; subtract $1E to map to equivalent 10% chance effects
 .next1
 	push af
-	call BattleRandom ; get random 8bit value for probability test
-	cp b
+	call RollSideEffect
 	pop bc
 	ret nc ; do nothing if random value is >= 1A or 4D [no status applied]
 	ld a, b ; what type of effect is this?
@@ -8438,8 +8396,7 @@ opponentAttacker:
 	sub $1e
 .next1
 	push af
-	call BattleRandom
-	cp b
+	call RollSideEffect
 	pop bc
 	ret nc
 	ld a, b
@@ -8771,8 +8728,8 @@ StatModifierDownEffect:
 	ld a, [de]
 	cp ATTACK_DOWN_SIDE_EFFECT
 	jr c, .nonSideEffect
-	call BattleRandom
-	cp $55 ; 85/256 chance for side effects
+	ld b, $55 ; 85/256 chance for side effects
+	call RollSideEffect
 	jp nc, CantLowerAnymore
 	ld a, [de]
 	sub ATTACK_DOWN_SIDE_EFFECT ; map each stat to 0-3, and 4 for special defense
@@ -9218,6 +9175,11 @@ TwoToFiveAttacksEffect:
 .load_two_hits
 	ld a, $2 ; number of hits is always 2 for ATTACK_TWICE_EFFECT
 	jr z, .saveNumberOfHits
+	push bc
+	callab SkillLink
+	pop bc
+	ld a, 5 ; Skill Link always hits five times
+	jr c, .saveNumberOfHits
 ; for TWO_TO_FIVE_ATTACKS_EFFECT 3/8 chance for 2 and 3 hits, and 1/8 chance for 4 and 5 hits
 	call BattleRandom
 	and $3
@@ -9239,6 +9201,24 @@ TwoToFiveAttacksEffect:
 ;	jr .saveNumberOfHits	;this assumes POISON_SIDE_EFFECT1 = 2
 	jr .load_two_hits 	;joenote - jump back a bit further to make sure 2 is loaded into A
 
+; b = a side effect's chance out of 256 -> carry if it happens, after the
+; target's and user's abilities (Shield Dust, Serene Grace, the immunities)
+; preserves bc, de and hl
+RollSideEffect:
+	push hl
+	push de
+	push bc
+	ld a, b
+	ld [wSideEffectChance], a
+	callab AbilitySideEffectChance
+	call BattleRandom
+	ld hl, wSideEffectChance
+	cp [hl]
+	pop bc
+	pop de
+	pop hl
+	ret
+
 FlinchSideEffect:
 	call CheckTargetSubstitute
 	ret nz
@@ -9256,8 +9236,7 @@ FlinchSideEffect:
 	jr z, .gotEffectChance
 	ld b, $4d ; ~30% chance of flinch
 .gotEffectChance
-	call BattleRandom
-	cp b
+	call RollSideEffect
 	ret nc
 	set FLINCHED, [hl] ; set mon's status to flinching
 	call ClearHyperBeam
@@ -9406,13 +9385,15 @@ FocusEnergyEffect:
 	jpab FocusEnergyEffect_
 
 RecoilEffect:
+	callab RecoilPrevented ; Rock Head, Magic Guard
+	ret c
 	jpab RecoilEffect_
 
 ConfusionSideEffect:
 	call CheckTargetSubstitute	;joenote - return if opponent has substitute up
 	ret nz
-	call BattleRandom
-	cp $19 ; ~10% chance
+	ld b, $19 ; ~10% chance
+	call RollSideEffect
 	ret nc
 	jr ConfusionSideEffectSuccess
 

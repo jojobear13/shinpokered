@@ -1,4 +1,6 @@
 HealEffect_:
+	callab RestPrevented ; Insomnia, Vital Spirit
+	jp c, .failed
 	ld a, [H_WHOSETURN]
 	and a
 	ld de, wBattleMonHP
