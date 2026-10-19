@@ -136,6 +136,10 @@ _Random_BiasDV::
 	jr c, .gotSpclDef
 	ld l, a
 .gotSpclDef
+	call Random ; the ability slot, in bit 0
+	and 1
+	or l
+	ld l, a
 	
 	;if gym leader or champion music playing, make it so values cannot be below 8
 	ld a, [wChannelSoundIDs]
@@ -274,7 +278,10 @@ _Random_DV::	;generates four 0 to 15 DVs in DE and the special defense DV in the
 	ld e, a
 
 .done
-	ld l, h
+	call Random ; the ability slot, in bit 0
+	and 1
+	or h
+	ld l, a
 	ret
 
 	

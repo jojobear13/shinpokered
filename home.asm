@@ -4633,8 +4633,8 @@ GetMoveCategory::
 	ret
 
 Random_BiasDV::
-; Return random DVs in A and B, and the special defense DV in the high nybble of C,
-; with a bias towards higher numbers
+; Return random DVs in A and B, and the special defense DV in the high nybble of C
+; and the ability slot in bit 0, with a bias towards higher numbers
 	push hl
 	push de
 	push bc
@@ -4647,8 +4647,8 @@ Random_BiasDV::
 	pop hl
 	ret
 Random_DV::
-; Return random DVs in A and B, and the special defense DV in the high nybble of C,
-; with adjustments for being a wild pokemon DV
+; Return random DVs in A and B, and the special defense DV in the high nybble of C
+; and the ability slot in bit 0, with adjustments for being a wild pokemon DV
 	push hl
 	push de
 	push bc

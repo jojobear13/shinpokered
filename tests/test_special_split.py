@@ -278,7 +278,7 @@ class WildDVsTest(unittest.TestCase):
                 g.poke("wOptions", 0)  # normal mode: no rerolls
                 g.poke("wFontLoaded", 0)  # no forced shiny
                 g.poke("wCurMap", 0)  # not the Safari Zone
-                g.queue_random(0x12, 0x34, third)
+                g.queue_random(0x12, 0x34, third, 0)  # the last picks the ability slot
                 g.call("DetermineWildMonDVs")
                 self.assertEqual(g.peek("wEnemyMonDVs", 3), [0x12, 0x34, third & 0xF0])
 

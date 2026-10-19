@@ -104,8 +104,8 @@ DetermineWildMonDVs:
 	jr nz, .do_random	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call Random
-	and $F0
-	ld c, a ; any special defense DV: Gen 2's shiny rule doesn't involve it
+	and $F1
+	ld c, a ; any special defense DV and ability slot: Gen 2's shiny rule doesn't involve them
 	ld b, $AA
 	call Random	;get random number into a
 	or $20	;set only bit 5

@@ -2013,7 +2013,7 @@ LoadBattleMonFromParty:
 	ld [hli], a
 	dec b
 	jr nz, .statModLoop
-	ret
+	jpab LoadPlayerAbility
 
 ; copies from enemy party data to current enemy mon data when sending out a new enemy mon
 LoadEnemyMonFromParty:	;function for link battles
@@ -2075,6 +2075,56 @@ LoadEnemyMonFromParty:	;function for link battles
 	jr nz, .statModLoop
 	ld a, [wWhichPokemon]
 	ld [wEnemyMonPartyPos], a
+	jpab LoadEnemyAbility
+
+; a = 0 for the player's mon or 1 for the enemy's -> a = its ability, after
+; Neutralizing Gas (which stops every ability but itself), and z if none
+; preserves bc, de and hl
+GetSideAbility:
+	push hl
+	push bc
+	ld hl, wPlayerAbility
+	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	and a
+	jr z, .gotSide
+	ld a, b
+	ld b, c
+	ld c, a
+.gotSide ; b = this side's, c = the other side's
+	ld a, c
+	cp NEUTRALIZING_GAS
+	ld a, b
+	jr nz, .done
+	cp NEUTRALIZING_GAS
+	jr z, .done
+	xor a ; NO_ABILITY
+.done
+	pop bc
+	pop hl
+	and a
+	ret
+
+; the ability of the mon whose turn it is
+UserAbility:
+	ld a, [H_WHOSETURN]
+	jr GetSideAbility
+
+; the ability of the other mon
+TargetAbility:
+	ld a, [H_WHOSETURN]
+	xor 1
+	jr GetSideAbility
+
+; the target's ability where the user's move meets it: none if the user has
+; Mold Breaker. Abilities that react to a hit after it lands (Static and the
+; like) use TargetAbility, since Mold Breaker doesn't stop them
+TargetAbilityForMove:
+	call UserAbility
+	cp MOLD_BREAKER
+	jr nz, TargetAbility
+	xor a
 	ret
 
 SendOutMon:
@@ -7265,7 +7315,7 @@ LoadEnemyMonData:
 .end_set_sendout
 	pop af
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ret
+	jpab LoadEnemyAbility
 
 ; calls BattleTransition to show the battle transition animation and initializes some battle variables
 DoBattleTransitionAndInitBattleVariables:

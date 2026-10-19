@@ -560,6 +560,7 @@ StatusScreen2:
 	call GetMonName
 	coord hl, 9, 1
 	call PlaceString
+	callab PrintStatusScreenAbility
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3

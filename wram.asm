@@ -3545,6 +3545,10 @@ wRNGSeed:: ; da77
 wCalcStatNature:: ; the nature of the mon _CalcStat is working on
 	ds 1
 
+; the abilities of the mons in battle, set when each is sent out
+wPlayerAbility:: ds 1
+wEnemyAbility:: ds 1
+
 ; free up to the stack at $df00
 
 
