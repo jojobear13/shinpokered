@@ -373,8 +373,8 @@ identically. Derived values (natures, abilities, held items) travel inside the
 party data the link already exchanges, so they agree by construction; time
 and weather do not exist in link battles (decision 5). A mirror test (run the
 same turn on two harness instances with sides swapped and compare random
-consumption) joins the suite when the first ability that uses randomness
-lands (Static, Shed Skin and the like; the abilities so far use none).
+consumption) is in the suite: `tests/test_link_mirror.py` (see "Link
+mirror test" below).
 
 **Why last.** Nothing in this brief depends on link play, and the per-turn
 check is cheap to add once the pipeline and abilities exist. It is plan step
@@ -419,7 +419,7 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E (parts 1-4 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move in two spare bits of its type byte, read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (hook tables, ability slot bit); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 6 WRAM bytes for the party's DVs, 2 per party Pokémon and per battle mon for the new stat; 1 byte (weather) |
+| E (parts 1-4 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move (a table by move id, `GetMoveCategory`), read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (an ability slot bit; the logic in bank 9, reached by far-call hooks in the battle engine); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 53 WRAM bytes (a third DV byte and a sixth stat in every party and battle struct); natures 1; abilities 15; weather 1 planned |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
@@ -844,6 +844,19 @@ abilities.**
   for single-gender, genderless and DV-gendered species; Transform. In the
   emulator: a foe's Intimidate acting just before its move, with its
   messages.
+
+**Link mirror test** (`tests/test_link_mirror.py`). Two emulator instances
+run the same mon's move in a link battle: one as the player's move, the
+other, with every player/enemy pair of battle state swapped, as the enemy's.
+Both draw from the shared random list, and `Random` itself is trapped, since
+a link battle must never call it. Afterwards the random list, its index and
+the mirrored battle state must match (PP aside: the player spends it when
+moving, the enemy when choosing; and the party copies aside: each game
+copies only its own player's HP back to its party). 80 random turns with
+random abilities, plus 96 targeted ones where Static, Effect Spore, Cursed
+Body, Poison Point, Stench, Serene Grace, Shed Skin and Shield Dust get to
+roll, all agree. Checked that it bites: with one game's `AbilityRandom`
+drawing from `Random` instead, 39 of the 96 targeted turns fail.
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the
