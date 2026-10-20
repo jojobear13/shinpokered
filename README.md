@@ -44,6 +44,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Sleep 1-3 turns; freeze 20% thaw per turn; paralysis halves Speed, 25% full para.
 - Confusion self-hit 1/3 of the time; poison and Leech Seed 1/8, burn 1/16.
 - Toxic stays bad poison through a switch.
+- Poison, burn, Leech Seed, binding damage, Leftovers and residual abilities happen at the end of the round, faster mon first (Gen 4+), not after each mon's move.
 - Type immunities to status: Fire/burn, Ice/freeze, Electric/paralysis, Poison and Steel/poison.
 - A move's side effect can now hit its own type (e.g. Body Slam paralyzes Normal types).
 - Priority uses Gen 9 brackets (Quick Attack +1, Counter -5, Roar/Whirlwind/Teleport -6, etc.).
@@ -112,7 +113,7 @@ Every option starts as the original game played; everything extra is off by defa
 - OPTION screen: five pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS) with two-line explanations.
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
-- HP PERCENT: the enemy HUD shows its HP as a percentage (Showdown-style) in place of "HP:".
+- HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:".
 - CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
 - EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR, SAFARI EVENT, PC IN MENU.

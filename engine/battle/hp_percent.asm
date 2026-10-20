@@ -1,5 +1,5 @@
 ; The DISPLAY option HP PERCENT: the enemy's HUD shows its HP as a percentage,
-; as on Showdown, in place of the "HP:" label. The number is drawn in a small
+; as on Showdown (the number alone), in place of the "HP:" label. It is drawn in a small
 ; 3x5 font into two tiles ($D0 and $D1, blank in the English font: kana
 ; slots) that take the place of the label's two tiles; the second keeps the
 ; bar's left end.
@@ -71,7 +71,9 @@ EnemyHPPercent:
 	inc a ; it has HP left
 	ret
 
-; draws percentage a (0-100) into the two tiles at wHPPercentTiles, then VRAM
+; draws percentage a (0-100) into the two tiles at wHPPercentTiles, then VRAM:
+; up to three digits, right-aligned, in columns 3-13 of the two tiles' 16
+; (a column apart), and the bar's left end in the last
 DrawHPPercentTiles:
 ; the digits: d = hundreds, e = tens, c = ones; 10 for a blank
 	ld d, 10
@@ -95,55 +97,57 @@ DrawHPPercentTiles:
 	jr nz, .gotDigits ; 100: keep the zero
 	ld e, 10
 .gotDigits
-	ld hl, wHPPercentTiles
+	ld hl, wHPPercentDigits
+	ld [hl], d
+	inc hl
+	ld [hl], e
+	inc hl
+	ld [hl], c
 	ld b, 0 ; the row
-.row
-	push bc
-	push de
-; the first tile: the hundreds then the tens
-	ld a, d
+.row ; de = its 16 columns: hundreds at bits 12-10, tens at 8-6, ones at 4-2
+	ld a, [wHPPercentDigits]
 	call .glyphRow
-	swap a
-	add a ; to bits 5-7
+	add a
+	add a
 	ld d, a
-	ld a, e
+	ld a, [wHPPercentDigits + 1]
 	call .glyphRow
-	add a ; to bits 1-3
+	ld c, a
+	srl a
+	srl a
 	or d
-	ld [hli], a
-	ld [hli], a
-; the second: the ones, the "%", and the bar's left end
-	pop de
-	pop bc
-	push bc
-	push de
+	ld d, a
 	ld a, c
+	and %11
+	rrca
+	rrca
+	ld e, a
+	ld a, [wHPPercentDigits + 2]
 	call .glyphRow
-	swap a
 	add a
-	ld d, a
-	ld a, 11 ; "%"
-	call .glyphRow
 	add a
-	or d
-	ld d, a
-	ld a, b
+	or e
+	ld e, a
+	ld a, b ; the bar's left end, on rows 3 and 4
 	cp 3
 	jr z, .barEnd
 	cp 4
 	jr nz, .noBarEnd
 .barEnd
-	set 0, d
+	set 0, e
 .noBarEnd
-	ld a, d
-	ld de, 2 * 8 - 2 ; to the same row of the second tile
-	push hl
-	add hl, de
-	ld [hli], a
-	ld [hl], a
-	pop hl
-	pop de
-	pop bc
+	ld hl, wHPPercentTiles
+	ld a, b
+	add a
+	call .addAToHL
+	ld [hl], d ; the first tile's row, both bit planes
+	inc hl
+	ld [hl], d
+	ld a, 2 * 8 - 1 ; the second tile's
+	call .addAToHL
+	ld [hl], e
+	inc hl
+	ld [hl], e
 	inc b
 	ld a, b
 	cp 8
@@ -161,6 +165,13 @@ DrawHPPercentTiles:
 	ld hl, vChars1 + (HP_PERCENT_TILE - $80) * $10
 	lb bc, BANK(@), 2
 	jp CopyVideoData
+
+.addAToHL
+	add l
+	ld l, a
+	ret nc
+	inc h
+	ret
 
 ; a = row b (0-7) of glyph a's three columns (bits 0-2); rows 1-5 hold it
 .glyphRow
@@ -192,7 +203,7 @@ DrawHPPercentTiles:
 	pop hl
 	ret
 
-PercentGlyphs: ; 0-9, a blank, "%"; five rows of three columns each
+PercentGlyphs: ; 0-9 and a blank; five rows of three columns each
 	db %111, %101, %101, %101, %111
 	db %010, %110, %010, %010, %111
 	db %111, %001, %111, %100, %111
@@ -204,4 +215,3 @@ PercentGlyphs: ; 0-9, a blank, "%"; five rows of three columns each
 	db %111, %101, %111, %101, %111
 	db %111, %101, %111, %001, %111
 	db %000, %000, %000, %000, %000
-	db %101, %001, %010, %100, %101

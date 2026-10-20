@@ -1912,4 +1912,13 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     (`engine/battle/hp_percent.asm`).
   - Tests: `test_move_secret.py`, `test_hp_percent.py`, and the share on and
     off in `test_growth.py`.
+- **End-of-round residuals** (Gen 4+): poison, burn, Leech Seed, binding
+  damage, Leftovers/berries and the residual abilities (`AbilityResidual`)
+  used to hit each mon right after its own move, as in Gen 1-3. They now
+  run in `EndOfRound`, after both have moved: the faster mon first (a speed
+  tie goes to the one that moved first, `H_WHOFIRST`, so link battles agree).
+  A round where a move makes a mon faint still skips them, as before; Gen 9
+  would still apply the survivor's.
+- **HP PERCENT** shows the number alone (no % sign), right-aligned in the
+  two tiles' columns 3-13, digits a column apart.
 

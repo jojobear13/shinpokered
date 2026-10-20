@@ -42,11 +42,13 @@ class HPPercentTest(unittest.TestCase):
         out = g.call("DrawEnemyHPPercent", de=0x1234, max_frames=100)
         self.assertEqual(out["de"], 0x1234)  # the bar's pixels, for its color
         self.assertEqual(g.peek(tiles, 2), [0xD0, 0xD1])
-        # "73%": the second tile's ones digit is a 3, then the % sign, and the
-        # bar's left end in its last column on rows 3 and 4
+        # "73", no % sign: the 7 at columns 7-9 (the first tile's last column
+        # and the second's first two), the 3 at 11-13, and the bar's left end
+        # in the last column on rows 3 and 4
         rows = g.peek("wHPPercentTiles", 32)
-        second = rows[16::2]
-        self.assertEqual(second[1] >> 5, 0b111)  # 3's top row
+        first, second = rows[0:16:2], rows[16::2]
+        self.assertEqual(first[1], 0b00000001)  # no hundreds; the 7's left column
+        self.assertEqual(second[1], 0b11011100)  # the 7's other two, then the 3
         self.assertEqual(second[3] & 1, 1)
         self.assertEqual(second[0], 0)
 

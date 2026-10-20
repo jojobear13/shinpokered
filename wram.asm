@@ -3679,6 +3679,8 @@ wLastRepelUsed:: ; the kind of repel last used, offered again when it wears off 
 	ds 1
 wHPPercentTiles:: ; the HP PERCENT option's two tiles (engine/battle/hp_percent.asm)
 	ds 2 * 16
+wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)
+	ds 3
 
 ; free up to the stack at $df00
 

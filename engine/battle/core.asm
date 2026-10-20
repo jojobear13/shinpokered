@@ -608,8 +608,6 @@ MainInBattleLoop:
 	and a
 	jp z, HandlePlayerMonFainted
 .AIActionUsedEnemyFirst
-	call HandlePoisonBurnLeechSeed
-	jp z, HandleEnemyMonFainted
 	call DrawHUDsAndHPBars
 	call ExecutePlayerMoveThenAbilities
 	ld a, [wEscapedFromBattle]
@@ -618,10 +616,7 @@ MainInBattleLoop:
 	ld a, b
 	and a
 	jp z, HandleEnemyMonFainted
-	call HandlePoisonBurnLeechSeed
-	jp z, HandlePlayerMonFainted
-	call DrawHUDsAndHPBars
-	jp MainInBattleLoop
+	jp EndOfRound
 .playerMovesFirst	;joenote - reorganizing this so enemy AI item use and switching has priority over player moves
 ;#1 - handle enemy switching or using an item
 	xor a
@@ -641,8 +636,6 @@ MainInBattleLoop:
 	ld a, b
 	and a
 	jp z, HandleEnemyMonFainted
-	call HandlePoisonBurnLeechSeed
-	jp z, HandlePlayerMonFainted
 	call DrawHUDsAndHPBars
 ;#3 - handle enemy using move
 	ld a, $1
@@ -658,10 +651,44 @@ MainInBattleLoop:
 	and a
 	jp z, HandlePlayerMonFainted
 .AIActionUsedPlayerFirst
+	; fall through
+
+; Gen 4+: poison, burn, Leech Seed, binding, Leftovers and the residual
+; abilities come at the end of the round, once both have moved, the faster
+; mon first (on a tie, the one that moved first). A round that ends in a
+; faint from a move skips them, as each mon's used to after its move.
+EndOfRound:
+	ld de, wBattleMonSpeed
+	ld hl, wEnemyMonSpeed
+	ld c, $2
+	call StringCmp
+	ld a, 0
+	jr z, .tie
+	jr nc, .gotFirst ; the player is faster
+	inc a
+	jr .gotFirst
+.tie
+	ld a, [H_WHOFIRST]
+.gotFirst
+	ld [H_WHOSETURN], a
+	push af
 	call HandlePoisonBurnLeechSeed
-	jp z, HandleEnemyMonFainted
+	jr z, .firstFainted
+	call DrawHUDsAndHPBars
+	pop af
+	xor $1
+	ld [H_WHOSETURN], a
+	call HandlePoisonBurnLeechSeed
+	jr z, .fainted
 	call DrawHUDsAndHPBars
 	jp MainInBattleLoop
+.firstFainted
+	pop af
+.fainted
+	ld a, [H_WHOSETURN]
+	and a
+	jp z, HandlePlayerMonFainted
+	jp HandleEnemyMonFainted
 
 
 ; a move, then what abilities do after it (H_WHOSETURN is still the attacker)
