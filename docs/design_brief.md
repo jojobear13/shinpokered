@@ -1728,8 +1728,10 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   colours to the Game Boy's: the peach skin light grey, the body colour dark
   grey, the outline black. They're 9.5 KB a frame, in two banks of their
   own. When the party menu draws, each party slot's icon is copied to its
-  own tiles (slot n: sprite tiles 4n, and $40 + 4n for the second frame);
-  the naming screen and the trade load their one species' icon into slot
+  own tiles (slot n: sprite tiles 4n, and $40 + 4n for the second frame),
+  and `wPartyIconSpecies` remembers whose they are, so a redraw reloads a
+  slot whose species changed (a swap, an evolution, a hatch; swapping at
+  first left the icons where they were); the naming screen and the trade load their one species' icon into slot
   0's. The old icon types' graphics are gone except the two pieces the
   trade's cable circle uses. Every icon now animates by swapping frames
   (the Poké Ball and helix icons used to bob instead). On the Game Boy
