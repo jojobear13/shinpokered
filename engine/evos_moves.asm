@@ -223,7 +223,7 @@ Evolution_PartyMonLoop: ; loop over party mons
 	ld [wMonHIndex], a
 	pop af
 	ld [wd11e], a
-	ld hl, wLoadedMonHPExp - 1
+	ld hl, wLoadedMonEVs
 	ld de, wLoadedMonStats
 	ld b, $1
 	call CalcStats

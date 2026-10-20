@@ -116,6 +116,7 @@ KeyItemBitfield:
 	FALSE, \ ; a floor
 	FALSE, \ ; a floor
 	FALSE, \ ; a floor
+	FALSE, \ ; ZINC
 	FALSE, \ ; BLACK_BELT
 	FALSE, \ ; CHARCOAL
 	FALSE, \ ; DRAGON_FANG

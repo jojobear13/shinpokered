@@ -157,10 +157,10 @@ def setup(game, rng):
     game.poke("wIsInBattle", rng.choice([1, 2]))
     game.poke("wLinkState", LINK_STATE_BATTLING if rng.random() < 0.15 else 0)
 
-    # trainer battles read stat exp through this pointer (HPExp - 1 of the
-    # enemy's party mon)
+    # trainer battles read the EVs through this pointer (the enemy's party
+    # mon's)
     pos = rng.randint(0, PARTY_LENGTH - 1)
-    ptr = game.addr("wEnemyMons") + pos * party_struct_len(game) + party_offset(game, "HPExp") - 1
+    ptr = game.addr("wEnemyMons") + pos * party_struct_len(game) + party_offset(game, "EVs")
     game.poke16("wUnusedD153", ptr)
 
     game.poke16("wDamage", rng.randint(0, 0xFFFF))

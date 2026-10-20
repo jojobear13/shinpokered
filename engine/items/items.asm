@@ -15,6 +15,8 @@ UseItem_:
 	jp nc, ItemUseTMHM
 	cp FIRST_HELD_ITEM
 	jp nc, ItemUseHeldItem
+	cp ZINC
+	jp z, ItemUseVitamin
 	ld hl, ItemUsePtrTable
 	dec a
 	add a
@@ -679,16 +681,13 @@ ItemUseBall:
 
 .notTransformed
 ; If the Pokémon is not transformed, set the transformed bit and copy the
-; DVs to wTransformedEnemyMonOriginalDVs so that LoadEnemyMonData won't generate
-; new DVs.
+; IVs to wTransformedEnemyMonOriginalIVs so that LoadEnemyMonData won't generate
+; new IVs.
 	set TRANSFORMED, [hl]
-	ld hl, wTransformedEnemyMonOriginalDVs
-	ld a, [wEnemyMonDVs]
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 1]
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 2]
-	ld [hl], a
+	ld hl, wEnemyMonIVs
+	ld de, wTransformedEnemyMonOriginalIVs
+	ld bc, NUM_IVS
+	call CopyData
 
 .skip6
 	ld a, [wcf91]
@@ -1125,6 +1124,8 @@ ItemUseMedicine:
 	jp z, .healingItemNoEffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, [wcf91]
+	cp ZINC
+	jp z, .useVitamin
 	cp REVIVE
 	jr nc, .healHP ; if it's a Revive or Max Revive
 	cp FULL_HEAL
@@ -1586,55 +1587,27 @@ ItemUseMedicine:
 		
 	jp UseCustomMedicine	;joenote - custom medicine items (m_gene and mist_stone)
 .no_custom_medicine
-
-	call VitaminLevelCheck
-	push af
-	
-	ld a, [wcf91]	;joenote - 'A' might get clobbered by UseCustomMedicine, so reload wcf91
-	sub HP_UP
-	add a
-	ld bc, wPartyMon1HPExp - wPartyMon1
+; Gen 9's vitamins: 10 EVs in their stat, up to MAX_EV, MAX_TOTAL_EVS in all
+	ld a, [wcf91]
+	sub HP_UP ; the stat, 0 = HP
+	cp ZINC - HP_UP
+	jr nz, .gotVitaminStat
+	ld a, NUM_STATS - 1 ; Zinc: special defense
+.gotVitaminStat
+	ld [wItemScratch], a
+	ld a, 10
+	ld [wItemScratch + 1], a
+	ld bc, wPartyMon1EVs - wPartyMon1
 	add hl, bc
-	add l
-	ld l, a
-	jr nc, .noCarry2
-	inc h
-.noCarry2
-	pop af
-	jr c, .e4notbeaten		;apply vitamin limiter of less than the level threshold
-	CheckEvent EVENT_908	;joenote - has elite 4 been beaten?
-	jr z, .e4notbeaten 	;if not, apply the vitamin limiter
-
-	;else remove the vitamin limiter
-	ld a, 10
-	ld b, a
-	call CheckMaxStatExp
-	jr c, .vitaminNoEffect ; if stat exp was already at 65535, then can't add any more
-
-	ld a, [hl] ; a = MSB of stat experience of the appropriate stat
-	add b ; add 2560 (256 * 10) stat experience
-	jr nc, .noCarry3	;if there is an overflow, load 65535 stat exp
-	ld a, $ff
-	inc hl
-	ld [hld], a
-	jr .noCarry3
-	
-.e4notbeaten
-	ld a, 10
-	ld b, a
-	ld a, [hl] ; a = MSB of stat experience of the appropriate stat
-	cp 100 ; is there already at least 25600 (256 * 100) stat experience?
-	jr nc, .vitaminNoEffect ; if so, vitamins can't add any more
-	add b ; add 2560 (256 * 10) stat experience
-;	jr nc, .noCarry3 ; a carry should be impossible here, so this will always jump
-;	ld a, 255
-.noCarry3
-	ld [hl], a
+	ld d, h
+	ld e, l
+	callab AddEVs
+	jr c, .vitaminNoEffect
 	pop hl		;pop wPartyMonX
 	call .recalculateStats
 	ld hl, VitaminText
-	ld a, [wcf91]
-	sub HP_UP - 1
+	ld a, [wItemScratch]
+	inc a
 	ld c, a
 .statNameLoop ; loop to get the address of the name of the stat the vitamin increases
 	dec c
@@ -1738,7 +1711,7 @@ ItemUseMedicine:
 	ld a, [hExperience + 2]
 	ld [hl], a
 
-.returnDVMedicine
+.returnIVMedicine
 
 	pop hl	;pop wPartyMonX
 	
@@ -1791,7 +1764,8 @@ VitaminText:
 	db "ATTACK@"
 	db "DEFENSE@"
 	db "SPEED@"
-	db "SPECIAL@"
+	db "SP.ATK@"
+	db "SP.DEF@"
 
 ItemUseBait:
 	ld hl, ThrewBaitText
@@ -3308,7 +3282,7 @@ SendNewMonToBox:
 	ld [wEnemyMonBoxLevel], a
 	ld hl, wEnemyMon
 	ld de, sBoxMon1
-	ld bc, wEnemyMonDVs - wEnemyMon
+	ld bc, wEnemyMonIVs - wEnemyMon
 	call CopyData
 	ld hl, wPlayerID
 	ld a, [hli]
@@ -3332,21 +3306,21 @@ SendNewMonToBox:
 	ld [de], a
 	inc de
 	xor a
-	ld b, NUM_STAT_EXPS * 2
+	ld b, NUM_STATS ; no EVs
 .asm_e89f
 	ld [de], a
 	inc de
 	dec b
 	jr nz, .asm_e89f
-	ld hl, wEnemyMonDVs
+	ld hl, wEnemyMonIVs
+	ld b, NUM_IVS
+.copyIVs
 	ld a, [hli]
 	ld [de], a
 	inc de
-	ld a, [hli]
-	ld [de], a
-	inc de
-	ld a, [hli]
-	ld [de], a
+	dec b
+	jr nz, .copyIVs
+	dec de ; the PP loop starts with inc de
 	ld hl, wEnemyMonPP
 	ld b, NUM_MOVES
 .asm_e8b1
@@ -3592,56 +3566,64 @@ UseCustomMedicine:
 
 	jr .exit_no_usage
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;added code for the MIST_STONE
+;added code for the MIST_STONE: like Gen 7's Gold Bottle Cap, all IVs to 31
 .useMistStone
 	call VitaminLevelCheck
 	jp c, ItemUseMedicine.vitaminNoEffect
-
 	push hl
-	ld bc, wPartyMon1HPExp - wPartyMon1
-	add hl, bc ; hl now points to stat experience
-	ld b, 5
-	ld c, 5
-.useMistStone_loop
-	call CheckMaxStatExp
-	call c, .decB
-	ld a , $ff
-	ld [hli], a
-	ld [hli], a
-	dec c
-	jr nz, .useMistStone_loop
-	ld a, b
-	sub 1
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	ld a, [hli]
+	and [hl]
+	inc hl
+	and [hl]
+	inc hl
+	ld b, a
+	ld a, [hl]
+	or %11 ; not the flags
+	and b
+	inc a
+	jr z, .alreadyMax ; every IV bit was already set
+	ld a, [hl]
+	or $FC ; the flags stay
+	ld [hld], a
+	ld a, $ff
+	ld [hld], a
+	ld [hld], a
+	ld [hl], a
 	pop hl
-	
-	call c, .maxDVs	;if stat exp is all at max, try to max the DVs
-	jp c, ItemUseMedicine.vitaminNoEffect	;no effect if everything is already at max
 	jr .exit_used_meds
+.alreadyMax
+	pop hl
+	jp ItemUseMedicine.vitaminNoEffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;added code for the M_GENE
+;added code for the M_GENE: new biased IVs of 16 or more (keeping the
+;Nuzlocke mark; the ability slot is rerolled)
 .useMGene
 	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-;generate new random DVs and make sure they are biased to be more than average
-;make all the DVs at least 8
-	call Random_BiasDV
-	or $98
-	ld [hli], a
-	ld a, b
-	or $88
-	ld [hli], a
+	ld bc, wPartyMon1IVs + IV_FLAGS - wPartyMon1
+	add hl, bc
 	ld a, [hl]
-	and 1 << NUZLOCKE_DEAD_F ; keep the nuzlocke mark
-	or c
-	or $80
+	and 1 << NUZLOCKE_DEAD_F
+	ld [wItemScratch], a
+	ld bc, -IV_FLAGS
+	add hl, bc
+	ld d, h
+	ld e, l
+	push de
+	callab MGeneIVs
+	pop hl
+	ld bc, IV_FLAGS
+	add hl, bc
+	ld a, [wItemScratch]
+	or [hl]
 	ld [hl], a
 	pop hl
 	;fall through
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;jump back to the original function after using an item
 .exit_used_meds
-	jp ItemUseMedicine.returnDVMedicine
+	jp ItemUseMedicine.returnIVMedicine
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;jump back to the original function after not using an item
@@ -3649,38 +3631,6 @@ UseCustomMedicine:
 	jp ItemUseMedicine.no_custom_medicine
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;max out the DVs
-.maxDVs	
-	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-	ld b, 3
-	ld a, [hli]
-	add 1
-	call c, .decB
-	ld a, [hli]
-	add 1
-	call c, .decB
-	ld a, [hl] ; special defense DV in the high nybble
-	add $10
-	call c, .decB
-	ld a, b
-	sub 1
-	pop hl
-	ret c	;return with carry bit set if DVs are already at max
-	
-	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-	ld a, $ff
-	ld [hli], a
-	ld [hli], a
-	ld a, [hl]
-	or $F0
-	ld [hl], a
-	pop hl
-	ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;general decrement for conditionals
 .decB
@@ -3696,17 +3646,6 @@ VitaminLevelCheck:
 	cp 31
 	ret
 	
-CheckMaxStatExp:
-	push de
-	ld a, [hli] ; a = MSB of stat experience of the appropriate stat
-	ld d, a
-	ld a, [hld]	; a = LSB of stat experience of the appropriate stat
-	ld e, a
-	ld a, 1
-	add e
-	ld a, 0
-	adc a, d
-	pop de
-	ret		;carry bit is set if there is an overflow
+
 
 

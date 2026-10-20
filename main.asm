@@ -602,6 +602,7 @@ INCLUDE "engine/overworld/pewter_guys.asm"
 INCLUDE "engine/multiply_divide.asm"
 INCLUDE "engine/menu/natures.asm"
 INCLUDE "engine/random.asm" ; out of bank 4, which is nearly full
+INCLUDE "engine/ivs.asm"
 INCLUDE "engine/game_corner_slots.asm"
 
 SECTION "Battle (bank A)", ROMX, BANK[$A]
@@ -1943,6 +1944,8 @@ INCLUDE "text/item_names.asm"
 SECTION "Battle 2", ROMX, BANK[$35]
 
 INCLUDE "engine/battle/type_effectiveness.asm"
+INCLUDE "engine/battle/enemy_mon_stats.asm"
+INCLUDE "engine/battle/exp_formula.asm"
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 

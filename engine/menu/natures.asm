@@ -1,8 +1,8 @@
 ; on the status screen: the mon's nature under its HP, and ▴ and ▼ next to the
 ; stats it raises and lowers
 PrintStatusScreenNature:
-	ld hl, wLoadedMonDVs
-	call GetNatureFromDVs
+	ld hl, wLoadedMonIVs
+	call GetNatureFromIVs
 	push af
 	add a
 	add a

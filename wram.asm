@@ -5,7 +5,7 @@ MACRO flag_array
 	ds ((\1) + 7) / 8
 ENDM
 
-box_struct_length EQU 23 + NUM_DVS + NUM_MOVES * 2
+box_struct_length EQU 13 + NUM_STATS + NUM_IVS + NUM_MOVES * 2
 ASSERT DAY_CARE_DATA_LENGTH == 2 * NAME_LENGTH + box_struct_length
 MACRO box_struct
 \1Species::    db	;+$00
@@ -15,32 +15,31 @@ MACRO box_struct
 \1Type::
 \1Type1::      db	;+$05
 \1Type2::      db	;+$06
-\1CatchRate::  db	;+$07
+\1CatchRate::  db	;+$07 the held item
 \1Moves::      ds NUM_MOVES	;+$08
 \1OTID::       dw	;+$0C
 \1Exp::        ds 3	;+$0E
-\1HPExp::      dw	;+$11
-\1AttackExp::  dw	;+$13
-\1DefenseExp:: dw	;+$15
-\1SpeedExp::   dw	;+$17
-\1SpecialExp:: dw	;+$19 special attack and special defense share it
-\1DVs::        ds NUM_DVS	;+$1B
-\1PP::         ds NUM_MOVES	;+$1E
+\1EVs::        ; one byte per stat, in stat order (CalcStat reads them from here)
+\1HPEV::       db	;+$11
+\1AttackEV::   db	;+$12
+\1DefenseEV::  db	;+$13
+\1SpeedEV::    db	;+$14
+\1SpecialAttackEV::  db	;+$15
+\1SpecialDefenseEV:: db	;+$16
+\1IVs::        ds NUM_IVS	;+$17 (engine/ivs.asm)
+\1PP::         ds NUM_MOVES	;+$1B
 ENDM
-
-;		 - <stat>Exp is MSB while <stat>Exp+1 is LSB
-;        - CalcStat function needs hl to point to LSB to take the stat experience into account
 
 MACRO party_struct
 	box_struct \1
-\1Level::      db	;+$22
+\1Level::      db	;+$1F
 \1Stats::
-\1MaxHP::      dw	;+$23
-\1Attack::     dw	;+$25
-\1Defense::    dw	;+$27
-\1Speed::      dw	;+$29
-\1SpecialAttack::  dw	;+$2B
-\1SpecialDefense:: dw	;+$2D
+\1MaxHP::      dw	;+$20
+\1Attack::     dw	;+$22
+\1Defense::    dw	;+$24
+\1Speed::      dw	;+$26
+\1SpecialAttack::  dw	;+$28
+\1SpecialDefense:: dw	;+$2A
 ENDM
 
 MACRO battle_struct
@@ -54,7 +53,7 @@ MACRO battle_struct
 \1Type2::      db
 \1CatchRate::  db
 \1Moves::      ds NUM_MOVES
-\1DVs::        ds NUM_DVS
+\1IVs::        ds NUM_IVS
 \1Level::      db
 \1Stats::
 \1MaxHP::      dw
@@ -796,10 +795,8 @@ wSafariEscapeFactor:: ; cce8
 wSafariBaitFactor:: ; cce9
 	ds 1;
 
-	ds 1
-
-wTransformedEnemyMonOriginalDVs:: ; cceb
-	ds NUM_DVS
+wTransformedEnemyMonOriginalIVs:: ; ccea (in the spare byte before Gen 1's 3)
+	ds NUM_IVS
 
 wMonIsDisobedient:: ds 1 ; cced
 
@@ -1660,7 +1657,7 @@ wFontLoaded:: ; cfc4
 ;bit 4: 4th pkmn (position 3)
 ;bit 5: 5th pkmn (position 4)
 ;bit 6: 6th pkmn (position 5)
-;bit 7: force a wild pokemon with shiny DVs if set
+;bit 7: force a wild pokemon with shiny IVs if set
 	ds 1
 
 wWalkCounter:: ; cfc5
@@ -2472,7 +2469,7 @@ wPseudoItemID:: ; d152
 ; that case, this would be ESCAPE_ROPE.
 	ds 1
 
-wUnusedD153:: ; d153	;joenote - use this to hold the pointer for trainerAI statexp
+wUnusedD153:: ; d153	;joenote - use this to hold the pointer to a trainer's mon's EVs
 	ds 2
 
 wUnusedD155:: ; d155	;joenote - use this to as a backup for how many pokemon to split exp between (fixing exp all)
@@ -3187,8 +3184,8 @@ wFossilItem:: ; d70f
 wFossilMon:: ; d710
 ; mon that will result from the item
 	ds 1
-wFossilMonDVs::	;d711	;joenote - added to store some values
-	ds NUM_DVS
+wFossilMonIVs::	;d711	;joenote - added to store some values
+	ds NUM_IVS
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200
@@ -3257,7 +3254,7 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 ;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
-wUnusedD726:: ; the status screen's HP DV, then its special defense DV
+wUnusedD726::
 	ds 2
 ;;;;;;;;;;;;;;
 wd728:: ; d728
@@ -3562,6 +3559,21 @@ wItemScratch:: ds 2
 wAbilitySnapshot:: ; before a move: flags (SNAPSHOT_*_F), the target's HP,
 	; status and stat stages, for the abilities that react to the move
 	ds 1 + 2 + 1 + NUM_STAT_MODS
+wIVScratch:: ; six IVs unpacked (HP, attack, defense, speed, special attack, special defense)
+	ds NUM_STATS
+wIVGenMode:: ; how GenerateIVs rolls (IVGEN_*_F)
+	ds 1
+wExpScratch:: ; ScaledExp: the party mon's level, its share (1, or 2 for the
+	; Exp. Share's half), then two bytes of working
+	ds 4
+wMulResult:: ; Mul16's product, big-endian
+	ds 4
+wMulCount::
+	ds 1
+wSqrtTarget:: ; ISqrt2_13's target, big-endian
+	ds 4
+wEvoScratch:: ; PastEvolutionLevel: a species' evolutions
+	ds EVO_SCRATCH_LENGTH
 
 ; free up to the stack at $df00
 

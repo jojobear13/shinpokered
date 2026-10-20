@@ -16,9 +16,20 @@ TAKE_ITEM_MENU_ENTRY EQU 10 ; after the field moves in FieldMoveNames
 
 NUM_MOVES     EQU 4
 NUM_STATS     EQU 6 ; HP, attack, defense, speed, special attack, special defense
-NUM_STAT_EXPS EQU 5 ; special attack and special defense share one, as in Gen 2
 NUM_STAT_MODS EQU 8
-NUM_DVS       EQU 3 ; bytes: attack/defense, speed/special attack, special defense/spare
+NUM_IVS       EQU 4 ; bytes: six 5-bit IVs, then the flags below (engine/ivs.asm)
+IV_FLAGS      EQU NUM_IVS - 1 ; the byte with them
+ABILITY_SLOT_F EQU 0
+MAX_EV        EQU 252 ; per stat
+MAX_TOTAL_EVS EQU 510
+SHINY_IV_BITS EQU %10 ; every IV's low two bits, for a shiny
+EVO_SCRATCH_LENGTH EQU 3 * 4 + 1 ; Eevee's three evolutions and the 0
+
+; how GenerateIVs rolls (wIVGenMode)
+IVGEN_HARD_F  EQU 0 ; hard mode rerolls IVs under 8 once (wild mons)
+IVGEN_BIAS_F  EQU 1 ; the better of two rolls; bosses' mons get IVGEN_MIN16_F
+IVGEN_MIN16_F EQU 2 ; 16 or more (gifts)
+IVGEN_SHINY_F EQU 3
 
 PARTY_LENGTH EQU 6
 
@@ -34,7 +45,7 @@ HOF_TEAM_CAPACITY EQU 50
 
 NAME_LENGTH EQU 11
 ; the day-care mon's nickname, OT name and box struct, kept together in save RAM
-DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 23 + NUM_DVS + NUM_MOVES * 2
+DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 13 + NUM_STATS + NUM_IVS + NUM_MOVES * 2
 ITEM_NAME_LENGTH EQU 13
 
 A_BUTTON EQU %00000001
@@ -237,8 +248,8 @@ PAL_SIZE EQU NUM_COLORS * 2
 NUM_ACTIVE_PALS EQU 4
 
 ;joenote - catch rate given to pokemon marked as dead for nuzlocke mode
-; nuzlocke mode: a dead mon has this bit set in the third byte of its DVs (a
-; spare bit; the catch-rate byte, which held the old mark, is the held item)
+; nuzlocke mode: a dead mon has this bit set in its IVs' flags byte (IV_FLAGS;
+; the catch-rate byte, which held the old mark, is the held item)
 NUZLOCKE_DEAD_F EQU 1
 
 ; wOptions

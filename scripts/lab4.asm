@@ -197,43 +197,38 @@ Lab4Text3:
 	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
 	
-	; the special defense DV is a single gene: inherit one parent's at random
+	; each IV is inherited from one parent or the other, at random
+	ld de, wPartyMon1IVs
+	callab UnpackIVsAtDE
+	ld hl, wIVScratch
+	ld de, wBuffer + 8
+	ld bc, NUM_STATS
+	call CopyData ; the first parent's
+	ld de, wPartyMon2IVs
+	callab UnpackIVsAtDE
+	ld hl, wIVScratch
+	ld de, wBuffer + 8
+	ld c, NUM_STATS
+.inheritIV
 	call Random
 	rrca
-	ld a, [wPartyMon1DVs+2]
-	jr c, .gotSpclDefDV
-	ld a, [wPartyMon2DVs+2]
-.gotSpclDefDV
-	and $F0
-	ld [wFossilMonDVs+2], a
+	jr nc, .gotParent
+	ld a, [de]
+	ld [hl], a
+.gotParent
+	inc hl
+	inc de
+	dec c
+	jr nz, .inheritIV
+	ld hl, wIVScratch
+	ld de, wBuffer
+	ld bc, NUM_STATS
+	call CopyData ; to show
+	xor a
+	ld [wFossilMonIVs + IV_FLAGS], a
+	ld de, wFossilMonIVs
+	callab PackIVsKeepFlags
 
-	ld a, [wPartyMon1DVs]
-	ld b, a
-	ld a, [wPartyMon1DVs+1]
-	ld c, a
-	ld a, [wPartyMon2DVs]
-	ld d, a
-	ld a, [wPartyMon2DVs+1]
-	ld e, a
-	predef DVPunnettSquare
-
-	ld a, h
-	ld [wFossilMonDVs], a
-	and $F0
-	swap a
-	ld [wBuffer], a
-	ld a, h
-	and $0F
-	ld [wBuffer+1], a
-	ld a, l
-	ld [wFossilMonDVs+1], a
-	and $F0
-	swap a
-	ld [wBuffer+2], a
-	ld a, l
-	and $0F
-	ld [wBuffer+3], a
-	
 	ld hl, Lab4Text_Clone1
 	call PrintText
 	call YesNoChoice
@@ -306,20 +301,67 @@ Lab4Text3:
 	ld c, 5
 	call GivePokemon
 	
+	; the cloned IVs, with the new mon's own flags (its ability slot), and its stats again
 	ld a, [wPartyCount]
 	dec a
 	ld bc, wPartyMon2 - wPartyMon1
-	ld hl, wPartyMon1DVs
+	ld hl, wPartyMon1IVs
 	call AddNTimes
-	ld a, [wFossilMonDVs]
+	ld de, wFossilMonIVs
+	ld a, [de]
 	ld [hli], a
-	ld a, [wFossilMonDVs+1]
+	inc de
+	ld a, [de]
 	ld [hli], a
-	ld a, [wFossilMonDVs+2]
+	inc de
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [hl]
+	and %11
+	ld b, a
+	ld a, [de]
+	and $FC
+	or b
 	ld [hl], a
+	ld bc, wPartyMon1Species - (wPartyMon1IVs + IV_FLAGS)
+	add hl, bc
+	ld a, [hl]
+	ld [wd0b5], a
+	push hl
+	call GetMonHeader
+	pop hl
+	push hl
+	ld bc, wPartyMon1Level - wPartyMon1Species
+	add hl, bc
+	ld a, [hl]
+	ld [wCurEnemyLVL], a
+	pop hl
+	push hl
+	ld bc, wPartyMon1Stats - wPartyMon1Species
+	add hl, bc
+	ld d, h
+	ld e, l
+	pop hl
+	push hl
+	ld bc, wPartyMon1EVs - wPartyMon1Species
+	add hl, bc
+	ld b, 1
+	call CalcStats
+	pop hl
+	ld bc, wPartyMon1MaxHP - wPartyMon1Species
+	add hl, bc
+	ld a, [hli]
+	ld c, [hl]
+	ld b, a
+	ld de, wPartyMon1HP - (wPartyMon1MaxHP + 1)
+	add hl, de
+	ld a, b
+	ld [hli], a
+	ld [hl], c ; full HP
 
 	ResetEvents EVENT_2E3, EVENT_2E4
-	jr .end
+	jp .end
 	
 
 Lab4Text4:

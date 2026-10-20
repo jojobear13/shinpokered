@@ -1469,6 +1469,12 @@ _ExpPointsText::
 	text " EXP. Points!"
 	prompt
 
+_TeamGainedExpText::
+	text "The rest of your"
+	line "team gained EXP."
+	cont "Points too!"
+	prompt
+
 _GrewLevelText::
 	TX_RAM wcd6d
 	text " grew"

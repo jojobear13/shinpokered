@@ -126,7 +126,7 @@ class PickupTest(unittest.TestCase):
         g.poke("wPartyCount", len(mons))
         for i, (species, slot, item) in enumerate(mons):
             g.poke(f"wPartyMon{i + 1}Species", SPECIES[species])
-            g.poke(f"wPartyMon{i + 1}DVs", 0xFF, 0xFF, 0xF0 | slot)
+            g.poke(f"wPartyMon{i + 1}IVs", 0xFF, 0xFF, 0xFF, 0xFC | slot)
             g.poke(f"wPartyMon{i + 1}CatchRate", ITEMS[item] if item else 0)
         g.call("PartyPickup")
         self.assertEqual(g.random_used(), len(rolls))

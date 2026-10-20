@@ -12,7 +12,7 @@ IsPartyMonDead:
 	and a
 	ret
 .next
-	ld hl, wPartyMon1DVs + 2
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	ld a, [wUsedItemOnWhichPokemon]
 	call AddNTimes
@@ -213,7 +213,7 @@ SetDeadPartyMons:
 	
 	push hl
 	push bc
-	ld bc, (wPartyMon1DVs + 2 - wPartyMon1HP)
+	ld bc, (wPartyMon1IVs + IV_FLAGS - wPartyMon1HP)
 	add hl, bc
 	pop bc
 	set NUZLOCKE_DEAD_F, [hl]
@@ -235,7 +235,7 @@ OneHPDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1DVs + 2
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 .loop	
@@ -246,7 +246,7 @@ OneHPDeadMons:
 	;if dead, give it 1 hp
 	push hl
 	push bc
-	ld bc, wPartyMon1HP - (wPartyMon1DVs + 2)
+	ld bc, wPartyMon1HP - (wPartyMon1IVs + IV_FLAGS)
 	add hl, bc	;points hl to PartyMonXHP
 	pop bc
 	xor a
@@ -271,7 +271,7 @@ ZeroPPDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1DVs + 2
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 	ld e, %11000000
@@ -284,7 +284,7 @@ ZeroPPDeadMons:
 	;if dead, zero the PP for all moves
 	push hl
 	push bc
-	ld bc, (wPartyMon1PP - (wPartyMon1DVs + 2))	;point to PartyMonXPP
+	ld bc, (wPartyMon1PP - (wPartyMon1IVs + IV_FLAGS))	;point to PartyMonXPP
 	add hl, bc
 	pop bc
 	;move 1
@@ -321,7 +321,7 @@ FRZDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1DVs + 2
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 .loop	
@@ -332,7 +332,7 @@ FRZDeadMons:
 	;if dead, give it the FRZ status
 	push hl
 	push bc
-	ld bc, wPartyMon1Status - (wPartyMon1DVs + 2)
+	ld bc, wPartyMon1Status - (wPartyMon1IVs + IV_FLAGS)
 	add hl, bc
 	pop bc
 	;points hl to PartyMonXStatus

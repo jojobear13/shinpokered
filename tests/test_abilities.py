@@ -2,7 +2,7 @@
 step E, part 4).
 
 Each species has two abilities (Gen 9's non-hidden ones; a species with one
-has it twice), and bit 0 of the third DV byte picks one. Abilities that need
+has it twice), and bit 0 of the IVs' flags byte picks one. Abilities that need
 weather, held items, infatuation or the Steel type are NO_ABILITY until those
 exist. Each mon's ability is set when it is sent out; Neutralizing Gas stops
 every other ability while it is out, and Mold Breaker ignores the target's
@@ -15,7 +15,8 @@ import unittest
 
 from harness import REPO_ROOT, shared_game
 from suites.apply_attack import H_WHOSETURN
-from test_special_split import SPECIES, TRAINER_DVS
+from ivs import TRAINER_IVS, is_shiny, pack, unpack
+from test_special_split import SPECIES
 
 SCREEN_WIDTH = 20
 
@@ -123,52 +124,69 @@ class GetMonAbilityTest(unittest.TestCase):
                 self.assertEqual(g.peek("wcd6d", len(name) + 1), text(name) + [0x50])
 
 
+def slot_ivs(slot):
+    return pack([19] * 6, slot)
+
+
 class SlotBitTest(unittest.TestCase):
-    """The DV generators roll the slot; trainers' fixed DVs give slot 0."""
+    """The IV generators roll the slot; trainers' fixed IVs give slot 0."""
 
     @classmethod
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def test_random_dv(self):
+    def generate(self, routine, *rolls, **pokes):
         g = self.game
+        g.reset()
+        g.clear_random()
+        for name, value in pokes.items():
+            g.poke(name, value)
+        g.queue_random(*rolls)
+        g.call(routine, de=g.addr("wBuffer"))
+        self.assertEqual(g.random_used(), len(rolls))
+        return g.peek("wBuffer", 4)
+
+    def test_wild_ivs(self):
         for slot_roll in (0x00, 0x01, 0xFE, 0x37):
             with self.subTest(roll=slot_roll):
-                g.reset()
-                g.poke("wOptions", 0)  # normal mode: no rerolls
-                g.queue_random(0x12, 0x34, 0x5A, slot_roll)
-                out = g.call("Random_DV")
-                self.assertEqual((out["a"], out["bc"] >> 8, out["bc"] & 0xFF),
-                                 (0x12, 0x34, 0x50 | slot_roll & 1))
-                self.assertEqual(g.random_used(), 4)
+                rolls = (0x12, 0x34, 0x5A, 0x7F, 0x00, 0xE3)
+                got = self.generate("WildIVs", *rolls, slot_roll, wOptions=0)  # normal mode: no rerolls
+                self.assertEqual(got, pack([r & 31 for r in rolls], slot_roll & 1))
 
-    def test_random_bias_dv(self):
-        g = self.game
+    def test_hard_mode_rerolls_ivs_under_8_once(self):
+        got = self.generate("WildIVs", 3, 2, 20, 7, 31, 8, 31, 5, 30, 1, wOptions=1 << 3)
+        # 3 -> 2 (rerolled once only), 20, 7 -> 31, 8, 31, 5 -> 30; then the slot
+        self.assertEqual(unpack(got), ([2, 20, 31, 8, 31, 30], 1))
+
+    def test_biased_ivs(self):
         for slot_roll in (0x00, 0x01):
             with self.subTest(roll=slot_roll):
-                g.reset()
-                g.poke("wChannelSoundIDs", 0)
-                g.poke("wCurOpponent", 0)
-                g.queue_random(0x12, 0x34, 0x56, 0x78, 0x30, 0x40, slot_roll)
-                out = g.call("Random_BiasDV")
-                self.assertEqual((out["a"], out["bc"] >> 8, out["bc"] & 0xFF),
-                                 (0x78, 0x56, 0x40 | slot_roll))
+                rolls = (0x12, 0x14, 0x30, 0x2F, 5, 6, 31, 0, 9, 9, 1, 2)
+                got = self.generate("BiasedIVs", *rolls, slot_roll, wChannelSoundIDs=0, wCurOpponent=0)
+                self.assertEqual(got, pack([0x14, 0x10, 6, 31, 9, 2], slot_roll))
+
+    def test_gift_ivs_are_16_or_more(self):
+        got = self.generate("GiftIVs", 0, 1, 15, 16, 31, 7, 0)
+        self.assertEqual(unpack(got), ([16, 17, 31, 16, 31, 23], 0))
 
     def test_forced_shiny_wild_mon(self):
         g = self.game
-        for roll in (0x50, 0x51):
-            with self.subTest(roll=roll):
+        for slot in (0, 1):
+            with self.subTest(slot=slot):
                 g.reset()
+                g.clear_random()
                 g.poke("wFontLoaded", 0x80)  # force a shiny
                 g.poke("wBattleType", 0)
                 g.poke("wFlags_D733", 0)
                 g.poke("wCurMap", 0)
-                g.queue_random(roll, 0x00)
-                g.call("DetermineWildMonDVs")
-                self.assertEqual(g.peek("wEnemyMonDVs", 3), [0x2A, 0xAA, roll])
+                g.queue_random(0, 31, 0x13, 0x0C, 0x55, 0xA8, slot)
+                g.call("DetermineWildMonIVs")
+                data = g.peek("wEnemyMonIVs", 4)
+                self.assertEqual(unpack(data), ([2, 30, 18, 14, 22, 10], slot))
+                self.assertTrue(is_shiny(data))
 
-    def test_trainer_dvs(self):
-        self.assertEqual(TRAINER_DVS[2] & 1, 0)
+    def test_trainer_ivs(self):
+        self.assertEqual(pack(TRAINER_IVS)[3] & 1, 0)
 
 
 class SendOutTest(unittest.TestCase):
@@ -186,7 +204,7 @@ class SendOutTest(unittest.TestCase):
                     g.poke("wWhichPokemon", 0)
                     g.poke("wPlayerMonNumber", 0)
                     g.poke("wPartyMon1Species", SPECIES[species])
-                    g.poke("wPartyMon1DVs", 0x99, 0x99, 0x90 | slot)
+                    g.poke("wPartyMon1IVs", *slot_ivs(slot))
                     g.poke("wBattleMonSpecies2", SPECIES[species])
                     g.call("LoadBattleMonFromParty")
                     self.assertEqual(g.peek("wPlayerAbility"), dict(TABLE)[species][slot])
@@ -199,7 +217,7 @@ class SendOutTest(unittest.TestCase):
                 g.poke("wEnemyAbility", 0xEE)
                 g.poke("wWhichPokemon", 1)
                 g.poke("wEnemyMon2Species", SPECIES["PORYGON"])
-                g.poke("wEnemyMon2DVs", 0x99, 0x99, 0x90 | slot)
+                g.poke("wEnemyMon2IVs", *slot_ivs(slot))
                 g.call("LoadEnemyMonFromParty")
                 self.assertEqual(g.peek("wEnemyAbility"), dict(TABLE)["PORYGON"][slot])
 
@@ -209,13 +227,13 @@ class SendOutTest(unittest.TestCase):
         g.poke("wEnemyAbility", 0xEE)
         g.poke("wLinkState", 0)
         g.poke("wIsInBattle", 2)
-        g.poke("wOptions", 0)  # fixed trainer DVs
+        g.poke("wOptions", 0)  # fixed trainer IVs
         g.poke("wEnemyBattleStatus3", 0)
         g.poke("wWhichPokemon", 0)
         g.poke("wEnemyMonSpecies2", SPECIES["PINSIR"])
         g.poke("wCurEnemyLVL", 30)
         g.call("LoadEnemyMonData")
-        self.assertEqual(g.peek("wEnemyMonDVs", 3), list(TRAINER_DVS))
+        self.assertEqual(g.peek("wEnemyMonIVs", 4), pack(TRAINER_IVS))
         self.assertEqual(g.peek("wEnemyAbility"), ABILITIES["HYPER_CUTTER"])
 
 
@@ -292,7 +310,7 @@ class StatusScreenAbilityTest(unittest.TestCase):
                 g.reset()
                 g.poke(tilemap, *[0x7F] * (SCREEN_WIDTH * 18))
                 g.poke("wLoadedMonSpecies", SPECIES[species])
-                g.poke("wLoadedMonDVs", 0x99, 0x99, 0x90 | slot)
+                g.poke("wLoadedMonIVs", *slot_ivs(slot))
                 g.call("PrintStatusScreenAbility")
                 row7 = tilemap + 7 * SCREEN_WIDTH
                 self.assertEqual(g.peek(row7 + 8, 12), text(name) + [0x7F] * (12 - len(name)))

@@ -31,7 +31,7 @@ StartMenu_Pokemon:
 	jp RedisplayStartMenu
 .chosePokemon
 
-	;joenote - add debug function for resetting stat exp and DVs
+	;joenote - add debug function for resetting EVs and IVs
 	callba DebugStatReset
 
 	call SaveScreenTilesToBuffer1
@@ -501,6 +501,7 @@ UsableItems_PartyMenu:
 	db IRON
 	db CARBOS
 	db CALCIUM
+	db ZINC
 	db RARE_CANDY
 	db LEAF_STONE
 	db FULL_HEAL

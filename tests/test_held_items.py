@@ -5,7 +5,7 @@ A mon's held item is the catch-rate byte of its data (decision 6), 0 for
 none. Gen 2's held items plus a few later staples are new item ids from
 FIRST_HELD_ITEM. Using one from the bag gives it to a party mon (one it held
 goes back in the bag); TAKE on the party menu takes it. Nuzlocke mode's
-"dead" mark, which used that byte, is a spare bit of the third DV byte now.
+"dead" mark, which used that byte, is a bit of the IVs' flags byte now.
 """
 
 import os
@@ -30,7 +30,7 @@ def _items():
 
 
 ITEMS = _items()
-HELD = [name for name, value in sorted(ITEMS.items(), key=lambda kv: kv[1]) if 0x62 <= value < 0xC4]
+HELD = [name for name, value in sorted(ITEMS.items(), key=lambda kv: kv[1]) if ITEMS["BLACK_BELT"] <= value < 0xC4]
 TAKE_ITEM_MENU_ENTRY = 10
 
 
@@ -67,14 +67,15 @@ class ItemDataTest(unittest.TestCase):
         cls.game = shared_game()
 
     def test_ids(self):
-        self.assertEqual(ITEMS[HELD[0]], 0x62)
+        self.assertEqual(ITEMS["ZINC"], 0x62)  # Gen 2's vitamin, just before them
+        self.assertEqual(ITEMS[HELD[0]], 0x63)
         self.assertEqual(len(HELD), 49)
-        self.assertEqual(ITEMS[HELD[-1]], 0x62 + 48)
+        self.assertEqual(ITEMS[HELD[-1]], 0x63 + 48)
 
     def test_names(self):
         g = self.game
         names = item_names()
-        names = names[names.index("B4F") + 1:]  # the held items' names follow the last floor's
+        names = names[names.index("ZINC") + 1:]  # the held items' names follow Zinc's
         self.assertEqual(len(names), len(HELD))
         for item, name in zip(HELD, names):
             with self.subTest(item=item):
@@ -292,14 +293,14 @@ class NuzlockeTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def test_dead_mark_is_a_dv_bit(self):
+    def test_dead_mark_is_an_iv_flag(self):
         g = self.game
         g.reset()
         g.poke("wUnusedD721", 1 << 6)  # nuzlocke on
         g.poke("wPartyMon2CatchRate", ITEMS["LEFTOVERS"])
-        for dv3, dead in ((0x50 | NUZLOCKE_DEAD, True), (0x51, False), (0x53, True)):
-            with self.subTest(dv3=dv3):
-                g.poke("wPartyMon2DVs", 0x12, 0x34, dv3)
+        for flags, dead in ((0x54 | NUZLOCKE_DEAD, True), (0x55, False), (0x57, True)):
+            with self.subTest(flags=flags):
+                g.poke("wPartyMon2IVs", 0x12, 0x34, 0x56, flags)
                 g.poke("wUsedItemOnWhichPokemon", 1)
                 self.assertEqual(g.call("IsPartyMonDead")["z"], dead)
 
@@ -307,8 +308,8 @@ class NuzlockeTest(unittest.TestCase):
         g = self.game
         g.reset()
         g.poke("wPartyCount", 2)
-        g.poke("wPartyMon1DVs", 0, 0, NUZLOCKE_DEAD)
-        g.poke("wPartyMon2DVs", 0, 0, 0)
+        g.poke("wPartyMon1IVs", 0, 0, 0, NUZLOCKE_DEAD)
+        g.poke("wPartyMon2IVs", 0, 0, 0, 0)
         g.poke16("wPartyMon1HP", 0)
         g.poke16("wPartyMon2HP", 0)
         g.call("OneHPDeadMons")

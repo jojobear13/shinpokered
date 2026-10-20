@@ -354,6 +354,7 @@ ItemSortList::	;only for items that are bag-accessed
 	db IRON
 	db CARBOS
 	db CALCIUM
+	db ZINC
 	db PP_UP
 	db M_GENE
 	; Stones

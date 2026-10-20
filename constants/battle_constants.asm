@@ -16,10 +16,12 @@ MOD_ACCURACY        EQU 4
 MOD_EVASION         EQU 5
 MOD_SPECIAL_DEFENSE EQU 6
 
-; the fixed DVs of trainers' Pokemon outside hard mode: 9 attack, 8 for the rest
-TRAINER_DVS_ATK_DEF EQU $98
-TRAINER_DVS_SPD_SPC EQU $88
-TRAINER_DVS_SPCLDEF EQU $80
+; the fixed IVs of trainers' Pokemon outside hard mode: 19 attack, 17 for the
+; rest (Gen 1's DVs of 9 and 8, as 2 x DV + 1), as the four IV bytes
+TRAINER_IVS_0 EQU $8C
+TRAINER_IVS_1 EQU $E3
+TRAINER_IVS_2 EQU $18
+TRAINER_IVS_3 EQU $C4
 
 ; natures, in Gen 3's order: nature = 5 * raised stat + lowered stat, the stats
 ; counted from attack (attack, defense, speed, special attack, special
@@ -51,11 +53,11 @@ NUM_NATURES EQU 25
 	const SASSY   ; 22
 	const CAREFUL ; 23
 	const QUIRKY  ; 24
-; A mon's nature is its three DV bytes, read as one number, plus NATURE_OFFSET,
-; mod 25. The offset makes the fixed trainer DVs come out HARDY, so trainers'
-; Pokemon are neutral outside hard mode.
-TRAINER_DVS EQU TRAINER_DVS_ATK_DEF << 16 | TRAINER_DVS_SPD_SPC << 8 | TRAINER_DVS_SPCLDEF
-NATURE_OFFSET EQU (NUM_NATURES - TRAINER_DVS % NUM_NATURES) % NUM_NATURES
+; A mon's nature is its IVs, read as one number (without the flag bits), plus
+; NATURE_OFFSET, mod 25. The offset makes the fixed trainer IVs come out
+; HARDY, so trainers' Pokemon are neutral outside hard mode.
+TRAINER_IVS_MOD EQU (((TRAINER_IVS_0 * 256 + TRAINER_IVS_1) % NUM_NATURES * 256 + TRAINER_IVS_2) % NUM_NATURES * 256 + (TRAINER_IVS_3 & $FC)) % NUM_NATURES
+NATURE_OFFSET EQU (NUM_NATURES - TRAINER_IVS_MOD) % NUM_NATURES
 
 ; move categories (data/move_categories.asm)
 PHYSICAL EQU 0

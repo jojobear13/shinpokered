@@ -3921,11 +3921,10 @@ CalcStats::
 	ret
 
 ; calculates stat c of current mon
-; c: stat to calc (HP=1,Atk=2,Def=3,Spd=4,Spc=5)
-; b: consider stat exp?
-; hl: base ptr to stat exp values ([hl + 2*c - 1] and [hl + 2*c])
-; have to point hl to *Mon1HPExp - 1
-; if b=0, then hl should point to <battle_struct>HP
+; c: stat to calc (HP=1, Atk=2, Def=3, Spd=4, SpAtk=5, SpDef=6)
+; b: consider EVs?
+; hl: the mon's EVs (*Mon1EVs), which its IVs follow; if b=0, its IVs - NUM_STATS
+; (<battle_struct>IVs - NUM_STATS)
 ; requires that data be preloaded into wMonHeader using GetMonHeader
 CalcStat::
 	predef _CalcStat	;joenote - moved to make space in home bank
@@ -4634,34 +4633,6 @@ GetMoveCategory::
 	ld a, STATUS
 	ret
 
-Random_BiasDV::
-; Return random DVs in A and B, and the special defense DV in the high nybble of C
-; and the ability slot in bit 0, with a bias towards higher numbers
-	push hl
-	push de
-	push bc
-	callba _Random_BiasDV
-	pop bc
-	ld c, l
-	ld b, e
-	ld a, d
-	pop de
-	pop hl
-	ret
-Random_DV::
-; Return random DVs in A and B, and the special defense DV in the high nybble of C
-; and the ability slot in bit 0, with adjustments for being a wild pokemon DV
-	push hl
-	push de
-	push bc
-	callba _Random_DV
-	pop bc
-	ld c, l
-	ld b, e
-	ld a, d
-	pop de
-	pop hl
-	ret
 
 
 StatModifierRatios:

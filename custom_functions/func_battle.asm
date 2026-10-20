@@ -87,8 +87,11 @@ SwapTurn:	;a simple custom function for swapping whose turn it is in the battle 
 	ret
 
 	
-;custom function to determin the DVs of wild pokemon with an option for forcing shiny DVs
-DetermineWildMonDVs:
+;custom function to determine the IVs of wild pokemon with an option for forcing shiny IVs
+DetermineWildMonIVs:
+	push hl
+	push de
+	ld de, wEnemyMonIVs
 	ld a, [wFontLoaded]
 	bit 7, a
 	jr z, .do_random
@@ -103,32 +106,20 @@ DetermineWildMonDVs:
 	CheckEvent EVENT_10E
 	jr nz, .do_random	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	call Random
-	and $F1
-	ld c, a ; any special defense DV and ability slot: Gen 2's shiny rule doesn't involve them
-	ld b, $AA
-	call Random	;get random number into a
-	or $20	;set only bit 5
-	and $F0 ; clear the lower nybble
-	or $0A	;set the lower nyble to $A
-	jr .load
+	callab ShinyIVs
+	jr .done
 .do_random
 	CheckEvent EVENT_90F	;special safari zone active?
 	jr z, .notsafari	
 	call IsInSafariZone
 	jr nz, .do_random_safari
 .notsafari
-	call Random_DV
-	jr .load
-.do_random_safari	;special safari zone pokemon have better DVs
-	call Random_BiasDV
-.load
-	push hl
-	ld hl, wEnemyMonDVs
-	ld [hli], a
-	ld [hl], b
-	inc hl
-	ld [hl], c
+	callab WildIVs
+	jr .done
+.do_random_safari	;special safari zone pokemon have better IVs
+	callab BiasedIVs
+.done
+	pop de
 	pop hl
 	ld a, [wFontLoaded]
 	res 7, a 

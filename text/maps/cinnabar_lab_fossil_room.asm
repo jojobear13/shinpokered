@@ -96,7 +96,11 @@ _Lab4Text_Clone1::
 	TX_NUM wBuffer+2, 1, 2
 	text " @"
 	TX_NUM wBuffer+3, 1, 2
-	text " Okay?" 
+	text " @"
+	TX_NUM wBuffer+4, 1, 2
+	text " @"
+	TX_NUM wBuffer+5, 1, 2
+	cont "Okay?"
 	done
 	
 _Lab4Text_Clone2::

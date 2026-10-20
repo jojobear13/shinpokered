@@ -97,6 +97,7 @@ ItemPrices:;joenote - added prices for amber/fossils/moon stone/pp_up/exp all/ma
 	money 0     ; FLOOR_10F
 	money 0     ; FLOOR_11F
 	money 0     ; FLOOR_B4F
+	money 9800  ; ZINC
 	money 3000  ; BLACK_BELT
 	money 3000  ; CHARCOAL
 	money 3000  ; DRAGON_FANG

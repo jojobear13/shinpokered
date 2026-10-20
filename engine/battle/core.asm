@@ -2017,12 +2017,12 @@ LoadBattleMonFromParty:
 	ld hl, wPartyMon1Species
 	call AddNTimes
 	ld de, wBattleMonSpecies
-	ld bc, wBattleMonDVs - wBattleMonSpecies
+	ld bc, wBattleMonIVs - wBattleMonSpecies
 	call CopyData
-	ld bc, wPartyMon1DVs - wPartyMon1OTID
+	ld bc, wPartyMon1IVs - wPartyMon1OTID
 	add hl, bc
-	ld de, wBattleMonDVs
-	ld bc, NUM_DVS
+	ld de, wBattleMonIVs
+	ld bc, NUM_IVS
 	call CopyData
 	ld de, wBattleMonPP
 	ld bc, NUM_MOVES
@@ -2065,12 +2065,12 @@ LoadEnemyMonFromParty:	;function for link battles
 	ld hl, wEnemyMons
 	call AddNTimes
 	ld de, wEnemyMonSpecies
-	ld bc, wEnemyMonDVs - wEnemyMonSpecies
+	ld bc, wEnemyMonIVs - wEnemyMonSpecies
 	call CopyData
-	ld bc, wEnemyMon1DVs - wEnemyMon1OTID
+	ld bc, wEnemyMon1IVs - wEnemyMon1OTID
 	add hl, bc
-	ld de, wEnemyMonDVs
-	ld bc, NUM_DVS
+	ld de, wEnemyMonIVs
+	ld bc, NUM_IVS
 	call CopyData
 	ld de, wEnemyMonPP
 	ld bc, NUM_MOVES
@@ -2236,7 +2236,7 @@ IF DEF(_EXPBAR)
 ENDC
 	ld hl, wBattleMonSpecies
 	ld de, wLoadedMon
-	ld bc, wBattleMonDVs - wBattleMonSpecies
+	ld bc, wBattleMonIVs - wBattleMonSpecies
 	call CopyData
 	ld hl, wBattleMonLevel
 	ld de, wLoadedMonLevel
@@ -5283,7 +5283,7 @@ GetEnemyMonStat:
 	ld a, [wEnemyMonSpecies]
 	ld [wd0b5], a
 	call GetMonHeader
-	;ld hl, wEnemyMonDVs	;joenote - why load this into speedexp? I don't even know like seriously WTF
+	;ld hl, wEnemyMonIVs	;joenote - why load this into speedexp? I don't even know like seriously WTF
 	;ld de, wLoadedMonSpeedExp		
 	;ld a, [hli]
 	;ld [de], a
@@ -5292,21 +5292,20 @@ GetEnemyMonStat:
 	;ld [de], a
 	pop bc
 	ld b, $0
-	;ld hl, wLoadedMonSpeedExp - $b ; this base address makes CalcStat look in [wLoadedMonSpeedExp] for DVs
-	ld hl, wEnemyMonHP	;joenote - I mean come on just read it out of the wEnemyMon battle structure like normal
+	ld hl, wEnemyMonIVs - NUM_STATS ; the IVs, no EVs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - take stat exp into account if this is a trainer AI battle
+;joenote - take the EVs into account if this is a trainer AI battle
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
 	jr nz, .nottrainer
 
-	;point hl to the saved position for HPStatExp - 1
+	;point hl to the saved position of the party mon's EVs
 	ld a, [wUnusedD153]
 	ld h, a
 	ld a, [wUnusedD153 + 1]
 	ld l, a
 	
-	ld b, $01	;take stat exp into account
+	ld b, $01	;take the EVs into account
 .nottrainer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	call CalcStat
@@ -6598,141 +6597,8 @@ LoadEnemyMonData:
 	ld [wEnemyMonSpecies], a
 	ld [wd0b5], a
 	call GetMonHeader
-	ld a, [wEnemyBattleStatus3]
-	bit TRANSFORMED, a ; is enemy mon transformed?
-	ld hl, wTransformedEnemyMonOriginalDVs ; original DVs before transforming
-	ld a, [hli]
-	ld b, [hl]
-	inc hl
-	ld c, [hl]
-	jr nz, .storeDVs
-	ld a, [wIsInBattle]
-	cp $2 ; is it a trainer battle?
-	jr nz, .nottrainer	;if not a trainer then skip this part
-;joenote - load default DVs if using "hard" battle style
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check battle style
-; fixed DVs for trainer mon
-	ld a, TRAINER_DVS_ATK_DEF
-	ld b, TRAINER_DVS_SPD_SPC
-	ld c, TRAINER_DVS_SPCLDEF
-	jr z, .storeDVs	;joenote - store the fixed DVs if shift battle style
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;joenote - going to randomly determine trainer DVs (values of 8 to 15)
-;load whatever default DVs are already there for the pkmn
-	ld hl, wEnemyMon1DVs
-	ld a, [wWhichPokemon]
-	ld bc, wEnemyMon2 - wEnemyMon1
-	call AddNTimes
-	ld a, [hl]
-	inc hl
-	ld b, [hl]
-	inc hl
-	ld c, [hl]
-	dec hl
-	dec hl
-;lets see if it's been sent out before
-	push bc
-	ld c, a
-	
-	
-	push bc
-	push hl
-	callba CheckAISentOut
-	pop hl
-	pop bc
-	
-	ld a, c
-	pop bc
-	jr nz, .storeDVs	;if bit for that pkmn position is already set, then store its DVs that were just loaded
-;not sent out before, so generate special random DVs
-	call Random_BiasDV
-	;save DVs to the party data structure, to which hl is still pointing, so that they can be recalled on a switch-in
-	ld [hli], a
-	ld [hl], b
-	inc hl
-	ld [hl], c
-	dec hl
-	dec hl
-	jr .storeDVs
-.nottrainer
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; random DVs for wild mon
-;joenote - custom function for determining and storing them
-;		- allows for more memory space and control over wild mon DVs
-	;call BattleRandom
-	;ld b, a
-	;call BattleRandom
-	callba DetermineWildMonDVs
-	jr .wildDVstored
-.storeDVs
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joedebug automatically do shiny DVs
-;	ld a, $FA
-;	ld b, $AA
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld hl, wEnemyMonDVs
-	ld [hli], a
-	ld [hl], b
-	inc hl
-	ld [hl], c
-.wildDVstored
-	ld de, wEnemyMonLevel
-	ld a, [wCurEnemyLVL]
-	ld [de], a
-	inc de
-	ld b, $0
+	callab EnemyMonIVsAndStats ; IVs, level and stats
 	ld hl, wEnemyMonHP
-	push hl
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - assign calculated stat exp to all stats if this is a trainer ai battle 
-
-;is this a trainer battle? Wild pkmn do not have statexp
-	ld a, [wIsInBattle]
-	cp $2 ; is it a trainer battle?
-	jr nz, .nottrainer2	;not a trainer battle, so hl will continue to point to wEnemyMonHP and b=0 for CalcStats
-	
-;this is a trainer battle, so point hl to the HP statExp address of the correct mon in the enemy party data
-	ld hl, wEnemyMon1HPExp	;make hl point to HP statExp of the first enemy party mon
-	ld a, [wWhichPokemon]	;get the party position
-	ld bc, wEnemyMon2 - wEnemyMon1	;get the size to advance between party positions
-	call AddNTimes	;advance the pointer to the correct party position
-	dec hl	;move the pointer back one position so it points at party data wEnemyMon<x>HPExp - 1
-	;save this position to recall it later
-	ld a, h
-	ld [wUnusedD153], a
-	ld a, l
-	ld [wUnusedD153 + 1], a
-	
-;has this pkmn been sent out before? If so, then it already has statExp values
-	push hl
-	callba CheckAISentOut
-	pop hl
-	jr nz, .noloops
-	
-;the pkmn is out for the first time, so give it some statExp
-	push de	;preserve de
-	push hl
-	callba CalcEnemyStatEXP	;based on the enemy pkmn level, get a stat exp amount into de 
-	pop hl
-	push hl	;save position for party data wEnemyMon<x>HPExp - 1
-	inc hl ; move hl forward one position to MSB of first stat exp
-	ld b, $05	;load loops into b to loop through the five stats
-.writeStatExp_loop
-	ld a, d	;set some statExp for MSB
-	ld [hli], a		;load MSB and point hl to the LSB position
-	ld a, e	;set some statExp for LSB
-	ld [hli], a		;load LSB and point hl to MSB of next statexp location
-	dec b
-	jr nz, .writeStatExp_loop
-	
-	pop hl	;point hl back to the saved position for party data wEnemyMon<x>HPExp - 1
-	pop de	;restore the prior de
-.noloops
-	ld b, $1	;make CalcStats account for statExp and recognize that hl points to wEnemyMon<x>HPExp - 1
-.nottrainer2
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	call CalcStats
-	pop hl
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
 	jr z, .copyHPAndStatusFromPartyData

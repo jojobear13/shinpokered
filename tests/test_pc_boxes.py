@@ -95,7 +95,7 @@ class DepositWithdrawTest(BoxTestCase):
                 self.move_mon(bx.BOX_TO_PARTY, len(box), mon["species"])
                 back = bx.read_party(self.game)[-1]
                 for name, (start, end) in {"species/HP": (0, 3), "status/types/catch rate/moves/OT ID": (4, 0x0E),
-                                           "stat exp/DVs/PP": (0x11, bx.BOX_STRUCT_LEN)}.items():
+                                           "EVs/IVs/PP": (0x11, bx.BOX_STRUCT_LEN)}.items():
                     self.assertEqual(back["data"][start:end], mon["data"][start:end], name)
                 self.assertEqual((back["ot"], back["nick"]), (mon["ot"], mon["nick"]))
                 self.assertEqual(bx.read_current_box(self.game), box)
@@ -126,12 +126,12 @@ class CatchTest(BoxTestCase):
                 species = rng.choice(SPECIES)
                 level = rng.randint(2, 100)
                 moves = [rng.randint(1, 165) for _ in range(4)]
-                dvs = [rng.randint(0, 255), rng.randint(0, 255), rng.randint(0, 15) << 4]
+                ivs = [rng.randint(0, 255) for _ in range(bx.NUM_IVS)]
                 g.poke("wcf91", species)
                 g.poke("wEnemyMonSpecies", species)
                 g.poke("wEnemyMonLevel", level)
                 g.poke("wEnemyMonMoves", *moves)
-                g.poke("wEnemyMonDVs", *dvs)
+                g.poke("wEnemyMonIVs", *ivs)
                 g.menu_choices(1)  # "Give it a nickname?" no
                 g.call("SendNewMonToBox", max_frames=600)
 
@@ -141,7 +141,8 @@ class CatchTest(BoxTestCase):
                 self.assertEqual(caught["species"], species)
                 self.assertEqual(caught["data"][bx.BOX_LEVEL], level)
                 self.assertEqual(caught["data"][bx.MOVES:bx.MOVES + 4], moves)
-                self.assertEqual(caught["data"][bx.DVS:bx.DVS + bx.NUM_DVS], dvs)
+                self.assertEqual(caught["data"][bx.IVS:bx.IVS + bx.NUM_IVS], ivs)
+                self.assertEqual(caught["data"][bx.EVS:bx.IVS], [0] * 6)
                 self.assertEqual(caught["ot"], g.peek("wPlayerName", bx.NAME_LENGTH))
                 self.assertEqual(after[1:], box)
                 self.assertEqual(bx.read_party(g), party)

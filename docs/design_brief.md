@@ -29,7 +29,7 @@ checked.
 | ROM bank 0 (always loaded) | 16 KB | 246 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). Moving the marts' item lists to bank `$34` (held items, part 5) freed about 150 more. The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
 | Battle engine bank ($0F) | 16 KB | 98 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
-| WRAM | 8 KB | **1083 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move); held items 5 (each side's Choice lock, what a Focus item saved, 2 scratch bytes). Still allocate new state through this table |
+| WRAM | 8 KB | **1086 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move); held items 5 (each side's Choice lock, what a Focus item saved, 2 scratch bytes); the Gen 9 pass's IVs and EVs gave back 3 more than their scratch bytes took (now **1086** free). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -1123,6 +1123,67 @@ a new bank, `$35` ("Battle 2"), replacing the old code as it goes.
 - **Verified:** `tests/test_species_data.py` checks Gen 9 values for the
   buffed species and a few others, the catch rates, and both tables as the
   ROM holds them.
+
+### Part 3: IVs, EVs and Gen 9's formulas
+
+- **Layout.** A mon's data has six one-byte EVs where the five two-byte stat
+  experience fields were, then four IV bytes (`engine/ivs.asm`): one 32-bit
+  number holding six 5-bit IVs (HP, Attack, Defense, Speed, Special Attack,
+  Special Defense) and two flags, the ability slot (bit 0) and Nuzlocke's
+  dead mark (bit 1), in the byte at `IV_FLAGS`. The box struct is 31 bytes
+  (was 34), the party struct 44 (was 47), the battle struct 1 longer. WRAM
+  comes out 3 bytes ahead after the new scratch bytes; the saved fossil-clone
+  IVs take one more byte.
+- **Stats** use Gen 3+'s formula: (2 x base + IV + EV / 4) x level / 100 +
+  5 (HP: + level + 10), then the nature, capped at 999. `CalcStat` takes the
+  mon's EVs, with the IVs after them (or, with no EVs, the IVs minus six).
+- **Natures, gender, shininess** come from the IVs, since there is no
+  personality value. The nature is the IVs (without the flags) mod 25, offset
+  so trainers' fixed IVs are Hardy. The gender byte is the first and third
+  IV bytes xored, against Gen 9-like thresholds out of 256. A mon is shiny
+  when every IV's low two bits are `%10` (1 in 4096, Gen 9's odds); forced
+  shinies (the Chansey attract, the trainer "mercy") roll those bits.
+- **Rolling IVs** (`GenerateIVs`): wild mons uniform, with hard mode
+  rerolling each IV under 8 once; Safari and hard-mode trainers the better of
+  two rolls, and bosses' mons 16 or more; gifts 16 or more; trainers outside
+  hard mode a fixed 19 Attack and 17 for the rest (Gen 1's DVs of 9 and 8,
+  as 2 x DV + 1). Hard-mode trainers' mons get level x 85 / 100 EVs in each
+  stat (510 in all at level 100).
+- **EVs** are capped at 252 a stat and 510 in all (`AddEVs`). A defeated mon
+  gives its Gen 9 EV yield to every party mon that gains experience.
+  Vitamins give 10 (Gen 9), up to the caps, at any level; Calcium now raises
+  Special Attack only and **Zinc** (a new item, `$62`, sold beside the other
+  vitamins in Celadon) Special Defense. The held items moved up one id.
+- **Experience** is Gen 7+'s (`ScaledExp`): base exp x foe level / 5, x
+  ((2 Lf + 10) / (Lf + Lp + 10)) ^ 2.5, + 1, worked in 2.13 fixed point
+  (within 0.5% or 1.5 points of the exact value), then x1.5 traded, x1.5 Lucky
+  Egg, x1.2 at or past the level it could have evolved at. Every non-fainted
+  party mon gains: those that took part (or hold an Exp. Share) in full, the
+  rest half (Gen 9's always-on Exp. Share), with one line for the rest of the
+  team. The Exp. All item does nothing now; the catch-up boost option stays.
+  Gen 9 has no trainer-battle bonus, so that x1.5 is gone.
+- **Items and features.** The M.Gene rolls new biased IVs of 16 or more
+  (keeping the Nuzlocke mark); the Mist Stone sets every IV to 31 (Gen 7's
+  Gold Bottle Cap) instead of maxing stat experience. The Cinnabar gene
+  clone inherits each IV from one parent or the other and shows all six; it
+  now recalculates the clone's stats (it didn't before). The status screen
+  shows EVs with SELECT and IVs with START. The debug reset zeroes the EVs
+  and takes the IVs from the first six bag quantities. The Celadon IV-scoring
+  minigames average the six IVs.
+- **Transform** copies the target's IVs but keeps the user's flags. It also
+  reset only the player's move index, so a link battle's two games disagreed
+  after the player transformed; it now resets the enemy's too (the link
+  mirror test found it, once the new stats changed which turn reached it).
+- **Space.** The enemy mon's IV and stat setup moved out of bank `$0F` to
+  bank `$35` with the experience formula; the IV code is in bank 9.
+- **Verified:** `tests/test_growth.py` checks `GetIV`, unpacking and packing,
+  the shiny rule, gender thresholds, the EV caps and yields, `ScaledExp`
+  against its fixed-point model and Gen 9's exact formula, the evolution
+  bonus, the x1.2, hard-mode trainer EVs, and whole `GainExperience` runs
+  (full share, half share, fainted, EVs, a level-up recalculating the stats
+  from the IVs and EVs). `test_special_split` and `test_natures` check the
+  stat formula for all 151 species and every nature; `test_abilities` the
+  generators. In the emulator: the status screen's IVs and EVs.
 
 ## Bugs found by the refactor
 

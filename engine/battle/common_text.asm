@@ -62,10 +62,15 @@ PrintBeginningBattleText:
 	callab LoadEnemyMonData
 	callab MarowakAnim
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - make the ghost marowak female by capping attack dv to < 8
-	ld a, [wEnemyMonDVs]
+;joenote - make the ghost marowak female: its gender byte (the first and
+;third IV bytes xored) below 128, by matching the first's top bit to the third's
+	ld a, [wEnemyMonIVs + 2]
+	and $80
+	ld b, a
+	ld a, [wEnemyMonIVs]
 	and $7F
-	ld [wEnemyMonDVs], a
+	or b
+	ld [wEnemyMonIVs], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, WildMonAppearedText
 	call PrintText

@@ -75,11 +75,23 @@ _AddPartyMon:
 	push hl
 	ld a, [wMonDataLocation]
 	and $f
-	ld a, TRAINER_DVS_ATK_DEF     ; set enemy trainer mon IVs to fixed average values
-	ld b, TRAINER_DVS_SPD_SPC
-	ld c, TRAINER_DVS_SPCLDEF
-	jr nz, .next4
+	jr z, .playerMon
+; an enemy trainer's mon: the fixed trainer IVs
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	ld a, TRAINER_IVS_0
+	ld [hli], a
+	ld a, TRAINER_IVS_1
+	ld [hli], a
+	ld a, TRAINER_IVS_2
+	ld [hli], a
+	ld [hl], TRAINER_IVS_3
+	dec hl
+	dec hl
+	dec hl
+	jr .calcHP
 
+.playerMon
 ; If the mon is being added to the player's party, update the pokedex.
 	ld a, [wcf91]
 	ld [wd11e], a
@@ -111,36 +123,22 @@ _AddPartyMon:
 	and a ; is this a wild mon caught in battle?
 	jr nz, .copyEnemyMonData
 
-; Not wild.
-	call Random_DV	;generate DVs as if it is a wild pokemon
-	;joenote - makes pkmn given to player (being sent to the party) have average IVs at minimum
-	push af
-	ld a, b
-	or $88
-	ld b, a
-	ld a, c
-	or $80
-	ld c, a
-	pop af
-	or $98
-	
-	
+; Not wild: a gift, with IVs of 16 or more
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	push de
+	ld d, h
+	ld e, l
+	callab GiftIVs
+	ld h, d
+	ld l, e
+	pop de
 
-.next4
-	push bc
-	ld bc, wPartyMon1DVs - wPartyMon1
+.calcHP ; hl = the IVs
+	ld bc, -NUM_STATS
 	add hl, bc
-	pop bc
-	ld [hli], a
-	ld a, b
-	ld [hli], a
-	ld [hl], c         ; write IVs
-	ld bc, (wPartyMon1HPExp - 1) - (wPartyMon1DVs + 2)
-	add hl, bc
-	ld a, 1
-	ld c, a
-	xor a
-	ld b, a
+	ld c, 1
+	ld b, 0
 	call CalcStat      ; calc HP stat (set cur Hp to max HP)
 	ld a, [H_MULTIPLICAND+1]
 	ld [de], a
@@ -155,14 +153,15 @@ _AddPartyMon:
 	inc de
 	jr .copyMonTypesAndMoves
 .copyEnemyMonData
-	ld bc, wEnemyMon1DVs - wEnemyMon1
+	ld bc, wPartyMon1IVs - wPartyMon1
 	add hl, bc
-	ld a, [wEnemyMonDVs] ; copy IVs from cur enemy mon
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 1]
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 2]
-	ld [hl], a
+	push de
+	ld d, h
+	ld e, l
+	ld hl, wEnemyMonIVs ; copy IVs from cur enemy mon
+	ld bc, NUM_IVS
+	call CopyData
+	pop de
 	ld a, [wEnemyMonHP]    ; copy HP from cur enemy mon
 	ld [de], a
 	inc de
@@ -240,13 +239,13 @@ _AddPartyMon:
 	ld a, [hExperience + 2]
 	ld [de], a
 	xor a
-	ld b, NUM_STAT_EXPS * 2
+	ld b, NUM_STATS
 .writeEVsLoop              ; set all EVs to 0
 	inc de
 	ld [de], a
 	dec b
 	jr nz, .writeEVsLoop
-REPT NUM_DVS ; skip the DVs, already written
+REPT NUM_IVS ; skip the IVs, already written
 	inc de
 ENDR
 	pop hl
@@ -265,7 +264,7 @@ ENDR
 	jr .done
 .calcFreshStats
 	pop hl
-	ld bc, wPartyMon1HPExp - 1 - wPartyMon1
+	ld bc, wPartyMon1EVs - wPartyMon1
 	add hl, bc
 	ld b, $0
 	call CalcStats         ; calculate fresh set of stats
@@ -542,7 +541,7 @@ _MoveMon:
 	ld [hli], a
 	ld d, h
 	ld e, l
-	ld bc, (wPartyMon1HPExp - 1) - wPartyMon1MaxHP
+	ld bc, wPartyMon1EVs - wPartyMon1MaxHP
 	add hl, bc
 	ld b, $1
 	call CalcStats

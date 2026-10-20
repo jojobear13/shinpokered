@@ -1,7 +1,7 @@
 ; abilities: each species has two (data/mon_abilities.asm), and the ability
-; slot bit, bit 0 of the third DV byte, picks one
+; slot bit, bit 0 of the IVs' flags byte (IV_FLAGS), picks one
 
-; a = species, c = the third DV byte -> a = the ability
+; a = species, c = the IVs' flags byte -> a = the ability
 ; preserves bc, de and hl
 GetMonAbility:
 	push hl
@@ -41,9 +41,9 @@ LoadEnemyAbility:
 	ld de, wEnemyMon
 	ld hl, wEnemyAbility
 LoadBattleMonAbility:
-	ASSERT wEnemyMonDVs - wEnemyMon == wBattleMonDVs - wBattleMon
+	ASSERT wEnemyMonIVs - wEnemyMon == wBattleMonIVs - wBattleMon
 	push hl
-	ld hl, wBattleMonDVs + 2 - wBattleMon
+	ld hl, wBattleMonIVs + IV_FLAGS - wBattleMon
 	add hl, de
 	ld c, [hl]
 	ld a, [de] ; species
@@ -166,7 +166,7 @@ GetAbilityName:
 ; on page 2 of the status screen: the mon's ability, under the pic beside its
 ; dex number
 PrintStatusScreenAbility:
-	ld a, [wLoadedMonDVs + 2]
+	ld a, [wLoadedMonIVs + IV_FLAGS]
 	ld c, a
 	ld a, [wLoadedMonSpecies]
 	call GetMonAbility
@@ -2105,7 +2105,7 @@ ContactAbilities:
 	jp GiveUserStatus
 
 ; a = 0 for the player's mon or 1 for the enemy's -> a = 0 genderless,
-; 1 male, 2 female (from its species and attack DV, as the status screen shows)
+; 1 male, 2 female (from its species and IVs, as the status screen shows)
 GetBattleMonGender:
 	ld hl, wBattleMonSpecies
 	and a
@@ -2113,12 +2113,12 @@ GetBattleMonGender:
 	ld hl, wEnemyMonSpecies
 .gotMon
 	ld d, [hl]
-	ld bc, wBattleMonDVs - wBattleMonSpecies
+	ld bc, wBattleMonIVs - wBattleMonSpecies
 	add hl, bc
-	ld a, [hl]
-	swap a
-	and $f
-	ld e, a ; attack DV
+	ld a, [hli]
+	inc hl
+	xor [hl]
+	ld e, a ; the gender byte: the first and third IV bytes xored
 	callba DetermineMonGender
 	ld a, d
 	and a

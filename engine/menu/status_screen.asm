@@ -84,7 +84,7 @@ StatusScreen:
 	ld a, [wLoadedMonBoxLevel]
 	ld [wLoadedMonLevel], a
 	ld [wCurEnemyLVL], a
-	ld hl, wLoadedMonHPExp - 1
+	ld hl, wLoadedMonEVs
 	ld de, wLoadedMonStats
 	ld b, $1
 	call CalcStats ; Recalculate stats
@@ -134,12 +134,12 @@ StatusScreen:
 	coord hl, 11, 3
 	predef DrawHP
 	
-	;joenote - print stat exp if select is held
-	;parse dv stats here so they can be grabbed later
+	;joenote - print EVs if select is held
+	;parse the IVs here so they can be grabbed later
 	push de
 	ld bc, SCREEN_WIDTH + 1
 	add hl, bc
-	call DVParse
+	call IVParse
 	call Joypad
 	
 	ld a, [hJoyHeld]
@@ -160,13 +160,13 @@ StatusScreen:
 	ld a, [hJoyHeld]
 	bit BIT_SELECT, a
 	jr z, .checkstart
-	ld de, wLoadedMonHPExp
-	lb bc, 2, 5
+	ld de, wLoadedMonHPEV
+	lb bc, 1, 3
 	jr .printnum
-.checkstart	;print DVs if start is held
+.checkstart	;print IVs if start is held
 	bit BIT_START, a
 	jr z, .doregular
-	ld de, wUnusedD726  
+	ld de, wIVScratch ; HP
 	lb bc, 1, 2
 .printnum
 	call PrintNumber
@@ -180,8 +180,11 @@ StatusScreen:
 	push de
 	ld a, [wLoadedMonSpecies]
 	ld d, a
-	ld a, [wUnusedD722]
+	ld a, [wLoadedMonIVs]
 	ld e, a
+	ld a, [wLoadedMonIVs + 2]
+	xor e
+	ld e, a ; the gender byte
 	callba DetermineMonGender
 	ld a, d
 	pop de
@@ -362,7 +365,7 @@ PrintStatsBox:
 	pop hl
 	pop bc
 	add hl, bc
-;joenote - print stat exp if select is held and on the status screen
+;joenote - print EVs if select is held and on the status screen
 	pop af
 	jr nz, .doregular
 	call Joypad
@@ -371,30 +374,31 @@ PrintStatsBox:
 	jr z, .checkstart
 	dec l	;shift alignment 2 tiles to the left
 	dec l
-	ld de, wLoadedMonAttackExp
-	lb bc, 2, 5
+	ld de, wLoadedMonAttackEV
+	lb bc, 1, 3
 	call PrintStat
-	ld de, wLoadedMonDefenseExp
+	ld de, wLoadedMonDefenseEV
 	call PrintStat
-	ld de, wLoadedMonSpeedExp
+	ld de, wLoadedMonSpeedEV
 	call PrintStat
-	ld de, wLoadedMonSpecialExp ; shared by special attack and special defense
+	ld de, wLoadedMonSpecialAttackEV
 	call PrintStat
-	ld de, wLoadedMonSpecialExp
+	ld de, wLoadedMonSpecialDefenseEV
 	jp PrintNumber
-.checkstart	;joenote - print DVs if start is held
+.checkstart	;joenote - print IVs if start is held
 	bit BIT_START, a
 	jr z, .doregular
-	ld de, wUnusedD722
+	call IVParse
+	ld de, wIVScratch + 1 ; attack
 	lb bc, 1, 2
 	call PrintStat
-	ld de, wUnusedD722 + 1
+	ld de, wIVScratch + 2
 	call PrintStat
-	ld de, wUnusedD722 + 2
+	ld de, wIVScratch + 3
 	call PrintStat
-	ld de, wUnusedD722 + 3
+	ld de, wIVScratch + 4
 	call PrintStat
-	ld de, wUnusedD726 + 1 ; special defense DV (wUnusedD726 is the HP DV)
+	ld de, wIVScratch + 5
 	jp PrintNumber
 .doregular
 	ld de, wLoadedMonAttack
@@ -619,63 +623,16 @@ StatusScreen_PrintPP:
 	jr nz, StatusScreen_PrintPP
 	ret
 
-;joenote - parse DV scores
-DVParse:
+;joenote - unpack the IVs into wIVScratch (HP, attack, defense, speed,
+;special attack, special defense) for printing
+IVParse:
 	push hl
+	push de
 	push bc
-	ld hl, wUnusedD722
-	ld b, $00
-
-	ld a, [wLoadedMonDVs]	;get attack dv
-	swap a
-	and $0F
-	ld [hl], a
-	inc hl
-	and $01
-	sla a
-	sla a
-	sla a
-	or b
-	ld b, a
-	
-	
-	ld a, [wLoadedMonDVs]	;get defense dv
-	and $0F
-	ld [hl], a
-	inc hl
-	and $01
-	sla a
-	sla a
-	or b
-	ld b, a
-	
-	ld a, [wLoadedMonDVs + 1]	;get speed dv
-	swap a
-	and $0F
-	ld [hl], a
-	inc hl
-	and $01
-	sla a
-	or b
-	ld b, a
-	
-	ld a, [wLoadedMonDVs + 1]	;get special dv
-	and $0F
-	ld [hl], a
-	inc hl
-	and $01
-	or b
-	ld b, a
-
-	ld [hl], b	;load hp dv
-	inc hl
-
-	ld a, [wLoadedMonDVs + 2]	;get special defense dv (not part of the hp dv)
-	swap a
-	and $0F
-	ld [hl], a
-
+	ld de, wLoadedMonIVs
+	callab UnpackIVsAtDE
 	pop bc
+	pop de
 	pop hl
 	ret
 	

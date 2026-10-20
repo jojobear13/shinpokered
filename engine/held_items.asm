@@ -269,6 +269,49 @@ CanEvolve:
 	scf
 	ret
 
+; [wd0b5] = a species, [wExpScratch] = its level -> carry if it could have
+; evolved by level at that level (Gen 9's x1.2 experience)
+PastEvolutionLevel:
+	ld a, [wd0b5]
+	dec a
+	ld l, a
+	ld h, 0
+	add hl, hl
+	ld bc, EvosMovesPointerTable
+	add hl, bc
+	ld de, wEvoScratch
+	ld bc, 2
+	ld a, BANK(EvosMovesPointerTable)
+	call FarCopyData
+	ld hl, wEvoScratch
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wEvoScratch
+	ld bc, EVO_SCRATCH_LENGTH
+	ld a, BANK(EvosMovesPointerTable)
+	call FarCopyData
+	ld hl, wEvoScratch
+.loop
+	ld a, [hli]
+	and a
+	ret z ; carry clear
+	cp EV_ITEM
+	jr z, .item
+	cp EV_LEVEL
+	jr nz, .next ; a trade: its level, its species
+	ld a, [wExpScratch]
+	cp [hl]
+	ccf
+	ret c ; at or past it
+.next
+	inc hl
+	inc hl
+	jr .loop
+.item ; the item, a level, the species
+	inc hl
+	jr .next
+
 ; Who moves first, before speed (same priority): a Quick Claw (20%) that
 ; goes off for one side only, else the speeds with a Choice Scarf's 1/2 more.
 ; Carry if decided, then nz for the player first, z for the enemy. In a link
@@ -919,7 +962,7 @@ PartyPickup:
 	ld e, l ; de = the held item
 	pop hl
 	push hl
-	ld bc, wPartyMon1DVs + 2 - wPartyMon1
+	ld bc, wPartyMon1IVs + IV_FLAGS - wPartyMon1
 	add hl, bc
 	ld c, [hl]
 	pop hl

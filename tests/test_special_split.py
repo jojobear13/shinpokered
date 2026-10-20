@@ -1,13 +1,12 @@
 """Spec tests for the special split (design brief, plan step E, part 1).
 
 Special is now two stats, special attack and special defense, with Gen 2's
-base stats and a DV each (the third DV byte's high nybble is the special
-defense DV). Special stat experience stays shared, as in Gen 2. Amnesia and
-Psychic's side effect work on special defense; Growth and X Special on special
-attack. The Volcano Badge boosts both.
+base stats (Gen 9's since the Gen 9 pass), each with its own IV and EV (Gen
+9's growth, tests/ivs.py). Amnesia and Psychic's side effect work on special
+defense; Growth and X Special on special attack. The Volcano Badge boosts
+both.
 """
 
-import math
 import os
 import random
 import re
@@ -16,9 +15,9 @@ import unittest
 from harness import REPO_ROOT, shared_game
 from suites import move_execution as mx
 from suites.apply_attack import H_WHOSETURN
+from ivs import STAT_EVS, TRAINER_IVS, model_stats, nature, pack, unpack  # noqa: F401 (re-exported)
 
 STATS = ("MaxHP", "Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense")
-STAT_EXPS = ("HPExp", "AttackExp", "DefenseExp", "SpeedExp", "SpecialExp")
 BASE_NAMES = ("hp", "attack", "defense", "speed", "special attack", "special defense")
 
 VOLCANOBADGE = 1 << 6
@@ -50,42 +49,6 @@ def base_stats(species_name):
     return [int(re.search(rf"^db (\d+) ; base {stat}$", text, re.M).group(1)) for stat in BASE_NAMES]
 
 
-def model_stats(base, level, dvs, exps):
-    """Gen 1's stat formula, with special defense using its own base stat and
-    DV and the shared special stat exp."""
-    attack, defense = dvs[0] >> 4, dvs[0] & 0xF
-    speed, special_attack = dvs[1] >> 4, dvs[1] & 0xF
-    special_defense = dvs[2] >> 4
-    hp = (attack & 1) << 3 | (defense & 1) << 2 | (speed & 1) << 1 | (special_attack & 1)
-    stat_dvs = (hp, attack, defense, speed, special_attack, special_defense)
-    stat_exps = list(exps) + [exps[4]]
-    raised, lowered = divmod(nature(dvs), 5)
-    out = []
-    for i in range(6):
-        exp = stat_exps[i]
-        root = min(max(math.isqrt(exp - 1) + 1, 1) if exp else 1, 255)
-        value = ((base[i] + stat_dvs[i]) * 2 + root // 4) * level // 100
-        value += level + 10 if i == 0 else 5
-        if i and raised != lowered:
-            if i - 1 == raised:
-                value = value * 110 // 100
-            elif i - 1 == lowered:
-                value = value * 90 // 100
-        out.append(min(value, 999))
-    return out
-
-
-TRAINER_DVS = (0x98, 0x88, 0x80)
-
-
-def nature(dvs):
-    """0-24 in Gen 3's order (5 * raised + lowered, from attack): the DVs as one
-    number without the spare low nybble, offset so the trainer DVs are HARDY."""
-    def value(d):
-        return d[0] << 16 | d[1] << 8 | (d[2] & 0xF0)
-    return (value(dvs) - value(TRAINER_DVS)) % 25
-
-
 def badge_boost(value):
     return min(value + (value >> 3), 999)
 
@@ -95,16 +58,15 @@ class CalcStatsTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def calc(self, species, level, dvs, exps):
+    def calc(self, species, level, iv_bytes, evs):
         g = self.game
         g.reset()
         g.poke("wd0b5", species)
         g.call("GetMonHeader")
         g.poke("wCurEnemyLVL", level)
-        for name, exp in zip(STAT_EXPS, exps):
-            g.poke16("wPartyMon1" + name, exp)
-        g.poke("wPartyMon1DVs", *dvs)
-        g.call("CalcStats", hl=g.addr("wPartyMon1HPExp") - 1, de=g.addr("wPartyMon1MaxHP"), bc=0x0100)
+        g.poke("wPartyMon1EVs", *evs)
+        g.poke("wPartyMon1IVs", *iv_bytes)
+        g.call("CalcStats", hl=g.addr("wPartyMon1EVs"), de=g.addr("wPartyMon1MaxHP"), bc=0x0100)
         return [g.peek16("wPartyMon1" + name) for name in STATS]
 
     def test_every_species_matches_the_model(self):
@@ -116,9 +78,9 @@ class CalcStatsTest(unittest.TestCase):
                 continue  # not a real Pokemon (ghost, fossils, missingno slots)
             with self.subTest(species=name):
                 level = rng.randint(1, 100)
-                dvs = [rng.randint(0, 255), rng.randint(0, 255), rng.randint(0, 15) << 4]
-                exps = [rng.choice([0, 1, rng.randint(0, 0xFFFF), 0xFFFF]) for _ in STAT_EXPS]
-                self.assertEqual(self.calc(species, level, dvs, exps), model_stats(base, level, dvs, exps))
+                iv_bytes = pack([rng.randint(0, 31) for _ in range(6)], rng.randint(0, 3))
+                evs = [rng.choice([0, 3, 4, rng.randint(0, 252), 252]) for _ in range(6)]
+                self.assertEqual(self.calc(species, level, iv_bytes, evs), model_stats(base, level, iv_bytes, evs))
                 header = [self.game.peek("wMonHBase" + s) for s in
                           ("HP", "Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense")]
                 self.assertEqual(header, base, "GetMonHeader should load the six base stats")
@@ -131,16 +93,22 @@ class CalcStatsTest(unittest.TestCase):
         self.assertEqual(base_stats("CHANSEY")[4:], [35, 105])
         self.assertEqual(base_stats("CHARIZARD")[4:], [109, 85])
 
-    def test_special_defense_dv_is_the_high_nybble_of_the_third_byte(self):
-        species = SPECIES["MEWTWO"]
-        low = self.calc(species, 100, [0, 0, 0x00], [0] * 5)
-        high = self.calc(species, 100, [0, 0, 0xF0], [0] * 5)
-        spare = self.calc(species, 100, [0, 0, 0x0F], [0] * 5)
-        base = base_stats("MEWTWO")
-        self.assertEqual(low, model_stats(base, 100, [0, 0, 0x00], [0] * 5))
-        self.assertEqual(high, model_stats(base, 100, [0, 0, 0xF0], [0] * 5))
-        self.assertNotEqual(high[5], low[5])
-        self.assertEqual(spare, low, "the low nybble is spare and doesn't change the nature")
+    def test_each_iv_and_ev_reaches_its_own_stat(self):
+        species, base = SPECIES["MEWTWO"], base_stats("MEWTWO")
+        neutral = pack(TRAINER_IVS)  # a HARDY nature
+        none = self.calc(species, 100, neutral, [0] * 6)
+        self.assertEqual(none, model_stats(base, 100, neutral, [0] * 6))
+        for stat in range(6):
+            with self.subTest(stat=stat):
+                ivs, _ = unpack(neutral)
+                ivs[stat] += 4
+                evs = [0] * 6
+                evs[stat] = 252
+                iv_bytes = pack(ivs)
+                got = self.calc(species, 100, iv_bytes, evs)
+                self.assertEqual(got, model_stats(base, 100, iv_bytes, evs))
+                flags = self.calc(species, 100, pack(ivs, 3), evs)
+                self.assertEqual(flags, got, "the flags don't change the stats or the nature")
 
 
 class StatStageMoveTest(unittest.TestCase):
@@ -246,41 +214,25 @@ class BadgeBoostTest(unittest.TestCase):
                                "SpecialAttack": 160, "SpecialDefense": badge_boost(180)})
 
 
-class StatExpTest(unittest.TestCase):
+class WildIVsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def test_gain_adds_base_stats_to_the_five_fields_and_leaves_dvs(self):
+    def test_six_rolls_then_the_ability_slot(self):
         g = self.game
-        g.reset()
-        base = [45, 49, 49, 45, 65, 65]  # Bulbasaur: special exp gains special attack
-        g.poke("wBuffer", *base, 64)
-        g.poke("wPartyGainExpFlags", 1)
-        for name in STAT_EXPS:
-            g.poke16("wPartyMon1" + name, 1000)
-        g.poke("wPartyMon1DVs", 0x12, 0x34, 0x50)
-        g.call("GiveStatExp")
-        self.assertEqual([g.peek16("wPartyMon1" + name) for name in STAT_EXPS], [1000 + b for b in base[:5]])
-        self.assertEqual(g.peek("wPartyMon1DVs", 3), [0x12, 0x34, 0x50])
-
-
-class WildDVsTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.game = shared_game()
-
-    def test_third_random_number_gives_the_special_defense_dv(self):
-        g = self.game
-        for third in (0x00, 0x7F, 0xA5, 0xFF):
-            with self.subTest(third=third):
-                g.reset()
-                g.poke("wOptions", 0)  # normal mode: no rerolls
-                g.poke("wFontLoaded", 0)  # no forced shiny
-                g.poke("wCurMap", 0)  # not the Safari Zone
-                g.queue_random(0x12, 0x34, third, 0)  # the last picks the ability slot
-                g.call("DetermineWildMonDVs")
-                self.assertEqual(g.peek("wEnemyMonDVs", 3), [0x12, 0x34, third & 0xF0])
+        for rolls in ((0x00, 0x1F, 0x25, 0xFF, 0x40, 0x13), (0x31,) * 6):
+            for slot in (0, 1):
+                with self.subTest(rolls=rolls, slot=slot):
+                    g.reset()
+                    g.clear_random()
+                    g.poke("wOptions", 0)  # normal mode: no rerolls
+                    g.poke("wFontLoaded", 0)  # no forced shiny
+                    g.poke("wCurMap", 0)  # not the Safari Zone
+                    g.queue_random(*rolls, slot)
+                    g.call("DetermineWildMonIVs")
+                    self.assertEqual(g.random_used(), 7)
+                    self.assertEqual(g.peek("wEnemyMonIVs", 4), pack([r & 31 for r in rolls], slot))
 
 
 if __name__ == "__main__":

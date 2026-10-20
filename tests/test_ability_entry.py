@@ -261,16 +261,16 @@ class RivalryTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def damage(self, user_species, foe_species, foe_attack_dv=15, turn=0):
+    def damage(self, user_species, foe_species, foe_gender_byte=0xFF, turn=0):
         g = self.game
         g.reset()
         g.poke(H_WHOSETURN, turn)
         set_abilities(g, turn, "RIVALRY", "NO_ABILITY")
         user, foe = SIDES[turn][1], SIDES[turn][2]
         g.poke(user + "Species", SPECIES[user_species])
-        g.poke(user + "DVs", 0xFF, 0xFF, 0xF0)
+        g.poke(user + "IVs", 0xFF, 0xFF, 0x00, 0xFC)  # gender byte $FF: male if it can be
         g.poke(foe + "Species", SPECIES[foe_species])
-        g.poke(foe + "DVs", foe_attack_dv << 4 | 0xF, 0xFF, 0xF0)
+        g.poke(foe + "IVs", foe_gender_byte, 0xFF, 0x00, 0xFC)  # the first byte xor the third
         g.poke(SIDES[turn][0] + "MovePower", 80)
         g.poke(SIDES[turn][0] + "MoveType", NORMAL)
         g.poke16("wDamage", 100)
@@ -286,8 +286,8 @@ class RivalryTest(unittest.TestCase):
                 self.assertEqual(self.damage("NIDOKING", "NIDOQUEEN", turn=turn), 75)
                 self.assertEqual(self.damage("NIDOQUEEN", "CHANSEY", turn=turn), 125)
                 self.assertEqual(self.damage("NIDOKING", "MAGNEMITE", turn=turn), 100)
-                self.assertEqual(self.damage("NIDOKING", "PIKACHU", 15, turn), 125)  # a male Pikachu
-                self.assertEqual(self.damage("NIDOKING", "PIKACHU", 0, turn), 75)  # a female one
+                self.assertEqual(self.damage("NIDOKING", "PIKACHU", 0x80, turn), 125)  # a male Pikachu
+                self.assertEqual(self.damage("NIDOKING", "PIKACHU", 0x7F, turn), 75)  # a female one
 
 
 if __name__ == "__main__":
