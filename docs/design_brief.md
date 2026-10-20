@@ -1881,4 +1881,11 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   as the repel's steps aren't) if the bag has one. YES uses it (its steps,
   one fewer in the bag, the bag's sound); otherwise the old text alone.
 - `tests/test_qol_catch_repel.py`.
+- **Status screen EVs** (bug): holding SELECT printed the EVs two columns
+  left of the stats (left over from Shin's five-digit stat experience), so
+  the nature's raised/lowered marks covered their middle digit (252 showed
+  as 2▴2). They now line up with the stats.
+- **README**: rewritten as a compact list of every change (this fork's, then
+  Shin's, with what this fork replaced), credits and screenshots
+  (`screenshots/fork/`); Shin's README is kept as `docs/shin_readme.md`.
 

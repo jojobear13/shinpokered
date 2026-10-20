@@ -377,8 +377,9 @@ PrintStatsBox:
 	ld a, [hJoyHeld]
 	bit BIT_SELECT, a
 	jr z, .checkstart
-	dec l	;shift alignment 2 tiles to the left
-	dec l
+; (EVs are three digits, as the stats are, so they line up with them; the
+; old shift left, for Shin's five-digit stat experience, put the nature
+; marks over their middle digit)
 	ld de, wLoadedMonAttackEV
 	lb bc, 1, 3
 	call PrintStat
