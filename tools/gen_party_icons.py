@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes gfx/party_icons_1.png and gfx/party_icons_2.png: each party icon's
 first and second frame, 16x16, one under another by Pokédex number, then the
-egg's. They come from gfx/sources/minidex_001-251.gif ("MINIDEX 001-251", by
+egg's (from gfx/sources/egg_icon_frames.png, its white light grey). They come from gfx/sources/minidex_001-251.gif ("MINIDEX 001-251", by
 Chamber, Solo993, Blue Emerald, Lake, Neslug and Pikachu25), whose colours
 become the Game Boy's: the peach skin light grey, the body colour dark grey,
 the outline black, the background transparent (white).
@@ -16,25 +16,11 @@ SHEET = f"{repo}/gfx/sources/minidex_001-251.gif"
 BACKGROUND = (218, 229, 214)
 WHITE, LIGHT, DARK, BLACK = 255, 170, 85, 0
 
-# the egg's left half (the icon is symmetric), its second frame one pixel lower
-EGG = [
-    "......33",
-    ".....311",
-    "....3111",
-    "...31111",
-    "...31221",
-    "..311222",
-    "..311122",
-    ".3111111",
-    ".3111111",
-    ".3122111",
-    ".3122211",
-    ".3112211",
-    ".3111111",
-    "..311111",
-    "...33111",
-    ".....333",
-]
+# the egg's two frames: gfx/sources/egg_icon_frames.png, two 16x16 panels
+# drawn at 12x, inside a 2-pixel border with an 8-pixel gap between them
+EGG_SHEET = f"{repo}/gfx/sources/egg_icon_frames.png"
+EGG_PANELS = (2, 206)  # each panel's left edge
+EGG_COLOURS = {(147, 187, 236): WHITE, (248, 248, 248): LIGHT, (168, 168, 168): DARK, (0, 0, 0): BLACK}
 
 
 def shade(rgb):
@@ -56,9 +42,10 @@ for frame in (0, 1):
         for y in range(16):
             for x in range(16):
                 out.putpixel((x, 16 * n + y), shade(rgb.getpixel((x0 + x, y0 + y))))
-    for y, row in enumerate(EGG):
-        for x, c in enumerate(row + row[::-1]):
-            if y + frame < 16:
-                out.putpixel((x, 16 * 151 + y + frame), {".": WHITE, "1": LIGHT, "2": DARK, "3": BLACK}[c])
+    egg = Image.open(EGG_SHEET).convert("RGB")
+    for y in range(16):
+        for x in range(16):
+            out.putpixel((x, 16 * 151 + y),
+                         EGG_COLOURS[egg.getpixel((EGG_PANELS[frame] + 12 * x + 6, 1 + 12 * y + 6))])
     out.save(f"{repo}/gfx/party_icons_{frame + 1}.png")
 print("152 icons, 2 frames")

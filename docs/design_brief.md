@@ -1723,7 +1723,8 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   credited in the README). `tools/gen_party_icons.py` turns the sheet
   (`gfx/sources/minidex_001-251.gif`) into `gfx/party_icons_1.png` and
   `_2.png`, one frame each, 16x16 by Pokédex number with the egg's last
-  (its second frame one pixel lower, so it wiggles), mapping the sheet's
+  (two frames that rock it, from `gfx/sources/egg_icon_frames.png`, its
+  white light grey), mapping the sheet's
   colours to the Game Boy's: the peach skin light grey, the body colour dark
   grey, the outline black. They're 9.5 KB a frame, in two banks of their
   own. When the party menu draws, each party slot's icon is copied to its
