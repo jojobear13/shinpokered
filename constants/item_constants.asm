@@ -154,6 +154,9 @@ FIRST_HELD_ITEM EQU const_value
 	const LIFE_ORB      ; $91
 	const EVIOLITE      ; $92
 	const FOCUS_SASH    ; $93
+	const METAL_COAT    ; $94 the new types' boosting items
+	const BLACKGLASSES  ; $95
+	const FAIRYFEATHER  ; $96
 NUM_ITEMS_AND_FLOORS EQU const_value - 1
 
 const_value = $C4

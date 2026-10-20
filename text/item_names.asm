@@ -148,3 +148,6 @@ ItemNames:
 	db "LIFE ORB@"
 	db "EVIOLITE@"
 	db "FOCUS SASH@"
+	db "METAL COAT@"
+	db "BLACKGLASSES@"
+	db "FAIRYFEATHER@"

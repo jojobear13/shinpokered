@@ -1482,13 +1482,30 @@ One commit per group:
   level 1 moves are in their learnsets as `db 1` too (`WriteMonMoves` skips
   a move already known).
 - **Not taken up**: the sheet's suggested category changes (Vine Whip and
-  Razor Leaf special) and evolution-level changes; trainers' parties pick
-  up the new moves through `WriteMonMoves` as before.
+  Razor Leaf special). Trainers' parties pick up the new moves through
+  `WriteMonMoves` as before.
 - **Space**: Reflect and Light Screen's effect moved from bank `$E` to
   `$35` (the learnsets filled `$E`).
 - **Verified:** `tests/test_learnsets.py` (every learnset in level order with
   real moves, the sheet fully applied, Vaporeon learning Water Gun at level
   1); the full suite.
+
+### Part 10: AI and item follow-up
+
+- **Held items for the new types**: Metal Coat (Steel), BlackGlasses (Dark)
+  and Fairy Feather (Fairy) boost their type by 1/5 like the Gen 2 ones
+  (`TypeBoostingItems`), at $94-$96. The Celadon store's TM counter sells
+  them (the X item counter was full at 13), and a wild Magnemite holds a
+  Metal Coat 2% of the time.
+- **AI**: Growth is "useless" only with both Attack and Special Attack at +6;
+  Whirlwind, Roar and Teleport are no longer always discouraged in trainer
+  battles, only when no mon could come in (`HasSwitchIn`).
+- **Space**: the move categories moved from bank `$E` to `$35`.
+- **Verified:** `tests/test_ai_gen9.py` (Growth at 0, +5 and +6; the switch
+  moves with and without a mon to come in); the held item tests count 52.
+- **Left for later**: AI scoring of the other new effects (Close Combat's
+  drops, Ancient Power, Tri Attack) beyond what the generic damage scoring
+  gives them; the 13 custom animations (`docs/new_move_animations.md`).
 
 ## Bugs found by the refactor
 

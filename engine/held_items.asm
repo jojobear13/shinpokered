@@ -235,6 +235,9 @@ TypeBoostingItems: ; item, the type of move it boosts by 1/5
 	db SOFT_SAND, GROUND
 	db SPELL_TAG, GHOST
 	db TWISTEDSPOON, PSYCHIC
+	db METAL_COAT, STEEL
+	db BLACKGLASSES, DARK
+	db FAIRYFEATHER, FAIRY
 	db 0
 
 ; z if the move being used is physical (hBattleSide, set by GetDamageVars)

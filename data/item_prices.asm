@@ -147,3 +147,6 @@ ItemPrices:;joenote - added prices for amber/fossils/moon stone/pp_up/exp all/ma
 	money 200   ; LIFE_ORB
 	money 200   ; EVIOLITE
 	money 200   ; FOCUS_SASH
+	money 3000  ; METAL_COAT
+	money 3000  ; BLACKGLASSES
+	money 3000  ; FAIRYFEATHER

@@ -24,6 +24,7 @@ WildHeldItems:
 	db MACHAMP,    0,             FOCUS_BAND
 	db GRAVELER,   0,             HARD_STONE
 	db GOLEM,      0,             HARD_STONE
+	db MAGNEMITE,  0,             METAL_COAT
 	db MAGNETON,   0,             MAGNET
 	db FARFETCHD,  0,             STICK
 	db DODRIO,     0,             SHARP_BEAK

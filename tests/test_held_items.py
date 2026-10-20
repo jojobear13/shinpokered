@@ -69,8 +69,8 @@ class ItemDataTest(unittest.TestCase):
     def test_ids(self):
         self.assertEqual(ITEMS["ZINC"], 0x62)  # Gen 2's vitamin, just before them
         self.assertEqual(ITEMS[HELD[0]], 0x63)
-        self.assertEqual(len(HELD), 49)
-        self.assertEqual(ITEMS[HELD[-1]], 0x63 + 48)
+        self.assertEqual(len(HELD), 52)  # with the new types' Metal Coat, BlackGlasses, Fairy Feather
+        self.assertEqual(ITEMS[HELD[-1]], 0x63 + 51)
 
     def test_names(self):
         g = self.game

@@ -620,7 +620,6 @@ SECTION "Battle (bank D)", ROMX, BANK[$D]
 SECTION "bankE",ROMX,BANK[$E]
 
 INCLUDE "data/moves.asm"
-INCLUDE "data/move_categories.asm"
 BaseStats: INCLUDE "data/base_stats.asm"
 INCLUDE "data/cries.asm"
 ;INCLUDE "engine/battle/unused_stats_functions.asm" ;joenote - putting this back into use and moving to bank 2d
@@ -1949,6 +1948,7 @@ INCLUDE "engine/battle/decrement_pp.asm"
 INCLUDE "engine/overworld/ssanne.asm" ; (bank $1E was full)
 INCLUDE "engine/evolution.asm"
 INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm" ; (bank $E was full)
+INCLUDE "data/move_categories.asm"
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 

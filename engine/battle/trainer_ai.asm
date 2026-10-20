@@ -178,10 +178,27 @@ AIMoveChoiceModification1:
 	call ReadMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .checkBadMoves
-;joenote - do not use effects that end battle because this is a trainer battle and they do not work
+;Gen 9: Whirlwind and Roar drag out another of the player's mons, Teleport
+;switches the AI's own out; useless without one that could come in
 	ld a, [wEnemyMoveEffect]	;load the move effect
-	cp SWITCH_AND_TELEPORT_EFFECT	;see if it is a battle-ending effect
-	jp z, .heavydiscourage	;heavily discourage if so
+	cp SWITCH_AND_TELEPORT_EFFECT
+	jr nz, .notSwitchMove
+	push de
+	push hl
+	push bc
+	ld a, [wEnemyMoveNum]
+	cp TELEPORT
+	ld e, 0 ; the player's side
+	jr nz, .gotSwitchSide
+	inc e ; its own
+.gotSwitchSide
+	callab HasSwitchIn
+	pop bc
+	pop hl
+	pop de
+	jp z, .heavydiscourage
+	jr .endBadMoves
+.notSwitchMove
 ;and dont try to use splash either
 	cp SPLASH_EFFECT	
 	jp z, .heavydiscourage
@@ -490,6 +507,18 @@ AIMoveChoiceModification1:
 	;else can't be lowered anymore
 	jp .heavydiscourage
 .nostatdownmod
+	;Growth: useless only with both attack and special attack at +6
+	ld a, [wEnemyMoveEffect]
+	cp GROWTH_EFFECT
+	jr nz, .notGrowth
+	ld a, [wEnemyMonAttackMod]
+	cp $0d
+	jr c, .endstatmod
+	ld a, [wEnemyMonSpecialAttackMod]
+	cp $0d
+	jr c, .endstatmod
+	jp .heavydiscourage
+.notGrowth
 	;check for stat up effects
 	ld a, [wEnemyMoveEffect]	;get the move effect
 	cp SPECIAL_DEFENSE_UP2_EFFECT ; outside the ranges below
