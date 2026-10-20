@@ -1947,6 +1947,7 @@ INCLUDE "engine/battle/type_effectiveness.asm"
 INCLUDE "engine/battle/enemy_mon_stats.asm"
 INCLUDE "engine/battle/exp_formula.asm"
 INCLUDE "engine/battle/damage.asm"
+INCLUDE "engine/battle/move_data.asm"
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 

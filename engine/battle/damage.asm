@@ -73,15 +73,7 @@ CritChances: ; out of 256, by stage
 	db 32  ; 1/8
 	db 128 ; 1/2
 
-; the moves with a high critical hit ratio (+1)
-HighCriticalMoves:
-	db KARATE_CHOP
-	db RAZOR_LEAF
-	db CRABHAMMER
-	db SLASH
-	db RAZOR_WIND
-	db SKY_ATTACK
-	db $FF
+INCLUDE "data/move_crit_moves.asm"
 
 ; hBattleSide = the attacking side -> wDamage = the base damage, and
 ; BATTLE_SIDE_SPECIAL set for a special move; z if the move has no power

@@ -609,22 +609,10 @@ MainInBattleLoop:
 .specialMoveNotUsed
 	callab SwitchEnemyMon	;joedebug - both AI and link enemy use this to switch
 .noLinkBattle
-	callba CheckHigherPlayerPriority	;joenote - custom function now used
-	jr nz, .playerDidNotUseQuickAttack
-	callba CheckHigherEnemyPriority	;joenote - custom function now used
-	jr z, .compareSpeed  ; if both used Quick Attack
-	jp .playerMovesFirst ; if player used Quick Attack and enemy didn't
-.playerDidNotUseQuickAttack
-	callba CheckHigherEnemyPriority	;joenote - custom function now used
-	jr z, .enemyMovesFirst ; if enemy used Quick Attack and player didn't
-	callba CheckLowerPlayerPriority	;joenote - custom function now used
-	jr nz, .playerDidNotUseCounter
-	callba CheckLowerEnemyPriority	;joenote - custom function now used
-	jr z, .compareSpeed ; if both used Counter
-	jr .enemyMovesFirst ; if player used Counter and enemy didn't
-.playerDidNotUseCounter
-	callba CheckLowerEnemyPriority	;joenote - custom function now used
-	jr z, .playerMovesFirst ; if enemy used Counter and player didn't
+	callab ComparePriority ; Gen 9's priority brackets
+	jr nc, .compareSpeed
+	jp nz, .playerMovesFirst
+	jp .enemyMovesFirst
 .compareSpeed
 	callab ItemTurnOrder ; Quick Claw, Choice Scarf
 	jr nc, .bySpeed
@@ -8026,10 +8014,17 @@ RollSideEffect:
 	push bc
 	ld a, b
 	ld [wSideEffectChance], a
+	callab MoveSecondaryChance ; Gen 9's chance for the move
 	callab AbilitySideEffectChance
 	call BattleRandom
 	ld hl, wSideEffectChance
 	cp [hl]
+	jr c, .done
+	ld a, [hl]
+	inc a
+	jr nz, .done ; carry clear
+	scf ; 255: always
+.done
 	pop bc
 	pop de
 	pop hl

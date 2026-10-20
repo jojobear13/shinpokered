@@ -1,4 +1,4 @@
-;joenote - custom functions to handle move priority. Sets zero flag if priority lowered/raised.
+;joenote - custom functions to handle the trapping clause's priority. Sets zero flag if priority lowered.
 CheckLowerPlayerPriority:	
 	ld a, [wPlayerSelectedMove]
 	ld hl, wPlayerBattleStatus3
@@ -21,7 +21,8 @@ LowPriorityMoves:
 	res TRAPPING_COUNT, [hl]
 	res TRAPPING_NEGATIVE, [hl]
 .next2
-	cp COUNTER
+	ld a, 1
+	and a ; nz: only the trapping clause lowers priority here (MovePriorities has the rest)
 	ret
 .CheckTrappingClause
 	res TRAPPING_COUNT, [hl]
@@ -43,25 +44,6 @@ LowPriorityMoves:
 	xor a
 	ret
 
-CheckHigherPlayerPriority:	
-	ld a, [wPlayerSelectedMove]
-	jr HighPriorityMoves
-CheckHigherEnemyPriority:
-	ld a, [wEnemySelectedMove]
-;	jr HighPriorityMoves
-; fall through
-HighPriorityMoves:
-	cp QUICK_ATTACK
-;	ret z
-;	cp DUMMY_MOVE1
-;	ret z
-;	cp DUMMY_MOVE2
-;	ret z
-;	cp DUMMY_MOVE3
-;	ret z
-;	cp DUMMY_MOVE4
-	ret
-	
 CheckIfTrappingMove:
 	cp BIND
 	ret z
