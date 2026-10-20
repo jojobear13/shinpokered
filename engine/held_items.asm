@@ -762,3 +762,54 @@ ChoiceLockedText:
 	TX_RAM wcd6d
 	text "!"
 	prompt
+
+; Exp. Share: a party mon holding one counts as having fought (wPartyGainExpFlags),
+; and gains experience with those that did
+ExpShareHolders:
+	ld a, [wPartyCount]
+	and a
+	ret z
+	ld d, a
+	ld e, 0 ; party position
+	ld hl, wPartyMon1CatchRate
+.loop
+	ld a, [hl]
+	cp EXP_SHARE
+	jr nz, .next
+	push hl
+	push de
+	ld c, e
+	ld b, FLAG_SET
+	ld hl, wPartyGainExpFlags
+	predef FlagActionPredef
+	pop de
+	pop hl
+.next
+	ld bc, wPartyMon2 - wPartyMon1
+	add hl, bc
+	inc e
+	dec d
+	jr nz, .loop
+	ret
+
+; Amulet Coin: a trainer's prize money doubles when a party mon holds one
+AmuletCoinMoney:
+	ld a, [wPartyCount]
+	and a
+	ret z
+	ld d, a
+	ld hl, wPartyMon1CatchRate
+	ld bc, wPartyMon2 - wPartyMon1
+.loop
+	ld a, [hl]
+	cp AMULET_COIN
+	jr z, .double
+	add hl, bc
+	dec d
+	jr nz, .loop
+	ret
+.double
+	ld de, wAmountMoneyWon + 2
+	ld hl, wAmountMoneyWon + 2
+	ld c, 3
+	predef_jump AddBCDPredef

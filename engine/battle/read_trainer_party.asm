@@ -281,4 +281,4 @@ ReadTrainer:
 	inc de
 	dec b
 	jr nz, .LastLoop ; repeat wCurEnemyLVL times
-	ret
+	jpab AmuletCoinMoney

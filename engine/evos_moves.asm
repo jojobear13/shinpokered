@@ -135,6 +135,9 @@ Evolution_PartyMonLoop: ; loop over party mons
 	pop hl
 
 .checkLevel
+	ld a, [wLoadedMonCatchRate]
+	cp EVERSTONE ; no level-up evolution while holding one
+	jp z, Evolution_PartyMonLoop
 	ld a, [hli] ; level requirement
 	ld b, a
 	ld a, [wLoadedMonLevel]

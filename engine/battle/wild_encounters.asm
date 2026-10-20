@@ -49,6 +49,20 @@ TryDoWildEncounter:
 .CanEncounter
 ; compare encounter chance with a random number to determine if there will be an encounter
 	ld b, a
+; a Cleanse Tag on the first mon cuts the encounter rate by a third
+	ld a, [wPartyMon1CatchRate]
+	cp CLEANSE_TAG
+	jr nz, .gotRate
+	ld a, b
+	ld c, -1
+.divideBy3
+	inc c
+	sub 3
+	jr nc, .divideBy3
+	ld a, b
+	sub c
+	ld b, a
+.gotRate
 	ld a, [hRandomAdd]
 	cp b
 	jr nc, .CantEncounter2

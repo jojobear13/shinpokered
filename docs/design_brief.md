@@ -946,6 +946,17 @@ drawing from `Random` instead, 39 of the 96 targeted turns fail.
   link mirror test gained Focus Band, King's Rock, Life Orb, Sitrus Berry,
   Berry and Choice Band cases. In the emulator: Leftovers restoring HP with
   its messages.
+- **Outside the moves**: Lucky Egg gives x1.5 experience (on top of a
+  traded mon's x1.5); Exp. Share makes its holder count as having fought,
+  so it shares the experience and stat experience like a participant (Gen
+  2 gave it half; this keeps the fork's experience code as it is); Amulet
+  Coin doubles a trainer's prize money when any party mon holds one (Gen 2
+  required the holder to have fought); Everstone stops level-up evolution
+  (stones still work, as in Gen 2); Cleanse Tag on the first party mon cuts
+  the wild encounter rate by a third. Verified in
+  `tests/test_held_item_field.py`, except Cleanse Tag, whose roll needs a
+  whole map; the Everstone test checks that the evolution starts without it
+  (the harness can't run the evolution scene to the end).
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the

@@ -44,6 +44,7 @@ GainExperience:
 	ld [wd728], a	
 .skipexpallmsg
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	callab ExpShareHolders ; they count as having fought
 
 	call BufferExpData
 	call GetNumMonsGainingExp
@@ -507,6 +508,18 @@ AddExpToPokemon:
 	ld [wGainBoostedExp], a
 .next
 	pop hl
+; a Lucky Egg: x1.5 more
+	push hl
+	ld bc, wPartyMon1CatchRate - wPartyMon1OTID
+	add hl, bc
+	ld a, [hl]
+	pop hl
+	cp LUCKY_EGG
+	jr nz, .noLuckyEgg
+	call BoostExp
+	ld a, 1
+	ld [wGainBoostedExp], a
+.noLuckyEgg
 	
 	ld bc, (wPartyMon1Exp + 2) - wPartyMon1OTID
 	add hl, bc
