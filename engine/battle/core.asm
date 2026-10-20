@@ -626,6 +626,11 @@ MainInBattleLoop:
 	callba CheckLowerEnemyPriority	;joenote - custom function now used
 	jr z, .playerMovesFirst ; if enemy used Counter and player didn't
 .compareSpeed
+	callab ItemTurnOrder ; Quick Claw, Choice Scarf
+	jr nc, .bySpeed
+	jp nz, .playerMovesFirst
+	jp .enemyMovesFirst
+.bySpeed
 	ld de, wBattleMonSpeed ; player speed value
 	ld hl, wEnemyMonSpeed ; enemy speed value
 	ld c, $2
@@ -3147,6 +3152,8 @@ SelectMenuItem:
 	dec a
 	cp c
 	jr z, .disabled
+	callab PlayerChoiceLocked ; prints why if so
+	jr c, .printed
 	ld a, [wPlayerBattleStatus3]
 	bit 3, a ; transformed
 	jr nz, .dummy ; game freak derp
@@ -3167,6 +3174,7 @@ SelectMenuItem:
 	ld hl, MoveNoPPText
 .print
 	call PrintText
+.printed
 	call LoadScreenTilesFromBuffer1
 	jp MoveSelectionMenu
 

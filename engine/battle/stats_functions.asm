@@ -631,11 +631,11 @@ GetCriticalHitProbability:
 .capcritical
 	ld b, $ff					 ; cap at 255/256
 .finishcalc
-	push bc
-	callab ArmorBlocksCrit ; Battle Armor, Shell Armor
-	pop bc
-	ret nc
-	ld b, 0 ; no critical hit
+	ld a, b
+	ld [wSideEffectChance], a ; free while the rate is worked out
+	callab CritRateModifiers ; items, Battle Armor, Shell Armor
+	ld a, [wSideEffectChance]
+	ld b, a
 	ret
 
 ; high critical hit moves

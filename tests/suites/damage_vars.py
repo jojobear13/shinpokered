@@ -109,6 +109,7 @@ def _battle_mon(game, rng, prefix):
     game.poke(prefix + "Level", rng.randint(1, 100))
     for name in STATS:
         game.poke16(prefix + name, stat(rng))
+    game.poke(prefix + "CatchRate", 0)  # no held item: items have their own tests
 
 
 def _party(game, rng, prefix):

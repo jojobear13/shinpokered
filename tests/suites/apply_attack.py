@@ -72,6 +72,7 @@ def _mon(game, rng, prefix, nick):
     game.poke(prefix, *[rng.randint(0, 255) for _ in range(battle_struct_len(game))])
     game.poke(prefix + "Species", rng.choice(ENEMY_SPECIES if prefix == "wEnemyMon" else SPECIES))
     game.poke(prefix + "Level", rng.randint(1, 100))
+    game.poke(prefix + "CatchRate", 0)  # no held item: items have their own tests
     max_hp = max(_hp(rng), 1)
     game.poke16(prefix + "MaxHP", max_hp)
     game.poke16(prefix + "HP", rng.randint(0, max_hp) if rng.random() < 0.9 else _hp(rng))

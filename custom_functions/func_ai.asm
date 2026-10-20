@@ -968,6 +968,24 @@ ChooseMovePPTrack:
 	and $f
 	cp b
 	jp z, .flagset
+;a Choice item allows only the move it locked in, while that has PP
+	ld a, [wEnemyChoiceLock]
+	and a
+	jr z, .notChoiceLocked
+	cp b
+	jr z, .notChoiceLocked
+	push hl
+	push bc
+	ld c, a
+	ld b, 0
+	ld hl, wEnemyMonPP - 1
+	add hl, bc
+	ld a, [hl]
+	and $3f
+	pop bc
+	pop hl
+	jp nz, .flagset
+.notChoiceLocked
 ;is the move non-existant?
 	ld a, [hl]
 	and a

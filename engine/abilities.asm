@@ -24,6 +24,8 @@ GetMonAbility:
 ; set wPlayerAbility or wEnemyAbility from the mon just sent out, and clear
 ; what the side's last mon's ability had set up
 LoadPlayerAbility:
+	xor a
+	ld [wPlayerChoiceLock], a
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_PLAYER_F, [hl]
 	set ENTRY_PENDING_PLAYER_F, [hl]
@@ -31,6 +33,8 @@ LoadPlayerAbility:
 	ld hl, wPlayerAbility
 	jr LoadBattleMonAbility
 LoadEnemyAbility:
+	xor a
+	ld [wEnemyChoiceLock], a
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_ENEMY_F, [hl]
 	set ENTRY_PENDING_ENEMY_F, [hl]
@@ -795,6 +799,7 @@ AbilityDamageModifiers:
 	ld a, [hli]
 	or [hl]
 	ret z
+	callab ItemDamageModifiers
 	call UserAbility
 	call nz, .userAbility
 	call TargetAbilityForMove
@@ -1137,6 +1142,12 @@ CalcHitChance_:
 	lb bc, 13, 10
 	call .scale
 .notCompoundEyes
+	call TargetItem
+	cp BRIGHTPOWDER
+	jr nz, .notBrightPowder
+	lb bc, 9, 10
+	call .scale
+.notBrightPowder
 	call TargetAbilityForMove
 	cp TANGLED_FEET
 	ret nz
@@ -1350,15 +1361,6 @@ SturdyEndure:
 	ld a, [H_WHOSETURN]
 	cp e
 	ret z ; its own move: recoil, a crash, confusion
-	ld a, e
-	call GetSideAbility
-	cp STURDY
-	ret nz
-	ld a, e
-	xor 1
-	call GetSideAbility
-	cp MOLD_BREAKER
-	ret z
 	ld hl, wBattleMonHP
 	ld a, e
 	and a
@@ -1369,21 +1371,67 @@ SturdyEndure:
 	ld b, a
 	ld a, [hli]
 	ld c, a ; bc = HP
-	ld de, wBattleMonMaxHP - (wBattleMonHP + 2)
-	add hl, de
-	ld a, [hli]
-	cp b
-	ret nz
-	ld a, [hl]
-	cp c
-	ret nz ; not at full HP
+	push hl
 	ld hl, wDamage + 1
 	ld a, [hld]
 	sub c
 	ld a, [hl]
 	sbc b
+	pop hl
 	ret c ; the mon survives anyway
+	ld d, 1 ; d = at full HP
+	push de
+	ld de, wBattleMonMaxHP - (wBattleMonHP + 2)
+	add hl, de
+	pop de
+	ld a, [hli]
+	cp b
+	jr nz, .notFull
+	ld a, [hl]
+	cp c
+	jr z, .gotFull
+.notFull
+	ld d, 0
+.gotFull
+; Sturdy, at full HP
+	ld a, d
+	and a
+	jr z, .notSturdy
+	ld a, e
+	call GetSideAbility
+	cp STURDY
+	jr nz, .notSturdy
+	ld a, e
+	xor 1
+	call GetSideAbility
+	cp MOLD_BREAKER
+	ld a, 0 ; Sturdy, not an item
+	jr nz, .endure
+.notSturdy
+	ld a, e
+	call GetSideItem
+	cp FOCUS_SASH
+	jr nz, .notSash
+	ld a, d
+	and a
+	ret z
+	push bc
+	ld a, e
+	call ConsumeSideItem
+	pop bc
+	ld a, FOCUS_SASH
+	jr .endure
+.notSash
+	cp FOCUS_BAND
+	ret nz
+	call AbilityRandom
+	cp 26 ; 10%
+	ret nc
+	ld a, FOCUS_BAND
+.endure
+	ld [wEnduredBy], a
 	dec bc
+	ld hl, wDamage
 	ld a, b
 	ld [hli], a
 	ld [hl], c ; damage = HP - 1
@@ -1395,6 +1443,7 @@ SturdyEndure:
 ; for the mon whose turn it is; returns carry to skip them, with z if it has
 ; fainted anyway (so the battle sees it)
 AbilityResidual:
+	callab ItemResidual ; Leftovers, berries
 	call UserAbility
 	cp MAGIC_GUARD
 	jr z, .magicGuard
@@ -1602,14 +1651,51 @@ SkillLink:
 	and a
 	ret
 
-; carry if the target's Battle Armor or Shell Armor stops a critical hit
-ArmorBlocksCrit:
+; The critical hit rate (out of 256, in wSideEffectChance) after items and
+; abilities: Scope Lens doubles it, the Stick (Farfetch'd) and Lucky Punch
+; (Chansey) quadruple it, and the target's Battle Armor or Shell Armor stops
+; critical hits
+CritRateModifiers:
+	call UserItem
+	ld b, 1
+	cp SCOPE_LENS
+	jr z, .double
+	ld c, FARFETCHD
+	cp STICK
+	jr z, .species
+	ld c, CHANSEY
+	cp LUCKY_PUNCH
+	jr nz, .armor
+.species
+	ld hl, wBattleMonSpecies
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotSpecies
+	ld hl, wEnemyMonSpecies
+.gotSpecies
+	ld a, [hl]
+	cp c
+	jr nz, .armor
+	inc b
+.double
+	ld hl, wSideEffectChance
+.doubleLoop
+	sla [hl]
+	jr nc, .doubled
+	ld [hl], $ff
+	jr .armor
+.doubled
+	dec b
+	jr nz, .doubleLoop
+.armor
 	call TargetAbilityForMove
 	cp BATTLE_ARMOR
-	jr z, RecoilPrevented.prevented
+	jr z, .none
 	cp SHELL_ARMOR
-	jr z, RecoilPrevented.prevented
-	and a
+	ret nz
+.none
+	xor a
+	ld [wSideEffectChance], a
 	ret
 
 ; carry if the user is using Rest and its Insomnia or Vital Spirit keeps it
@@ -1633,23 +1719,29 @@ AbilityAfterMove:
 	bit STURDY_ENDURED_F, [hl]
 	jr z, .notEndured
 	res STURDY_ENDURED_F, [hl]
+	ld a, [wEnduredBy]
+	and a
+	jr nz, .item
 	call TargetAbility
 	ld d, a
 	call PrintAbilityActivated
 	ld hl, EnduredTheHitText
 	call PrintText
+	jr .notEndured
+.item
+	ld [wd11e], a
+	call GetItemName
+	ld hl, HungOnText
+	call PrintText
 .notEndured
 	ld hl, wAbilitySnapshot
 	bit SNAPSHOT_TAKEN_F, [hl]
 	ret z ; the mon didn't get to use a move
-	ld [hl], 0
 	ld a, [wEscapedFromBattle]
 	and a
-	ret nz
+	jr nz, .done
+; did the move hit the target for damage (even if it fainted)?
 	call GetTargetHP
-	ld a, b
-	or c
-	ret z ; it fainted: nothing more happens to it
 	ld hl, wAbilitySnapshot + 2
 	ld a, c
 	sub [hl]
@@ -1658,17 +1750,25 @@ AbilityAfterMove:
 	sbc [hl]
 	jr nc, .gotDamaged
 	dec hl
-	set SNAPSHOT_DAMAGED_F, [hl] ; the move hit it for damage
+	set SNAPSHOT_DAMAGED_F, [hl]
 .gotDamaged
+	call .abilities
+	callab ItemsAfterMove
+.done
+	xor a
+	ld [wAbilitySnapshot], a
+	ret
+.abilities
+	call GetTargetHP
+	ld a, b
+	or c
+	ret z ; it fainted: nothing more happens to it
 	call AngerPoint
 	call CursedBody
 	call Synchronize
 	call Competitive
 	call Stench
-	call ContactAbilities
-	xor a
-	ld [wAbilitySnapshot], a
-	ret
+	jp ContactAbilities
 
 ; bc = the target's HP (the mon whose turn it isn't)
 GetTargetHP:
@@ -2041,6 +2141,22 @@ Stench:
 	ret z
 	cp FLINCH_SIDE_EFFECT2
 	ret z
+	; fall through
+; a 10% chance that the target flinches, for a move that hit it for damage
+; and can't already make it flinch
+StenchFlinch:
+	call TargetWasDamaged
+	ret z
+	ld a, wPlayerMoveEffect - wPlayerMoveNum
+	call GetUserMoveField
+	cp FLINCH_SIDE_EFFECT1
+	ret z
+	cp FLINCH_SIDE_EFFECT2
+	ret z
+	call GetTargetHP
+	ld a, b
+	or c
+	ret z
 	call TargetAbilityForMove
 	cp INNER_FOCUS
 	ret z
@@ -2385,6 +2501,10 @@ EnemyTrapped:
 ; Arena Trap keeps it (z to try as usual)
 RunAwayOrTrapped:
 	xor a
+	call GetSideItem
+	cp SMOKE_BALL
+	jr z, .runAway
+	xor a
 	call GetSideAbility
 	cp RUN_AWAY
 	jr z, .runAway
@@ -2561,6 +2681,14 @@ SynchronizeBurnedText:
 SynchronizeParalyzedText:
 	TX_FAR _ParalyzedMayNotAttackText
 	db "@"
+
+HungOnText:
+	text "<TARGET> hung on"
+	line "using its"
+	cont "@"
+	TX_RAM wcd6d
+	text "!"
+	prompt
 
 EnduredTheHitText:
 	text "<TARGET>"

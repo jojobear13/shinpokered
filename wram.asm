@@ -3552,6 +3552,13 @@ wAbilityFlags:: ; what abilities have set up in battle (FLASH_FIRE_*_F, ...)
 	ds 1
 wSideEffectChance:: ; a side effect's chance out of 256, as abilities change it
 	ds 1
+wPlayerChoiceLock:: ; the move slot (1-4) a Choice item has locked in, 0 for none
+	ds 1
+wEnemyChoiceLock::
+	ds 1
+wEnduredBy:: ; what left the target 1 HP (STURDY_ENDURED_F): 0 for Sturdy, else the item
+	ds 1
+wItemScratch:: ds 2
 wAbilitySnapshot:: ; before a move: flags (SNAPSHOT_*_F), the target's HP,
 	; status and stat stages, for the abilities that react to the move
 	ds 1 + 2 + 1 + NUM_STAT_MODS

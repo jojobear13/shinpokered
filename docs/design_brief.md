@@ -28,8 +28,8 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 124 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
-| WRAM | 8 KB | **1088 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move). Still allocate new state through this table |
+| Battle engine bank ($0F) | 16 KB | 98 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
+| WRAM | 8 KB | **1083 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move); held items 5 (each side's Choice lock, what a Focus item saved, 2 scratch bytes). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
 | Event flags | 2560 bits (`wEventFlags`, 320 bytes, saved) | ~2000 | 2056 placeholder flags exist and only 44 are referenced by name. Some code computes flag numbers, so check before claiming a range |
@@ -895,6 +895,57 @@ drawing from `Random` instead, 39 of the 96 targeted turns fail.
   trainer and wild battles, new mons holding nothing, Transform keeping the
   user's item, the status-screen line; and the Nuzlocke mark. In the
   emulator: TAKE on the party menu and LEFTOVERS on the status screen.
+
+**Step E, part 5 continued: held items in battle.**
+
+- **A bank of their own.** Bank 9 was down to 1.5 KB, so the ability and
+  held-item code moved, with the item names and prices, to an empty bank,
+  `$34` (the ROM was already padded to 1 MB). All callers reach it through
+  far calls with `BANK(...)`, so nothing else changed; bank 9 has 10 KB again.
+- **Damage (S3, with the abilities').** The 15 type boosters x6/5 (Gen 9's
+  20%, not Gen 2's 10%: the mechanics are Gen 9's throughout, the item set
+  Gen 2's), Choice Band (physical) and Choice Specs (special) x3/2, Life Orb
+  x13/10, Light Ball (Pikachu) x2, Thick Club (Cubone, Marowak, physical) x2;
+  the target's Eviolite x2/3 if it has an evolution (read from the evolution
+  table), Metal Powder (an untransformed Ditto, physical) x1/2. Gen 9
+  scales the stats for most of these; the difference is rounding.
+- **Critical hits** (the rate predef): Scope Lens x2, the Stick (Farfetch'd)
+  and Lucky Punch (Chansey) x4, capped at 255; armor still stops them.
+  **BrightPowder**: x9/10 accuracy against its holder.
+- **Focus Sash** (full HP, used up) and **Focus Band** (10%) survive a
+  foe's knockout with 1 HP, after Sturdy, with "... hung on using its ...!".
+- **Turn order.** Within the same priority, a Quick Claw that goes off (20%)
+  for one side only moves it first; otherwise speeds decide, with a Choice
+  Scarf's x3/2. In a link battle both games roll the claws in the same order
+  (the internal-clock game rolls its enemy's first, as the game's own speed
+  tie does).
+- **Choice lock.** After moving, a Choice item's holder is locked into that
+  move until it switches out: the move menu refuses the others ("Its CHOICE
+  item allows only ...!") and the AI won't pick them, unless the locked move
+  is out of PP (Gen 9 would Struggle; here the others become usable).
+- **After a move**: Life Orb costs 1/10 of max HP after a hit (even a
+  knockout; not with Magic Guard); King's Rock is Stench's 10% flinch (they
+  don't add up); a MysteryBerry gives 5 PP back to a move that ran out; then
+  both mons check their berries. **Each turn**, before residual damage:
+  Leftovers (1/16 of max HP), then berries.
+- **Berries**: Berry +10 HP, Gold Berry +30, Sitrus Berry +1/4 of max HP, at
+  half HP or less; PrzCureBerry, Mint Berry, PsnCureBerry, Ice Berry, Burnt
+  Berry for their status (undoing its stat penalty), Bitter Berry for
+  confusion, MiracleBerry for any status, or else confusion. A used item is
+  gone from the battle struct and the party data (the player's, or a
+  trainer's roster). Smoke Ball always gets away from a wild battle.
+- **Test suites** now zero the held item in the battle structs they
+  randomize, as they do abilities.
+- **Verified:** `tests/test_held_item_battle.py` checks each damage item on
+  both sides and its conditions, the crit rates and armor, BrightPowder,
+  Focus Sash (used up, also from a trainer's roster) and Focus Band at their
+  thresholds, Quick Claw and its link roll order, Choice Scarf and ties, the
+  Choice lock (set after the move, the menu, the AI, cleared on send-out),
+  Life Orb, King's Rock, MysteryBerry (with the party's PP), every berry
+  including thresholds and fainted holders, Leftovers, and Smoke Ball. The
+  link mirror test gained Focus Band, King's Rock, Life Orb, Sitrus Berry,
+  Berry and Choice Band cases. In the emulator: Leftovers restoring HP with
+  its messages.
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the

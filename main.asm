@@ -601,10 +601,6 @@ INCLUDE "engine/slot_machine.asm"
 INCLUDE "engine/overworld/pewter_guys.asm"
 INCLUDE "engine/multiply_divide.asm"
 INCLUDE "engine/menu/natures.asm"
-INCLUDE "engine/abilities.asm"
-INCLUDE "engine/held_items.asm"
-INCLUDE "data/item_prices.asm"
-INCLUDE "text/item_names.asm"
 INCLUDE "engine/random.asm" ; out of bank 4, which is nearly full
 INCLUDE "engine/game_corner_slots.asm"
 
@@ -1936,6 +1932,13 @@ INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
 INCLUDE "custom_functions/func_extra_menu.asm"
+
+; abilities and held items, with the item names and prices (out of bank 9)
+SECTION "Abilities and held items", ROMX, BANK[$34]
+INCLUDE "engine/abilities.asm"
+INCLUDE "engine/held_items.asm"
+INCLUDE "data/item_prices.asm"
+INCLUDE "text/item_names.asm"
 
 SECTION "Rules Menu", ROMX
 INCLUDE "custom_functions/func_rules_menu.asm"

@@ -39,6 +39,7 @@ def _mon(game, rng, prefix, nick, species_pool):
     base = game.addr(prefix)
     game.poke(base, *[rng.randint(0, 255) for _ in range(battle_struct_len(game))])
     game.poke(prefix + "Species", rng.choice(species_pool))
+    game.poke(prefix + "CatchRate", 0)  # no held item: items have their own tests
     game.poke(prefix + "Level", rng.randint(2, 100))
     game.poke(prefix + "Status", _status(rng))
     game.poke(prefix + "Type1", rng.choice(TYPES), rng.choice(TYPES))

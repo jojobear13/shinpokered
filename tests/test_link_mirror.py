@@ -18,6 +18,7 @@ from suites.apply_attack import H_WHOSETURN
 from suites.damage_vars import battle_struct_len, party_struct_len
 from test_abilities import ABILITIES
 from test_ability_damage import MOVES
+from test_held_items import ITEMS
 
 LINK_STATE_BATTLING = 4
 PARTY_LENGTH = 6
@@ -47,6 +48,7 @@ PAIRS = [
     ("wPlayerSelectedMove", "wEnemySelectedMove", 1),
     ("wPlayerMoveListIndex", "wEnemyMoveListIndex", 1),
     ("wPlayerAbility", "wEnemyAbility", 1),
+    ("wPlayerChoiceLock", "wEnemyChoiceLock", 1),
     ("wPartyCount", "wEnemyPartyCount", 1),
 ]
 # mirrored, but PP is spent differently by the two sides (the player's when it
@@ -123,7 +125,7 @@ class LinkMirrorTest(unittest.TestCase):
             state[key] = [b for i, b in enumerate(mons) if not party_pp <= i % party_len < party_pp + 4]
         return state
 
-    def mirror(self, seed, abilities=None, move=None):
+    def mirror(self, seed, abilities=None, move=None, held=None):
         """abilities: (the actor's, the target's) names, else random; move: the
         actor's move, made sure to be usable, else mx's random one."""
         a, b = self.a, self.b
@@ -147,6 +149,9 @@ class LinkMirrorTest(unittest.TestCase):
         else:
             pool = list(ABILITIES.values())
             a.poke("wPlayerAbility", rng.choice(pool), rng.choice(pool))
+        if held:  # (the actor's, the target's) held items
+            a.poke("wBattleMonCatchRate", ITEMS[held[0]] if held[0] else 0)
+            a.poke("wEnemyMonCatchRate", ITEMS[held[1]] if held[1] else 0)
         a.poke("wAbilityFlags", 0)
         a.poke("wLinkState", LINK_STATE_BATTLING)
         a.poke("wLinkBattleRandomNumberList", *[rng.randint(0, 255) for _ in range(NUM_LINK_RANDOMS)])
@@ -208,6 +213,18 @@ class LinkMirrorTest(unittest.TestCase):
              (("NO_ABILITY", "CURSED_BODY"), "TACKLE"), (("NO_ABILITY", "POISON_POINT"), "BODY_SLAM"),
              (("STENCH", "NO_ABILITY"), "TACKLE"), (("SERENE_GRACE", "NO_ABILITY"), "BODY_SLAM"),
              (("SHED_SKIN", "NO_ABILITY"), "TACKLE"), (("NO_ABILITY", "SHIELD_DUST"), "BITE")]
+
+    ITEM_CASES = [((0, "FOCUS_BAND"), "TACKLE"), (("KINGS_ROCK", 0), "TACKLE"), (("LIFE_ORB", "SITRUS_BERRY"), "TACKLE"),
+                  (("CHOICE_BAND", "BERRY"), "SCRATCH")]
+
+    def test_random_items_agree(self):
+        for held, move in self.ITEM_CASES:
+            for seed in range(12):
+                with self.subTest(held=held, move=move, seed=seed):
+                    results = self.mirror(seed, ("NO_ABILITY", "NO_ABILITY"), move, held)
+                    self.assertEqual(results, [None, None])
+                    self.assertEqual(self.without_pp(self.b, self.state(self.b, 1, parties=False)),
+                                     self.without_pp(self.a, self.state(self.a, 0, parties=False)))
 
     def test_random_abilities_agree(self):
         for abilities, move in self.CASES:
