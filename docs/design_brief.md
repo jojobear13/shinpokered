@@ -1033,9 +1033,9 @@ differences noted above); the eight that need those are empty slots in
 
 **Weather and day/night are dropped** (your decision). The Game Boy has no
 elegant way to show either, and no Kanto Pokémon relies on them: they would
-make six abilities matter and nothing else. So step E's part 6 and step F
-won't be built (step F's map regions, decision 4, are separate and remain). Decision 5 and the weather rows above stay as a record of
-the design. Chlorophyll, Swift Swim, Sand Veil, Cloud Nine, Leaf Guard and
+make six abilities matter and nothing else. So step E's part 6 and step F's
+day/night won't be built (its map regions, decision 4, remain). Decision 5
+and the weather rows above stay as a record of the design. Chlorophyll, Swift Swim, Sand Veil, Cloud Nine, Leaf Guard and
 Hydration stay empty slots in `data/mon_abilities.asm`, with Cute Charm and
 Magnet Pull (infatuation and the Steel type, also not planned).
 
