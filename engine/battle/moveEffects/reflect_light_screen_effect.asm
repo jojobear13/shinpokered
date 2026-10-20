@@ -24,15 +24,13 @@ ReflectLightScreenEffect_:
 	ld l, e
 .playAnim
 	push hl
-	ld hl, PlayCurrentMoveAnimation
-	call BankswitchEtoF
+	callab PlayCurrentMoveAnimation
 	pop hl
 	jp PrintText
 .moveFailed
 	ld c, 50
 	call DelayFrames
-	ld hl, PrintButItFailedText_
-	jp BankswitchEtoF
+	jpab PrintButItFailedText_
 
 LightScreenProtectedText:
 	TX_FAR _LightScreenProtectedText
@@ -41,7 +39,3 @@ LightScreenProtectedText:
 ReflectGainedArmorText:
 	TX_FAR _ReflectGainedArmorText
 	db "@"
-
-BankswitchEtoF:
-	ld b, BANK(BattleCore)
-	jp Bankswitch

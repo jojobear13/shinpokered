@@ -1465,6 +1465,31 @@ One commit per group:
   animations, which showed Close Combat lowering the stats twice (it wasn't
   in `SpecialEffects`, so it ran again at the end of the move); fixed.
 
+### Part 9: the audit's learnsets
+
+- **All 249 rows** of the "Recommended Remaster Learnsets" sheet are
+  applied, CONDITIONAL ones included, by `tools/apply_learnset_audit.py`
+  (run again, it changes nothing; `tests/test_learnsets.py` checks that
+  when the spreadsheet is present). A move goes to the proposed level and
+  out of wherever the species had it; "Remove" takes Horn Drill and
+  Guillotine away. `docs/learnset_changes.md` lists every change.
+- **Starting moves**: a starting move the sheet moves later comes out of the
+  base stats' four; Zubat's only one (Leech Life, now at 12) gives way to
+  Absorb, its first damaging Gen 9 level 1 move.
+- **Level 1 moves are evolution moves** (Gen 7+): evolving now also calls
+  `LearnMoveFromLevelUp` for level 1, so Vaporeon, Jolteon and Flareon learn
+  their STAB as they evolve, and Clefable Disarming Voice. Base forms'
+  level 1 moves are in their learnsets as `db 1` too (`WriteMonMoves` skips
+  a move already known).
+- **Not taken up**: the sheet's suggested category changes (Vine Whip and
+  Razor Leaf special) and evolution-level changes; trainers' parties pick
+  up the new moves through `WriteMonMoves` as before.
+- **Space**: Reflect and Light Screen's effect moved from bank `$E` to
+  `$35` (the learnsets filled `$E`).
+- **Verified:** `tests/test_learnsets.py` (every learnset in level order with
+  real moves, the sheet fully applied, Vaporeon learning Water Gun at level
+  1); the full suite.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

@@ -151,3 +151,7 @@ FellAsleepBecameHealthyText:
 RegainedHealthText:
 	TX_FAR _RegainedHealthText
 	db "@"
+
+BankswitchEtoF:
+	ld b, BANK(BattleCore)
+	jp Bankswitch

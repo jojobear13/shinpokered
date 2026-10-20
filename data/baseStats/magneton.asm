@@ -15,7 +15,7 @@ dw MagnetonPicBack
 ; attacks known at lvl 0
 db TACKLE
 db SONICBOOM
-db THUNDERSHOCK
+db 0
 db 0
 db 0 ; growth rate
 ; learnset

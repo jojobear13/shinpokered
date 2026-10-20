@@ -295,6 +295,14 @@ Evolution_PartyMonLoop: ; loop over party mons
 .notinbattle
 	call LearnMoveFromLevelUp
 .skipfix_end
+; Gen 7+: the new form's level 1 moves are learned as it evolves
+	ld a, [wCurEnemyLVL]
+	push af
+	ld a, 1
+	ld [wCurEnemyLVL], a
+	call LearnMoveFromLevelUp
+	pop af
+	ld [wCurEnemyLVL], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 	pop hl
 	predef SetPartyMonTypes

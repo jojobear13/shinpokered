@@ -641,7 +641,6 @@ INCLUDE "engine/battle/draw_hud_pokeball_gfx.asm"
 INCLUDE "engine/evos_moves.asm"
 INCLUDE "engine/battle/moveEffects/heal_effect.asm"
 INCLUDE "engine/battle/moveEffects/transform_effect.asm"
-INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
 
 
 SECTION "bankF",ROMX,BANK[$F]
@@ -1949,6 +1948,7 @@ INCLUDE "engine/battle/side_conditions.asm"
 INCLUDE "engine/battle/decrement_pp.asm"
 INCLUDE "engine/overworld/ssanne.asm" ; (bank $1E was full)
 INCLUDE "engine/evolution.asm"
+INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm" ; (bank $E was full)
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 
