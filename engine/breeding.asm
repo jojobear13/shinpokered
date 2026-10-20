@@ -924,8 +924,13 @@ HatchEgg:
 	ld b, FLAG_SET
 	ld hl, wPokedexSeen
 	predef FlagActionPredef
-; the scene: the new mon's picture and cry
+; the scene: the new mon's picture and cry, without the map's sprites
+	ld a, [wUpdateSpritesEnabled]
+	push af
+	ld a, $ff
+	ld [wUpdateSpritesEnabled], a
 	call GBPalWhiteOutWithDelay3
+	call ClearSprites
 	call ClearScreen
 	ld a, [wcf91]
 	ld [wd0b5], a
@@ -951,7 +956,10 @@ HatchEgg:
 	predef AskName
 ; back to the map
 	call GBPalWhiteOutWithDelay3
+	pop af
+	ld [wUpdateSpritesEnabled], a
 	call ReloadMapData
+	call UpdateSprites
 	call RunDefaultPaletteCommand
 	jp GBPalNormal
 
