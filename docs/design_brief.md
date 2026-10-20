@@ -285,7 +285,7 @@ The region byte lands before the first map outside Kanto, but new code that
 looks up a per-map table goes through the accessor from day one so the switch
 is a table change, not a rewrite.
 
-### 5. Day/night: a 24-minute play-time day, computed on demand, no clock hardware
+### 5. Day/night: a 24-minute play-time day, computed on demand, no clock hardware (dropped)
 
 **Decision.** One in-game day is 24 minutes of the play-time clock. The
 minute-of-day is `(hours & 1) × 12 + minutes` (because 60 mod 24 is 12),
@@ -419,8 +419,8 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E (parts 1-5 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move (a table by move id, `GetMoveCategory`), read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (an ability slot bit; the logic in bank 9, reached by far-call hooks in the battle engine); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 53 WRAM bytes (a third DV byte and a sixth stat in every party and battle struct); natures 1; abilities 15; weather 1 planned |
-| F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
+| E (done; part 6 dropped) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move (a table by move id, `GetMoveCategory`), read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (an ability slot bit; the logic in bank 9, reached by far-call hooks in the battle engine); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte): **dropped**, with step F, see below | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 53 WRAM bytes (a third DV byte and a sixth stat in every party and battle struct); natures 1; abilities 15; held items 5; weather dropped |
+| F (day/night dropped; regions remain) | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
 **Step B as done, and where it differs from the row above.**
@@ -1031,8 +1031,16 @@ infatuation or the Steel type now does what it does in Gen 9 (with the
 differences noted above); the eight that need those are empty slots in
 `data/mon_abilities.asm` until they exist.
 
+**Weather and day/night are dropped** (your decision). The Game Boy has no
+elegant way to show either, and no Kanto Pokémon relies on them: they would
+make six abilities matter and nothing else. So step E's part 6 and step F
+won't be built (step F's map regions, decision 4, are separate and remain). Decision 5 and the weather rows above stay as a record of
+the design. Chlorophyll, Swift Swim, Sand Veil, Cloud Nine, Leaf Guard and
+Hydration stay empty slots in `data/mon_abilities.asm`, with Cute Charm and
+Magnet Pull (infatuation and the Steel type, also not planned).
+
 Steps A to D, the refactors, are done, and each compared identical apart
-from the differences recorded above. Steps E to G are the new behaviour.
+from the differences recorded above. Step E, the new behaviour, is done; step G (link checks) remains.
 WRAM no longer gates them. Bank 3's 3 free bytes may.
 
 ## Bugs found by the refactor
