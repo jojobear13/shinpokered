@@ -1418,6 +1418,53 @@ One commit per group:
   accuracy and PP against PokeAPI (when the CSVs are present) and the new
   effects; Forewarn's Tackle is 40 now.
 
+### Part 8: the learnset audit's 49 new moves
+
+- **Ids**: the 49 moves go after Substitute (`AERIAL_ACE` $A5 ...
+  `X_SCISSOR` $D5), so Struggle is $D6 and the special animations follow
+  it, up to $FC. Move and animation ids stay below the animation scripts'
+  special-effect commands ($D8+ are only command bytes, not ids), and no
+  script's sound byte reached Struggle's row, so none needed renumbering.
+  `ROUND` is an rgbds function, so the constant is `ROUND_M`. Names fit 12
+  letters: ANCIENTPOWER, DRAGONBREATH, DYNAMICPUNCH, EXTREMESPEED (Gen 2-4's
+  spellings), DISARM VOICE, STOMPTANTRUM.
+- **Data**: each constant has a `; pokeapi NAME id` line, so
+  `tools/gen_move_data.py` fills in power, type, accuracy, PP, category
+  (`data/move_categories.asm`, now generated), flags, chances, priorities
+  and high critical-hit moves. Effects are hand-picked from the existing ones
+  (flinch, burn, paralysis, poison, confusion, stat-down side effects, drain,
+  recoil).
+- **New rules**: Ancient Power (`ALL_STATS_UP_SIDE_EFFECT`, 10%: all five
+  stats +1); Close Combat (`CLOSE_COMBAT_EFFECT`: the user's Defense and
+  Special Defense -1, even when the target faints); Brine (double power at
+  half HP or less, `BrinePower`); Psyshock (special, against Defense, in
+  `BaseDamage`); Poison Fang's poison is bad poison; Flare Blitz's recoil
+  is 1/3; Flame Wheel and Flare Blitz thaw their user (defrost flag); Aerial
+  Ace, Disarming Voice never miss; sound moves (Hyper Voice, Bug Buzz,
+  Round, Disarming Voice) hit the mon behind a substitute
+  (`ApplyDamageToPokemon`); Aqua Jet, Mach Punch +1 and Extreme Speed +2.
+- **Not done**: Bug Bite, Pluck and Incinerate don't take or burn berries;
+  Stomping Tantrum doesn't double after a failed move; Fire Fang doesn't
+  flinch and Flare Blitz doesn't burn (one effect per move); Twister
+  doesn't hit a flying mon; Ancient Power's self-boost can be stopped by the
+  target's Shield Dust.
+- **Animations** reuse a donor move's animation and sound;
+  `docs/new_move_animations.md` lists each donor and the 13 moves that want
+  a custom animation (Shadow Ball, Moonblast, Air Slash, X-Scissor, Aqua
+  Jet, Dragon Rush, Fire Fang, Poison Fang, Flame Wheel, Flare Blitz,
+  Icicle Crash, Leaf Blade, Water Pulse).
+- **Space**: the SS Anne smoke and evolution code moved from bank `$1E` to
+  `$35` to make room for the longer sound and animation tables.
+- **Verified:** `tests/test_new_moves.py` (names, Ancient Power, Close
+  Combat, Poison Fang, Flare Blitz, Brine, Flame Wheel thawing, Aerial Ace,
+  Hyper Voice through a substitute, priorities, and Close Combat through a
+  whole move); the move-data test checks the new moves against PokeAPI; the
+  random-turn and link mirror suites draw from all 214 moves; the damage
+  model knows Brine and Psyshock. In the emulator, Shadow Ball, Close
+  Combat, Ancient Power and Extreme Speed play with their names and
+  animations, which showed Close Combat lowering the stats twice (it wasn't
+  in `SpecialEffects`, so it ran again at the end of the move); fixed.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

@@ -15,12 +15,14 @@ import unittest
 
 from harness import shared_game
 from suites import damage as dmg
+from suites.apply_attack import _constants
 from test_types import TYPES, expected as type_factor
 
 SEEDS = range(300)
 BRN = 1 << 4
 GETTING_PUMPED = 1 << 2
 LOW_KICK = 0x43
+NEW_MOVES = _constants("move_constants.asm", ["BRINE", "PSYSHOCK"])
 NAMES = {v: k for k, v in TYPES.items()}
 
 SIDES = {
@@ -52,14 +54,17 @@ def model(game, side, roll):
     if game.peek(move + "Num") == LOW_KICK:  # by the target's weight (test_move_effects checks the table)
         dex = rom(game, "PokedexOrder", game.peek(defender + "Species") - 1)
         power = rom(game, "LowKickPowers", dex - 1)
+    if game.peek(move + "Num") == NEW_MOVES["BRINE"] and game.peek16(defender + "HP") * 2 <= game.peek16(defender + "MaxHP"):
+        power = power * 2 & 0xFF
     special = dmg.category(game.peek(move + "Num")) == "SPECIAL"
     crit = game.peek("wCriticalHitOrOHKO") == 1
     a_stage = game.peek(a_mods + ("SpecialAttackMod" if special else "AttackMod"))
-    d_stage = game.peek(d_mods + ("SpecialDefenseMod" if special else "DefenseMod"))
+    d_special = special and game.peek(move + "Num") != NEW_MOVES["PSYSHOCK"]  # Psyshock: against defense
+    d_stage = game.peek(d_mods + ("SpecialDefenseMod" if d_special else "DefenseMod"))
     if crit:
         a_stage, d_stage = max(a_stage, 7), min(d_stage, 7)
     attack = scaled(game.peek16(a_unmod + ("SpecialAttack" if special else "Attack")), a_stage)
-    defense = scaled(game.peek16(d_unmod + ("SpecialDefense" if special else "Defense")), d_stage)
+    defense = scaled(game.peek16(d_unmod + ("SpecialDefense" if d_special else "Defense")), d_stage)
     level = game.peek(attacker + "Level")
     base = min((2 * level // 5 + 2) * power * attack // defense // 50 + 2, 0xFFFF)
     damage = base

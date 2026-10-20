@@ -79,7 +79,7 @@ const_value = 0
 	const SPECIAL_DEFENSE_DOWN_SIDE_EFFECT ; $48 with the other stat-down side effects
 	const TRI_ATTACK_EFFECT          ; $49 burn, paralysis or freeze at random
 	const GROWTH_EFFECT              ; $4A attack and special attack up 1
-	const UNUSED_EFFECT_4B           ; $4B
+	const ALL_STATS_UP_SIDE_EFFECT   ; $4B Ancient Power
 	const CONFUSION_SIDE_EFFECT      ; $4C
 	const TWINEEDLE_EFFECT           ; $4D
 	const SPECIAL_DEFENSE_UP2_EFFECT ; $4E
@@ -91,6 +91,7 @@ const_value = 0
 	const LEECH_SEED_EFFECT          ; $54
 	const SPLASH_EFFECT              ; $55
 	const DISABLE_EFFECT             ; $56
+	const CLOSE_COMBAT_EFFECT        ; $57 the user's defense and special defense down 1
 
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20

@@ -75,6 +75,34 @@ CritChances: ; out of 256, by stage
 
 INCLUDE "data/move_crit_moves.asm"
 
+; Brine: twice the power against a target at half its HP or less
+BrinePower:
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	ld hl, wEnemyMonHP
+	jr z, .gotTarget
+	ld hl, wBattleMonHP
+.gotTarget
+	ld a, [hli]
+	ld d, a
+	ld e, [hl] ; de = HP
+	sla e
+	rl d ; x 2
+	ASSERT wEnemyMonMaxHP - wEnemyMonHP == wBattleMonMaxHP - wBattleMonHP
+	ld bc, wBattleMonMaxHP - (wBattleMonHP + 1)
+	add hl, bc
+	ld a, [hli] ; max HP
+	cp d
+	ret c ; more than half
+	jr nz, .double
+	ld a, [hl]
+	cp e
+	ret c
+.double
+	ld hl, wDamageScratch
+	sla [hl]
+	ret
+
 ; Gen 9's Low Kick: its power is by the target's weight (LowKickPowers)
 LowKickPower:
 	ld a, [hBattleSide]
@@ -116,10 +144,14 @@ BaseDamage:
 	ld [wDamageScratch], a ; power
 	dec hl
 	ld a, [hl]
-	cp LOW_KICK
-	jr nz, .gotPower
 	push hl
-	call LowKickPower
+	cp LOW_KICK
+	call z, LowKickPower
+	pop hl
+	ld a, [hl]
+	push hl
+	cp BRINE
+	call z, BrinePower
 	pop hl
 	ld a, [hl]
 .gotPower
@@ -150,6 +182,21 @@ BaseDamage:
 	ld [wDamageScratch + 2], a
 	ld a, e
 	ld [wDamageScratch + 3], a
+; Psyshock: a special move against the target's defense
+	ld a, [hBattleSide]
+	push af
+	ld b, a
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	ld a, [wPlayerMoveNum]
+	jr z, .gotMoveNum
+	ld a, [wEnemyMoveNum]
+.gotMoveNum
+	cp PSYSHOCK
+	jr nz, .notPsyshock
+	ld hl, hBattleSide
+	res BATTLE_SIDE_SPECIAL_F, [hl]
+.notPsyshock
 	ld hl, .defenderStat
 	call .lookup
 	push hl
@@ -167,6 +214,8 @@ BaseDamage:
 .gotDefenderStage
 	pop hl
 	call ScaledStat
+	pop af
+	ld [hBattleSide], a
 	ld a, d
 	ld [wDamageScratch + 4], a
 	ld a, e

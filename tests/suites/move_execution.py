@@ -15,7 +15,7 @@ from suites.damage import (battle_struct_len, ENEMY_SPECIES, NUM_USED_STAT_MODS,
 NAME = "move_execution"
 
 NUM_MOVES = 4
-NUM_ATTACKS = 165  # moves 1-165; STRUGGLE (165) included
+NUM_ATTACKS = 214  # moves 1-214; STRUGGLE (214) included
 BATTLE_ANIMATION_OFF = 1 << 7  # wOptions
 TEXT_SPEED_FAST = 1
 

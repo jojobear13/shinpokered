@@ -7,4 +7,8 @@ HighCriticalMoves:
 	db SKY_ATTACK
 	db CRABHAMMER
 	db SLASH
+	db CROSS_CHOP
+	db DRILL_RUN
+	db LEAF_BLADE
+	db STONE_EDGE
 	db $FF

@@ -35,10 +35,12 @@ class DataTest(unittest.TestCase):
     def test_numbers_are_gen9s(self):
         with open(POKEAPI) as f:
             api = {int(r["id"]): r for r in csv.DictReader(f)}
+        with open(os.path.join(REPO_ROOT, "constants", "move_constants.asm")) as f:
+            pokeapi = {n: int(i) for n, i in re.findall(r"^; pokeapi (\w+) (\d+)$", f.read(), re.M)}
         for i, (name, effect, power, typ, accuracy, pp) in enumerate(rows(), 1):
-            if i > 164:  # Struggle keeps its own row
+            if name == "STRUGGLE":  # keeps its own row
                 break
-            r = api[i]
+            r = api[pokeapi.get(name, i)]
             with self.subTest(name=name):
                 if r["power"] and name != "LOW_KICK":
                     self.assertEqual(int(power), int(r["power"]))

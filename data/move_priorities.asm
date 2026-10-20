@@ -6,4 +6,7 @@ MovePriorities:
 	db QUICK_ATTACK, 1
 	db TELEPORT, -6
 	db BIDE, 1
+	db AQUA_JET, 1
+	db EXTREMESPEED, 2
+	db MACH_PUNCH, 1
 	db 0

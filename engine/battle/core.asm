@@ -73,6 +73,7 @@ AlwaysHappenSideEffects:
 	db TWINEEDLE_EFFECT
 	db RAGE_EFFECT
 	db HYPER_BEAM_EFFECT	;joenote - make hyperbeam recharge if knock out enemy
+	db CLOSE_COMBAT_EFFECT
 	db -1
 SpecialEffects:
 ; Effects from arrays 2, 4, and 5B, minus Twineedle and Rage.
@@ -92,6 +93,7 @@ SpecialEffects:
 	db ATTACK_TWICE_EFFECT
 	db JUMP_KICK_EFFECT
 	db RECOIL_EFFECT
+	db CLOSE_COMBAT_EFFECT
 	; fallthrough to Next EffectsArray
 SpecialEffectsCont:
 ; damaging moves whose effect is executed prior to damage calculation
@@ -5131,14 +5133,29 @@ ApplyDamageToPokemon:
 	ld b, a
 	ld a, [hl]
 	or b
-	jr z, ApplyAttackToPokemonDone ; we're done if damage is 0
+	jp z, ApplyAttackToPokemonDone ; we're done if damage is 0
 	ld a, [hBattleSide]
 	ld hl, DamageTargetStatus2
 	call GetAddrFromTable
 	ld a, [hBattleSide]
 	xor BATTLE_SIDE_ENEMY	;joenote - AttackSubstitute takes 0 if the enemy is the target, 1 if the player is (used to control turn differentiation)
 	bit HAS_SUBSTITUTE_UP, [hl] ; does the target have a substitute?
+	jr z, .noSubstitute
+; Gen 9: a sound move hits the mon behind it (not when a mon hurts itself)
+	ld b, a
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	ld c, a
+	ld a, [H_WHOSETURN]
+	cp c
+	ld a, b
+	jp z, AttackSubstitute
+	push bc
+	call CheckTargetSubstitute
+	pop bc
+	ld a, b
 	jp nz, AttackSubstitute
+.noSubstitute
 ; subtract the damage from the pokemon's current HP
 ; also, save the current HP at wHPBarOldHP
 	push de
@@ -6782,7 +6799,7 @@ MoveEffectPointerTable:
 	 dw StatModifierDownEffect    ; SPECIAL_DEFENSE_DOWN_SIDE_EFFECT
 	 dw TriAttackEffect           ; TRI_ATTACK_EFFECT
 	 dw GrowthEffect              ; GROWTH_EFFECT
-	 dw StatModifierDownEffect    ; unused effect
+	 dw AllStatsUpSideEffect      ; ALL_STATS_UP_SIDE_EFFECT
 	 dw ConfusionSideEffect       ; CONFUSION_SIDE_EFFECT
 	 dw TwoToFiveAttacksEffect    ; TWINEEDLE_EFFECT
 	 dw StatModifierUpEffect      ; SPECIAL_DEFENSE_UP2_EFFECT
@@ -6794,6 +6811,7 @@ MoveEffectPointerTable:
 	 dw LeechSeedEffect           ; LEECH_SEED_EFFECT
 	 dw SplashEffect              ; SPLASH_EFFECT
 	 dw DisableEffect             ; DISABLE_EFFECT
+	 dw CloseCombatEffect         ; CLOSE_COMBAT_EFFECT
 
 SleepEffect:
 	ld de, wEnemyMonStatus
@@ -6877,7 +6895,7 @@ PoisonEffect:
 	ld a, [hli]
 	ld b, a
 	and a
-	jr nz, .noEffect ; miss if target is already statused
+	jp nz, .noEffect ; miss if target is already statused
 	ld a, [hli]
 	cp POISON ; can't poison a poison-type target
 	jr z, .noEffect
@@ -6924,7 +6942,10 @@ PoisonEffect:
 	ld de, wEnemyToxicCounter
 .ok
 	cp TOXIC
+	jr z, .badPoison
+	cp POISON_FANG ; Gen 9: its side effect is bad poison
 	jr nz, .normalPoison ; done if move is not Toxic
+.badPoison
 	set BADLY_POISONED, [hl] ; else set Toxic battstatus
 	xor a
 	ld [de], a
@@ -7010,6 +7031,86 @@ TriAttackEffect:
 	pop hl
 	ld [hl], TRI_ATTACK_EFFECT
 	ret
+
+; Ancient Power: its chance (MoveChances) of raising all five of the user's
+; stats one stage
+AllStatsUpSideEffect:
+	ld b, $1a
+	call RollSideEffect
+	ret nc
+	ld hl, wPlayerMonAttackMod
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotMods
+	ld hl, wEnemyMonAttackMod
+.gotMods
+	ld c, MOD_SPECIAL_ATTACK + 1 ; attack, defense, speed, special attack
+.loop
+	call .raise
+	inc hl
+	dec c
+	jr nz, .loop
+	inc hl
+	inc hl ; past accuracy and evasion
+	call .raise ; special defense
+	ld hl, AllStatsRoseText
+	jr RecalculateUserStats
+.raise
+	ld a, [hl]
+	cp 13 ; +6
+	ret nc
+	inc [hl]
+	ret
+
+; Close Combat: the user's defense and special defense down one stage each
+CloseCombatEffect:
+	ld hl, wPlayerMonDefenseMod
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotMods
+	ld hl, wEnemyMonDefenseMod
+.gotMods
+	ld a, [hl]
+	cp 2
+	jr c, .defenseMin
+	dec [hl]
+.defenseMin
+	ld bc, MOD_SPECIAL_DEFENSE - MOD_DEFENSE
+	add hl, bc
+	ld a, [hl]
+	cp 2
+	jr c, .specialDefenseMin
+	dec [hl]
+.specialDefenseMin
+	ld hl, DefensesFellText
+	jr RecalculateUserStats
+
+; the user's stats from its stages again (paralysis still halving speed),
+; then text hl
+RecalculateUserStats:
+	push hl
+	ld a, [H_WHOSETURN]
+	ld [wCalculateWhoseStats], a
+	callab CalculateModifiedStats
+	ld a, [H_WHOSETURN]
+	push af
+	xor 1 ; HalveSpeedDueToParalysis halves the other side's
+	ld [H_WHOSETURN], a
+	call HalveSpeedDueToParalysis
+	pop af
+	ld [H_WHOSETURN], a
+	pop hl
+	jp PrintText
+
+AllStatsRoseText:
+	text "<USER>'s stats"
+	line "rose!"
+	prompt
+
+DefensesFellText:
+	text "<USER>'s defenses"
+	line "fell!"
+	prompt
 
 ; Gen 5+ Growth: attack and special attack up one stage each
 GrowthEffect:

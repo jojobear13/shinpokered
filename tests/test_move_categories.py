@@ -63,7 +63,7 @@ class GetMoveCategoryTest(unittest.TestCase):
                 out = g.call("GetMoveCategory", a=move_id, bc=0x1234, de=0x5678, hl=0x9ABC)
                 self.assertEqual(out["a"], names[damage_vars.category(move_id)])
                 self.assertEqual((out["bc"], out["de"], out["hl"]), (0x1234, 0x5678, 0x9ABC))
-        self.assertEqual(len(damage_vars.CATEGORIES), 165)  # POUND through STRUGGLE
+        self.assertEqual(len(damage_vars.CATEGORIES), MOVES["STRUGGLE"])  # POUND through STRUGGLE
 
     def test_crossover_moves(self):
         for name, (expected, _) in CROSSOVERS.items():

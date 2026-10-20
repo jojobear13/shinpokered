@@ -18,7 +18,6 @@ from suites.apply_attack import H_WHOSETURN
 from test_abilities import ABILITIES
 from test_move_categories import MOVES
 
-MOVES = dict(MOVES, STRUGGLE=0xA5)  # after NUM_ATTACKS, without a number comment
 
 NORMAL, FIGHTING, GROUND, BUG, GHOST = 0x00, 0x01, 0x04, 0x07, 0x08
 POISON = 0x03

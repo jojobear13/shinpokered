@@ -39,7 +39,7 @@ class AgreementTest(unittest.TestCase):
     def test_matches_the_gate(self):
         g = self.game
         rng = random.Random(26)
-        moves = sorted(name for name in MOVES if name != "STRUGGLE")
+        moves = sorted(name for name in MOVES if MOVES[name] <= 0xA4)  # Gen 1's, whose mix the count below expects
         blocked = 0
         for case in range(300):
             turn = case & 1

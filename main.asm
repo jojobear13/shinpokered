@@ -1846,11 +1846,9 @@ INCLUDE "engine/battle/animations.asm"
 
 INCLUDE "engine/overworld/cut2.asm"
 
-INCLUDE "engine/overworld/ssanne.asm"
 
 INCLUDE "data/animations.asm"
 
-INCLUDE "engine/evolution.asm"
 
 ;INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
@@ -1949,6 +1947,8 @@ INCLUDE "engine/battle/damage.asm"
 INCLUDE "engine/battle/move_data.asm"
 INCLUDE "engine/battle/side_conditions.asm"
 INCLUDE "engine/battle/decrement_pp.asm"
+INCLUDE "engine/overworld/ssanne.asm" ; (bank $1E was full)
+INCLUDE "engine/evolution.asm"
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 

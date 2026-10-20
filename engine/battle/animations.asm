@@ -2704,6 +2704,55 @@ MoveSoundTable:
 	db SFX_BATTLE_26,         $f0,$ff ; SUPER_FANG
 	db SFX_NOT_VERY_EFFECTIVE,$01,$ff ; SLASH
 	db SFX_BATTLE_2C,         $d8,$04 ; SUBSTITUTE
+	db SFX_BATTLE_12,         $10,$a0 ; AERIAL_ACE
+	db SFX_BATTLE_12,         $00,$c0 ; AIR_SLASH
+	db SFX_BATTLE_14,         $01,$e0 ; ANCIENTPOWER
+	db SFX_BATTLE_25,         $00,$10 ; AQUA_JET
+	db SFX_BATTLE_2A,         $f0,$60 ; BRINE
+	db SFX_BATTLE_1E,         $00,$80 ; BUG_BITE
+	db SFX_BATTLE_27,         $40,$60 ; BUG_BUZZ
+	db SFX_BATTLE_29,         $0f,$e0 ; BULLDOZE
+	db SFX_BATTLE_0B,         $01,$80 ; CLOSE_COMBAT
+	db SFX_BATTLE_0C,         $10,$80 ; CROSS_CHOP
+	db SFX_BATTLE_1E,         $12,$ff ; CRUNCH
+	db SFX_BATTLE_35,         $00,$80 ; DISARM_VOICE
+	db SFX_BATTLE_2F,         $20,$80 ; DISCHARGE
+	db SFX_BATTLE_29,         $f0,$80 ; DRAGONBREATH
+	db SFX_SUPER_EFFECTIVE,   $00,$a0 ; DRAGON_RUSH
+	db SFX_HORN_DRILL,        $00,$a0 ; DRILL_RUN
+	db SFX_BATTLE_0D,         $00,$40 ; DYNAMICPUNCH
+	db SFX_BATTLE_29,         $11,$20 ; EARTH_POWER
+	db SFX_BATTLE_25,         $00,$10 ; EXTREMESPEED
+	db SFX_BATTLE_1E,         $12,$ff ; FIRE_FANG
+	db SFX_BATTLE_29,         $20,$c0 ; FLAME_WHEEL
+	db SFX_BATTLE_29,         $1f,$20 ; FLARE_BLITZ
+	db SFX_BATTLE_28,         $00,$80 ; FLASH_CANNON
+	db SFX_BATTLE_24,         $40,$c0 ; GIGA_DRAIN
+	db SFX_BATTLE_2A,         $20,$20 ; GUNK_SHOT
+	db SFX_BATTLE_19,         $21,$e0 ; HEAT_WAVE
+	db SFX_BATTLE_0B,         $00,$40 ; HYPER_VOICE
+	db SFX_BATTLE_0D,         $20,$80 ; ICICLE_CRASH
+	db SFX_BATTLE_19,         $10,$a0 ; INCINERATE
+	db SFX_BATTLE_12,         $20,$e0 ; LEAF_BLADE
+	db SFX_SUPER_EFFECTIVE,   $f0,$ff ; LIQUIDATION
+	db SFX_BATTLE_23,         $00,$80 ; LOW_SWEEP
+	db SFX_BATTLE_0B,         $01,$80 ; MACH_PUNCH
+	db SFX_BATTLE_13,         $f1,$ff ; MOONBLAST
+	db SFX_PECK,$01,          $a0 ; PLUCK
+	db SFX_BATTLE_1E,         $12,$ff ; POISON_FANG
+	db SFX_BATTLE_1B,         $00,$80 ; POISON_JAB
+	db SFX_BATTLE_29,         $f0,$e0 ; POWDER_SNOW
+	db SFX_BATTLE_0C,         $f0,$f0 ; PSYSHOCK
+	db SFX_BATTLE_0F,         $1f,$ff ; RAZOR_SHELL
+	db SFX_BATTLE_35,         $00,$80 ; ROUND_M
+	db SFX_BATTLE_34,         $00,$40 ; SEED_BOMB
+	db SFX_NOT_VERY_EFFECTIVE,$f0,$e0 ; SHADOW_BALL
+	db SFX_BATTLE_2A,         $20,$20 ; SLUDGE_BOMB
+	db SFX_BATTLE_20,         $00,$80 ; STOMPTANTRUM
+	db SFX_BATTLE_36,         $f0,$20 ; STONE_EDGE
+	db SFX_BATTLE_12,         $00,$c0 ; TWISTER
+	db SFX_BATTLE_2A,         $f0,$60 ; WATER_PULSE
+	db SFX_NOT_VERY_EFFECTIVE,$01,$ff ; X_SCISSOR
 	db SFX_BATTLE_0B,         $00,$80 ; STRUGGLE
 	db SFX_BATTLE_0B,         $00,$80
 

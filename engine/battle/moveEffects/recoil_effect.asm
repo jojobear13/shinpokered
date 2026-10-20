@@ -1,4 +1,4 @@
-; Gen 9's recoil: Double-Edge 1/3 of the damage dealt, Take Down and
+; Gen 9's recoil: Double-Edge and Flare Blitz 1/3 of the damage dealt, Take Down and
 ; Submission 1/4 (rounded), Struggle 1/4 of the user's max HP; at least 1
 RecoilEffect_:
 	call UserMaxHP
@@ -6,9 +6,12 @@ RecoilEffect_:
 	jr z, .struggle ; of its max HP (hl)
 	ld hl, wDamage
 	cp DOUBLE_EDGE
+	jr z, .third
+	cp FLARE_BLITZ
+	ld a, 4
+	jr nz, .gotFraction
+.third
 	ld a, 3
-	jr z, .gotFraction
-	inc a
 	jr .gotFraction
 .struggle
 	ld a, 4
