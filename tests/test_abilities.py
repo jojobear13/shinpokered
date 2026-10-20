@@ -62,7 +62,8 @@ SPOT_CHECKS = {
     "KANGASKHAN": ("EARLY_BIRD", "SCRAPPY"),
     "PINSIR": ("HYPER_CUTTER", "MOLD_BREAKER"),
     "CHANSEY": ("NATURAL_CURE", "SERENE_GRACE"),
-    # weather, infatuation and Steel leave slots empty
+    "MAGNEMITE": ("MAGNET_PULL", "STURDY"),
+    # weather and infatuation leave slots empty
     "CLEFAIRY": ("NO_ABILITY", "MAGIC_GUARD"),
     "GRIMER": ("STENCH", "STICKY_HOLD"),  # empty until held items
     "MEOWTH": ("PICKUP", "TECHNICIAN"),
@@ -88,7 +89,7 @@ class AbilityDataTest(unittest.TestCase):
 
     def test_unworkable_abilities_are_absent(self):
         for name in ("CHLOROPHYLL", "SWIFT_SWIM", "SAND_VEIL", "CLOUD_NINE", "LEAF_GUARD",
-                     "HYDRATION", "CUTE_CHARM", "MAGNET_PULL"):
+                     "HYDRATION", "CUTE_CHARM"):
             self.assertNotIn(name, ABILITIES)
 
     def test_names_fit(self):

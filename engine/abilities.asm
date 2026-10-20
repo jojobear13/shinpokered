@@ -2503,18 +2503,15 @@ SideTrapped:
 	ld a, e
 	xor 1
 	call GetSideAbility
+	cp MAGNET_PULL
+	jr z, .magnetPull
 	cp ARENA_TRAP
 	jr nz, .free
 	ld a, e
 	call GetSideAbility
 	cp LEVITATE
 	jr z, .free
-	ld hl, wBattleMonType1
-	ld a, e
-	and a
-	jr z, .gotTypes
-	ld hl, wEnemyMonType1
-.gotTypes
+	call .types
 	ld a, [hli]
 	call .canLeave
 	jr z, .free
@@ -2530,6 +2527,35 @@ SideTrapped:
 	cp FLYING
 	ret z
 	cp GHOST
+	ret
+
+; Magnet Pull keeps Steel types in (but not Ghost types, as from Gen 6)
+.magnetPull
+	call .types
+	ld a, [hli]
+	ld b, [hl]
+	cp GHOST
+	jr z, .free
+	ld c, a
+	ld a, b
+	cp GHOST
+	jr z, .free
+	cp STEEL
+	jr z, .trapped
+	ld a, c
+	cp STEEL
+	jr nz, .free
+.trapped
+	scf
+	ret
+
+; hl = side e's types
+.types
+	ld hl, wBattleMonType1
+	ld a, e
+	and a
+	ret z
+	ld hl, wEnemyMonType1
 	ret
 
 PlayerTrapped:

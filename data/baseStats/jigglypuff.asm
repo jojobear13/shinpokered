@@ -6,7 +6,7 @@ db 20 ; base speed
 db 45 ; base special attack
 db 25 ; base special defense
 db NORMAL ; species type 1
-db NORMAL ; species type 2
+db FAIRY ; species type 2
 db 170 ; catch rate
 db 76 ; base exp yield
 INCBIN JIGGLYPUFF_FR,0,1 ; 55, sprite dimensions

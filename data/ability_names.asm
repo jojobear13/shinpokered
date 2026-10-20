@@ -28,6 +28,7 @@ AbilityNames: ; in the order of the ability constants
 	db "POISON POINT@"
 	db "INNER FOCUS@"
 	db "WATER VEIL@"
+	db "MAGNET PULL@"
 	db "SOUNDPROOF@"
 	db "PRESSURE@"
 	db "THICK FAT@"

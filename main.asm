@@ -1940,6 +1940,11 @@ INCLUDE "engine/held_items.asm"
 INCLUDE "data/item_prices.asm"
 INCLUDE "text/item_names.asm"
 
+SECTION "Battle 2", ROMX, BANK[$35]
+
+INCLUDE "engine/battle/type_effectiveness.asm"
+
+
 SECTION "Rules Menu", ROMX
 INCLUDE "custom_functions/func_rules_menu.asm"
 

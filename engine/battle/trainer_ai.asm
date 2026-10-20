@@ -863,8 +863,12 @@ AIMoveChoiceModification3:
 	ld a, [wBattleMonType]
 	cp POISON
 	jp z, .heavydiscourage2
+	cp STEEL
+	jp z, .heavydiscourage2
 	ld a, [wBattleMonType + 1]
 	cp POISON
+	jp z, .heavydiscourage2
+	cp STEEL
 	jp z, .heavydiscourage2
 .notpoisoneffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
