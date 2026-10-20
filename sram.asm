@@ -8,6 +8,39 @@ sSpriteBuffer2:: ds SPRITEBUFFERSIZE ; a310
 
 sHallOfFame:: ds HOF_TEAM * HOF_TEAM_CAPACITY ; a598
 
+; Live game data that used to be in WRAM (design brief, step D). Only
+; accessed between OpenBox and CloseBox (home.asm). Saved by copying it to
+; the bank 1 snapshot below, so a reset without saving loses changes to it,
+; as it did when it was in WRAM.
+sLiveDataStart::
+sDayCareMonName:: ds NAME_LENGTH ; b858
+sDayCareMonOT::   ds NAME_LENGTH ; b863
+sDayCareMon:: box_struct sDayCareMon ; b86e
+; the second day-care mon, in the same layout: the day care works on the
+; first, swapping the two (SwapDayCareMons) to work on this one
+sDayCareMon2Name:: ds NAME_LENGTH
+sDayCareMon2OT::   ds NAME_LENGTH
+sDayCareMon2:: box_struct sDayCareMon2
+ASSERT sDayCareMon2Name - sDayCareMonName == DAY_CARE_DATA_LENGTH
+; the egg the day care is keeping for the player (wDayCareEggReady), made
+; when it was laid, in the same layout
+sDayCareEggName:: ds NAME_LENGTH
+sDayCareEggOT::   ds NAME_LENGTH
+sDayCareEgg:: box_struct sDayCareEgg
+ASSERT sDayCareEggName - sDayCareMon2Name == DAY_CARE_DATA_LENGTH
+
+sBoxDataStart:: ; b88f
+sNumInBox::  ds 1
+sBoxSpecies:: ds MONS_PER_BOX + 1
+sBoxMons::
+sBoxMon1:: box_struct sBoxMon1
+sBoxMon2:: ds box_struct_length * (MONS_PER_BOX + -1)
+sBoxMonOT::    ds NAME_LENGTH * MONS_PER_BOX
+sBoxMonNicks:: ds NAME_LENGTH * MONS_PER_BOX
+sBoxMonNicksEnd::
+sBoxDataEnd::
+sLiveDataEnd:: ; bcf1
+
 
 SECTION "Save Data", SRAM, BANK[1]
 	ds $598
@@ -16,30 +49,39 @@ sPlayerName::  ds NAME_LENGTH ; a598
 sMainData::    ds wMainDataEnd   - wMainDataStart ; a5a3
 sSpriteData::  ds wSpriteDataEnd - wSpriteDataStart ; ad2c
 sPartyData::   ds wPartyDataEnd  - wPartyDataStart ; af2c
-sCurBoxData::  ds wBoxDataEnd    - wBoxDataStart ; b0c0
-sTilesetType:: ds 1 ; b522
-sMainDataCheckSum:: ds 1 ; b523
+sTilesetType:: ds 1 ; b089
+sMainDataCheckSum:: ds 1 ; b08a, covers sPlayerName up to here
+
+; The live day care and current box (sLiveDataStart, bank 0) as of the last
+; save, in the same layout, with their own checksum. Loading copies this back.
+sLiveDataSnapshot:: ; b08b
+sDayCareData:: ds DAY_CARE_DATA_LENGTH * (DAY_CARE_SLOTS + 1) ; the egg's too
+sCurBoxData::  ds sBoxDataEnd - sBoxDataStart ; b0c2
+sLiveDataSnapshotEnd::
+sLiveDataSnapshotCheckSum:: ds 1 ; b524
+ASSERT sCurBoxData - sLiveDataSnapshot == sBoxDataStart - sLiveDataStart
+ASSERT sLiveDataSnapshotEnd - sLiveDataSnapshot == sLiveDataEnd - sLiveDataStart
 
 
 SECTION "Saved Boxes 1", SRAM, BANK[2]
 
-sBox1:: ds wBoxDataEnd - wBoxDataStart ; a000
-sBox2:: ds wBoxDataEnd - wBoxDataStart ; a462
-sBox3:: ds wBoxDataEnd - wBoxDataStart ; a8c4
-sBox4:: ds wBoxDataEnd - wBoxDataStart ; ad26
-sBox5:: ds wBoxDataEnd - wBoxDataStart ; b188
-sBox6:: ds wBoxDataEnd - wBoxDataStart ; b5ea
+sBox1:: ds sBoxDataEnd - sBoxDataStart ; a000
+sBox2:: ds sBoxDataEnd - sBoxDataStart ; a462
+sBox3:: ds sBoxDataEnd - sBoxDataStart ; a8c4
+sBox4:: ds sBoxDataEnd - sBoxDataStart ; ad26
+sBox5:: ds sBoxDataEnd - sBoxDataStart ; b188
+sBox6:: ds sBoxDataEnd - sBoxDataStart ; b5ea
 sBank2AllBoxesChecksum:: ds 1 ; ba4c
 sBank2IndividualBoxChecksums:: ds 6 ; ba4d
 
 
 SECTION "Saved Boxes 2", SRAM, BANK[3]
 
-sBox7::  ds wBoxDataEnd - wBoxDataStart ; a000
-sBox8::  ds wBoxDataEnd - wBoxDataStart ; a462
-sBox9::  ds wBoxDataEnd - wBoxDataStart ; a8c4
-sBox10:: ds wBoxDataEnd - wBoxDataStart ; ad26
-sBox11:: ds wBoxDataEnd - wBoxDataStart ; b188
-sBox12:: ds wBoxDataEnd - wBoxDataStart ; b5ea
+sBox7::  ds sBoxDataEnd - sBoxDataStart ; a000
+sBox8::  ds sBoxDataEnd - sBoxDataStart ; a462
+sBox9::  ds sBoxDataEnd - sBoxDataStart ; a8c4
+sBox10:: ds sBoxDataEnd - sBoxDataStart ; ad26
+sBox11:: ds sBoxDataEnd - sBoxDataStart ; b188
+sBox12:: ds sBoxDataEnd - sBoxDataStart ; b5ea
 sBank3AllBoxesChecksum:: ds 1 ; ba4c
 sBank3IndividualBoxChecksums:: ds 6 ; ba4d

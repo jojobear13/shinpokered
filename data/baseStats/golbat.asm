@@ -3,7 +3,8 @@ db 75 ; base hp
 db 80 ; base attack
 db 70 ; base defense
 db 90 ; base speed
-db 75 ; base special
+db 65 ; base special attack
+db 75 ; base special defense
 db POISON ; species type 1
 db FLYING ; species type 2
 db 90 ; catch rate
@@ -12,9 +13,9 @@ INCBIN GOLBAT_FR,0,1 ; 77, sprite dimensions
 dw GolbatPicFront
 dw GolbatPicBack
 ; attacks known at lvl 0
-db LEECH_LIFE
 db SCREECH
 db BITE
+db 0
 db 0
 db 0 ; growth rate
 ; learnset

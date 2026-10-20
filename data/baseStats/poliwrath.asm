@@ -1,9 +1,10 @@
 db DEX_POLIWRATH ; pokedex id
 db 90 ; base hp
-db 85 ; base attack
+db 95 ; base attack
 db 95 ; base defense
 db 70 ; base speed
-db 70 ; base special
+db 70 ; base special attack
+db 90 ; base special defense
 db WATER ; species type 1
 db FIGHTING ; species type 2
 db 45 ; catch rate

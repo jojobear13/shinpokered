@@ -4,6 +4,8 @@ PSN EQU 3
 BRN EQU 4
 FRZ EQU 5
 PAR EQU 6
+TOX EQU 7 ; with PSN: badly poisoned, which Gen 9 keeps through a switch (the
+          ; toxic counter starts again)
 SLP_NOMOVE EQU %110	;joenote - sleep counter for when choosing won't be used on wakeup
 
 ; volatile statuses 1
@@ -12,13 +14,13 @@ THRASHING_ABOUT          EQU 1 ; e.g. Thrash
 ATTACKING_MULTIPLE_TIMES EQU 2 ; e.g. Double Kick, Fury Attack
 FLINCHED                 EQU 3
 CHARGING_UP              EQU 4 ; e.g. Solar Beam, Fly
-USING_TRAPPING_MOVE      EQU 5 ; e.g. Wrap
+;                        EQU 5 ; unused (Gen 9's binding is wPlayerBoundTurns)
 INVULNERABLE             EQU 6 ; charging up Fly/Dig
 CONFUSED                 EQU 7
 
 ; volatile statuses 2
 USING_X_ACCURACY    EQU 0
-PROTECTED_BY_MIST   EQU 1
+;                   EQU 1 ; unused (Mist is wPlayerMistTurns)
 GETTING_PUMPED      EQU 2 ; Focus Energy
 ;                   EQU 3 ; unused
 HAS_SUBSTITUTE_UP   EQU 4
@@ -28,12 +30,7 @@ SEEDED              EQU 7
 
 ; volatile statuses 3
 BADLY_POISONED      EQU 0
-HAS_LIGHT_SCREEN_UP EQU 1
-HAS_REFLECT_UP      EQU 2
+;                   EQU 1 ; unused (screens are wPlayerLightScreenTurns
+;                   EQU 2 ; and wPlayerReflectTurns)
 TRANSFORMED         EQU 3
-;joenote - for trapping spam counter
-TRAPPING_COUNT EQU 6
-TRAPPING_NEGATIVE EQU 7
-TRAPPING_COUNT_BIT EQU %01000000
-TRAPPING_NEGATIVE_BIT EQU %10000000
 

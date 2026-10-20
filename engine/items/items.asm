@@ -11,8 +11,10 @@ UseItem_:
 .nottrainerbattle
 
 	ld a, [wcf91] ;contains item_ID
-	cp HM_01
-	jp nc, ItemUseTMHM
+	cp FIRST_HELD_ITEM
+	jp nc, ItemUseHeldItem
+	cp ZINC
+	jp z, ItemUseVitamin
 	ld hl, ItemUsePtrTable
 	dec a
 	add a
@@ -111,6 +113,13 @@ ItemUsePtrTable:
 	dw ItemUsePPRestore  ; ELIXER
 	dw ItemUsePPRestore  ; MAX_ELIXER
 
+; a held item (or the DEXREPEL), used from the bag: engine/items/held_item_use.asm
+ItemUseHeldItem:
+	ld a, [wIsInBattle]
+	and a
+	jp nz, ItemUseNotTime
+	jpab ItemUseHeldItem_
+
 ItemUseBall:
 
 ;joenote - restrict throwing a ball for nuzlocke mode
@@ -140,7 +149,7 @@ ItemUseBall:
 	ld a, [wPartyCount] ; is party full?
 	cp PARTY_LENGTH
 	jr nz, .canUseBall
-	ld a, [wNumInBox] ; is box full?
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jp z, BoxFullCannotThrowBall
 
@@ -547,14 +556,13 @@ ItemUseBall:
 
 .notTransformed
 ; If the Pokémon is not transformed, set the transformed bit and copy the
-; DVs to wTransformedEnemyMonOriginalDVs so that LoadEnemyMonData won't generate
-; new DVs.
+; IVs to wTransformedEnemyMonOriginalIVs so that LoadEnemyMonData won't generate
+; new IVs.
 	set TRANSFORMED, [hl]
-	ld hl, wTransformedEnemyMonOriginalDVs
-	ld a, [wEnemyMonDVs]
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 1]
-	ld [hl], a
+	ld hl, wEnemyMonIVs
+	ld de, wTransformedEnemyMonOriginalIVs
+	ld bc, NUM_IVS
+	call CopyData
 
 .skip6
 	ld a, [wcf91]
@@ -595,6 +603,7 @@ ItemUseBall:
 
 	ld hl, ItemUseBallText05
 	call PrintText
+	call CaughtMonExperience
 
 ; Clear a flag to indicate that the player has caught a pokemon with a ball throw at least once
 	CheckEvent EVENT_01B
@@ -657,7 +666,7 @@ ItemUseBall:
 .printTransferredToPCText
 	call PrintText
 ;joenote - add reminder that box is now full
-	ld a, [wNumInBox] ; is box full?
+	call GetNumInBox ; the box is in save RAM
 	cp MONS_PER_BOX
 	jr nz, .done
 	ld hl, BoxFullReminderTXT
@@ -713,6 +722,30 @@ ItemUseBallText04:
 ;"Shoot! It was so close too!"
 	TX_FAR _ItemUseBallText04
 	db "@"
+
+; Gen 6+: the party gains experience and EVs for a caught mon as for one
+; defeated (not in the Safari Zone, where none of them battle). It keeps
+; wcf91, wd11e and wWhichPokemon, which the rest of the catch reads.
+CaughtMonExperience:
+	ld a, [wBattleType]
+	cp BATTLE_TYPE_SAFARI
+	ret z
+	call ClearSprites ; the thrown ball, which would sit over the stat boxes
+	ld a, [wcf91]
+	push af
+	ld a, [wd11e]
+	push af
+	ld a, [wWhichPokemon] ; the ball's place in the bag, to use it up
+	push af
+	callab GainExperience
+	pop af
+	ld [wWhichPokemon], a
+	pop af
+	ld [wd11e], a
+	pop af
+	ld [wcf91], a
+	ret
+
 ItemUseBallText05:
 ;"All right! {MonName} was caught!"
 ;play sound
@@ -991,6 +1024,8 @@ ItemUseMedicine:
 	jp z, .healingItemNoEffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, [wcf91]
+	cp ZINC
+	jp z, .useVitamin
 	cp REVIVE
 	jr nc, .healHP ; if it's a Revive or Max Revive
 	cp FULL_HEAL
@@ -1452,55 +1487,27 @@ ItemUseMedicine:
 		
 	jp UseCustomMedicine	;joenote - custom medicine items (m_gene and mist_stone)
 .no_custom_medicine
-
-	call VitaminLevelCheck
-	push af
-	
-	ld a, [wcf91]	;joenote - 'A' might get clobbered by UseCustomMedicine, so reload wcf91
-	sub HP_UP
-	add a
-	ld bc, wPartyMon1HPExp - wPartyMon1
+; Gen 9's vitamins: 10 EVs in their stat, up to MAX_EV, MAX_TOTAL_EVS in all
+	ld a, [wcf91]
+	sub HP_UP ; the stat, 0 = HP
+	cp ZINC - HP_UP
+	jr nz, .gotVitaminStat
+	ld a, NUM_STATS - 1 ; Zinc: special defense
+.gotVitaminStat
+	ld [wItemScratch], a
+	ld a, 10
+	ld [wItemScratch + 1], a
+	ld bc, wPartyMon1EVs - wPartyMon1
 	add hl, bc
-	add l
-	ld l, a
-	jr nc, .noCarry2
-	inc h
-.noCarry2
-	pop af
-	jr c, .e4notbeaten		;apply vitamin limiter of less than the level threshold
-	CheckEvent EVENT_908	;joenote - has elite 4 been beaten?
-	jr z, .e4notbeaten 	;if not, apply the vitamin limiter
-
-	;else remove the vitamin limiter
-	ld a, 10
-	ld b, a
-	call CheckMaxStatExp
-	jr c, .vitaminNoEffect ; if stat exp was already at 65535, then can't add any more
-
-	ld a, [hl] ; a = MSB of stat experience of the appropriate stat
-	add b ; add 2560 (256 * 10) stat experience
-	jr nc, .noCarry3	;if there is an overflow, load 65535 stat exp
-	ld a, $ff
-	inc hl
-	ld [hld], a
-	jr .noCarry3
-	
-.e4notbeaten
-	ld a, 10
-	ld b, a
-	ld a, [hl] ; a = MSB of stat experience of the appropriate stat
-	cp 100 ; is there already at least 25600 (256 * 100) stat experience?
-	jr nc, .vitaminNoEffect ; if so, vitamins can't add any more
-	add b ; add 2560 (256 * 10) stat experience
-;	jr nc, .noCarry3 ; a carry should be impossible here, so this will always jump
-;	ld a, 255
-.noCarry3
-	ld [hl], a
+	ld d, h
+	ld e, l
+	callab AddEVs
+	jr c, .vitaminNoEffect
 	pop hl		;pop wPartyMonX
 	call .recalculateStats
 	ld hl, VitaminText
-	ld a, [wcf91]
-	sub HP_UP - 1
+	ld a, [wItemScratch]
+	inc a
 	ld c, a
 .statNameLoop ; loop to get the address of the name of the stat the vitamin increases
 	dec c
@@ -1604,7 +1611,7 @@ ItemUseMedicine:
 	ld a, [hExperience + 2]
 	ld [hl], a
 
-.returnDVMedicine
+.returnIVMedicine
 
 	pop hl	;pop wPartyMonX
 	
@@ -1657,7 +1664,8 @@ VitaminText:
 	db "ATTACK@"
 	db "DEFENSE@"
 	db "SPEED@"
-	db "SPECIAL@"
+	db "SP.ATK@"
+	db "SP.DEF@"
 
 ItemUseBait:
 	ld hl, ThrewBaitText
@@ -1778,6 +1786,8 @@ ItemUseRepelCommon:
 	jp nz, ItemUseNotTime
 	ld a, b
 	ld [wRepelRemainingSteps], a
+	ld a, [wcf91] ; to offer another when it wears off (RepelWoreOff)
+	ld [wLastRepelUsed], a
 	jp PrintItemUseTextAndRemoveItem
 
 ; handles X Accuracy item
@@ -1902,8 +1912,8 @@ ItemUseGuardSpec:
 	ld a, [wIsInBattle]
 	and a
 	jp z, ItemUseNotTime
-	ld hl, wPlayerBattleStatus2
-	set PROTECTED_BY_MIST, [hl] ; Mist bit
+	ld a, 5 ; Mist on the player's side for 5 turns
+	ld [wPlayerMistTurns], a
 	jp PrintItemUseTextAndRemoveItem
 
 ItemUseSuperRepel:
@@ -2070,7 +2080,7 @@ ItemUsePokeflute:
 ; OUTPUT:
 ; [wWereAnyMonsAsleep]: set to 1 if any pokemon were asleep
 WakeUpEntireParty:
-	ld de, 44
+	ld de, wPartyMon2 - wPartyMon1
 	ld c, 6
 .loop
 	ld a, [hl]
@@ -2543,122 +2553,6 @@ PPRestoredText:
 UnusableItem:
 	jp ItemUseNotTime
 
-ItemUseTMHM:
-	ld a, [wIsInBattle]
-	and a
-	jp nz, ItemUseNotTime
-	ld a, [wcf91]
-	sub TM_01
-	push af
-	jr nc, .skipAdding
-	add 55 ; if item is an HM, add 55
-.skipAdding
-	inc a
-	ld [wd11e], a
-	predef TMToMove ; get move ID from TM/HM ID
-	ld a, [wd11e]
-	ld [wMoveNum], a
-	call GetMoveName
-	call CopyStringToCF4B ; copy name to wcf4b
-	pop af
-	ld hl, BootedUpTMText
-	jr nc, .printBootedUpMachineText
-	ld hl, BootedUpHMText
-.printBootedUpMachineText
-	call PrintText
-	ld hl, TeachMachineMoveText
-	call PrintText
-	coord hl, 14, 7
-	lb bc, 8, 15
-	ld a, TWO_OPTION_MENU
-	ld [wTextBoxID], a
-	call DisplayTextBoxID ; yes/no menu
-	ld a, [wCurrentMenuItem]
-	and a
-	jr z, .useMachine
-	ld a, 2
-	ld [wActionResultOrTookBattleTurn], a ; item not used
-	ret
-.useMachine
-	ld a, [wWhichPokemon]
-	push af
-	ld a, [wcf91]
-	push af
-.chooseMon
-	ld hl, wcf4b
-	ld de, wTempMoveNameBuffer
-	ld bc, 14
-	call CopyData ; save the move name because DisplayPartyMenu will overwrite it
-	ld a, $ff
-	ld [wUpdateSpritesEnabled], a
-	ld a, TMHM_PARTY_MENU
-	ld [wPartyMenuTypeOrMessageID], a
-	call DisplayPartyMenu
-	push af
-	ld hl, wTempMoveNameBuffer
-	ld de, wcf4b
-	ld bc, 14
-	call CopyData
-	pop af
-	jr nc, .checkIfAbleToLearnMove
-; if the player canceled teaching the move
-	pop af
-	pop af
-	call GBPalWhiteOutWithDelay3
-	call ClearSprites
-	call RunDefaultPaletteCommand
-	jp LoadScreenTilesFromBuffer1 ; restore saved screen
-.checkIfAbleToLearnMove
-	predef CanLearnTM ; check if the pokemon can learn the move
-	push bc
-	ld a, [wWhichPokemon]
-	ld hl, wPartyMonNicks
-	call GetPartyMonName
-	pop bc
-	ld a, c
-	and a ; can the pokemon learn the move?
-	jr nz, .checkIfAlreadyLearnedMove
-; if the pokemon can't learn the move
-	ld a, SFX_DENIED
-	call PlaySoundWaitForCurrent
-	ld hl, MonCannotLearnMachineMoveText
-	call PrintText
-	jr .chooseMon
-.checkIfAlreadyLearnedMove
-	callab CheckIfMoveIsKnown ; check if the pokemon already knows the move
-	jr c, .chooseMon
-	predef LearnMove ; teach move
-	pop af
-	ld [wcf91], a
-	pop af
-	ld [wWhichPokemon], a
-	ld a, b
-	and a
-	ret z
-	xor a
-	cp c
-	ret c	;treat learning a field move from a TM the same as a HM
-	ld a, [wcf91]
-	call IsItemHM
-	ret c
-	jp RemoveUsedItem
-
-BootedUpTMText:
-	TX_FAR _BootedUpTMText
-	db "@"
-
-BootedUpHMText:
-	TX_FAR _BootedUpHMText
-	db "@"
-
-TeachMachineMoveText:
-	TX_FAR _TeachMachineMoveText
-	db "@"
-
-MonCannotLearnMachineMoveText:
-	TX_FAR _MonCannotLearnMachineMoveText
-	db "@"
-
 PrintItemUseTextAndRemoveItem:
 	ld hl, ItemUseText00
 	call PrintText
@@ -2865,6 +2759,7 @@ AddBonusPP:
 ; OUTPUT:
 ; [wMaxPP] = max PP
 GetMaxPP:
+	call OpenBox ; the box and the day care are in save RAM; closed at the end
 	ld a, [wMonDataLocation]
 	and a
 	ld hl, wPartyMon1Moves
@@ -2873,11 +2768,11 @@ GetMaxPP:
 	ld hl, wEnemyMon1Moves
 	dec a
 	jr z, .sourceWithMultipleMon
-	ld hl, wBoxMon1Moves
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMon1Moves
+	ld bc, sBoxMon2 - sBoxMon1
 	dec a
 	jr z, .sourceWithMultipleMon
-	ld hl, wDayCareMonMoves
+	ld hl, sDayCareMonMoves
 	dec a
 	jr z, .sourceWithOneMon
 	ld hl, wBattleMonMoves ; player's in-battle pokemon
@@ -2922,7 +2817,7 @@ GetMaxPP:
 	ld a, [hl]
 	and %00111111 ; mask out the PP Up count
 	ld [wMaxPP], a ; store max PP
-	ret
+	jp CloseBox
 
 GetSelectedMoveOffset:
 	ld a, [wWhichPokemon]
@@ -2944,11 +2839,6 @@ GetSelectedMoveOffset2:
 ; OUTPUT:
 ; clears carry flag if the item is tossed, sets carry flag if not
 TossItem_:
-	push hl
-	ld a, [wcf91]
-	call IsItemHM
-	pop hl
-	jr c, .tooImportantToToss
 	push hl
 	call IsKeyItem_
 	ld a, [wIsKeyItem]
@@ -3022,7 +2912,8 @@ IsKeyItem_:
 	push af
 	ld hl, KeyItemBitfield
 	ld de, wBuffer
-	ld bc, 15 ; only 11 bytes are actually used
+	ld bc, (NUM_ITEMS_AND_FLOORS + 7) / 8
+	ASSERT (NUM_ITEMS_AND_FLOORS + 7) / 8 <= 30 ; wBuffer's size
 	call CopyData
 	pop af
 	dec a
@@ -3044,7 +2935,16 @@ IsKeyItem_:
 INCLUDE "data/key_items.asm"
 
 SendNewMonToBox:
-	ld de, wNumInBox
+; The box is in save RAM (design brief, step D). The nickname is asked for
+; first, into wcd6d, so the naming screen never runs with save RAM open. It
+; stays in wcd6d for the "was transferred" texts the callers print. AskName
+; leaves wcf91 alone (AddPartyMon relies on that too).
+	ld hl, wcd6d
+	ld a, NAME_MON_SCREEN
+	ld [wNamingScreenType], a
+	predef AskName
+	call OpenBox ; closed at the end
+	ld de, sNumInBox
 	ld a, [de]
 	inc a
 	ld [de], a
@@ -3061,9 +2961,9 @@ SendNewMonToBox:
 	cp $ff
 	jr nz, .asm_e7b1
 	call GetMonHeader
-	ld hl, wBoxMonOT
+	ld hl, sBoxMonOT
 	ld bc, NAME_LENGTH
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e7ee
 	dec a
@@ -3074,7 +2974,7 @@ SendNewMonToBox:
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e7db
@@ -3092,13 +2992,13 @@ SendNewMonToBox:
 	jr nz, .asm_e7db
 .asm_e7ee
 	ld hl, wPlayerName
-	ld de, wBoxMonOT
+	ld de, sBoxMonOT
 	ld bc, NAME_LENGTH
 	call CopyData
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e82a
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 	ld bc, NAME_LENGTH
 	dec a
 	call AddNTimes
@@ -3108,7 +3008,7 @@ SendNewMonToBox:
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e817
@@ -3125,35 +3025,35 @@ SendNewMonToBox:
 	dec b
 	jr nz, .asm_e817
 .asm_e82a
-	ld hl, wBoxMonNicks
-	ld a, NAME_MON_SCREEN
-	ld [wNamingScreenType], a
-	predef AskName
-	ld a, [wNumInBox]
+	ld hl, wcd6d
+	ld de, sBoxMonNicks
+	ld bc, NAME_LENGTH
+	call CopyData
+	ld a, [sNumInBox]
 	dec a
 	jr z, .asm_e867
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 	dec a
 	call AddNTimes
 	push hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld d, h
 	ld e, l
 	pop hl
-	ld a, [wNumInBox]
+	ld a, [sNumInBox]
 	dec a
 	ld b, a
 .asm_e854
 	push bc
 	push hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	call CopyData
 	pop hl
 	ld d, h
 	ld e, l
-	ld bc, wBoxMon1 - wBoxMon2
+	ld bc, sBoxMon1 - sBoxMon2
 	add hl, bc
 	pop bc
 	dec b
@@ -3162,8 +3062,8 @@ SendNewMonToBox:
 	ld a, [wEnemyMonLevel]
 	ld [wEnemyMonBoxLevel], a
 	ld hl, wEnemyMon
-	ld de, wBoxMon1
-	ld bc, wEnemyMonDVs - wEnemyMon
+	ld de, sBoxMon1
+	ld bc, wEnemyMonIVs - wEnemyMon
 	call CopyData
 	ld hl, wPlayerID
 	ld a, [hli]
@@ -3187,18 +3087,21 @@ SendNewMonToBox:
 	ld [de], a
 	inc de
 	xor a
-	ld b, NUM_STATS * 2
+	ld b, NUM_STATS ; no EVs
 .asm_e89f
 	ld [de], a
 	inc de
 	dec b
 	jr nz, .asm_e89f
-	ld hl, wEnemyMonDVs
+	ld hl, wEnemyMonIVs
+	ld b, NUM_IVS
+.copyIVs
 	ld a, [hli]
 	ld [de], a
 	inc de
-	ld a, [hli]
-	ld [de], a
+	dec b
+	jr nz, .copyIVs
+	dec de ; the PP loop starts with inc de
 	ld hl, wEnemyMonPP
 	ld b, NUM_MOVES
 .asm_e8b1
@@ -3207,7 +3110,7 @@ SendNewMonToBox:
 	ld [de], a
 	dec b
 	jr nz, .asm_e8b1
-	ret
+	jp CloseBox
 
 	
 ;joenote - replacing this with adapted code from pokemon yellow to prevent statue fishing/surfing
@@ -3444,51 +3347,64 @@ UseCustomMedicine:
 
 	jr .exit_no_usage
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;added code for the MIST_STONE
+;added code for the MIST_STONE: like Gen 7's Gold Bottle Cap, all IVs to 31
 .useMistStone
 	call VitaminLevelCheck
 	jp c, ItemUseMedicine.vitaminNoEffect
-
 	push hl
-	ld bc, wPartyMon1HPExp - wPartyMon1
-	add hl, bc ; hl now points to stat experience
-	ld b, 5
-	ld c, 5
-.useMistStone_loop
-	call CheckMaxStatExp
-	call c, .decB
-	ld a , $ff
-	ld [hli], a
-	ld [hli], a
-	dec c
-	jr nz, .useMistStone_loop
-	ld a, b
-	sub 1
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	ld a, [hli]
+	and [hl]
+	inc hl
+	and [hl]
+	inc hl
+	ld b, a
+	ld a, [hl]
+	or %11 ; not the flags
+	and b
+	inc a
+	jr z, .alreadyMax ; every IV bit was already set
+	ld a, [hl]
+	or $FC ; the flags stay
+	ld [hld], a
+	ld a, $ff
+	ld [hld], a
+	ld [hld], a
+	ld [hl], a
 	pop hl
-	
-	call c, .maxDVs	;if stat exp is all at max, try to max the DVs
-	jp c, ItemUseMedicine.vitaminNoEffect	;no effect if everything is already at max
 	jr .exit_used_meds
+.alreadyMax
+	pop hl
+	jp ItemUseMedicine.vitaminNoEffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;added code for the M_GENE
+;added code for the M_GENE: new biased IVs of 16 or more (keeping the
+;Nuzlocke mark; the ability slot is rerolled)
 .useMGene
 	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-;generate new random DVs and make sure they are biased to be more than average
-;make all the DVs at least 8
-	call Random_BiasDV
-	or $98
-	ld [hli], a
-	ld a, b
-	or $88
+	ld bc, wPartyMon1IVs + IV_FLAGS - wPartyMon1
+	add hl, bc
+	ld a, [hl]
+	and 1 << NUZLOCKE_DEAD_F
+	ld [wItemScratch], a
+	ld bc, -IV_FLAGS
+	add hl, bc
+	ld d, h
+	ld e, l
+	push de
+	callab MGeneIVs
+	pop hl
+	ld bc, IV_FLAGS
+	add hl, bc
+	ld a, [wItemScratch]
+	or [hl]
 	ld [hl], a
 	pop hl
 	;fall through
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;jump back to the original function after using an item
 .exit_used_meds
-	jp ItemUseMedicine.returnDVMedicine
+	jp ItemUseMedicine.returnIVMedicine
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;jump back to the original function after not using an item
@@ -3496,32 +3412,6 @@ UseCustomMedicine:
 	jp ItemUseMedicine.no_custom_medicine
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;max out the DVs
-.maxDVs	
-	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-	ld b, 2
-	ld a, [hli]
-	add 1
-	call c, .decB
-	ld a, [hld]
-	add 1
-	call c, .decB
-	ld a, b
-	sub 1
-	pop hl
-	ret c	;return with carry bit set if DVs are already at max
-	
-	push hl
-	ld bc, wPartyMon1DVs - wPartyMon1
-	add hl, bc ; hl now points to DVs
-	ld a, $ff
-	ld [hli], a
-	ld [hl], a
-	pop hl
-	ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;general decrement for conditionals
 .decB
@@ -3537,17 +3427,6 @@ VitaminLevelCheck:
 	cp 31
 	ret
 	
-CheckMaxStatExp:
-	push de
-	ld a, [hli] ; a = MSB of stat experience of the appropriate stat
-	ld d, a
-	ld a, [hld]	; a = LSB of stat experience of the appropriate stat
-	ld e, a
-	ld a, 1
-	add e
-	ld a, 0
-	adc a, d
-	pop de
-	ret		;carry bit is set if there is an overflow
+
 
 

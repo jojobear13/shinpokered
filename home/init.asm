@@ -77,7 +77,7 @@ rLCDC_DEFAULT EQU %11100011
 
 ;finish initializing RNG
 ;joenote - added lines to save the RNG seed
-	ld hl, $DEF0
+	ld hl, wRNGSeed
 	pop af
 	call z, .inc_a
 	ld [hRandomAdd], a

@@ -49,7 +49,7 @@ ENDM
 	mapconst VIRIDIAN_POKECENTER,         4,  7 ; $29
 	mapconst VIRIDIAN_MART,               4,  4 ; $2A
 	mapconst VIRIDIAN_SCHOOL,             4,  4 ; $2B
-	mapconst VIRIDIAN_HOUSE,              4,  8 ; $2C	;joenote - widened the house map
+	mapconst VIRIDIAN_HOUSE,              4,  4 ; $2C
 	mapconst VIRIDIAN_GYM,                9, 10 ; $2D
 	mapconst DIGLETTS_CAVE_EXIT,          4,  4 ; $2E
 	mapconst VIRIDIAN_FOREST_EXIT,        4,  5 ; $2F

@@ -8,23 +8,11 @@
 ;Feel free to take this file and implement it for your own pokered-based project.
 ;This takes about the same time to run as the original code, but at least it is easier to manage and modify.
 
-;joenote - This is the main function that gets called from engine\battle\core.asm
-;core.asm has a few required changes at the spot where it calls GainExperience
-;Note that this fixes several bugs involving EXP ALL including the division bug where chunks of exp can be lost.
-;Here is how things now work with EXP ALL:
-; 1 - Resolve battle participants.
-;   A - Copy the base stats and base exp value of the enemy pokemon into buffer memory.
-;   B - Halve each of these six values due to EXP ALL.
-;   C - Divide these six values further by the number of non-fainted pokemon who fought.
-;   D - Add the resulting five base stat values to the Stat EXP values of non-fainted pokemon who fought.
-;	E - Get the enemy pokemon base exp value (which was previously halved) and multiply it by the enemy's level.
-;	F - Take that result and divide by 7 to get the general EXP amount. Multiply again by 1.5 if a trainer battle.
-;	G - Give that EXP value to every non-fainted pokemon who fought, multiplying it by 1.5 for any traded pokemon.
-; 2 - Set flags so that the entire party is now treated as "having fought" for the purposes of EXP ALL.
-; 3 - Repeat #1.
-;Meaning that:
-;  - Pokemon still do not recieve EXP for being fainted, but they no longer count towards division and dilute the EXP.
-;  - The division done by having multiple battle participants is now cleared before doing whole-party EXP.
+;Gen 9's experience: the party mons that took part (or hold an Exp. Share) gain
+;it in full; with the EXP. SHARE option on (Gen 9's always-on Exp. Share), or
+;else with the EXP ALL in the bag, the rest of the team gains half, by Gen 7+'s level-scaled formula (ScaledExp), then x1.5 if traded, x1.5
+;with a Lucky Egg, x1.2 past the level it could have evolved at. Each of them
+;gains the enemy's EV yield too.
 GainExperience:
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
@@ -33,46 +21,69 @@ GainExperience:
 ;shinpokered feature having to do with the GBC double speed CPU mode
 ;Running in double speed CPU mode shaves off about 1 second of computation delay
 	predef SetCPUSpeed
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;shinpokered feature having to do with exp all
-	ld a, [wBoostExpByExpAll]
-	and a
-	jr z, .skipexpallmsg
-	ld a, [wd728]
-	set 7, a
-	ld [wd728], a	
-.skipexpallmsg
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	call BufferExpData
-	call GetNumMonsGainingExp
-	call DivideExpDataByNumMonsGainingExp
-	call GiveStatExp
-	call CalculateLevelExp
-	
+	callab ExpShareHolders ; they count as having taken part
+	ld a, [wPartyGainExpFlags]
+	ld [wUnusedD155], a ; who took part
 	xor a
 	ld [wWhichPokemon], a
-	ld a, [wPartyGainExpFlags]
-	and %00111111
-	ld c, a
-	ld hl, wPartyMon1OTID
+	ld [wBoostExpByExpAll], a ; set if any mon gains the Exp. Share's half
 .loop
-	push bc
-	srl c
-	jr nc, .next
+	ld a, [wWhichPokemon]
+	ld hl, wPartyCount
+	cp [hl]
+	jp nc, .done
+	ld hl, wPartyMon1HP
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	ld a, [hli]
+	or [hl]
+	jp z, .nextMon ; fainted: nothing
+; its share: 1 if it took part, else 2 if the rest of the team gains half
+	ld a, [wWhichPokemon]
+	inc a
+	ld b, a
+	ld a, [wUnusedD155]
+.findBit
+	rrca
+	dec b
+	jr nz, .findBit
+	ld a, 1
+	jr c, .gotShare
+	push hl
+	call RestOfTeamGainsExp
+	pop hl
+	jp z, .nextMon ; no share: no EXP and no EVs, as in the original game
+	ld a, 2
+	ld [wBoostExpByExpAll], a
+.gotShare
+	ld [wExpScratch + 1], a
+	ld bc, wPartyMon1Level - (wPartyMon1HP + 1)
+	add hl, bc
+	ld a, [hl]
+	ld [wExpScratch], a
+; the EVs
+	ld bc, wPartyMon1EVs - wPartyMon1Level
+	add hl, bc
+	ld d, h
+	ld e, l
+	callab GiveEnemyEVs
+; the experience
+	callab ScaledExp
+	call CatchUpBoost ;shinpokered-master feature
+	ld hl, wPartyMon1OTID
+	ld a, [wWhichPokemon]
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
 	push hl		;preserve wPartyMon'X'OTID
 
 	call AddExpToPokemon
 	;HL  now equals wPartyMon'X'Exp
-	;Now backup the general exp calculation since the quotient addresses are going to get clobbered
-	ld a, [H_QUOTIENT+2]
-	push af
-	ld a, [H_QUOTIENT+3]
-	push af
 	call CapExpAtMaxLevel
 	;HL  still equals wPartyMon'X'Exp
-	call PrintExpGained
+	ld a, [wExpScratch + 1]
+	dec a
+	call z, PrintExpGained ; those that took part; the rest get one line at the end
 	;HL  still equals wPartyMon'X'Exp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
 ;joenote - Now to check if the pointed pokemon gained any levels
@@ -98,63 +109,26 @@ ENDC
 	;This has to do with shinpokered fixes implemented in engine\evos_moves.asm
 
 	cp d	;D holds the potential new level based on the added exp
-	jr z, .nextMon ; if level didn't change, go to next mon
-;remember that HL equals wPartyMon'X'Level at this line
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		
-	call LevelUpPokemon
-.nextMon
-	;Need to restore the general exp calculation back into the quotient addresses
-	pop af
-	ld [H_QUOTIENT+3], a
-	pop af
-	ld [H_QUOTIENT+2], a
-	xor a
-	ld [H_QUOTIENT+1], a
-	ld [H_QUOTIENT], a
+	call nz, LevelUpPokemon
 	pop hl	;HL equals wPartyMon'X'OTID
-.next
-	ld bc, wPartyMon2 - wPartyMon1
-	add hl, bc
-	ld a, [wWhichPokemon]
-	inc a
-	ld [wWhichPokemon], a
-	pop bc
-	srl c
-	jr nz, .loop
-	
-;all done with the main run, so do some finishing-up
+.nextMon
+	ld hl, wWhichPokemon
+	inc [hl]
+	jp .loop
+
+.done
+	ld a, [wBoostExpByExpAll]
+	and a
+	jr z, .noShare
+	ld hl, TeamGainedExpText
+	call PrintText
+.noShare
+	xor a
+	ld [wBoostExpByExpAll], a
 
 	;shinpokered feature having to do with the GBC double speed CPU mode
 	predef SingleCPUSpeed
-	
-	ld b, EXP_ALL
-	call IsItemInBag
-	jr z, .done_doPredefJump	;totally done if exp all is not in the bag
-	
-	ld a, [wBoostExpByExpAll]
-	and a
-	jr nz, .done_doPredefJump	;totally done if exp all is in the bag but ran through its effect already
 
-;exp all is in the bag but its effect still needs to happen
-.done_doPredefAndLoop
-	ld hl, wPartyGainExpFlags
-	xor a
-	ld [hl], a ; clear gain exp flags
-	ld a, [wPlayerMonNumber]
-	ld c, a
-	ld b, FLAG_SET
-	push bc
-	predef FlagActionPredef ; set the gain exp flag for the mon that is currently out
-	ld hl, wPartyFoughtCurrentEnemyFlags
-	xor a
-	ld [hl], a
-	pop bc
-	predef FlagActionPredef ; set the fought current enemy flag for the mon that is currently out
-	;initiate the exp all effect and run through this function again
-	call SetExpAllFlags
-	jp GainExperience
-	
-.done_doPredefJump
 	ld hl, wPartyGainExpFlags
 	xor a
 	ld [hl], a ; clear gain exp flags
@@ -169,272 +143,18 @@ ENDC
 	pop bc
 	predef_jump FlagActionPredef ; jump out to set the fought current enemy flag for the mon that is currently active
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-;joenote - This function backs up enemy base stats and base exp into wBuffer
-;it also halves the values if EXP ALL is detected in the bag
-BufferExpData:
-	push de
-	ld de, wBuffer
-	ld hl, wEnemyMonBaseStats
-	ld c, wEnemyMonBaseExp + 1 - wEnemyMonBaseStats
-.loop
-	ld a, c
-	cp 2
-	ld a, [hli]
-	jr z, .next	;skip wEnemyMonActualCatchRate
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;shinpokered-master cheat
-;If the opponent is above the level cap, max the base exp values
-	ld b, a
-	ld a, [wEnemyMonLevel]
-	cp MAX_LEVEL+1
-	ld a, b
-	jr c, .keepgoing
-	ld a, $ff
-.keepgoing
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld [de], a
-	inc de
-.next
-	dec c
-	jr nz, .loop
-	
+; nz if the party mons that didn't take part gain half: the EXP. SHARE option
+; (Gen 9) or, without it, the EXP ALL in the bag
+RestOfTeamGainsExp:
+	CheckEvent EVENT_EXP_SHARE_ON
+	ret nz
 	ld b, EXP_ALL
-	call IsItemInBag
-	jr z, .done
-	
-	;if exp all is in the bag, halve everything in the buffer
-	ld c, NUM_STATS+1
-	ld hl, wBuffer
-.loop2
-	ld a, [hl]
-	srl a
-	ld [hli], a
-	dec c
-	jr nz, .loop2
+	jp IsItemInBag
 
-.done	
-	pop de
-	ret
+TeamGainedExpText:
+	TX_FAR _TeamGainedExpText
+	db "@"
 
-	
-;joenote - This function counts the number of pokemon that get a share of exp
-;stores this value in wUnusedD155
-GetNumMonsGainingExp:
-	ld a, [wPartyGainExpFlags]
-	ld b, a
-	xor a
-	ld c, $6
-.countSetBitsLoop ; loop to count set bits in wPartyGainExpFlags
-	srl b
-	adc 0
-	dec c
-	jr nz, .countSetBitsLoop
-	ld [wUnusedD155], a
-	ret
-
-;Divide enemy base stats and base exp by the number of mons gaining exp
-;joenote - given a rewrite
-;assumes that pokemon with zero hp are already cleared in wPartyGainExpFlags
-;assumes that wUnusedD155 already contains the number to divide by from GetNumMonsGainingExp
-;assumes BufferExpData was already run
-DivideExpDataByNumMonsGainingExp:
-	ld hl, wBuffer
-	ld c, wEnemyMonBaseExp + 1 - wEnemyMonBaseStats - 1
-.loop
-	ld a, [wUnusedD155]
-	cp 2
-	ret c	;do nothing if dividing by 1	
-	jr z, .div2
-	
-	cp 3
-	jr z, .div3
-	
-	cp 4
-	jr z, .div4
-	
-	cp 5
-	jr z, .div5
-
-	;else divide by 6
-.div6
-	ld a, [hl]
-	call ByteDivBy3
-	ld [hl], a
-	jr .div2
-.div5
-	ld a, [hl]
-	call ByteDivBy5
-	ld [hli], a
-	jr .next
-.div3
-	ld a, [hl]
-	call ByteDivBy3
-	ld [hli], a
-	jr .next
-.div4
-	ld a, [hl]
-	srl a
-	ld [hl], a
-	;fall through
-.div2
-	ld a, [hl]
-	srl a
-	ld [hli], a
-.next
-	dec c
-	jr nz, .loop
-	ret
-
-;joenote - this function divides the byte in A by 3	
-;Does a little bit of error correction
-ByteDivBy3:
-	ld b, a
-	srl b
-	sub b
-	
-	ld b, a
-	srl b
-	srl b
-	add b
-	
-	ld b, a
-	srl b
-	srl b
-	srl b
-	srl b
-	add b
-	
-	push af
-	and 1
-	ld b, a
-	pop af
-	
-	srl a
-	add b
-	ret	
-	
-;joenote - this function divides the byte in A by 5	
-;Does a little bit of error correction
-ByteDivBy5:
-	ld b, a
-	srl b
-	srl b
-	sub b
-	
-	ld b, a
-	srl b
-	srl b
-	srl b
-	srl b
-	add b
-	
-	push af
-	and 1
-	ld b, a
-	pop af
-	
-	srl a
-	srl a
-	add b
-	ret
-	
-	
-;joenote - adds the stat exp values in wBuffer to every flagged participant
-GiveStatExp:	
-	push de
-	ld a, [wPartyGainExpFlags]
-	and %00111111 
-	ld c, a
-	ld hl, wPartyMon1HPExp + 1
-.loopPartyMonStatExp
-	push bc
-	push hl
-	srl c
-	jr nc, .nextPartyMonStatExp	;if not flagged, go to next mon
-
-	ld c, NUM_STATS
-	ld de, wBuffer	
-.loopPartyMonStatExp_subloop
-	ld a, [de]
-	ld b, a
-	ld a, [hl]
-	add b
-	ld [hld], a
-	ld a, [hl]
-	adc 0
-	ld [hli], a
-	call c, ExpWordOverflow
-	inc hl
-	inc hl
-	inc de
-	dec c
-	jr nz, .loopPartyMonStatExp_subloop
-
-.nextPartyMonStatExp	
-	pop hl	;reset to wPartyMon'X'HPExp + 1
-	ld bc, wPartyMon2 - wPartyMon1
-	add hl, bc	;advance to next party mon
-	pop bc	;get flag state back
-	srl c	;advance the flags
-	jr nz, .loopPartyMonStatExp
-
-	pop de
-	ret		;we're done if C is zero
-	
-	
-;joenote - call after adding and getting a carry flag. sets HL and HL-1 each to FF
-ExpWordOverflow:
-	ld a, $ff
-	ld [hld], a
-	ld [hli], a
-	ret
-	
-;joenote - do a general calculation for level experience to be doled out
-;result can be up to two bytes large stored in H_QUOTIENT + 2 and H_QUOTIENT + 3
-CalculateLevelExp:
-	;multiply the adjusted base exp value in the buffer by the level of the enemy pokemon
-	ld hl, wBuffer + NUM_STATS
-	ld a, [hl]
-	ld [H_MULTIPLICAND + 2], a
-	xor a
-	ld [H_MULTIPLICAND + 1], a
-	ld [H_MULTIPLICAND], a
-	ld a, [wEnemyMonLevel]
-	ld [H_MULTIPLIER], a
-	call Multiply
-	
-	;now divide it by 7
-	ld a, 7
-	ld [H_DIVISOR], a
-	ld b, 4
-	call Divide
-	
-	;if this is a trainer battle, multiply the exp by 1.5
-	ld a, [wIsInBattle]
-	dec a
-	call nz, BoostExp
-	
-	call CatchUpBoost	;shinpokered-master feature
-
-	ret
-
-	
 ;joenote - multiplies exp by 1.5
 BoostExp:
 	ld a, [H_QUOTIENT + 2]
@@ -457,6 +177,33 @@ BoostExp:
 	ret
 
 	
+;multiplies exp by 1.2
+BoostExpByFifth:
+	ld a, [H_QUOTIENT + 2]
+	ld b, a
+	ld a, [H_QUOTIENT + 3]
+	ld c, a
+	push bc
+	xor a
+	ld [H_QUOTIENT], a
+	ld [H_QUOTIENT + 1], a
+	ld a, 5
+	ld [H_DIVISOR], a
+	ld b, 4
+	call Divide ; a fifth
+	pop bc
+	ld a, [H_QUOTIENT + 3]
+	add c
+	ld [H_QUOTIENT + 3], a
+	ld a, [H_QUOTIENT + 2]
+	adc b
+	ld [H_QUOTIENT + 2], a
+	ret nc
+	ld a, $FF
+	ld [H_QUOTIENT + 2], a
+	ld [H_QUOTIENT + 3], a
+	ret
+
 ;joenote - apply a big exp boost if an underleveled active pokemon scored the K.O.
 ;shinpokered-master feature
 CatchUpBoost:	
@@ -507,7 +254,34 @@ AddExpToPokemon:
 	ld [wGainBoostedExp], a
 .next
 	pop hl
-	
+; a Lucky Egg: x1.5 more
+	push hl
+	ld bc, wPartyMon1CatchRate - wPartyMon1OTID
+	add hl, bc
+	ld a, [hl]
+	pop hl
+	cp LUCKY_EGG
+	jr nz, .noLuckyEgg
+	call BoostExp
+	ld a, 1
+	ld [wGainBoostedExp], a
+.noLuckyEgg
+; past the level it could have evolved at: x1.2
+	push hl
+	push de
+	ld bc, wPartyMon1Species - wPartyMon1OTID
+	add hl, bc
+	ld a, [hl]
+	ld [wd0b5], a
+	ld bc, wPartyMon1Level - wPartyMon1Species
+	add hl, bc
+	ld a, [hl]
+	ld [wExpScratch], a
+	callab PastEvolutionLevel
+	pop de
+	pop hl
+	call c, BoostExpByFifth
+
 	ld bc, (wPartyMon1Exp + 2) - wPartyMon1OTID
 	add hl, bc
 	;hl now points to wPartyMon'X'Exp + 2
@@ -598,22 +372,7 @@ PrintExpGained:
 	call GetPartyMonName
 	ld hl, GainedText
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - changing exp.all text for shinpokered
-	ld a, [wBoostExpByExpAll]
-	and a
-	jr z, .noexpall
-	ld a, [wd728]
-	bit 7, a
-	jr z, .noexpprint	;print the exp.all amount only once (for the first party member)
-	res 7, a
-	ld [wd728], a
-	ld hl, WithExpAllText
-.noexpall
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 	call PrintText
-.noexpprint
 	pop hl
 	ret
 	
@@ -659,9 +418,9 @@ ENDC
 	ld d, h
 	ld e, l
 	;DE = wPartyMon'X'MaxHP
-	ld bc, (wPartyMon1HPExp - 1) - wPartyMon1MaxHP
-	add hl, bc	;HL = wPartyMon1HPExp - 1
-	ld b, $1 ; consider stat exp when calculating stats
+	ld bc, wPartyMon1EVs - wPartyMon1MaxHP
+	add hl, bc	;HL = wPartyMon'X'EVs
+	ld b, $1 ; consider the EVs when calculating stats
 	call CalcStats
 	
 	pop bc ; restore max HP (from before levelling up) into BC
@@ -734,6 +493,11 @@ ENDC
 ;all done dealing with the active pokemon in battle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 .printGrewLevelText
+; its own name: a mon that didn't take part never printed "gained", so
+; wcd6d still held another mon's name or a move's
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
 	ld hl, GrewLevelText
 	call PrintText
 	xor a ; PLAYER_PARTY_DATA
@@ -793,32 +557,6 @@ ENDC
 ;With regards to wPartyGainExpFlags
 ;--Bit 0 of the flags represents the first mon in the party
 ;--Bit 5 of the flags represents the sixth mon in the party
-SetExpAllFlags:
-	push de	
-	ld a, $1
-	ld [wBoostExpByExpAll], a
-	ld a, [wPartyCount]
-	ld d, a
-	ld e, %00000001
-	ld hl, wPartyMon1HP
-	ld bc, wPartyMon2HP - wPartyMon1HP
-.gainExpFlagsLoop	
-	ld a, [hli]
-	or [hl] ; is mon's HP 0?
-	jp z, .nextmon
-	ld a, [wPartyGainExpFlags]
-	or e
-	ld [wPartyGainExpFlags], a
-.nextmon 
-	dec hl
-	sla e
-	add hl, bc
-	dec d
-	jr nz, .gainExpFlagsLoop
-	pop de
-	ret
-
-	
 GainedText:
 	TX_FAR _GainedText
 	TX_ASM

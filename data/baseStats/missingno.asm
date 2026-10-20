@@ -4,7 +4,8 @@ db 128 ; base hp
 db 128 ; base attack
 db 128 ; base defense
 db 128 ; base speed
-db 128 ; base special
+db 128 ; base special attack
+db 128 ; base special defense
 db BIRD ; species type 1
 db NORMAL ; species type 2
 db 1 ; catch rate

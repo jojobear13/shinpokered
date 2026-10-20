@@ -1,36 +1,36 @@
+; Gen 9: the user's side is protected for 5 turns, through switches
 ReflectLightScreenEffect_:
-	ld hl, wPlayerBattleStatus3
+	ld hl, wPlayerReflectTurns
 	ld de, wPlayerMoveEffect
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .reflectLightScreenEffect
-	ld hl, wEnemyBattleStatus3
+	ld hl, wEnemyReflectTurns
 	ld de, wEnemyMoveEffect
 .reflectLightScreenEffect
 	ld a, [de]
 	cp LIGHT_SCREEN_EFFECT
-	jr nz, .reflect
-	bit HAS_LIGHT_SCREEN_UP, [hl] ; is mon already protected by light screen?
+	ld de, ReflectGainedArmorText
+	jr nz, .gotScreen
+	inc hl
+	inc hl ; light screen
+	ld de, LightScreenProtectedText
+.gotScreen
+	ld a, [hl]
+	and a ; is the side already protected?
 	jr nz, .moveFailed
-	set HAS_LIGHT_SCREEN_UP, [hl] ; mon is now protected by light screen
-	ld hl, LightScreenProtectedText
-	jr .playAnim
-.reflect
-	bit HAS_REFLECT_UP, [hl] ; is mon already protected by reflect?
-	jr nz, .moveFailed
-	set HAS_REFLECT_UP, [hl] ; mon is now protected by reflect
-	ld hl, ReflectGainedArmorText
+	ld [hl], 5
+	ld h, d
+	ld l, e
 .playAnim
 	push hl
-	ld hl, PlayCurrentMoveAnimation
-	call BankswitchEtoF
+	callab PlayCurrentMoveAnimation
 	pop hl
 	jp PrintText
 .moveFailed
 	ld c, 50
 	call DelayFrames
-	ld hl, PrintButItFailedText_
-	jp BankswitchEtoF
+	jpab PrintButItFailedText_
 
 LightScreenProtectedText:
 	TX_FAR _LightScreenProtectedText
@@ -39,7 +39,3 @@ LightScreenProtectedText:
 ReflectGainedArmorText:
 	TX_FAR _ReflectGainedArmorText
 	db "@"
-
-BankswitchEtoF:
-	ld b, BANK(BattleCore)
-	jp Bankswitch

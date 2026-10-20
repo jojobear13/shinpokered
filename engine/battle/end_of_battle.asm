@@ -25,6 +25,7 @@ EndOfBattle:
 	call DelayFrames
 	jr .evolution
 .notLinkBattle
+	callab PartyPickup
 	ld a, [wBattleResult]
 	and a
 	jr nz, .resetVariables
@@ -55,6 +56,20 @@ EndOfBattle:
 	ld a, [wUnusedD721]
 	res 1, a
 	ld [wUnusedD721], a
+;fully heal the party after winning a trainer battle (dead nuzlocke mons stay dead)
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jr z, .noTrainerVictoryHeal
+	ld a, [wIsInBattle]
+	cp 2 ; trainer battle?
+	jr nz, .noTrainerVictoryHeal
+	ld a, [wBattleResult]
+	and a ; did the player win?
+	jr nz, .noTrainerVictoryHeal
+	CheckEvent EVENT_WIN_HEAL ; the HEAL ON WIN option
+	jr z, .noTrainerVictoryHeal
+	predef HealParty
+.noTrainerVictoryHeal
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	xor a
 	ld [wLowHealthAlarm], a ;disable low health alarm

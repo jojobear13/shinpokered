@@ -165,9 +165,109 @@ const_value = 1
 	const SLASH        ; a3
 	const SUBSTITUTE   ; a4
 
+; Gen 9 moves (the learnset audit's), with their PokeAPI ids for tools/gen_move_data.py
+	const AERIAL_ACE   ; a5
+	const AIR_SLASH    ; a6
+	const ANCIENTPOWER ; a7
+	const AQUA_JET     ; a8
+	const BRINE        ; a9
+	const BUG_BITE     ; aa
+	const BUG_BUZZ     ; ab
+	const BULLDOZE     ; ac
+	const CLOSE_COMBAT ; ad
+	const CROSS_CHOP   ; ae
+	const CRUNCH       ; af
+	const DISARM_VOICE ; b0
+	const DISCHARGE    ; b1
+	const DRAGONBREATH ; b2
+	const DRAGON_RUSH  ; b3
+	const DRILL_RUN    ; b4
+	const DYNAMICPUNCH ; b5
+	const EARTH_POWER  ; b6
+	const EXTREMESPEED ; b7
+	const FIRE_FANG    ; b8
+	const FLAME_WHEEL  ; b9
+	const FLARE_BLITZ  ; ba
+	const FLASH_CANNON ; bb
+	const GIGA_DRAIN   ; bc
+	const GUNK_SHOT    ; bd
+	const HEAT_WAVE    ; be
+	const HYPER_VOICE  ; bf
+	const ICICLE_CRASH ; c0
+	const INCINERATE   ; c1
+	const LEAF_BLADE   ; c2
+	const LIQUIDATION  ; c3
+	const LOW_SWEEP    ; c4
+	const MACH_PUNCH   ; c5
+	const MOONBLAST    ; c6
+	const PLUCK        ; c7
+	const POISON_FANG  ; c8
+	const POISON_JAB   ; c9
+	const POWDER_SNOW  ; ca
+	const PSYSHOCK     ; cb
+	const RAZOR_SHELL  ; cc
+	const ROUND_M        ; cd
+	const SEED_BOMB    ; ce
+	const SHADOW_BALL  ; cf
+	const SLUDGE_BOMB  ; d0
+	const STOMPTANTRUM ; d1
+	const STONE_EDGE   ; d2
+	const TWISTER      ; d3
+	const WATER_PULSE  ; d4
+	const X_SCISSOR    ; d5
+; pokeapi AERIAL_ACE 332
+; pokeapi AIR_SLASH 403
+; pokeapi ANCIENTPOWER 246
+; pokeapi AQUA_JET 453
+; pokeapi BRINE 362
+; pokeapi BUG_BITE 450
+; pokeapi BUG_BUZZ 405
+; pokeapi BULLDOZE 523
+; pokeapi CLOSE_COMBAT 370
+; pokeapi CROSS_CHOP 238
+; pokeapi CRUNCH 242
+; pokeapi DISARM_VOICE 574
+; pokeapi DISCHARGE 435
+; pokeapi DRAGONBREATH 225
+; pokeapi DRAGON_RUSH 407
+; pokeapi DRILL_RUN 529
+; pokeapi DYNAMICPUNCH 223
+; pokeapi EARTH_POWER 414
+; pokeapi EXTREMESPEED 245
+; pokeapi FIRE_FANG 424
+; pokeapi FLAME_WHEEL 172
+; pokeapi FLARE_BLITZ 394
+; pokeapi FLASH_CANNON 430
+; pokeapi GIGA_DRAIN 202
+; pokeapi GUNK_SHOT 441
+; pokeapi HEAT_WAVE 257
+; pokeapi HYPER_VOICE 304
+; pokeapi ICICLE_CRASH 556
+; pokeapi INCINERATE 510
+; pokeapi LEAF_BLADE 348
+; pokeapi LIQUIDATION 710
+; pokeapi LOW_SWEEP 490
+; pokeapi MACH_PUNCH 183
+; pokeapi MOONBLAST 585
+; pokeapi PLUCK 365
+; pokeapi POISON_FANG 305
+; pokeapi POISON_JAB 398
+; pokeapi POWDER_SNOW 181
+; pokeapi PSYSHOCK 473
+; pokeapi RAZOR_SHELL 534
+; pokeapi ROUND_M 496
+; pokeapi SEED_BOMB 402
+; pokeapi SHADOW_BALL 247
+; pokeapi SLUDGE_BOMB 188
+; pokeapi STOMPTANTRUM 707
+; pokeapi STONE_EDGE 444
+; pokeapi TWISTER 239
+; pokeapi WATER_PULSE 352
+; pokeapi X_SCISSOR 404
+
 NUM_ATTACKS EQU const_value + -1
 
-	const STRUGGLE
+	const STRUGGLE     ; d6
 
 	; Moves do double duty as animation identifiers.
 

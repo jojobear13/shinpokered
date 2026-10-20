@@ -9,10 +9,9 @@ SafariZoneEntranceObject:
 
 	db 0 ; signs
 
-	db 3 ; objects	;joenote - adding an npc for special safari event
+	db 2 ; objects
 	object SPRITE_WHITE_PLAYER, 6, 2, STAY, LEFT, 1 ; person
 	object SPRITE_WHITE_PLAYER, 1, 4, STAY, RIGHT, 2 ; person
-	object SPRITE_WHITE_PLAYER, 6, 4, STAY, LEFT, 3 ; person
 
 	; warp-to
 	warp_to 3, 5, SAFARI_ZONE_ENTRANCE_WIDTH

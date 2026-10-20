@@ -75,9 +75,13 @@ RedrawPartyMenu_:
 	inc hl
 	inc hl
 .skipUnfilledRightArrow
+	ld a, [wcf91]
+	cp EGG
+	jr nz, .notEgg
+	call SetPartyMenuEggSpeed ; an egg: its name only
+	jr .nextMon
+.notEgg
 	ld a, [wPartyMenuTypeOrMessageID] ; menu type
-	cp TMHM_PARTY_MENU
-	jr z, .teachMoveMenu
 	cp EVO_STONE_PARTY_MENU
 	jr z, .evolutionStoneMenu
 	push hl
@@ -98,26 +102,11 @@ RedrawPartyMenu_:
 	ld [hFlags_0xFFF6], a
 	call SetPartyMenuHPBarColor ; color the HP bar (on SGB)
 	pop hl
-	jr .printLevel
-.teachMoveMenu
-	push hl
-	predef CanLearnTM ; check if the pokemon can learn the move
-	pop hl
-	ld de, .ableToLearnMoveText
-	ld a, c
-	and a
-	jr nz, .placeMoveLearnabilityString
-	ld de, .notAbleToLearnMoveText
-.placeMoveLearnabilityString
-	ld bc, 20 + 9 ; down 1 row and right 9 columns
-	push hl
-	add hl, bc
-	call PlaceString
-	pop hl
 .printLevel
 	ld bc, 10 ; move 10 columns to the right
 	add hl, bc
 	call PrintLevel
+.nextMon
 	pop hl
 	pop de
 	inc de
@@ -126,10 +115,6 @@ RedrawPartyMenu_:
 	pop bc
 	inc c
 	jp .loop
-.ableToLearnMoveText
-	db "ABLE@"
-.notAbleToLearnMoveText
-	db "NOT ABLE@"
 .evolutionStoneMenu
 	push hl
 	ld hl, EvosMovesPointerTable
@@ -249,7 +234,7 @@ PartyMenuMessagePointers:
 	dw PartyMenuNormalText
 	dw PartyMenuItemUseText
 	dw PartyMenuBattleText
-	dw PartyMenuUseTMText
+	dw PartyMenuNormalText ; (3 was the TM menu)
 	dw PartyMenuSwapMonText
 	dw PartyMenuItemUseText
 	dw PartyMenuBlankText	;joenote - it'd be helpful to be able to print a blank message
@@ -267,10 +252,6 @@ PartyMenuItemUseText:
 
 PartyMenuBattleText:
 	TX_FAR _PartyMenuBattleText
-	db "@"
-
-PartyMenuUseTMText:
-	TX_FAR _PartyMenuUseTMText
 	db "@"
 
 PartyMenuSwapMonText:
@@ -314,6 +295,18 @@ RareCandyText:
 	TX_SFX_ITEM_1 ; probably supposed to play SFX_LEVEL_UP but the wrong music bank is loaded
 	TX_BLINK
 	db "@"
+
+; an egg has no HP bar; its icon wiggles slowly (as for red HP)
+SetPartyMenuEggSpeed:
+	ld hl, wPartyMenuHPBarColors
+	ld a, [wWhichPartyMenuHPBar]
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld [hl], 2
+	ld hl, wWhichPartyMenuHPBar
+	inc [hl]
+	ret
 
 SetPartyMenuHPBarColor:
 	ld hl, wPartyMenuHPBarColors

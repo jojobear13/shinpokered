@@ -37,12 +37,19 @@ AnimateHallOfFame:
 	ld a, MUSIC_HALL_OF_FAME
 	call PlayMusic
 	ld hl, wPartySpecies
-	ld c, $ff
+	lb bc, $ff, $ff ; b = the Hall of Fame slot, c = the party mon
 .partyMonLoop
 	ld a, [hli]
 	cp $ff
 	jr z, .doneShowingParty
 	inc c
+	cp EGG
+	jr z, .partyMonLoop ; eggs aren't in the Hall of Fame
+	inc b
+	push af
+	ld a, b
+	ld [wHoFSlot], a
+	pop af
 	push hl
 	push bc
 	ld [wHoFMonSpecies], a
@@ -71,7 +78,7 @@ AnimateHallOfFame:
 	pop hl
 	jr .partyMonLoop
 .doneShowingParty
-	ld a, c
+	ld a, b
 	inc a
 	ld hl, wHallOfFame
 	ld bc, HOF_MON
@@ -299,7 +306,7 @@ DexRatingText:
 HoFRecordMonInfo:
 	ld hl, wHallOfFame
 	ld bc, HOF_MON
-	ld a, [wHoFPartyMonIndex]
+	ld a, [wHoFSlot]
 	call AddNTimes
 	ld a, [wHoFMonSpecies]
 	ld [hli], a

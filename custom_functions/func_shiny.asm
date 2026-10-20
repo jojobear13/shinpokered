@@ -9,7 +9,7 @@ ShinyAttractFunction:
 	ld a, [wPartyMon1Species]
 	cp CHANSEY
 	ret nz
-;make a 1 in 255 chance to force shiny DVs on a wild pokemon 
+;make a 1 in 255 chance to force shiny IVs on a wild pokemon 
 	call Random
 	ret nz
 	ld a, [wFontLoaded]
@@ -17,13 +17,13 @@ ShinyAttractFunction:
 	ld [wFontLoaded], a
 	ret
 
-;joenote - check if enemy mon has gen2 shiny DVs
+;joenote - check if enemy mon has gen2 shiny IVs
 ;zero flag is set if not shiny	
 ;as a mercy, makes the next encounter shiny via a flag bit if this is a trainer shiny
-CheckEnemyShinyDVs:
+CheckEnemyShinyIVs:
 	push hl
-	ld hl, wEnemyMonDVs
-	call ShinyDVsChecker
+	ld hl, wEnemyMonIVs
+	call ShinyIVsChecker
 	jr z, .end
 	ld a, $01
 	and a 
@@ -56,10 +56,10 @@ CheckEnemyShinyDVs:
 	ld [wFontLoaded], a
 	ret
 
-CheckPlayerShinyDVs:
+CheckPlayerShinyIVs:
 	push hl
-	ld hl, wBattleMonDVs
-	call ShinyDVsChecker
+	ld hl, wBattleMonIVs
+	call ShinyIVsChecker
 	jr z, .end
 	ld a, $01
 	and a 
@@ -67,10 +67,10 @@ CheckPlayerShinyDVs:
 	pop hl
 	ret
 	
-CheckLoadedShinyDVs:
+CheckLoadedShinyIVs:
 	push hl
-	ld hl, wLoadedMonDVs
-	call ShinyDVsChecker
+	ld hl, wLoadedMonIVs
+	call ShinyIVsChecker
 	jr z, .end
 	ld a, $01
 	and a 
@@ -78,32 +78,50 @@ CheckLoadedShinyDVs:
 	pop hl
 	ret
 
-ShinyDVsChecker2:	;uses DE instead of HL to better call across banks
+ShinyIVsChecker2:	;uses DE instead of HL to better call across banks
 	ld h, d
 	ld l, e
-ShinyDVsChecker:	;return z flag set if not shiny or cleared z flag if shiny
-	ld a, [hl]	;load MSB
-	bit 5, a	;bit 5 of the MSB need to be a 1 for shininess
-	jr z, .end_zero
-	and $0F	;now mask out the lesser nybble of the MSB
-	cp $0A	;need to be a DV of 10 for shininess
-	jr nz, .end_zero
+; hl = IVs -> z if not shiny, nz if shiny: every IV's low two bits are
+; SHINY_IV_BITS (1 in 4096; engine/ivs.asm makes them)
+ShinyIVsChecker:
+	push de
+	push bc
+	ld de, ShinyIVMask
+	ld b, NUM_IVS
+.loop
+	ld a, [de]
+	and [hl]
+	ld c, a
+	inc de
+	ld a, [de]
+	inc de
+	cp c
+	jr nz, .notShiny
 	inc hl
-	ld a, [hl]	;load LSB
-	cp a, $AA	;need to be DVs of 10 for shininess
-	jr nz, .end_zero
+	dec b
+	jr nz, .loop
+	pop bc
+	pop de
 	ld a, $01
-	and a 
+	and a
 	ret
-.end_zero
+.notShiny
+	pop bc
+	pop de
 	xor a
 	ret
+
+ShinyIVMask: ; each IV byte's mask and what it must hold
+	db $18, $10
+	db $C6, $84
+	db $31, $21
+	db $8C, $08
 
 ShinyPlayerAnimation:
 	ld a, [wUnusedD366]
 	bit 0, a
 	jr nz, .noPlayerShiny
-	call CheckPlayerShinyDVs
+	call CheckPlayerShinyIVs
 	jr z, .noPlayerShiny
 	push de
 	ld d, $00
@@ -122,7 +140,7 @@ ShinyEnemyAnimation:
 	ld a, [wUnusedD366]
 	bit 7, a
 	jr nz, .noEnemyShiny
-	call CheckEnemyShinyDVs
+	call CheckEnemyShinyIVs
 	jr z, .noEnemyShiny
 	push de
 	ld d, $01

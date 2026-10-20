@@ -3,6 +3,7 @@ Route12GateUpstairsScript:
 
 Route12GateUpstairsTextPointers:
 	dw Route12GateUpstairsText1
+	dw Route12GateUpstairsAideText
 	dw Route12GateUpstairsText2
 	dw Route12GateUpstairsText3
 
@@ -44,6 +45,36 @@ TM39ExplanationText:
 
 TM39NoRoomText:
 	TX_FAR _TM39NoRoomText
+	db "@"
+
+; PROF.OAK's aide: the DEXREPEL for 80 kinds caught
+Route12GateUpstairsAideText:
+	TX_ASM
+	CheckEvent EVENT_GOT_DEXREPEL
+	jr nz, .gotItem
+	ld a, 80 ; pokemon needed
+	ld [hOaksAideRequirement], a
+	ld a, DEXREPEL ; oak's aide reward
+	ld [hOaksAideRewardItem], a
+	ld [wd11e], a
+	call GetItemName
+	ld hl, wcd6d
+	ld de, wOaksAideRewardItemName
+	ld bc, ITEM_NAME_LENGTH
+	call CopyData
+	predef OaksAideScript
+	ld a, [hOaksAideResult]
+	cp $1
+	jr nz, .done
+	SetEvent EVENT_GOT_DEXREPEL
+.gotItem
+	ld hl, DexRepelExplanationText
+	call PrintText
+.done
+	jp TextScriptEnd
+
+DexRepelExplanationText:
+	TX_FAR _DexRepelExplanationText
 	db "@"
 
 Route12GateUpstairsText2:

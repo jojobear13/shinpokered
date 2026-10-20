@@ -50,8 +50,7 @@ INCLUDE "engine/battle/safari_zone.asm"
 INCLUDE "engine/titlescreen.asm"
 INCLUDE "engine/load_mon_data.asm"
 
-INCLUDE "data/item_prices.asm"
-INCLUDE "text/item_names.asm"
+; item prices and names are in bank 9 (with the held items), out of bank 1
 ;INCLUDE "text/unused_names.asm"	;joenote - free up space in bank 1
 
 INCLUDE "engine/overworld/oam.asm"
@@ -93,7 +92,6 @@ INCLUDE "engine/overworld/pokecenter.asm"
 INCLUDE "engine/overworld/set_blackout_map.asm"
 
 INCLUDE "engine/display_text_id_init.asm"
-INCLUDE "engine/menu/draw_start_menu.asm"
 
 INCLUDE "engine/overworld/cable_club_npc.asm"
 
@@ -130,8 +128,6 @@ INCLUDE "engine/items/inventory.asm"
 INCLUDE "engine/overworld/wild_mons.asm"
 
 INCLUDE "engine/items/items.asm"
-
-INCLUDE "engine/menu/draw_badges.asm"
 
 INCLUDE "engine/overworld/update_map.asm"
 INCLUDE "engine/overworld/cut.asm"
@@ -250,7 +246,6 @@ INCLUDE "engine/battle/moveEffects/conversion_effect.asm"
 INCLUDE "engine/battle/moveEffects/haze_effect.asm"
 INCLUDE "engine/battle/moveEffects/substitute_effect.asm"	;joenote - moved this here to make room elsewhere
 INCLUDE "engine/battle/get_trainer_name.asm"
-INCLUDE "engine/random.asm"
 
 ;joenote - adding exp bar
 IF DEF(_EXPBAR)
@@ -411,8 +406,8 @@ LavenderHouse1Blocks:
 LavenderHouse2Blocks:
 CeruleanHouse1Blocks:
 PewterHouse1Blocks:
-PewterHouse2Blocks: INCBIN "maps/viridianhouse.blk"
-ViridianHouseBlocks: INCBIN "maps/viridianhouse_new.blk"	;joenote - sectioning this off
+PewterHouse2Blocks:
+ViridianHouseBlocks: INCBIN "maps/viridianhouse.blk"
 
 CeladonMansion5Blocks:
 SchoolBlocks: INCBIN "maps/school.blk"
@@ -504,11 +499,6 @@ INCLUDE "data/mapHeaders/saffronhouse1.asm"
 INCLUDE "scripts/saffronhouse1.asm"
 INCLUDE "data/mapObjects/saffronhouse1.asm"
 
-IF DEF(_MOVENPCS)
-;joenote - adding Mateo's move relearner/deleter files
-INCLUDE "scripts/move_deleter.asm"
-INCLUDE "scripts/move_relearner.asm"
-ENDC
 
 INCLUDE "data/mapHeaders/saffronhouse2.asm"
 INCLUDE "scripts/saffronhouse2.asm"
@@ -604,6 +594,9 @@ INCLUDE "engine/battle/link_battle_versus_text.asm"
 INCLUDE "engine/slot_machine.asm"
 INCLUDE "engine/overworld/pewter_guys.asm"
 INCLUDE "engine/multiply_divide.asm"
+INCLUDE "engine/menu/natures.asm"
+INCLUDE "engine/random.asm" ; out of bank 4, which is nearly full
+INCLUDE "engine/ivs.asm"
 INCLUDE "engine/game_corner_slots.asm"
 
 SECTION "Battle (bank A)", ROMX, BANK[$A]
@@ -641,7 +634,6 @@ INCLUDE "engine/battle/draw_hud_pokeball_gfx.asm"
 INCLUDE "engine/evos_moves.asm"
 INCLUDE "engine/battle/moveEffects/heal_effect.asm"
 INCLUDE "engine/battle/moveEffects/transform_effect.asm"
-INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
 
 
 SECTION "bankF",ROMX,BANK[$F]
@@ -1634,7 +1626,6 @@ Plateau_Block:     INCBIN "gfx/blocksets/plateau.bst"
 
 SECTION "bank1A",ROMX,BANK[$1A]
 
-INCLUDE "engine/battle/decrement_pp.asm"
 
 Version_GFX:
 IF (DEF(_RED) || DEF(_GREEN))
@@ -1847,11 +1838,9 @@ INCLUDE "engine/battle/animations.asm"
 
 INCLUDE "engine/overworld/cut2.asm"
 
-INCLUDE "engine/overworld/ssanne.asm"
 
 INCLUDE "data/animations.asm"
 
-INCLUDE "engine/evolution.asm"
 
 ;INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
@@ -1866,6 +1855,7 @@ INCLUDE "custom_functions/func_enc_gen.asm"
 INCLUDE "custom_functions/func_misc.asm"
 INCLUDE "custom_functions/func_monlists.asm"
 INCLUDE "custom_functions/func_overworld.asm"
+INCLUDE "custom_functions/func_blackout.asm"
 INCLUDE "custom_functions/func_shiny.asm"
 INCLUDE "custom_functions/func_nuzlocke.asm"
 INCLUDE "custom_functions/func_stat_reset.asm"
@@ -1874,7 +1864,6 @@ IF DEF(_EXPBAR)
 INCLUDE "engine/battle/exp_bar_print.asm"	
 ENDC
 INCLUDE "custom_functions/fisher_yates.asm"
-INCLUDE "custom_functions/func_transformations.asm"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 TradingAnimationGraphics:
@@ -1932,10 +1921,70 @@ INCLUDE "engine/learn_move.asm"	;joenote - moved in order to have more space
 INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
-INCLUDE "custom_functions/func_extra_menu.asm"
+
+; abilities and held items, with the item names and prices (out of bank 9)
+SECTION "Abilities and held items", ROMX, BANK[$34]
+INCLUDE "engine/abilities.asm"
+INCLUDE "engine/held_items.asm"
+INCLUDE "data/item_prices.asm"
+INCLUDE "text/item_names.asm"
+
+SECTION "Battle 2", ROMX, BANK[$35]
+
+INCLUDE "engine/battle/type_effectiveness.asm"
+INCLUDE "engine/battle/enemy_mon_stats.asm"
+INCLUDE "engine/battle/exp_formula.asm"
+INCLUDE "engine/battle/damage.asm"
+INCLUDE "engine/battle/move_data.asm"
+INCLUDE "engine/battle/side_conditions.asm"
+INCLUDE "engine/battle/decrement_pp.asm"
+INCLUDE "engine/overworld/ssanne.asm" ; (bank $1E was full)
+INCLUDE "engine/evolution.asm"
+INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm" ; (bank $E was full)
+INCLUDE "data/move_categories.asm"
+INCLUDE "data/ev_yields.asm"
+INCLUDE "data/base_exp.asm"
+
+
+SECTION "Options Menu", ROMX
+INCLUDE "engine/menu/options.asm"
+
+SECTION "Held Item Use", ROMX
+INCLUDE "engine/items/held_item_use.asm"
+
+SECTION "Repel Prompt", ROMX
+INCLUDE "engine/items/repel_prompt.asm"
+
+SECTION "HP Percent", ROMX
+INCLUDE "engine/battle/hp_percent.asm"
+
+SECTION "Type Chart", ROMX
+INCLUDE "engine/battle/type_chart.asm"
+
+SECTION "Draw Start Menu", ROMX
+INCLUDE "engine/menu/draw_start_menu.asm"
+
+; out of bank 3, which is nearly full
+SECTION "Draw Badges", ROMX
+INCLUDE "engine/menu/draw_badges.asm"
 INCLUDE "custom_functions/func_move_secrets.asm"
 INCLUDE "custom_functions/func_linkbattlecomms.asm"
 INCLUDE "custom_functions/func_bag.asm"
+INCLUDE "engine/menu/bag_menu.asm"
+
+SECTION "Moves Screen", ROMX
+INCLUDE "engine/menu/moves_screen.asm"
+
+SECTION "Breeding", ROMX
+INCLUDE "engine/breeding.asm"
+
+; the party icons (engine/mon_party_sprites.asm), by Pokédex number then the
+; egg's, from "MINIDEX 001-251" by Chamber, Solo993, Blue Emerald, Lake,
+; Neslug and Pikachu25 (tools/gen_party_icons.py)
+SECTION "Party Icons 1", ROMX
+PartyIcons1: INCBIN "gfx/party_icons_1.2bpp"
+SECTION "Party Icons 2", ROMX
+PartyIcons2: INCBIN "gfx/party_icons_2.2bpp"
 INCLUDE "custom_functions/func_soundtest.asm"
 INCLUDE "custom_functions/func_emuchecks.asm"
 
@@ -1986,3 +2035,8 @@ INCLUDE "engine/printer/printer_pc_menu.asm"
 INCLUDE "engine/printer/diploma_page2.asm"
 DiplomaPikachuGraphics:  INCBIN "gfx/printer/diploma_pikachu.2bpp"
 DiplomaPikachuGraphicsEnd:
+
+; Gen 2 sprites (the extra options' SPRITES), Crystal's from pret's pokecrystal;
+; data/gen2_pics.asm then gives each species' pics a section of its own
+SECTION "Gen 2 Sprites", ROMX
+INCLUDE "engine/gen2_pics.asm"

@@ -7,7 +7,12 @@ LoadMonData_:
 ; Return monster id at wcf91 and its data at wLoadedMon.
 ; Also load base stats at wMonHeader for convenience.
 
-	ld a, [wDayCareMonSpecies]
+	call OpenBox ; the box and the day care are in save RAM
+	call .body
+	jp CloseBox
+
+.body
+	ld a, [sDayCareMonSpecies]
 	ld [wcf91], a
 	ld a, [wMonDataLocation]
 	and $7f
@@ -20,8 +25,11 @@ LoadMonData_:
 
 .GetMonHeader
 	ld a, [wcf91]
+	cp EGG
+	jr z, .gotHeader ; after the data, from its real species
 	ld [wd0b5], a ; input for GetMonHeader
 	call GetMonHeader
+.gotHeader
 
 	ld hl, wPartyMons
 	ld bc, wPartyMon2 - wPartyMon1
@@ -34,11 +42,11 @@ LoadMonData_:
 	jr z, .getMonEntry
 
 	cp 2
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 	jr z, .getMonEntry
 
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr .copyMonData
 
 .getMonEntry
@@ -51,6 +59,14 @@ LoadMonData_:
 	;jp CopyData
 ;joenote - allow active battle pokemon's realtime stats to be used in place of its unmodified stats
 	call CopyData
+
+	ld a, [wcf91]
+	cp EGG
+	jr nz, .notEgg
+	ld a, [wLoadedMonSpecies] ; an egg's header is its real species'
+	ld [wd0b5], a
+	call GetMonHeader
+.notEgg
 
 	ld a, [wMonDataLocation]
 	and $7f
@@ -72,7 +88,7 @@ LoadMonData_:
 	
 	ld hl, wBattleMonAttack
 	ld de, wLoadedMonAttack
-	ld bc, wBattleMonSpecial - wBattleMonMaxHP
+	ld bc, wBattleMonSpecialDefense + 2 - wBattleMonAttack
 	jp CopyData
 	
 	

@@ -28,12 +28,11 @@ _TM34ExplanationText::
 	cont "can be taught to"
 	cont "#MON!"
 
-	para "A TM is good only"
-	line "once! So when you"
-	cont "use one to teach"
-	cont "a new technique,"
-	cont "pick the #MON"
-	cont "carefully!"
+	para "A TM never runs"
+	line "out! Teach it as"
+	cont "often as you like"
+	cont "from a #MON's"
+	cont "MOVES menu!"
 
 	para "TM34 contains"
 	line "BIDE!"

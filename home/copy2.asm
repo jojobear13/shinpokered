@@ -13,28 +13,6 @@ FarCopyData2::
 	ld [MBC1RomBank], a
 	ret
 
-FarCopyData3::
-; Copy bc bytes from a:de to hl.
-	ld [hROMBankTemp], a
-	ld a, [H_LOADEDROMBANK]
-	push af
-	ld a, [hROMBankTemp]
-	ld [H_LOADEDROMBANK], a
-	ld [MBC1RomBank], a
-	push hl
-	push de
-	push de
-	ld d, h
-	ld e, l
-	pop hl
-	call CopyData
-	pop de
-	pop hl
-	pop af
-	ld [H_LOADEDROMBANK], a
-	ld [MBC1RomBank], a
-	ret
-
 FarCopyDataDouble::
 ; Expand bc bytes of 1bpp image data
 ; from a:hl to 2bpp data at de.

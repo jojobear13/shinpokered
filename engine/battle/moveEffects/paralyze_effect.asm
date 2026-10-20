@@ -23,6 +23,13 @@ ParalyzeEffect_:
 	ld a, [hl]
 	and a ; does the target already have a status ailment?
 	jr nz, .didntAffect
+; Gen 9: Electric types can't be paralyzed
+	push hl
+	inc hl ; the target's types
+	ld a, 1 << PAR
+	call StatusTypeImmune
+	pop hl
+	jr c, .doesntAffect
 ; check if the target is immune due to types
 	ld a, [de]
 	cp ELECTRIC
@@ -45,7 +52,7 @@ ParalyzeEffect_:
 	and a
 	jr nz, .didntAffect
 	set PAR, [hl]
-	callab QuarterSpeedDueToParalysis
+	callab HalveSpeedDueToParalysis
 	ld c, 30
 	call DelayFrames
 	callab PlayCurrentMoveAnimation

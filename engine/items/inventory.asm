@@ -5,6 +5,9 @@
 ; [wItemQuantity] = item quantity
 ; sets carry flag if successful, unsets carry flag if unsuccessful
 AddItemToInventory_:
+	ld a, [wcf91]
+	cp HM_01
+	jr nc, AddMachine
 	ld a, [wItemQuantity] ; a = item quantity
 	push af
 	push bc
@@ -108,7 +111,24 @@ AddItemToInventory_:
 	ld a, h
 	cp wNumBoxItems >> 8
 	ret
-	
+
+; a TM or HM isn't kept in the bag: getting one marks it owned, for good
+; (the MOVES screen teaches it); always succeeds
+AddMachine:
+	push bc
+	push de
+	push hl
+	call MachineIndex
+	ld c, a
+	ld b, FLAG_SET
+	ld hl, wTMsOwned
+	predef FlagActionPredef
+	pop hl
+	pop de
+	pop bc
+	scf
+	ret
+
 ; function to remove an item (in varying quantities) from the player's bag or PC box
 ; INPUT:
 ; hl = address of inventory (either wNumBagItems or wNumBoxItems)

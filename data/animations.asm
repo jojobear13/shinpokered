@@ -163,6 +163,55 @@ AttackAnimationPointers:
 	dw SuperFangAnim
 	dw SlashAnim
 	dw SubstituteAnim
+	dw WingAttackAnim      ; AERIAL_ACE
+	dw GustAnim            ; AIR_SLASH
+	dw RockThrowAnim       ; ANCIENTPOWER
+	dw QuickAttackAnim     ; AQUA_JET
+	dw BubbleBeamAnim      ; BRINE
+	dw BiteAnim            ; BUG_BITE
+	dw SupersonicAnim      ; BUG_BUZZ
+	dw EarthquakeAnim      ; BULLDOZE
+	dw CometPunchAnim      ; CLOSE_COMBAT
+	dw KarateChopAnim      ; CROSS_CHOP
+	dw HyperFangAnim       ; CRUNCH
+	dw SingAnim            ; DISARM_VOICE
+	dw ThunderBoltAnim     ; DISCHARGE
+	dw DragonRageAnim      ; DRAGONBREATH
+	dw TakeDownAnim        ; DRAGON_RUSH
+	dw HornDrillAnim       ; DRILL_RUN
+	dw MegaPunchAnim       ; DYNAMICPUNCH
+	dw FissureAnim         ; EARTH_POWER
+	dw QuickAttackAnim     ; EXTREMESPEED
+	dw HyperFangAnim       ; FIRE_FANG
+	dw FireSpinAnim        ; FLAME_WHEEL
+	dw FireBlastAnim       ; FLARE_BLITZ
+	dw AuroraBeamAnim      ; FLASH_CANNON
+	dw MegaDrainAnim       ; GIGA_DRAIN
+	dw SludgeAnim          ; GUNK_SHOT
+	dw FlamethrowerAnim    ; HEAT_WAVE
+	dw RoarAnim            ; HYPER_VOICE
+	dw IcePunchAnim        ; ICICLE_CRASH
+	dw EmberAnim           ; INCINERATE
+	dw RazorLeafAnim       ; LEAF_BLADE
+	dw CrabHammerAnim      ; LIQUIDATION
+	dw LowKickAnim         ; LOW_SWEEP
+	dw CometPunchAnim      ; MACH_PUNCH
+	dw ConfuseRayAnim      ; MOONBLAST
+	dw PeckAnim            ; PLUCK
+	dw HyperFangAnim       ; POISON_FANG
+	dw PoisonStingAnim     ; POISON_JAB
+	dw BlizzardAnim        ; POWDER_SNOW
+	dw PsywaveAnim         ; PSYSHOCK
+	dw ClampAnim           ; RAZOR_SHELL
+	dw SingAnim            ; ROUND_M
+	dw EggBombAnim         ; SEED_BOMB
+	dw NightShadeAnim      ; SHADOW_BALL
+	dw SludgeAnim          ; SLUDGE_BOMB
+	dw StompAnim           ; STOMPTANTRUM
+	dw RockSlideAnim       ; STONE_EDGE
+	dw GustAnim            ; TWISTER
+	dw BubbleBeamAnim      ; WATER_PULSE
+	dw SlashAnim           ; X_SCISSOR
 	dw StruggleAnim
 	dw ShowPicAnim
 	dw EnemyFlashAnim

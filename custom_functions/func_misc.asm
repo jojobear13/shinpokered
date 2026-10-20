@@ -148,7 +148,7 @@ ToggleCPUSpeed:
 ;takes a number loaded into wcd6d to determine value:
 ;	1 is catch rate
 ;	2 is level
-;	default is DVs
+;	default is IVs
 Mon1BCDScore:
 	push de
 	push hl
@@ -164,29 +164,41 @@ Mon1BCDScore:
 .next1
 	cp 1
 	jr nz, .default
-	;calculate a = $FF - wPartyMon1CatchRate
-	ld a, [wPartyMon1CatchRate]
+	;calculate a = $FF - the species' catch rate (the struct byte is the held item)
+	ld a, [wPartyMon1Species] ; (an egg's real species)
+	ld [wd0b5], a
+	call GetMonHeader
+	ld a, [wMonHCatchRate]
 	ld b, a
 	ld a, $FF
 	sub b
 	jr .AddToTotal
 
 .default
-	;calculate a = $00 to $FF based on average of DVs
-	ld a, [wPartyMon1DVs]	;load first two nybbles of DVs
-	call .add_nybbles
-	push bc
-	ld a, [wPartyMon1DVs + 1]	;load second two nybbles of DVs
-	call .add_nybbles
-	ld a, b
-	srl a	;a = mean of first two nybbles
-	pop bc
-	srl b	;b = mean of second two nybbles
-	add b
-	srl a	;a = mean of all four nybbles
-	ld b, a
-	swap a
-	add b	;use mean to make a byte of 00,11,22...,EE,FF
+	;calculate a = $00 to $FF based on the average of the IVs
+	ld de, wPartyMon1IVs
+	callab UnpackIVsAtDE
+	ld hl, wIVScratch
+	ld bc, NUM_STATS << 8 ; c = the sum
+.sumIVs
+	ld a, [hli]
+	add c
+	ld c, a
+	dec b
+	jr nz, .sumIVs
+	ld a, c
+	ld b, -1
+.divideBy6
+	inc b
+	sub NUM_STATS
+	jr nc, .divideBy6
+	ld a, b ; the mean, 0-31
+	add a
+	add a
+	add a ; x 8
+	srl b
+	srl b
+	add b ; + mean / 4: 31 makes $FF
 
 .AddToTotal
 	;double the score and return it
@@ -218,20 +230,6 @@ Mon1BCDScore:
 	pop bc
 	pop hl
 	pop de
-	ret
-.add_nybbles
-	;get first nybble
-	push af
-	and $F0
-	swap a
-	ld b, a
-	pop af
-	;add second nybble
-	push af
-	and $0F
-	add b
-	ld b, a
-	pop af
 	ret
 
 	
@@ -666,7 +664,7 @@ ENDM
 ;determine if the mon should have a gender symbol
 ;mons that are genderless or a single gender do not get a symbol
 ;takes a pokemon index in d
-;takes its atk dv in e
+;takes its gender byte in e (its first and third IV bytes xored)
 ;symbol is returned in d --> ;$F5 for female and $EF for male
 DetermineMonGender:
 	xor a
@@ -683,6 +681,11 @@ DetermineMonGender:
 .foundmon
 	ld a, b
 	call GetGenderRatioTarget
+	ld a, b
+	cp 16
+	jr z, .alwaysFemale
+	swap a ; out of 256: female below it
+	ld b, a
 	ld a, e
 	cp b
 .male
@@ -693,6 +696,9 @@ DetermineMonGender:
 	ret c
 .nosymbol
 	ld d, $00
+	ret
+.alwaysFemale
+	ld d, $F5
 	ret
 
 

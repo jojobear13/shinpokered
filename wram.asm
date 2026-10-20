@@ -5,7 +5,8 @@ MACRO flag_array
 	ds ((\1) + 7) / 8
 ENDM
 
-box_struct_length EQU 25 + NUM_MOVES * 2
+box_struct_length EQU 13 + NUM_STATS + NUM_IVS + NUM_MOVES * 2
+ASSERT DAY_CARE_DATA_LENGTH == 2 * NAME_LENGTH + box_struct_length
 MACRO box_struct
 \1Species::    db	;+$00
 \1HP::         dw	;+$01
@@ -14,31 +15,31 @@ MACRO box_struct
 \1Type::
 \1Type1::      db	;+$05
 \1Type2::      db	;+$06
-\1CatchRate::  db	;+$07
+\1CatchRate::  db	;+$07 the held item
 \1Moves::      ds NUM_MOVES	;+$08
 \1OTID::       dw	;+$0C
 \1Exp::        ds 3	;+$0E
-\1HPExp::      dw	;+$11
-\1AttackExp::  dw	;+$13
-\1DefenseExp:: dw	;+$15
-\1SpeedExp::   dw	;+$17
-\1SpecialExp:: dw	;+$19
-\1DVs::        ds 2	;+$1B
-\1PP::         ds NUM_MOVES	;+$1D
+\1EVs::        ; one byte per stat, in stat order (CalcStat reads them from here)
+\1HPEV::       db	;+$11
+\1AttackEV::   db	;+$12
+\1DefenseEV::  db	;+$13
+\1SpeedEV::    db	;+$14
+\1SpecialAttackEV::  db	;+$15
+\1SpecialDefenseEV:: db	;+$16
+\1IVs::        ds NUM_IVS	;+$17 (engine/ivs.asm)
+\1PP::         ds NUM_MOVES	;+$1B
 ENDM
-
-;		 - <stat>Exp is MSB while <stat>Exp+1 is LSB
-;        - CalcStat function needs hl to point to LSB to take the stat experience into account
 
 MACRO party_struct
 	box_struct \1
-\1Level::      db	;+$21
+\1Level::      db	;+$1F
 \1Stats::
-\1MaxHP::      dw	;+$22
-\1Attack::     dw	;+$24
-\1Defense::    dw	;+$26
-\1Speed::      dw	;+$28
-\1Special::    dw	;+$2A
+\1MaxHP::      dw	;+$20
+\1Attack::     dw	;+$22
+\1Defense::    dw	;+$24
+\1Speed::      dw	;+$26
+\1SpecialAttack::  dw	;+$28
+\1SpecialDefense:: dw	;+$2A
 ENDM
 
 MACRO battle_struct
@@ -52,14 +53,15 @@ MACRO battle_struct
 \1Type2::      db
 \1CatchRate::  db
 \1Moves::      ds NUM_MOVES
-\1DVs::        ds 2	
+\1IVs::        ds NUM_IVS
 \1Level::      db
 \1Stats::
 \1MaxHP::      dw
 \1Attack::     dw
 \1Defense::    dw
 \1Speed::      dw
-\1Special::    dw
+\1SpecialAttack::  dw
+\1SpecialDefense:: dw
 \1PP::         ds NUM_MOVES
 ENDM
 
@@ -793,10 +795,8 @@ wSafariEscapeFactor:: ; cce8
 wSafariBaitFactor:: ; cce9
 	ds 1;
 
-	ds 1
-
-wTransformedEnemyMonOriginalDVs:: ; cceb
-	ds 2
+wTransformedEnemyMonOriginalIVs:: ; ccea (in the spare byte before Gen 1's 3)
+	ds NUM_IVS
 
 wMonIsDisobedient:: ds 1 ; cced
 
@@ -867,7 +867,9 @@ wPlayerMonUnmodifiedDefense:: ; cd14
 	ds 2
 wPlayerMonUnmodifiedSpeed:: ; cd16
 	ds 2
-wPlayerMonUnmodifiedSpecial:: ; cd18
+wPlayerMonUnmodifiedSpecialAttack:: ; cd18
+	ds 2
+wPlayerMonUnmodifiedSpecialDefense::
 	ds 2
 
 ; stat modifiers for the player's current pokemon
@@ -881,7 +883,7 @@ wPlayerMonDefenseMod:: ; cd1b
 	ds 1
 wPlayerMonSpeedMod:: ; cd1c
 	ds 1
-wPlayerMonSpecialMod:: ; cd1d
+wPlayerMonSpecialAttackMod:: ; cd1d
 	ds 1
 
 wInGameTradeReceiveMonName:: ; cd1e
@@ -890,8 +892,11 @@ wPlayerMonAccuracyMod:: ; cd1e
 	ds 1
 wPlayerMonEvasionMod:: ; cd1f
 	ds 1
+; after the original six so that accuracy and evasion keep their indices
+wPlayerMonSpecialDefenseMod::
+	ds 1
 
-	ds 3
+	ds 2
 
 wEnemyMonUnmodifiedLevel:: ; cd23
 	ds 1
@@ -907,11 +912,13 @@ wInGameTradeMonNick:: ; cd29
 
 wEnemyMonUnmodifiedSpeed:: ; cd2a
 	ds 2
-wEnemyMonUnmodifiedSpecial:: ; cd2c
+wEnemyMonUnmodifiedSpecialAttack:: ; cd2c
 	ds 1
 
 wEngagedTrainerClass:: ; cd2d
 	ds 1
+wEnemyMonUnmodifiedSpecialDefense::
+	ds 2
 wEngagedTrainerSet:: ; cd2e
 ;	ds 1
 
@@ -926,7 +933,7 @@ wEnemyMonDefenseMod:: ; cd2f
 	ds 1
 wEnemyMonSpeedMod:: ; cd30
 	ds 1
-wEnemyMonSpecialMod:: ; cd31
+wEnemyMonSpecialAttackMod:: ; cd31
 	ds 1
 wEnemyMonAccuracyMod:: ; cd32
 	ds 1
@@ -934,6 +941,8 @@ wEnemyMonEvasionMod:: ; cd33
 	ds 1
 
 wInGameTradeReceiveMonSpecies::
+; after the original six so that accuracy and evasion keep their indices
+wEnemyMonSpecialDefenseMod::
 	ds 1
 
 	ds 2
@@ -1021,7 +1030,7 @@ wChargeMoveNum:: ; cd3d
 
 wCoordIndex:: ; cd3d
 
-wOptionsTextSpeedCursorX:: ; cd3d
+wOptionsPage:: ; cd3d
 
 wBoxNumString:: ; cd3d
 
@@ -1084,7 +1093,7 @@ wRivalStarterBallSpriteIndex:: ; cd3e
 
 wDayCareNumLevelsGrown:: ; cd3e
 
-wOptionsBattleAnimCursorX:: ; cd3e
+wOptionsRow:: ; cd3e
 
 wTrainerInfoTextBoxWidth:: ; cd3e
 
@@ -1124,7 +1133,6 @@ wDayCareTotalCost:: ; cd3f
 
 wJigglypuffFacingDirections:: ; cd3f
 
-wOptionsBattleStyleCursorX:: ; cd3f
 
 wTrainerInfoTextBoxNextRowOffset:: ; cd3f
 
@@ -1648,7 +1656,7 @@ wFontLoaded:: ; cfc4
 ;bit 4: 4th pkmn (position 3)
 ;bit 5: 5th pkmn (position 4)
 ;bit 6: 6th pkmn (position 5)
-;bit 7: force a wild pokemon with shiny DVs if set
+;bit 7: force a wild pokemon with shiny IVs if set
 	ds 1
 
 wWalkCounter:: ; cfc5
@@ -1731,7 +1739,7 @@ wEnemyMonNick:: ds NAME_LENGTH ; cfda
 
 wEnemyMon:: battle_struct wEnemyMon ; cfe5
 
-wEnemyMonBaseStats:: ds 5
+wEnemyMonBaseStats:: ds NUM_STATS
 wEnemyMonActualCatchRate:: ds 1
 wEnemyMonBaseExp:: ds 1
 
@@ -1832,7 +1840,8 @@ wPlayerStatsToDouble:: ; d060
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wPlayerStatsToHalve:: ; d061
@@ -1842,7 +1851,8 @@ wPlayerStatsToHalve:: ; d061
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wPlayerBattleStatus1:: ; d062
@@ -1882,7 +1892,8 @@ wEnemyStatsToDouble:: ; d065
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wEnemyStatsToHalve:: ; d066
@@ -1892,7 +1903,8 @@ wEnemyStatsToHalve:: ; d066
 ;bit 0 - attack
 ;bit 1 - defence
 ;bit 2 - speed
-;bit 3 - special
+;bit 3 - special attack
+;bit 4 - special defense
 	ds 1
 
 wEnemyBattleStatus1:: ; d067
@@ -2208,7 +2220,9 @@ wMonHBaseDefense:: ; d0bb
 	ds 1
 wMonHBaseSpeed:: ; d0bc
 	ds 1
-wMonHBaseSpecial:: ; d0bd
+wMonHBaseSpecialAttack:: ; d0bd
+	ds 1
+wMonHBaseSpecialDefense::
 	ds 1
 
 wMonHTypes:: ; d0be
@@ -2454,7 +2468,7 @@ wPseudoItemID:: ; d152
 ; that case, this would be ESCAPE_ROPE.
 	ds 1
 
-wUnusedD153:: ; d153	;joenote - use this to hold the pointer for trainerAI statexp
+wUnusedD153:: ; d153	;joenote - use this to hold the pointer to a trainer's mon's EVs
 	ds 2
 
 wUnusedD155:: ; d155	;joenote - use this to as a backup for how many pokemon to split exp between (fixing exp all)
@@ -2510,6 +2524,11 @@ wBagItems:: ; d31e
 	ds BAG_ITEM_CAPACITY * 2
 wBagItemsTerminator::	;holds FF when the bag becomes full
 	ds 1 ; end
+
+wTMsOwned:: ; a flag per TM and HM (MachineIndex's order): they're owned, not carried; NEW GAME+ keeps them
+	ds (NUM_MACHINES + 7) / 8
+wTMsOwnedEnd::
+	ds 1
 
 wPlayerMoney:: ; d347
 	ds 3 ; BCD
@@ -3113,14 +3132,6 @@ wRoute18GateCurScript:: ; d669
 	ds 30
 wTempFieldMoveSlots::	;joenote - for field move slot
 	ds 6
-wBagBackupSpace::	;joenote - added to expand the bag space (42 bytes long)
-wBagNumBackup::
-	ds 1
-wBagItemsBackup::
-	ds BAG_ITEM_CAPACITY * 2
-wBagItemsBackupTerminator::
-	ds 1
-wBagBackupSpaceEnd::
 wGameProgressFlagsEnd::
 
 
@@ -3169,8 +3180,13 @@ wFossilItem:: ; d70f
 wFossilMon:: ; d710
 ; mon that will result from the item
 	ds 1
-wFossilMonDVs::	;d711 (2 bytes)	;joenote - added to store some values
-	ds 2
+wDayCareEggReady:: ; an egg is waiting at the day care (in sDayCareEgg)
+	ds 1
+wEggStepCounter:: ; every 256 steps the day care may lay an egg, and eggs in the party get closer to hatching
+	ds 1
+wDisplayOptions:: ; the DISPLAY options' SPRITES (BIT_GEN2_SPRITES) and TYPE HINT (TYPE_HINT_MASK); kept through NEW GAME as the options are
+	ds 1
+	ds NUM_IVS - 3
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200
@@ -3239,7 +3255,7 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 ;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
-wUnusedD726:: 
+wUnusedD726::
 	ds 2
 ;;;;;;;;;;;;;;
 wd728:: ; d728
@@ -3464,33 +3480,39 @@ wNumSafariBalls:: ; da47
 
 
 wDayCareInUse:: ; da48
-; 0 if no pokemon is in the daycare
-; 1 if pokemon is in the daycare
+; how many mons are in the day care (0 to DAY_CARE_SLOTS); one is in
+; sDayCareMon, a second in sDayCareMon2
 	ds 1
 
-wDayCareMonName:: ds NAME_LENGTH ; da49
-wDayCareMonOT::   ds NAME_LENGTH ; da54
-
-wDayCareMon:: box_struct wDayCareMon ; da5f
+wTypeChartSeen:: ; a flag per matchup the player has seen an attacking move
+; make: attacking type * NUM_CHART_TYPES + defending type (engine/battle/type_chart.asm);
+; NEW GAME+ keeps it
+	ds (NUM_CHART_TYPES * NUM_CHART_TYPES + 7) / 8
 
 wMainDataEnd::
 
+; The day-care mon and the current PC box live in save RAM (sLiveDataStart
+; in sram.asm) and are read through OpenBox/CloseBox in home.asm. Design
+; brief, step D.
+wBoxOpenDepth:: ; da49
+; OpenBox calls not yet matched by a CloseBox; SRAM is disabled when it
+; returns to zero
+	ds 1
+wSRAMCopyBanks:: ; da4a
+; CopySRAMBanked: source bank in the low nybble, destination bank in the high
+	ds 1
+wBoxListCopy:: ; da4b
+; the current box's count and species list, copied from save RAM for the PC's
+; list menu, which reads its list every frame (bills_pc.asm)
+	ds 1 + MONS_PER_BOX + 1
+; The list menu tells a party list from a box list by the low byte of its
+; address alone (home.asm, .pokemonList)
+ASSERT LOW(wBoxListCopy) != LOW(wPartyCount)
 
-wBoxDataStart::
-
-wNumInBox::  ds 1 ; da80
-wBoxSpecies:: ds MONS_PER_BOX + 1
-
-wBoxMons::
-wBoxMon1:: box_struct wBoxMon1 ; da96
-wBoxMon2:: ds box_struct_length * (MONS_PER_BOX + -1) ; dab7
-
-wBoxMonOT::    ds NAME_LENGTH * MONS_PER_BOX ; dd2a
-wBoxMonNicks:: ds NAME_LENGTH * MONS_PER_BOX ; de06
-wBoxMonNicksEnd:: ; dee2
-
-wBoxDataEnd::
-
+wWeightedLevelScratch:: ; da61
+; GetWeightedLevel (func_enc_gen.asm) uses the six bytes from here as
+; scratch. They overlap the EXP bar variables, as they did when this label
+; was wBoxDataEnd; both are only used outside of this routine's call.
 ;joenote - exp bar wram values
 IF DEF(_EXPBAR)
 wEXPBarPixelLength::  ds 1
@@ -3505,7 +3527,164 @@ ENDC
 wdeed::
 ds 1
 
-; deee
+;holds the player's position from when they blacked out so they can return to it
+wBlackoutReturnFlag:: ; da6d
+; 0 = nothing pending
+; 1 = ask the player if they want to return to where they blacked out
+; 2 = the player chose to return
+	ds 1
+wBlackoutSavedMapData:: ; da6e
+; copy of wCurMap through wLastMap
+	ds 8
+wBlackoutSavedWalkBikeSurfState:: ; da76
+	ds 1
+
+wRNGSeed:: ; da77
+; the four RNG bytes the game booted with (init.asm); RNG_Correction and the
+; A+SELECT seed display on the title screen read them back. These used to be
+; the literal address $def0, which overlapped wBlackoutSavedMapData.
+	ds 4
+
+wCalcStatNature:: ; the nature of the mon _CalcStat is working on
+	ds 1
+
+; the abilities of the mons in battle, set when each is sent out
+wPlayerAbility:: ds 1
+wEnemyAbility:: ds 1
+wAbilityFlags:: ; what abilities have set up in battle (FLASH_FIRE_*_F, ...)
+	ds 1
+wSideEffectChance:: ; a side effect's chance out of 256, as abilities change it
+	ds 1
+wPlayerChoiceLock:: ; the move slot (1-4) a Choice item has locked in, 0 for none
+	ds 1
+wEnemyChoiceLock::
+	ds 1
+wEnduredBy:: ; what left the target 1 HP (STURDY_ENDURED_F): 0 for Sturdy, else the item
+	ds 1
+wItemScratch:: ds 2
+wAbilitySnapshot:: ; before a move: flags (SNAPSHOT_*_F), the target's HP,
+	; status and stat stages, for the abilities that react to the move
+	ds 1 + 2 + 1 + NUM_STAT_MODS
+wIVScratch:: ; six IVs unpacked (HP, attack, defense, speed, special attack, special defense)
+	ds NUM_STATS
+wIVGenMode:: ; how GenerateIVs rolls (IVGEN_*_F)
+	ds 1
+wExpScratch:: ; ScaledExp: the party mon's level, its share (1, or 2 for the
+	; Exp. Share's half), then two bytes of working
+	ds 4
+wMulResult:: ; Mul16's product, big-endian
+	ds 4
+wMulCount::
+	ds 1
+wSqrtTarget:: ; ISqrt2_13's target, big-endian
+	ds 4
+wDamageScratch:: ; BaseDamage: power, level, attack, defense
+	ds 6
+wEvoScratch:: ; PastEvolutionLevel: a species' evolutions
+	ds EVO_SCRATCH_LENGTH
+
+; Gen 9's binding and side conditions, each the player's then the enemy's;
+; cleared as a battle starts
+wSideConditions::
+wPlayerBoundTurns:: ; the turns left (+1) the mon is bound by Wrap and co., 0 if free
+	ds 1
+wEnemyBoundTurns::
+	ds 1
+wPlayerBoundMove:: ; the move binding it
+	ds 1
+wEnemyBoundMove::
+	ds 1
+wPlayerReflectTurns:: ; the turns left of each screen and Mist on the side
+	ds 1
+wEnemyReflectTurns::
+	ds 1
+wPlayerLightScreenTurns::
+	ds 1
+wEnemyLightScreenTurns::
+	ds 1
+wPlayerMistTurns::
+	ds 1
+wEnemyMistTurns::
+	ds 1
+wEndOfRoundPending:: ; the round's end-of-round effects haven't run yet (EndOfRound)
+	ds 1
+wTurnPending:: ; both sides have chosen this turn; it ends as the battle loop comes round
+	ds 1
+wPlayerMimicSlot:: ; the slot (1-4) Mimic filled until the mon leaves, 0 for none
+	ds 1
+wEnemyMimicSlot::
+	ds 1
+wPlayerMimicPP:: ; Mimic's own PP, for the party mon
+	ds 1
+wEnemyMimicPP::
+	ds 1
+wForcedSwitchSlot:: ; the slot (1-4) the enemy's Roar-dragged mon comes from, 0 for the AI's pick
+	ds 1
+wSideConditionsEnd::
+
+; the bag screen (engine/menu/bag_menu.asm)
+wBagPocket:: ; the pocket shown (POCKET_*), kept between visits
+	ds 1
+wBagCursor:: ; the entry the cursor is on (the pocket's count for CANCEL)
+	ds 1
+wBagScroll:: ; the first entry shown
+	ds 1
+wBagPocketList:: ; the pocket's count, then each entry's index in the bag
+	ds 1 + BAG_ITEM_CAPACITY
+wSortInventory:: ; SortInventory: the inventory being sorted
+	ds 2
+
+; the MOVES screen (engine/menu/moves_screen.asm)
+wMovesSlotCursor:: ; the slot the cursor is on (NUM_MOVES for the field move slot)
+	ds 1
+wMovesSlot:: ; the slot being changed
+	ds 1
+wMovesCursor:: ; the choice the cursor is on
+	ds 1
+wMovesScroll:: ; the first choice shown
+	ds 1
+wMovesSpecies::
+	ds 1
+wMovesMachine:: ; the machine being checked (MachineIndex's order)
+	ds 1
+wMovesNumber:: ; for printing; a pointer
+	ds 2
+wMovesData:: ; a move's Moves entry
+	ds 6
+wMovesChoices:: ; the count, then (move, where from) pairs: the level, or the TM or HM; move 0 is REMOVE
+	ds 1 + MAX_MOVE_CHOICES * 2
+wMovesLearnset:: ; the mon's evolutions and learnset (breeding uses it too)
+	ds MOVES_LEARNSET_LENGTH
+
+; breeding (engine/breeding.asm)
+wBreedParents:: ; the day care's two mons, copied from save RAM
+	ds DAY_CARE_DATA_LENGTH * DAY_CARE_SLOTS
+wBreedInfo:: ; for each parent: BREED_INFO_LENGTH bytes (BREED_INFO_*)
+	ds BREED_INFO_LENGTH * DAY_CARE_SLOTS
+wBreedMother:: ; the parent the egg's species and ability come from (0 or 1)
+	ds 1
+wBreedParentIVs:: ; each parent's six IVs
+	ds NUM_STATS * DAY_CARE_SLOTS
+wBreedInherited:: ; which IVs came from a parent (bit 0 = HP ...)
+	ds 1
+wBreedNature:: ; the nature an Everstone passes down, $FF for none
+	ds 1
+wBreedTemp::
+	ds 2
+wBreedEgg:: ; the egg being made, in the day care's layout
+	ds DAY_CARE_DATA_LENGTH
+wHoFSlot:: ; the Hall of Fame slot being recorded (eggs are skipped)
+	ds 1
+wPartyIconSpecies:: ; the species whose icon each party slot's sprite tiles hold
+	ds PARTY_LENGTH
+wLastRepelUsed:: ; the kind of repel last used, offered again when it wears off (0: none)
+	ds 1
+wHPPercentTiles:: ; the HP PERCENT option's two tiles (engine/battle/hp_percent.asm)
+	ds 2 * 16
+wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)
+	ds 3
+
+; free up to the stack at $df00
 
 
 SECTION "Stack", WRAM0[$df00]

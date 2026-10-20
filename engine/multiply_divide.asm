@@ -146,123 +146,134 @@ _Divide:
 	ret
 
 	
+; hl = a mon's IVs -> a and wCalcStatNature = its nature (HARDY ... QUIRKY): the
+; four IV bytes as one number (without the flag bits), plus NATURE_OFFSET, mod
+; 25. Preserves bc, de and hl. Other banks can callab it and read
+; wCalcStatNature.
+GetNatureFromIVs:
+	push hl
+	push bc
+	ld bc, NUM_IVS << 8 ; b = bytes left, c = remainder so far
+.loop
+	ld a, c ; remainder * 256 = remainder * 6 (mod 25)
+	add a
+	add c
+	add a
+	ld c, a
+	ld a, b
+	cp 1
+	ld a, [hli]
+	jr nz, .gotByte
+	and $FC ; not the flags
+.gotByte
+	call .mod25
+	add c ; at most 6 * 24 + 24
+	call .mod25
+	ld c, a
+	dec b
+	jr nz, .loop
+	add NATURE_OFFSET
+	call .mod25
+	ld [wCalcStatNature], a
+	pop bc
+	pop hl
+	ret
+.mod25
+	cp NUM_NATURES
+	ret c
+	sub NUM_NATURES
+	jr .mod25
+
+; scale stat c, in H_MULTIPLICAND+1 and +2, by the nature in wCalcStatNature:
+; x 1.1 if the nature raises it, x 0.9 if it lowers it (rounded down, as from
+; Gen 3). HP and neutral natures are left alone.
+ApplyNature:
+	ld a, c
+	cp STAT_ATTACK
+	ret c ; HP
+	ld a, [wCalcStatNature]
+	ld b, STAT_ATTACK
+.divideBy5
+	cp 5
+	jr c, .gotStats
+	sub 5
+	inc b
+	jr .divideBy5
+.gotStats
+	add STAT_ATTACK ; a = the lowered stat, b = the raised one
+	cp b
+	ret z ; neutral
+	ld d, 90
+	cp c
+	jr z, .scale
+	ld a, b
+	cp c
+	ret nz
+	ld d, 110
+.scale
+	xor a
+	ld [H_MULTIPLICAND], a
+	ld a, d
+	ld [H_MULTIPLIER], a
+	call Multiply
+	ld a, 100
+	ld [H_DIVISOR], a
+	ld b, 4
+	jp Divide ; the result is back in H_MULTIPLICAND+1 and +2
+
+; Gen 3+'s formula: (2 x base + IV + EV / 4) x level / 100 + 5 (HP: + level +
+; 10), then the nature. hl = the mon's EVs, with its IVs after them, or (b = 0,
+; no EVs) its IVs - NUM_STATS
 _CalcStat:
 	call GetPredefRegisters
 	push hl
 	push de
 	push bc
-	ld a, b
-	ld d, a
 	push hl
 	ld hl, wMonHeader
-	ld b, $0
+	ld a, b
+	ld b, 0
 	add hl, bc
-	ld a, [hl]          ; read base value of stat
-	ld e, a
+	ld e, [hl] ; base stat
 	pop hl
-	push hl
-	sla c
-	ld a, d
+	ld b, 0
 	and a
-	jr z, .statExpDone  ; consider stat exp?
-	add hl, bc          ; skip to corresponding stat exp value
-.statExpLoop            ; calculates ceil(Sqrt(stat exp)) in b
-	xor a
-	ld [H_MULTIPLICAND], a
-	ld [H_MULTIPLICAND+1], a
-	inc b               ; increment current stat exp bonus
-	ld a, b
-	cp $ff
-	jr z, .statExpDone
-	ld [H_MULTIPLICAND+2], a
-	ld [H_MULTIPLIER], a
-	call Multiply
-	ld a, [hld]
-	ld d, a
-	ld a, [$ff98]
-	sub d
-	ld a, [hli]
-	ld d, a
-	ld a, [$ff97]
-	sbc d               ; test if (current stat exp bonus)^2 < stat exp
-	jr c, .statExpLoop
-.statExpDone
-	srl c
-	pop hl
-	push bc
-	ld bc, wPartyMon1DVs - (wPartyMon1HPExp - 1) ; also wEnemyMonDVs - wEnemyMonHP beause the structures are the same size
-	add hl, bc
-	pop bc
+	jr z, .gotEV
+	push hl
 	ld a, c
-	cp $2
-	jr z, .getAttackIV
-	cp $3
-	jr z, .getDefenseIV
-	cp $4
-	jr z, .getSpeedIV
-	cp $5
-	jr z, .getSpecialIV
-.getHpIV
+	dec a
+	add l
+	ld l, a
+	jr nc, .noCarryEV
+	inc h
+.noCarryEV
+	ld a, [hl]
+	pop hl
+	srl a
+	srl a
+	ld b, a ; b = EV / 4
+.gotEV
 	push bc
-	ld a, [hl]  ; Atk IV
-	swap a
-	and $1
-	sla a
-	sla a
-	sla a
-	ld b, a
-	ld a, [hli] ; Def IV
-	and $1
-	sla a
-	sla a
-	add b
-	ld b, a
-	ld a, [hl] ; Spd IV
-	swap a
-	and $1
-	sla a
-	add b
-	ld b, a
-	ld a, [hl] ; Spc IV
-	and $1
-	add b      ; HP IV: LSB of the other 4 IVs
+	ld bc, NUM_STATS
+	add hl, bc ; the IVs
 	pop bc
-	jr .calcStatFromIV
-.getAttackIV
-	ld a, [hl]
-	swap a
-	and $f
-	jr .calcStatFromIV
-.getDefenseIV
-	ld a, [hl]
-	and $f
-	jr .calcStatFromIV
-.getSpeedIV
-	inc hl
-	ld a, [hl]
-	swap a
-	and $f
-	jr .calcStatFromIV
-.getSpecialIV
-	inc hl
-	ld a, [hl]
-	and $f
-.calcStatFromIV
-	ld d, $0
+	call GetNatureFromIVs
+	call GetIV
+	ld d, 0
+	sla e
+	rl d ; de = base x 2
 	add e
 	ld e, a
-	jr nc, .noCarry
-	inc d                     ; de = Base + IV
-.noCarry
-	sla e
-	rl d                      ; de = (Base + IV) * 2
-	srl b
-	srl b                     ; b = ceil(Sqrt(stat exp)) / 4
+	jr nc, .noCarryIV
+	inc d ; + IV
+.noCarryIV
 	ld a, b
 	add e
+	ld e, a
 	jr nc, .noCarry2
-	inc d                     ; de = (Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4
+	inc d ; + EV / 4
 .noCarry2
+	ld a, e
 	ld [H_MULTIPLICAND+2], a
 	ld a, d
 	ld [H_MULTIPLICAND+1], a
@@ -270,7 +281,7 @@ _CalcStat:
 	ld [H_MULTIPLICAND], a
 	ld a, [wCurEnemyLVL]
 	ld [H_MULTIPLIER], a
-	call Multiply            ; ((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level
+	call Multiply            ; (2 x Base + IV + EV / 4) x Level
 	ld a, [H_MULTIPLICAND]
 	ld [H_DIVIDEND], a
 	ld a, [H_MULTIPLICAND+1]
@@ -281,7 +292,7 @@ _CalcStat:
 	ld [H_DIVISOR], a
 	ld a, $3
 	ld b, a
-	call Divide             ; (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100
+	call Divide             ; (2 x Base + IV + EV / 4) x Level / 100
 	ld a, c
 	cp $1
 	ld a, 5 ; + 5 for non-HP stat
@@ -294,7 +305,7 @@ _CalcStat:
 	jr nc, .noCarry3
 	ld a, [H_MULTIPLICAND+1]
 	inc a
-	ld [H_MULTIPLICAND+1], a ; HP: (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100 + Level
+	ld [H_MULTIPLICAND+1], a ; HP: ... + Level
 .noCarry3
 	ld a, 10 ; +10 for HP stat
 .notHPStat
@@ -304,9 +315,10 @@ _CalcStat:
 	ld [H_MULTIPLICAND+2], a
 	jr nc, .noCarry4
 	ld a, [H_MULTIPLICAND+1]
-	inc a                    ; non-HP: (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100 + 5
-	ld [H_MULTIPLICAND+1], a ; HP: (((Base + IV) * 2 + ceil(Sqrt(stat exp)) / 4) * Level) / 100 + Level + 10
+	inc a                    ; non-HP: ... + 5
+	ld [H_MULTIPLICAND+1], a ; HP: ... + Level + 10
 .noCarry4
+	call ApplyNature
 	ld a, [H_MULTIPLICAND+1] ; check for overflow (>999)
 	cp 999 / $100 + 1
 	jr nc, .overflow

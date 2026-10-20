@@ -281,4 +281,5 @@ ReadTrainer:
 	inc de
 	dec b
 	jr nz, .LastLoop ; repeat wCurEnemyLVL times
-	ret
+	callab TrainerHeldItems
+	jpab AmuletCoinMoney

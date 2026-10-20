@@ -12,12 +12,13 @@ IsPartyMonDead:
 	and a
 	ret
 .next
-	ld hl, wPartyMon1CatchRate
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	ld a, [wUsedItemOnWhichPokemon]
 	call AddNTimes
 	ld a, [hl]
-	cp DEAD
+	and 1 << NUZLOCKE_DEAD_F
+	xor 1 << NUZLOCKE_DEAD_F ; z if dead
 	ret
 
 
@@ -212,11 +213,10 @@ SetDeadPartyMons:
 	
 	push hl
 	push bc
-	ld bc, (wPartyMon1CatchRate - wPartyMon1HP)
+	ld bc, (wPartyMon1IVs + IV_FLAGS - wPartyMon1HP)
 	add hl, bc
 	pop bc
-	ld a, DEAD
-	ld [hl], a
+	set NUZLOCKE_DEAD_F, [hl]
 	pop hl
 	
 .next
@@ -235,20 +235,19 @@ OneHPDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1CatchRate
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 .loop	
-	;check the catch rate for the "dead" value
-	ld a, [hl]
-	cp DEAD
-	jr nz, .next
+	;check for the "dead" mark
+	bit NUZLOCKE_DEAD_F, [hl]
+	jr z, .next
 	
 	;if dead, give it 1 hp
 	push hl
 	push bc
-	ld bc, $FFFA
-	add hl, bc	;same as subtracting 6, and points hl to PartyMonXHP
+	ld bc, wPartyMon1HP - (wPartyMon1IVs + IV_FLAGS)
+	add hl, bc	;points hl to PartyMonXHP
 	pop bc
 	xor a
 	ld [hli], a
@@ -272,21 +271,20 @@ ZeroPPDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1CatchRate
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 	ld e, %11000000
 
 .loop	
-	;check the catch rate for the "dead" value
-	ld a, [hl]
-	cp DEAD
-	jr nz, .next
+	;check for the "dead" mark
+	bit NUZLOCKE_DEAD_F, [hl]
+	jr z, .next
 	
 	;if dead, zero the PP for all moves
 	push hl
 	push bc
-	ld bc, (wPartyMon1PP - wPartyMon1CatchRate)	;point to PartyMonXPP
+	ld bc, (wPartyMon1PP - (wPartyMon1IVs + IV_FLAGS))	;point to PartyMonXPP
 	add hl, bc
 	pop bc
 	;move 1
@@ -323,20 +321,20 @@ FRZDeadMons:
 	ld a, [wPartyCount]
 	ld d, a
 	
-	ld hl, wPartyMon1CatchRate
+	ld hl, wPartyMon1IVs + IV_FLAGS
 	ld bc, wPartyMon2 - wPartyMon1
 	
 .loop	
-	;check the catch rate for the "dead" value
-	ld a, [hl]
-	cp DEAD
-	jr nz, .next
+	;check for the "dead" mark
+	bit NUZLOCKE_DEAD_F, [hl]
+	jr z, .next
 	
 	;if dead, give it the FRZ status
 	push hl
-	dec hl
-	dec hl
-	dec hl
+	push bc
+	ld bc, wPartyMon1Status - (wPartyMon1IVs + IV_FLAGS)
+	add hl, bc
+	pop bc
 	;points hl to PartyMonXStatus
 	xor a
 	set FRZ, a

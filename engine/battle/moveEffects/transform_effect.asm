@@ -3,10 +3,16 @@ TransformEffect_:
 	ld hl, wBattleMonSpecies
 	ld de, wEnemyMonSpecies
 ;	ld bc, wEnemyBattleStatus3
-	ld a, [wEnemyBattleStatus1]
 	ld a, [H_WHOSETURN]
 	and a
-	jr nz, .hitTest
+	jr z, .playerTurn
+; as for the player below, so both games of a link battle agree (Gen 1 reset
+; only the player's move index, and tested the turn number for Fly or Dig)
+	xor a
+	ld [wEnemyMoveListIndex], a
+	ld a, [wEnemyBattleStatus1]
+	jr .hitTest
+.playerTurn
 	ld hl, wEnemyMonSpecies
 	ld de, wBattleMonSpecies
 ;	ld bc, wPlayerBattleStatus3
@@ -66,15 +72,30 @@ TransformEffect_:
 	inc de	;point to type 1
 	inc bc
 	inc bc
+	push de
+	inc de
+	inc de
+	ld a, [de] ; the user's own held item, which Transform doesn't copy
+	pop de
+	push af
 	call CopyData
+	pop af
+	push de
+	dec de
+	dec de
+	dec de
+	dec de
+	dec de
+	ld [de], a
+	pop de
 ;	call CopyDataTransform	;joenote - want to do a special copy that doesn't copy the transform move and replaces it
-	;de is now pointing to DVs
+	;de is now pointing to the IVs
 	ld a, [H_WHOSETURN]
 	and a
 	push af	;joenote - save the turn result
 	ld bc, wPlayerBattleStatus3
 	jr z, .next
-; save enemy mon DVs at wTransformedEnemyMonOriginalDVs
+; save enemy mon IVs at wTransformedEnemyMonOriginalIVs
 ; joenote - there is a bug here. It assumes the enemy mon is not transformed already.
 ; If the enemy has already transformed once before, then the DVs for that form 
 ; end up getting written to wTransformedEnemyMonOriginalDVs.
@@ -86,12 +107,17 @@ TransformEffect_:
 	ld a, [bc]
 	bit 3, a 	;check the state of the enemy transformed bit
 	jr nz, .next	;skip ahead if bit is set
-	ld a, [de]
-	ld [wTransformedEnemyMonOriginalDVs], a
-	inc de
-	ld a, [de]
-	ld [wTransformedEnemyMonOriginalDVs + 1], a
-	dec de
+	push hl
+	push de
+	push bc
+	ld h, d
+	ld l, e
+	ld de, wTransformedEnemyMonOriginalIVs
+	ld bc, NUM_IVS
+	call CopyData
+	pop bc
+	pop de
+	pop hl
 .next
 	ld a, [bc]
 	set TRANSFORMED, a ; mon is now transformed
@@ -111,21 +137,30 @@ TransformEffect_:
 	ld [wEnemyDisabledMoveNumber], a
 .undo_disable_end
 	
-; DVs
+; IVs, but the user keeps its own flags (ability slot, Nuzlocke mark)
+REPT NUM_IVS - 1
 	ld a, [hli]
 	ld [de], a
 	inc de
+ENDR
+	push bc
+	ld a, [de]
+	and %11
+	ld b, a
 	ld a, [hli]
+	and $FC
+	or b
 	ld [de], a
 	inc de
-; Attack, Defense, Speed, and Special stats
+	pop bc
+; Attack, Defense, Speed, Special Attack and Special Defense stats
 	inc hl
 	inc hl
 	inc hl
 	inc de
 	inc de
 	inc de
-	ld bc, $8
+	ld bc, (NUM_STATS - 1) * 2
 	call CopyData
 	ld bc, wBattleMonMoves - wBattleMonPP
 	add hl, bc ; ld hl, wBattleMonMoves
@@ -192,6 +227,7 @@ TransformEffect_:
 	ld hl, wEnemyMonStatMods
 	ld de, wPlayerMonStatMods
 	call .copyBasedOnTurn ; stat mods
+	callab TransformAbility ; and its ability, as from Gen 3
 	ld hl, TransformedText
 	jp PrintText
 

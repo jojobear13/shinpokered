@@ -17,7 +17,7 @@ const_value = 0
 	const ATTACK_UP1_EFFECT          ; $0A
 	const DEFENSE_UP1_EFFECT         ; $0B
 	const SPEED_UP1_EFFECT           ; $0C
-	const SPECIAL_UP1_EFFECT         ; $0D
+	const SPECIAL_UP1_EFFECT         ; $0D special attack (the Special effects all mean special attack)
 	const ACCURACY_UP1_EFFECT        ; $0E
 	const EVASION_UP1_EFFECT         ; $0F
 	const PAY_DAY_EFFECT             ; $10
@@ -76,13 +76,13 @@ const_value = 0
 	const DEFENSE_DOWN_SIDE_EFFECT   ; $45
 	const SPEED_DOWN_SIDE_EFFECT     ; $46
 	const SPECIAL_DOWN_SIDE_EFFECT   ; $47
-	const UNUSED_EFFECT_48           ; $48
-	const UNUSED_EFFECT_49           ; $49
-	const UNUSED_EFFECT_4A           ; $4A
-	const UNUSED_EFFECT_4B           ; $4B
+	const SPECIAL_DEFENSE_DOWN_SIDE_EFFECT ; $48 with the other stat-down side effects
+	const TRI_ATTACK_EFFECT          ; $49 burn, paralysis or freeze at random
+	const GROWTH_EFFECT              ; $4A attack and special attack up 1
+	const ALL_STATS_UP_SIDE_EFFECT   ; $4B Ancient Power
 	const CONFUSION_SIDE_EFFECT      ; $4C
 	const TWINEEDLE_EFFECT           ; $4D
-	const UNUSED_EFFECT_4E           ; $4E
+	const SPECIAL_DEFENSE_UP2_EFFECT ; $4E
 	const SUBSTITUTE_EFFECT          ; $4F
 	const HYPER_BEAM_EFFECT          ; $50
 	const RAGE_EFFECT                ; $51
@@ -91,7 +91,18 @@ const_value = 0
 	const LEECH_SEED_EFFECT          ; $54
 	const SPLASH_EFFECT              ; $55
 	const DISABLE_EFFECT             ; $56
+	const CLOSE_COMBAT_EFFECT        ; $57 the user's defense and special defense down 1
 
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20
 DRAGON_RAGE_DAMAGE EQU 40
+
+; bits of a move's flags (data/move_flags.asm, Gen 9's)
+MOVE_CONTACT_F    EQU 0
+MOVE_PUNCH_F      EQU 1
+MOVE_SOUND_F      EQU 2
+MOVE_MIRROR_F     EQU 3 ; Mirror Move can copy it
+MOVE_DEFROST_F    EQU 4 ; thaws its frozen user
+MOVE_POWDER_F     EQU 5 ; Grass types are immune
+MOVE_BYPASS_SUB_F EQU 6 ; goes through a substitute
+MOVE_NEVER_MISS_F EQU 7 ; skips the accuracy check

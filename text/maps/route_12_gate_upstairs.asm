@@ -27,6 +27,16 @@ _TM39NoRoomText::
 	line "room for this."
 	done
 
+_DexRepelExplanationText::
+	text "With the DEXREPEL"
+	line "on, #MON you've"
+	cont "already caught"
+	cont "won't come out."
+
+	para "Use it again to"
+	line "turn it off!"
+	done
+
 _Route12GateUpstairsText_495b8::
 	text "Looked into the"
 	line "binoculars."

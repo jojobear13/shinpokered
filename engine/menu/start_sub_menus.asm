@@ -31,7 +31,7 @@ StartMenu_Pokemon:
 	jp RedisplayStartMenu
 .chosePokemon
 
-	;joenote - add debug function for resetting stat exp and DVs
+	;joenote - add debug function for resetting EVs and IVs
 	callba DebugStatReset
 
 	call SaveScreenTilesToBuffer1
@@ -39,7 +39,7 @@ StartMenu_Pokemon:
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; display pokemon menu options
 	ld hl, wFieldMoves
-	lb bc, 2, 12 ; max menu item ID, top menu item Y
+	lb bc, 3, 10 ; max menu item ID, top menu item Y
 	ld e, NUM_FIELD_MOVES+1	;joenote - increase field moves that can be listed
 .adjustMenuVariablesLoop
 	dec e
@@ -83,6 +83,9 @@ StartMenu_Pokemon:
 	jr z, .choseSwitch
 	dec b
 	cp b
+	jr z, .choseMoves
+	dec b
+	cp b
 	jp z, .choseStats
 	ld c, a
 	ld b, 0
@@ -98,6 +101,22 @@ StartMenu_Pokemon:
 	ld [wPartyMenuTypeOrMessageID], a
 	call GoBackToPartyMenu
 	jp .checkIfPokemonChosen
+.choseMoves
+	ld a, [wWhichPokemon]
+	ld c, a
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl]
+	cp EGG
+	jr nz, .notEgg
+	ld a, SFX_DENIED ; an egg can't learn moves yet
+	call PlaySound
+	jp StartMenu_Pokemon
+.notEgg
+	callab MovesScreen
+	call ReloadMapData
+	jp StartMenu_Pokemon
 .choseStats
 	call ClearSprites
 	xor a ; PLAYER_PARTY_DATA
@@ -134,6 +153,10 @@ StartMenu_Pokemon:
 	dw .dig
 	dw .teleport
 	dw .softboiled
+	dw .takeItem
+.takeItem
+	callab TakeHeldItem
+	jp StartMenu_Pokemon
 .fly
 	bit 2, a ; does the player have the Thunder Badge?
 	jp z, .newBadgeRequired
@@ -332,20 +355,9 @@ StartMenu_Item:
 	call PrintText
 	jr .exitMenu
 .notInCableClubRoom
-	ld bc, wNumBagItems
-	ld hl, wListPointer
-	ld a, c
-	ld [hli], a
-	ld [hl], b ; store item bag pointer in wListPointer (for DisplayListMenuID)
-	xor a
-	ld [wPrintItemPrices], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
-	ld a, [wBagSavedMenuItem]
-	ld [wCurrentMenuItem], a
-	call DisplayListMenuID
-	ld a, [wCurrentMenuItem]
-	ld [wBagSavedMenuItem], a
+	callab BagMenu ; the full-screen bag, by pocket
 	jr nc, .choseItem
 .exitMenu
 	call LoadScreenTilesFromBuffer2 ; restore saved screen
@@ -353,13 +365,6 @@ StartMenu_Item:
 	call UpdateSprites
 	jp RedisplayStartMenu
 .choseItem
-; erase menu cursor (blank each tile in front of an item name)
-	ld a, " "
-	Coorda 5, 4
-	Coorda 5, 6
-	Coorda 5, 8
-	Coorda 5, 10
-	call PlaceUnfilledArrowMenuCursor
 	xor a
 	ld [wMenuItemToSwap], a
 	ld a, [wcf91]
@@ -414,8 +419,6 @@ StartMenu_Item:
 ; use item
 	ld [wPseudoItemID], a ; a must be 0 due to above conditional jump
 	ld a, [wcf91]
-	cp HM_01
-	jr nc, .useItem_partyMenu
 	ld hl, UsableItems_CloseMenu
 	ld de, 1
 	call IsInArray
@@ -456,9 +459,6 @@ StartMenu_Item:
 	ld a, [wIsKeyItem]
 	and a
 	jr nz, .skipAskingQuantity
-	ld a, [wcf91]
-	call IsItemHM
-	jr c, .skipAskingQuantity
 	call DisplayChooseQuantityMenu
 	inc a
 	jr z, .tossZeroItems
@@ -497,6 +497,7 @@ UsableItems_PartyMenu:
 	db IRON
 	db CARBOS
 	db CALCIUM
+	db ZINC
 	db RARE_CANDY
 	db LEAF_STONE
 	db FULL_HEAL
@@ -611,7 +612,7 @@ ENDC
 	ld hl, GymLeaderFaceAndBadgeTileGraphics  ; gym leader face and badge tile patterns
 	ld de, vChars2 + $200
 	ld bc, $0400
-	ld a, $03
+	ld a, BANK(GymLeaderFaceAndBadgeTileGraphics)
 	call FarCopyData2
 	ld hl, TextBoxGraphics
 	ld de, $00d0

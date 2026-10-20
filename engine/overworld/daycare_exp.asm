@@ -40,8 +40,23 @@ IncrementDayCareMonExp:
 	ld b, h
 	ld c, l
 	
-	ld hl, wDayCareMonExp + 2
-	;add exp 
+	call OpenBox ; the day-care mons are in save RAM
+	ld hl, sDayCareMonExp + 2
+	call .addExp
+	ld a, [wDayCareInUse]
+	cp 2
+	jr c, .closeBox
+	ld hl, sDayCareMon2Exp + 2
+	call .addExp
+.closeBox
+	call CloseBox
+.return
+	pop de
+	pop bc
+	ret
+
+; hl = the last byte of a mon's exp, bc = how much to add
+.addExp
 	ld a, c	
 	add [hl]
 	ld [hld], a
@@ -51,14 +66,11 @@ IncrementDayCareMonExp:
 	ld a, 0
 	adc [hl]
 	ld [hl], a
-	jr nc, .return
+	ret nc
 	
 ;joenote - set the cap at $FFFFFF exp
 	ld a, $FF
 	ld [hli], a
 	ld [hli], a
 	ld [hl], a
-.return
-	pop de
-	pop bc
 	ret

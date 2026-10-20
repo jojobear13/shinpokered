@@ -15,7 +15,7 @@ SafariZoneEastObject:
 
 	db 4 ; objects
 	object SPRITE_BALL, 21, 10, STAY, NONE, 1, FULL_RESTORE
-	object SPRITE_BALL, 3, 7, STAY, NONE, 2, MAX_POTION
+	object SPRITE_BALL, 3, 7, STAY, NONE, 2, CHOICE_SCARF
 	object SPRITE_BALL, 20, 13, STAY, NONE, 3, CARBOS
 	object SPRITE_BALL, 15, 12, STAY, NONE, 4, TM_37
 

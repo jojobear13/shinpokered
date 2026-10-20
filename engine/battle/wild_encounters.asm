@@ -49,6 +49,20 @@ TryDoWildEncounter:
 .CanEncounter
 ; compare encounter chance with a random number to determine if there will be an encounter
 	ld b, a
+; a Cleanse Tag on the first mon cuts the encounter rate by a third
+	ld a, [wPartyMon1CatchRate]
+	cp CLEANSE_TAG
+	jr nz, .gotRate
+	ld a, b
+	ld c, -1
+.divideBy3
+	inc c
+	sub 3
+	jr nc, .divideBy3
+	ld a, b
+	sub c
+	ld b, a
+.gotRate
 	ld a, [hRandomAdd]
 	cp b
 	jr nc, .CantEncounter2
@@ -90,14 +104,9 @@ TryDoWildEncounter:
 ;joenote - generate a random wild pokemon based on a seed value
 	predef ReplaceWildMon
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wRepelRemainingSteps]
-	and a
-	jr z, .willEncounter
-	ld a, [wPartyMon1Level]
-	ld b, a
-	ld a, [wCurEnemyLVL]
-	cp b
-;	jr c, .CantEncounter2 ; repel prevents encounters if the leading party mon's level is higher than the wild mon
+; a REPEL keeps away mons lower level than the first party mon, and the
+; DEXREPEL mons already caught (engine/items/held_item_use.asm)
+	callab WildRepelCheck
 	jr c, .shinycheck_repel
 	jr .willEncounter
 .lastRepelStep

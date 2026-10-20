@@ -243,7 +243,7 @@ Players should deactivate this feature for post-game adventuring past the level 
 
 #### Scale Enemy Trainer Levels  
 Not available in the Lite patches.  
-Talk to the aide in the lower-right section of Oak's lab to toggle this feature.  
+Toggle this under RULES > TRNR SCALING in the extra options menu.  
 While active, enemy trainer roster levels will scale upwards relative to the highest-level pokemon in your party.  
 Normally, this scaling factor will be based on a weighted average of your whole team.  
 But on hard mode, or against Gym Leaders, the scaling will be based on the absolute highest level member of your team.  
@@ -253,7 +253,7 @@ Warning - The difficulty will be compounded if both trainer scaling and hard mod
 
 #### Alt Trainer Moves  
 Not available in the Lite patches.  
-There is an old man in the Viridian City schoolhouse who toggles this feature on & off.  
+Toggle this under RULES > ALT. MOVES in the extra options menu.  
 When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
 Their moves will be more competitive at higher levels.  
 
@@ -263,7 +263,7 @@ Their moves will be more competitive at higher levels.
 Note: These are not available in the Lite patches.    
 
 #### Wild & Starter Pokemon Randomization  
-The girl in Oak's lab toggles on/off a built-in randomizer for wild pokemon.  
+RULES > RANDOM WILD in the extra options menu toggles a built-in randomizer for wild pokemon.  
 It shuffles all pokemon that can be gained through walking, surfing, fishing, or from the Celadon Prize Corner.  
 If activated early enough in the game, your starter pokemon choices are randomized as well.  
 Scripted events are unaffected (gifts, in-game trades, static encounters, etc).  
@@ -271,24 +271,22 @@ The game's five legendary pokemon are also excluded from randomization.
 A saved seed value is used, so the shuffled order is always preserved between play sessions.  
 This lets the AREA feature of the pokedex automatically adjust for the new pokemon locations.  
 And a new random seed is generated upon each new game.  
-Talking to the girl in Oak's lab allows the player to generate a new randomization seed value.  
 Shuffling is done using three internal pokemon lists defined by base-stat-total: A, B, and C tiers.  
 Pokemon are only shuffled within their own tier list in order to maintain some modicum of balance.  
-The girl will also ask if full randomization is preferred, which will combine the tiers into one big list.  
+Choosing FULL instead of TIER combines the tiers into one big list.  
 
 #### Regular Trainer Randomization  
-One of Oak's Aides has been added to the Viridian Pokemon Center. Talk to him to toggle this feature.  
+Toggle this under RULES > RANDOM TRNRS in the extra options menu.  
 This randomizes the teams of regular no-name trainers that do not have roster customization.  
 This randomization method uses different curated lists based on level in order to maintain some balance.  
 
 #### Sleep, Freeze, and Item Clauses  
-The house to the lower-left of Viridian Gym is home to three new NPCs named the Clause Brothers.  
-Each one toggles enforcement of either the item, sleep, or freeze clause from Pokemon Stadium.  
+Each of these Pokemon Stadium clauses can be toggled under RULES in the extra options menu.  
 The sleep clause in particular works like it does in Stadium with respect to using the Rest move.  
 The clauses apply to the player and AI equally, and they only apply during trainer battles.  
 
 #### Trapping Move Clause  
-- A fourth brother has been added for this new clause.
+- Toggle it under RULES > TRAP CLAUSE.
   - A counter tracks if the player or the opponent use trapping moves like Wrap multiple times in a row. 
   - The counter increments only if a trapping effect move is selected to be used and it does not miss.
   - After the counter has incremented to 2, 
@@ -298,7 +296,7 @@ The clauses apply to the player and AI equally, and they only apply during train
   - Resetting the counter will restore normal priority to trapping effect moves.
 
 #### Hyper Beam Clause  
-- Added a fifth Clause Brother for the hyper beam clause.
+- Toggle it under RULES > H.BEAM CLAUSE.
 - Hyper beam will recharge if it KOs the opponent.
 
 #### Battle Clauses Over Link  
@@ -480,29 +478,12 @@ Consider using the daycare as a way to outsource some grinding while you go focu
 And yes, pokemon with HM moves are now allowed in the daycare.  
 The daycare now has a PC for the player's convenience.  
 
-#### The Shimmer  
-- This is a cheat feature for those who want more viability when using certain low-regarded pokemon.
-  - Toggled ON/OFF via the glass pokeball decoration in the rival's house.
-  - Pokemon Eligible: EKANS, CATERPIE, METAPOD, WEEDLE, KAKUNA, ZUBAT, PSYDUCK, PARAS, PONYTA, RATTATA, SANDSHREW, HORSEA, GOLDEEN, VENONAT, JIGGLYPUFF, ARBOK, BEEDRILL, BUTTERFREE, DITTO, FARFETCHD, GOLBAT, GOLDUCK, HITMONCHAN, LICKITUNG, ONIX, PARASECT, PINSIR, PORYGON, RAPIDASH, RATICATE, SANDSLASH, SEADRA, SEAKING, VENOMOTH, WIGGLYTUFF
-  - The shimmer factor appears randomly and secretly, being more likely to occur by training and sending out eligible 'mons.
-    - Each time an eligible 'mon is sent out into battle will trigger a random chance of it occurring.  
-    - The base chance is 1-in-256.  
-    - The base chance increases by an additional +(1-in-256) for every 2048 StatEXP the 'mon has in its HP stat.  
-  - The shimmer only manifests in 'mons that are fully evolved, even if their pre-evos gained the secret shimmer factor.
-  - When the shimmer manifests as a 'mon gets sent out, that 'mon gets a large boost to some stats that are low-to-poor.
-  - The boost when the shimmer activates is as follows:
-    - Affects the pokemon's unmodified Attack, Defense, Speed, and Special when it gets sent into battle.  
-    - If a stat is less than 8/3rds its level, then add its level to that stat.  
-  - There is a slight chance that the shimmer will manifest on applicable enemy trainer pokemon.
-  - Certain boss-like enemy trainers will always manifest the shimmer on their applicable pokemon.
-
-
 #Trainer-Aiding Features
 -----------------------------------------------
 Note: These are not available in the Lite patches.    
 
 #### Caught Symbol and Gender Symbol  
-Talk to the aide in the lower-left section of Oak's lab to toggle this feature after obtaining the pokedex.  
+Toggle this under RULES > CAUGHT ICON in the extra options menu.  
 While active, it has the following effects:  
 1 - Wild pokemon have a gender symbol by their names if applicable.  
 2 - If applicable, a gender symbol is added to a pokemon's status screen.  
@@ -522,7 +503,7 @@ His request changes every time you enter the hotel, so make use of the hotel's P
 Place his requested pokemon at the top of your team and speak to him to get your reward.  
 
 #### Catch-Up EXP Booster  
-Talk to the aide in the Celadon Diner to toggle this feature.  
+Toggle this under RULES > CATCH-UP EXP in the extra options menu.  
 While active, EXP gained is boosted if the active pokemon's level is lower than that of the fainted enemy.  
 The boost is 1.5 multiplied by an additional 1.5 for every 3 levels of difference.  
 For example, a level difference of 9 results in an EXP multiplier of (1.5)^4 = 5.0625.  
@@ -572,8 +553,7 @@ The value is based on the pokemon's DVs, level, catch rate, and whether it is sh
 One of the Rocket grunts walking around the top left corner of Celadon City will now sell you 1000 coins at a time.  
 
 #### Special Safari Event  
-A new NPC can be utilized in the Safari Zone Gate after beating the Elite-4.  
-Talk to him to toggle special parameters that have the following effects on the Safari Zone:  
+Toggle this under RULES > SAFARI EVENT in the extra options menu. It has the following effects on the Safari Zone:  
 - All pokemon encountered will have above-average DVs.  
 - There is a rare chance for any non-legendary pokemon to appear.  
 

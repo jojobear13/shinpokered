@@ -58,6 +58,11 @@ PrintType_:
 ;This allows for pokemon to have "forms" where the species is the same but the type is different.
 PrintMonType_StatusScreen:
 	call GetPredefRegisters
+	call OpenBox ; box mons are in save RAM
+	call .body
+	jp CloseBox
+
+.body
 	push de
 	push hl
 	
@@ -66,8 +71,8 @@ PrintMonType_StatusScreen:
 	ld a, [wMonDataLocation]
 	cp BOX_DATA
 	jr nz, .whichMon
-	ld hl, wBoxMon1Type1
-	ld bc, wBoxMon2 - wBoxMon1
+	ld hl, sBoxMon1Type1
+	ld bc, sBoxMon2 - sBoxMon1
 .whichMon
 	ld a, [wWhichPokemon]
 	call AddNTimes
@@ -94,3 +99,59 @@ PrintMonType_StatusScreen:
 	jp PrintType
 	
 INCLUDE "text/type_names.asm"
+
+; Gen 6+ Conversion: the user becomes the type of the move in its first slot,
+; unless it already has that type
+ConversionEffect_:
+	ld hl, wBattleMonMoves
+	ld de, wBattleMonType1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotUser
+	ld hl, wEnemyMonMoves
+	ld de, wEnemyMonType1
+.gotUser
+	ld a, [hl]
+	dec a
+	ld hl, Moves + 3 ; the type field
+	ld bc, MoveEnd - Moves
+	call AddNTimes
+	push de
+	ld de, wd11e
+	ld bc, 1
+	ld a, BANK(Moves)
+	call FarCopyData
+	pop de
+	ld a, [wd11e]
+	ld b, a
+	ld a, [de]
+	cp b
+	jr z, .failed
+	inc de
+	ld a, [de]
+	cp b
+	jr z, .failed
+	ld a, b
+	ld [de], a
+	dec de
+	ld [de], a
+	add a
+	ld hl, TypeNames
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wcd6d
+	ld bc, NAME_LENGTH
+	call CopyData
+	callab PlayCurrentMoveAnimation
+	ld hl, ConvertedTypeText
+	jp PrintText
+.failed
+	jpab PrintButItFailedText_
+
+ConvertedTypeText:
+	TX_FAR _ConvertedTypeText
+	db "@"

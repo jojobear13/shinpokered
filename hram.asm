@@ -303,6 +303,10 @@ hVendingMachinePrice EQU $FFDC ; 3-byte BCD number
 ; the first tile ID in a sequence of tile IDs that increase by 1 each step
 hStartTileID EQU $FFE1
 
+; which side a merged player/enemy battle routine is working on
+; (see BATTLE_SIDE_* in constants/battle_constants.asm)
+hBattleSide EQU $FFE2
+
 hNewPartyLength EQU $FFE4
 
 hDividend2 EQU $FFE5

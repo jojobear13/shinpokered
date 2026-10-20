@@ -186,12 +186,10 @@ LanceAfterBattleText:
 	ld a, [wPartyMon1Species]
 	cp DRAGONITE
 	jp nz, TextScriptEnd
-	ld a, [wPartyMon1CatchRate]
-	cp 168
-	jp z, TextScriptEnd
+	CheckEvent EVENT_FLYING_DRAGONITE
+	jp nz, TextScriptEnd
 	ld a, DRAGONITE
 	call PlayCry
-	ld a, 168
-	ld [wPartyMon1CatchRate], a
+	SetEvent EVENT_FLYING_DRAGONITE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	jp TextScriptEnd

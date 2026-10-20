@@ -1,79 +1,3 @@
-;joenote - custom functions to handle move priority. Sets zero flag if priority lowered/raised.
-CheckLowerPlayerPriority:	
-	ld a, [wPlayerSelectedMove]
-	ld hl, wPlayerBattleStatus3
-	jr LowPriorityMoves
-CheckLowerEnemyPriority:
-	ld a, [wEnemySelectedMove]
-	ld hl, wEnemyBattleStatus3
-;	jp LowPriorityMoves
-;fall through
-LowPriorityMoves:
-;joenote - handle trapping spam counter and implement the trapping clause
-	call CheckIfTrappingMove
-	jr nz, .next1	;reset the number of consecutive trapping moves and continue if this is not a trapping move
-
-	bit TRAPPING_NEGATIVE, [hl]
-	jr nz, .CheckTrappingClause	;if the bit indicating two consecutive uses is set, ret immediately with z flag for negative priority
-	jr .next2
-	
-.next1
-	res TRAPPING_COUNT, [hl]
-	res TRAPPING_NEGATIVE, [hl]
-.next2
-	cp COUNTER
-	ret
-.CheckTrappingClause
-	res TRAPPING_COUNT, [hl]
-
-;link battles now sync clause flag
-;	ld a, [wLinkState]
-;	cp LINK_STATE_BATTLING
-;	jr z, .next3
-
-	CheckEvent EVENT_8C5
-.next3
-	;invert the z flag bit at this point
-	jr nz, .retz
-.retnz
-	ld a, 1
-	and a
-	ret
-.retz
-	xor a
-	ret
-
-CheckHigherPlayerPriority:	
-	ld a, [wPlayerSelectedMove]
-	jr HighPriorityMoves
-CheckHigherEnemyPriority:
-	ld a, [wEnemySelectedMove]
-;	jr HighPriorityMoves
-; fall through
-HighPriorityMoves:
-	cp QUICK_ATTACK
-;	ret z
-;	cp DUMMY_MOVE1
-;	ret z
-;	cp DUMMY_MOVE2
-;	ret z
-;	cp DUMMY_MOVE3
-;	ret z
-;	cp DUMMY_MOVE4
-	ret
-	
-CheckIfTrappingMove:
-	cp BIND
-	ret z
-	cp WRAP
-	ret z
-	cp FIRE_SPIN
-	ret z
-	cp CLAMP
-	ret
-
-	
-
 SwapTurn:	;a simple custom function for swapping whose turn it is in the battle engine
 	ld a, [H_WHOSETURN]
 	and a
@@ -87,8 +11,11 @@ SwapTurn:	;a simple custom function for swapping whose turn it is in the battle 
 	ret
 
 	
-;custom function to determin the DVs of wild pokemon with an option for forcing shiny DVs
-DetermineWildMonDVs:
+;custom function to determine the IVs of wild pokemon with an option for forcing shiny IVs
+DetermineWildMonIVs:
+	push hl
+	push de
+	ld de, wEnemyMonIVs
 	ld a, [wFontLoaded]
 	bit 7, a
 	jr z, .do_random
@@ -103,27 +30,20 @@ DetermineWildMonDVs:
 	CheckEvent EVENT_10E
 	jr nz, .do_random	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld b, $AA
-	call Random	;get random number into a
-	or $20	;set only bit 5
-	and $F0 ; clear the lower nybble
-	or $0A	;set the lower nyble to $A
-	jr .load
+	callab ShinyIVs
+	jr .done
 .do_random
 	CheckEvent EVENT_90F	;special safari zone active?
 	jr z, .notsafari	
 	call IsInSafariZone
 	jr nz, .do_random_safari
 .notsafari
-	call Random_DV
-	jr .load
-.do_random_safari	;special safari zone pokemon have better DVs
-	call Random_BiasDV
-.load
-	push hl
-	ld hl, wEnemyMonDVs
-	ld [hli], a
-	ld [hl], b
+	callab WildIVs
+	jr .done
+.do_random_safari	;special safari zone pokemon have better IVs
+	callab BiasedIVs
+.done
+	pop de
 	pop hl
 	ld a, [wFontLoaded]
 	res 7, a 
@@ -282,122 +202,6 @@ FaintAllMons:
 
 
 	
-;These functions try to handle and correct situations where 
-;the disable effect, with a counter of 1, applied to a slower 'mon
-;will cause the effect to immediately wear off.
-PlayerDisableHandler:
-	call GetPredefRegisters
-	;hl points to wPlayerDisabledMove at this line
-	
-	;continue if the counter nybble is not valid: either it is 0 or between 9 and F
-	;else return because a valid counter of 1-8 exists
-	ld a, [hl]
-	and $0F
-	cp 9
-	jr nc, .continue
-	and a
-	ret nz
-	
-.continue
-	;now restore the counter values to a valid 1-8 distribution
-	sub 8 
-	jr nc, .valid_count
-	;if there was an underflow because of subtracting from 0, then make the value 8
-	ld a, 8
-.valid_count
-	push bc
-	ld b, a
-	ld a, [hl]
-	and $F0
-	or b
-	pop bc
-	ld [hl], a
-	;counter is now 1 to 8
-	
-	;now test to see if going second in the round
-	ld a, [H_WHOFIRST]
-	and a
-	ret z	;return if player going first
-	
-	;The player is going second at this line.
-	;So the counter will have one of the following outcomes at the start of the next round: [0,1,2,3,4,5,6,7].
-	;This is because it's assumed the counter will decrement after returning from this function.
-	;But said distribution is really supposed to be [1,2,3,4,5,6,7,8] like it is if going first.
-	;If the counter is 1 right now, it will decrement to zero. A value of 8 is also unattainable. Both are undesireable. 
-
-	;See if the counter is = 1 and return if not
-	ld a, [hl]
-	and $0F
-	cp $01
-	ret nz
-	
-	;now confirmed that: 
-	;--> the counter is initialized to 1 this round. 
-	;--> going second this round.
-	;so covert the 1 into an 9 so it can be decremented to 8 after returning
-	ld a, [hl]
-	add 8
-	ld [hl], a
-.return
-	ret
-
-EnemyDisableHandler:
-	call GetPredefRegisters
-	;hl points to wEnemyDisabledMove at this line
-	
-	;continue if the counter nybble is not valid: either it is 0 or between 9 and F
-	;else return because a valid counter of 1-8 exists
-	ld a, [hl]
-	and $0F
-	cp 9
-	jr nc, .continue
-	and a
-	ret nz
-	
-.continue
-	;now restore the counter values to a valid 1-8 distribution
-	sub 8 
-	jr nc, .valid_count
-	;if there was an underflow because of subtracting from 0, then make the value 8
-	ld a, 8
-.valid_count
-	push bc
-	ld b, a
-	ld a, [hl]
-	and $F0
-	or b
-	pop bc
-	ld [hl], a
-	;counter is now 1 to 8
-	
-	;now test to see if going second in the round
-	ld a, [H_WHOFIRST]
-	and a
-	ret nz	;return if enemy going first
-	
-	;The enemy is going second at this line.
-	;So the counter will have one of the following outcomes at the start of the next round: [0,1,2,3,4,5,6,7].
-	;This is because it's assumed the counter will decrement after returning from this function.
-	;But said distribution is really supposed to be [1,2,3,4,5,6,7,8] like it is if going first.
-	;If the counter is 1 right now, it will decrement to zero. A value of 8 is also unattainable. Both are undesireable. 
-
-	;See if the counter is = 1 and return if not
-	ld a, [hl]
-	and $0F
-	cp $01
-	ret nz
-	
-	;now confirmed that: 
-	;--> the counter is initialized to 1 this round. 
-	;--> going second this round.
-	;so covert the 1 into an 9 so it can be decremented to 8 after returning
-	ld a, [hl]
-	add 8
-	ld [hl], a
-.return
-	ret
-
-
 ;check hyper beam clause
 ;when active, hyperbeam does not need to recharge when scoring a KO
 ;set z flag if not applicable 
@@ -866,67 +670,7 @@ GetBadgeCap:
 	ld d, b
 	pop bc
 	ret
-	
-	
-PsywaveEnhanced:
-	;E = user's level
-	;D = [0, user's level]
-	push de
-	ld e, d
-	
-	ld hl, $0000
-	ld d, 0
-	add hl, de
-	srl e
-	add hl, de
-	ld a, h
-	or l
-	jr nz, .next
-	inc l
-.next
-	ld d, h
-	ld e, l
-	;DE = [1, 1.5*user's level]
-	
-	ld hl, wDamage
-	ld a, [hl]
-	cp d
-	jr c, .update
-	inc hl
-	ld a, [hld]
-	cp e
-	jr nc, .cycle
-.update
-	ld a, d
-	ld [hli], a
-	ld a, e
-	ld [hl], a
-	
-.cycle
-	ld hl, wcf4b
-	ld a, [hli]
-	ld d, a
-	ld a, [hld]
-	ld e, a
-	srl d
-	rr e
-	srl d
-	rr e
-	ld a, d
-	ld [hli], a
-	ld a, e
-	ld [hld], a
-	or d
-	jr nz, .return_reroll
-	
-.return_good
-	xor a
-	jr .return
-.return_reroll
-	scf
-.return
-	pop de
-	ret
+
 
 
 

@@ -72,14 +72,14 @@ SetPal_Battle:
 	ld a, [wUnusedD366]
 	bit 7, a
 	jr z, .noshinyenemy
-	callba CheckEnemyShinyDVs
+	callba CheckEnemyShinyIVs
 	jr z, .noshinyenemy
 	callba ShinyEnemyMon
 .noshinyenemy
 	ld a, [wUnusedD366]
 	bit 0, a
 	jr z, .noshinyplayer
-	callba CheckPlayerShinyDVs
+	callba CheckPlayerShinyIVs
 	jr z, .noshinyplayer
 	callba ShinyPlayerMon
 .noshinyplayer
@@ -119,7 +119,7 @@ SetPal_StatusScreen:
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;load shiny palette on status screen
-	callba CheckLoadedShinyDVs
+	callba CheckLoadedShinyIVs
 	jr z, .noshiny
 	callba ShinyStatusScreen
 .noshiny

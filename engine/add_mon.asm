@@ -75,10 +75,23 @@ _AddPartyMon:
 	push hl
 	ld a, [wMonDataLocation]
 	and $f
-	ld a, $98     ; set enemy trainer mon IVs to fixed average values
-	ld b, $88
-	jr nz, .next4
+	jr z, .playerMon
+; an enemy trainer's mon: the fixed trainer IVs
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	ld a, TRAINER_IVS_0
+	ld [hli], a
+	ld a, TRAINER_IVS_1
+	ld [hli], a
+	ld a, TRAINER_IVS_2
+	ld [hli], a
+	ld [hl], TRAINER_IVS_3
+	dec hl
+	dec hl
+	dec hl
+	jr .calcHP
 
+.playerMon
 ; If the mon is being added to the player's party, update the pokedex.
 	ld a, [wcf91]
 	ld [wd11e], a
@@ -110,31 +123,22 @@ _AddPartyMon:
 	and a ; is this a wild mon caught in battle?
 	jr nz, .copyEnemyMonData
 
-; Not wild.
-	call Random_DV	;generate DVs as if it is a wild pokemon
-	;joenote - makes pkmn given to player (being sent to the party) have average IVs at minimum
-	push af
-	ld a, b
-	or $88
-	ld b, a
-	pop af
-	or $98
-	
-	
+; Not wild: a gift, with IVs of 16 or more
+	ld bc, wPartyMon1IVs - wPartyMon1
+	add hl, bc
+	push de
+	ld d, h
+	ld e, l
+	callab GiftIVs
+	ld h, d
+	ld l, e
+	pop de
 
-.next4
-	push bc
-	ld bc, wPartyMon1DVs - wPartyMon1
+.calcHP ; hl = the IVs
+	ld bc, -NUM_STATS
 	add hl, bc
-	pop bc
-	ld [hli], a
-	ld [hl], b         ; write IVs
-	ld bc, (wPartyMon1HPExp - 1) - (wPartyMon1DVs + 1)
-	add hl, bc
-	ld a, 1
-	ld c, a
-	xor a
-	ld b, a
+	ld c, 1
+	ld b, 0
 	call CalcStat      ; calc HP stat (set cur Hp to max HP)
 	ld a, [H_MULTIPLICAND+1]
 	ld [de], a
@@ -149,12 +153,15 @@ _AddPartyMon:
 	inc de
 	jr .copyMonTypesAndMoves
 .copyEnemyMonData
-	ld bc, wEnemyMon1DVs - wEnemyMon1
+	ld bc, wPartyMon1IVs - wPartyMon1
 	add hl, bc
-	ld a, [wEnemyMonDVs] ; copy IVs from cur enemy mon
-	ld [hli], a
-	ld a, [wEnemyMonDVs + 1]
-	ld [hl], a
+	push de
+	ld d, h
+	ld e, l
+	ld hl, wEnemyMonIVs ; copy IVs from cur enemy mon
+	ld bc, NUM_IVS
+	call CopyData
+	pop de
 	ld a, [wEnemyMonHP]    ; copy HP from cur enemy mon
 	ld [de], a
 	inc de
@@ -175,8 +182,7 @@ _AddPartyMon:
 	ld a, [hli]       ; type 2
 	ld [de], a
 	inc de
-	ld a, [hli]       ; catch rate (held item in gen 2)
-	ld [de], a
+	callab NewMonHeldItem ; in the catch-rate byte, at de
 	ld hl, wMonHMoves
 	ld a, [hli]
 	inc de
@@ -233,14 +239,15 @@ _AddPartyMon:
 	ld a, [hExperience + 2]
 	ld [de], a
 	xor a
-	ld b, NUM_STATS * 2
+	ld b, NUM_STATS
 .writeEVsLoop              ; set all EVs to 0
 	inc de
 	ld [de], a
 	dec b
 	jr nz, .writeEVsLoop
+REPT NUM_IVS ; skip the IVs, already written
 	inc de
-	inc de
+ENDR
 	pop hl
 	call AddPartyMon_WriteMovePP
 	inc de
@@ -251,13 +258,13 @@ _AddPartyMon:
 	dec a
 	jr nz, .calcFreshStats
 	ld hl, wEnemyMonMaxHP
-	ld bc, $a
+	ld bc, NUM_STATS * 2
 	call CopyData          ; copy stats of cur enemy mon
 	pop hl
 	jr .done
 .calcFreshStats
 	pop hl
-	ld bc, wPartyMon1HPExp - 1 - wPartyMon1
+	ld bc, wPartyMon1EVs - wPartyMon1
 	add hl, bc
 	ld b, $0
 	call CalcStats         ; calculate fresh set of stats
@@ -359,16 +366,23 @@ _AddEnemyMonToPlayerParty:
 	ret                  ; return success
 
 _MoveMon:
+; the box and the day care are in save RAM; carry (destination full) survives
+; CloseBox
+	call OpenBox
+	call .body
+	jp CloseBox
+
+.body
 	ld a, [wMoveMonType]
 	and a   ; BOX_TO_PARTY
 	jr z, .checkPartyMonSlots
 	cp DAYCARE_TO_PARTY
 	jr z, .checkPartyMonSlots
 	cp PARTY_TO_DAYCARE
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr z, .findMonDataSrc
 	; else it's PARTY_TO_BOX
-	ld hl, wNumInBox
+	ld hl, sNumInBox
 	ld a, [hl]
 	cp MONS_PER_BOX
 	jr nz, .partyOrBoxNotFull
@@ -389,7 +403,7 @@ _MoveMon:
 	add hl, bc
 	ld a, [wMoveMonType]
 	cp DAYCARE_TO_PARTY
-	ld a, [wDayCareMon]
+	ld a, [sDayCareMon]
 	jr z, .copySpecies
 	ld a, [wcf91]
 .copySpecies
@@ -399,13 +413,13 @@ _MoveMon:
 	ld a, [wMoveMonType]
 	dec a
 	ld hl, wPartyMons
-	ld bc, wPartyMon2 - wPartyMon1 ; $2c
+	ld bc, wPartyMon2 - wPartyMon1
 	ld a, [wPartyCount]
 	jr nz, .addMonOffset
 	; if it's PARTY_TO_BOX
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1 ; $21
-	ld a, [wNumInBox]
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
+	ld a, [sNumInBox]
 .addMonOffset
 	dec a
 	call AddNTimes
@@ -415,21 +429,21 @@ _MoveMon:
 	ld d, h
 	ld a, [wMoveMonType]
 	and a
-	ld hl, wBoxMons
-	ld bc, wBoxMon2 - wBoxMon1 ; $21
+	ld hl, sBoxMons
+	ld bc, sBoxMon2 - sBoxMon1
 	jr z, .addMonOffset2
 	cp DAYCARE_TO_PARTY
-	ld hl, wDayCareMon
+	ld hl, sDayCareMon
 	jr z, .copyMonData
 	ld hl, wPartyMons
-	ld bc, wPartyMon2 - wPartyMon1 ; $2c
+	ld bc, wPartyMon2 - wPartyMon1
 .addMonOffset2
 	ld a, [wWhichPokemon]
 	call AddNTimes
 .copyMonData
 	push hl
 	push de
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	call CopyData
 	pop de
 	pop hl
@@ -438,7 +452,7 @@ _MoveMon:
 	jr z, .findOTdest
 	cp DAYCARE_TO_PARTY
 	jr z, .findOTdest
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld a, [hl] ; hl = Level
 	inc de
@@ -448,25 +462,25 @@ _MoveMon:
 .findOTdest
 	ld a, [wMoveMonType]
 	cp PARTY_TO_DAYCARE
-	ld de, wDayCareMonOT
+	ld de, sDayCareMonOT
 	jr z, .findOTsrc
 	dec a 
 	ld hl, wPartyMonOT
 	ld a, [wPartyCount]
 	jr nz, .addOToffset
-	ld hl, wBoxMonOT
-	ld a, [wNumInBox]
+	ld hl, sBoxMonOT
+	ld a, [sNumInBox]
 .addOToffset
 	dec a
 	call SkipFixedLengthTextEntries
 	ld d, h
 	ld e, l
 .findOTsrc
-	ld hl, wBoxMonOT
+	ld hl, sBoxMonOT
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addOToffset2
-	ld hl, wDayCareMonOT
+	ld hl, sDayCareMonOT
 	cp DAYCARE_TO_PARTY
 	jr z, .copyOT
 	ld hl, wPartyMonOT
@@ -479,25 +493,25 @@ _MoveMon:
 	ld a, [wMoveMonType]
 .findNickDest
 	cp PARTY_TO_DAYCARE
-	ld de, wDayCareMonName
+	ld de, sDayCareMonName
 	jr z, .findNickSrc
 	dec a
 	ld hl, wPartyMonNicks
 	ld a, [wPartyCount]
 	jr nz, .addNickOffset
-	ld hl, wBoxMonNicks
-	ld a, [wNumInBox]
+	ld hl, sBoxMonNicks
+	ld a, [sNumInBox]
 .addNickOffset
 	dec a
 	call SkipFixedLengthTextEntries
 	ld d, h
 	ld e, l
 .findNickSrc
-	ld hl, wBoxMonNicks
+	ld hl, sBoxMonNicks
 	ld a, [wMoveMonType]
 	and a
 	jr z, .addNickOffset2
-	ld hl, wDayCareMonName
+	ld hl, sDayCareMonName
 	cp DAYCARE_TO_PARTY
 	jr z, .copyNick
 	ld hl, wPartyMonNicks
@@ -522,12 +536,12 @@ _MoveMon:
 	ld a, d
 	ld [wCurEnemyLVL], a
 	pop hl
-	ld bc, wBoxMon2 - wBoxMon1
+	ld bc, sBoxMon2 - sBoxMon1
 	add hl, bc
 	ld [hli], a
 	ld d, h
 	ld e, l
-	ld bc, -18
+	ld bc, wPartyMon1EVs - wPartyMon1MaxHP
 	add hl, bc
 	ld b, $1
 	call CalcStats

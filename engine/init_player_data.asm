@@ -29,8 +29,15 @@ InitPlayerData2:
 	ld [wRandomizerSeed], a
 	
 	;write a new box terminator to empty the box list
-	ld hl, wNumInBox
+	call OpenBox ; the box is in save RAM
+	ld hl, sNumInBox
 	call InitializeEmptyList
+	call CloseBox
+
+	ld hl, wTMsOwned ; NEW GAME+ keeps them
+	ld bc, wTMsOwnedEnd - wTMsOwned
+	xor a
+	call FillMemory
 .newgameplus
 	
 	ld a, $ff
@@ -42,10 +49,15 @@ InitPlayerData2:
 	ld hl, wNumBagItems
 	call InitializeEmptyList
 
+	xor a
+	ld [wDayCareInUse], a
+	ld [wDayCareEggReady], a
+	ld [wEggStepCounter], a
+
+
 	ld hl, wNumBoxItems
 	call InitializeEmptyList
-	
-	;note that the new extra bag space is wiped out when all the game progress flags get cleared
+
 
 START_MONEY EQU $3000
 	ld hl, wPlayerMoney + 1

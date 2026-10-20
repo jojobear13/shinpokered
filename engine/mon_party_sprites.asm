@@ -55,19 +55,7 @@ GetAnimationSpeed:
 	ld bc, $10
 	ld a, [wCurrentMenuItem]
 	call AddNTimes
-	ld c, $40 ; amount to increase the tile id by
-	ld a, [hl]
-	cp $4 ; tile ID for SPRITE_BALL_M
-	jr z, .editCoords
-	cp $8 ; tile ID for SPRITE_HELIX
-	jr nz, .editTileIDS
-; SPRITE_BALL_M and SPRITE_HELIX only shake up and down
-.editCoords
-	dec hl
-	dec hl ; dec hl to the OAM y coord
-	ld c, $1 ; amount to increase the y coord by
-; otherwise, load a second sprite frame
-.editTileIDS
+	ld c, $40 ; the second frame's tiles are $40 on
 	ld b, $4
 	ld de, $4
 .loop
@@ -88,10 +76,16 @@ GetAnimationSpeed:
 PartyMonSpeeds:
 	db 5, 16, 32
 
+; Each party mon has its own icon (gfx/party_icons_*.png, by tools/
+; gen_party_icons.py): two 16x16 frames, four tiles each. Party slot n's go to
+; sprite tiles 4n (the first frame) and $40 + 4n (the second).
+
 LoadMonPartySpriteGfx:
-; Load mon party sprite tile patterns into VRAM during V-blank.
-	ld hl, MonPartySpritePointers
-	ld a, $1c
+; Load the party's icons, and the trade's circle, during V-blank.
+	ld hl, TradeCirclePointers
+	ld a, 2
+	call LoadAnimSpriteGfx
+	jp LoadPartyIcons
 
 LoadAnimSpriteGfx:
 ; Load animated sprite tile patterns into VRAM during V-blank. hl is the address
@@ -126,196 +120,154 @@ LoadAnimSpriteGfx:
 	ret
 
 LoadMonPartySpriteGfxWithLCDDisabled:
-; Load mon party sprite tile patterns into VRAM immediately by disabling the
-; LCD.
+; Load the party's icons, and the trade's circle, at once with the LCD off.
 	call DisableLCD
-	ld hl, MonPartySpritePointers
-	ld a, $1c
-	ld bc, $0
-.loop
-	push af
-	push bc
-	push hl
-	add hl, bc
-	ld a, [hli]
-	ld e, a
-	ld a, [hli]
-	ld d, a
-	push de
-	ld a, [hli]
-	ld c, a
-	swap c
-	ld b, $0
-	ld a, [hli]
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	pop hl
+	ld hl, MonPartySprites + $100
+	ld de, vSprites + $380
+	ld bc, $40
+	ld a, BANK(MonPartySprites)
 	call FarCopyData2
-	pop hl
-	pop bc
-	ld a, $6
-	add c
-	ld c, a
-	pop af
-	dec a
-	jr nz, .loop
+	ld hl, MonPartySprites + $140
+	ld de, vSprites + $780
+	ld bc, $40
+	ld a, BANK(MonPartySprites)
+	call FarCopyData2
+	call LoadPartyIcons
 	jp EnableLCD
 
-MonPartySpritePointers:
-	dw SlowbroSprite + $c0
-	db $40 / $10 ; 40 bytes
-	db BANK(SlowbroSprite)
-	dw vSprites
-
-	dw BallSprite
-	db $80 / $10 ; $80 bytes
-	db BANK(BallSprite)
-	dw vSprites + $40
-
-	dw ClefairySprite + $c0
-	db $40 / $10 ; $40 bytes
-	db BANK(ClefairySprite)
-	dw vSprites + $c0
-
-	dw BirdSprite + $c0
-	db $40 / $10 ; $40 bytes
-	db BANK(BirdSprite)
-	dw vSprites + $100
-
-	dw SeelSprite
-	db $40 / $10 ; $40 bytes
-	db BANK(SeelSprite)
-	dw vSprites + $140
-
-	dw MonPartySprites + $40
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $180
-
-	dw MonPartySprites + $50
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $1a0
-
-	dw MonPartySprites + $60
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $1c0
-
-	dw MonPartySprites + $70
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $1e0
-
-	dw MonPartySprites + $80
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $200
-
-	dw MonPartySprites + $90
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $220
-
-	dw MonPartySprites + $A0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $240
-
-	dw MonPartySprites + $B0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $260
-
+; the trade's circle around the mon in the cable (Trade_WriteCircleOAM):
+; tiles $38 and $78 on, clear of the icons'
+TradeCirclePointers:
 	dw MonPartySprites + $100
 	db $40 / $10 ; $40 bytes
 	db BANK(MonPartySprites)
 	dw vSprites + $380
-
-	dw SlowbroSprite
-	db $40 / $10 ; $40 bytes
-	db BANK(SlowbroSprite)
-	dw vSprites + $400
-
-	dw BallSprite
-	db $80 / $10 ; $80 bytes
-	db BANK(BallSprite)
-	dw vSprites + $440
-
-	dw ClefairySprite
-	db $40 / $10 ; $40 bytes
-	db BANK(ClefairySprite)
-	dw vSprites + $4c0
-
-	dw BirdSprite
-	db $40 / $10 ; $40 bytes
-	db BANK(BirdSprite)
-	dw vSprites + $500
-
-	dw SeelSprite + $C0
-	db $40 / $10 ; $40 bytes
-	db BANK(SeelSprite)
-	dw vSprites + $540
-
-	dw MonPartySprites
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $580
-
-	dw MonPartySprites + $10
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $5a0
-
-	dw MonPartySprites + $20
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $5c0
-
-	dw MonPartySprites + $30
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $5E0
-
-	dw MonPartySprites + $C0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $600
-
-	dw MonPartySprites + $D0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $620
-
-	dw MonPartySprites + $E0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $640
-
-	dw MonPartySprites + $F0
-	db $10 / $10 ; $10 bytes
-	db BANK(MonPartySprites)
-	dw vSprites + $660
 
 	dw MonPartySprites + $140
 	db $40 / $10 ; $40 bytes
 	db BANK(MonPartySprites)
 	dw vSprites + $780
 
+; each party mon's icon -> its slot's tiles
+LoadPartyIcons:
+	ld hl, wPartySpecies
+	ld e, 0
+.loop
+	ld a, [hli]
+	cp $ff
+	ret z
+	push hl
+	push de
+	call LoadPartyIcon
+	pop de
+	pop hl
+	inc e
+	ld a, e
+	cp PARTY_LENGTH
+	jr c, .loop
+	ret
+
+; a = a species (or EGG), e = a party slot -> its icon's two frames into the
+; slot's tiles (and wPartyIconSpecies): at once with the LCD off, else in
+; V-blank
+LoadPartyIcon:
+	ld d, 0
+	ld hl, wPartyIconSpecies
+	add hl, de
+	ld [hl], a
+	call PartyIconOffset
+	push hl
+	ld l, e
+	ld h, 0
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl ; 4 tiles of 16 bytes a slot
+	ld de, vSprites
+	add hl, de
+	ld d, h
+	ld e, l ; the first frame's tiles
+	pop hl
+	push hl
+	push de
+	ld bc, PartyIcons1
+	add hl, bc
+	ld a, BANK(PartyIcons1)
+	call .copy
+	pop de
+	pop hl
+	ld bc, PartyIcons2
+	add hl, bc
+	push hl
+	ld hl, $400 ; the second frame's tiles, $40 on
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	ld a, BANK(PartyIcons2)
+; a = bank, hl = an icon, de = its tiles
+.copy
+	ld b, a
+	ld a, [rLCDC]
+	bit 7, a
+	jr nz, .lcdOn
+	ld a, b
+	ld bc, 4 * $10
+	jp FarCopyData2
+.lcdOn
+	push de
+	ld d, h
+	ld e, l
+	pop hl
+	ld c, 4
+	jp CopyVideoData
+
+; a = a species (or EGG) -> hl = its icon's offset in either frame's data;
+; keeps de
+PartyIconOffset:
+	cp EGG
+	ld b, NUM_POKEMON ; the egg's is after Mew's
+	jr z, .gotIcon
+	push de
+	ld [wd11e], a
+	predef IndexToPokedex
+	pop de
+	ld a, [wd11e]
+	dec a
+	ld b, a
+.gotIcon
+	ld l, b
+	ld h, 0
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl
+	add hl, hl ; 64 bytes an icon
+	ret
+
 WriteMonPartySpriteOAMByPartyIndex:
-; Write OAM blocks for the party mon in [hPartyMonIndex].
+; Write OAM blocks for the party mon in [hPartyMonIndex], first loading its
+; icon into its slot's tiles if they hold another species' (after a swap, an
+; evolution or a hatch).
 	push hl
 	push de
 	push bc
 	ld a, [hPartyMonIndex]
-	ld hl, wPartySpecies
 	ld e, a
 	ld d, 0
+	ld hl, wPartySpecies
 	add hl, de
 	ld a, [hl]
-	call GetPartyMonSpriteID
-	ld [wOAMBaseTile], a
+	ld hl, wPartyIconSpecies
+	add hl, de
+	cp [hl]
+	call nz, LoadPartyIcon
+	ld a, [hPartyMonIndex]
+	add a
+	add a
 	call WriteMonPartySpriteOAM
 	pop bc
 	pop de
@@ -323,57 +275,20 @@ WriteMonPartySpriteOAMByPartyIndex:
 	ret
 
 WriteMonPartySpriteOAMBySpecies:
-; Write OAM blocks for the party sprite of the species in
-; [wMonPartySpriteSpecies].
+; Load the icon of the species in [wMonPartySpriteSpecies] into slot 0's
+; tiles and write its OAM blocks there.
 	xor a
 	ld [hPartyMonIndex], a
 	ld a, [wMonPartySpriteSpecies]
-	call GetPartyMonSpriteID
-	ld [wOAMBaseTile], a
-	jr WriteMonPartySpriteOAM
-
-UnusedPartyMonSpriteFunction:
-; This function is unused and doesn't appear to do anything useful. It looks
-; like it may have been intended to load the tile patterns and OAM data for
-; the mon party sprite associated with the species in [wcf91].
-; However, its calculations are off and it loads garbage data.
-	ld a, [wcf91]
-	call GetPartyMonSpriteID
-	push af
-	ld hl, vSprites
-	call .LoadTilePatterns
-	pop af
-	add $54
-	ld hl, vSprites + $40
-	call .LoadTilePatterns
+	ld e, 0
+	call LoadPartyIcon
 	xor a
-	ld [wMonPartySpriteSpecies], a
-	jr WriteMonPartySpriteOAMBySpecies
-
-.LoadTilePatterns
-	push hl
-	add a
-	ld c, a
-	ld b, 0
-	ld hl, MonPartySpritePointers
-	add hl, bc
-	add hl, bc
-	add hl, bc
-	ld a, [hli]
-	ld e, a
-	ld a, [hli]
-	ld d, a
-	ld a, [hli]
-	ld c, a
-	ld a, [hli]
-	ld b, a
-	pop hl
-	jp CopyVideoData
+; fall through
 
 WriteMonPartySpriteOAM:
-; Write the OAM blocks for the first animation frame into the OAM buffer and
-; make a copy at wMonPartySpritesSavedOAM.
-	push af
+; Write the OAM blocks for the first animation frame of the icon at tile a
+; into the OAM buffer and make a copy at wMonPartySpritesSavedOAM.
+	ld [wOAMBaseTile], a
 	ld c, $10
 	ld h, wOAMBuffer / $100
 	ld a, [hPartyMonIndex]
@@ -381,43 +296,13 @@ WriteMonPartySpriteOAM:
 	ld l, a
 	add $10
 	ld b, a
-	pop af
-	cp SPRITE_HELIX << 2
-	jr z, .helix
-	call WriteSymmetricMonPartySpriteOAM
-	jr .makeCopy
-.helix
 	call WriteAsymmetricMonPartySpriteOAM
 ; Make a copy of the OAM buffer with the first animation frame written so that
 ; we can flip back to it from the second frame by copying it back.
-.makeCopy
 	ld hl, wOAMBuffer
 	ld de, wMonPartySpritesSavedOAM
 	ld bc, $60
 	jp CopyData
 
-GetPartyMonSpriteID:
-	ld [wd11e], a
-	predef IndexToPokedex
-	ld a, [wd11e]
-	ld c, a
-	dec a
-	srl a
-	ld hl, MonPartyData
-	ld e, a
-	ld d, 0
-	add hl, de
-	ld a, [hl]
-	bit 0, c
-	jr nz, .skipSwap
-	swap a ; use lower nybble if pokedex num is even
-.skipSwap
-	and $f0
-	srl a
-	srl a
-	ret
-
-INCLUDE "data/mon_party_sprites.asm"
-
-MonPartySprites:
+MonPartySprites: ; (only the trade's circle is used now)
 	INCBIN "gfx/mon_ow_sprites.2bpp"

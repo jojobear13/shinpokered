@@ -37,12 +37,10 @@ SubstituteEffect_:
 	sbc 0
 	pop bc
 	jr c, .notEnoughHP ; underflow means user would be left with negative health
-                           ; bug: since it only branches on carry, it will possibly leave user with 0 HP
-;;;;joenote - fix the bug to also check for exactly 0 hp
-	inc d ;d is still holding the hp loss value from substitute. increment it by 1.
-	dec d ;decrement it by one to change it back
-	jr z, .notEnoughHP ; inc and dec set z if they result in zero values, if so then jump to the fail
-;;;;
+	ld e, a
+	or d
+	ld a, e
+	jr z, .notEnoughHP ; Gen 9: it needs more than a quarter of its max HP
 .userHasZeroOrMoreHP
 	ldi [hl], a ; save resulting HP after subtraction into current HP
 	ld [hl], d
@@ -91,9 +89,9 @@ _AttackSubstitute:
 ; subtract damage from HP of substitute
 	ld a, [de]
 	sub [hl]
-	ld [de], a
-;	ret nc		;joenote - slight rewrite
 	jr c, .substituteBroke
+	jr z, .substituteBroke ; Gen 9: it breaks at 0 HP
+	ld [de], a
 	;;;;;;;;;;;;;;;;;;;;;;
 	;joenote - get original turn back
 	push af
@@ -103,8 +101,15 @@ _AttackSubstitute:
 	;;;;;;;;;;;;;;;;;;;;;;
 	ret
 .substituteBroke
-; If the target's Substitute breaks, wDamage isn't updated with the amount of HP
-; the Substitute had before being attacked.
+; Gen 9: the damage dealt is what the substitute had left (recoil, drain and
+; Counter go by it)
+	ld hl, wDamage
+	xor a
+	ld [hli], a
+	ld a, [de]
+	ld [hl], a
+	xor a
+	ld [de], a
 	ld h, b
 	ld l, c
 	res HAS_SUBSTITUTE_UP, [hl] ; unset the substitute bit

@@ -7,9 +7,63 @@ DayCareMTextPointers:
 DayCareMText1:
 	TX_ASM
 	call SaveScreenTilesToBuffer2
+	ld a, [wDayCareEggReady]
+	and a
+	jr z, .noEgg
+	ld hl, DayCareEggText ; an egg first
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
+	jr nz, .declineEgg
+	ld a, [wPartyCount]
+	cp PARTY_LENGTH
+	ld hl, DayCareNoRoomForEggText
+	jp nc, .done
+	callab GiveDayCareEgg
+	ld hl, DayCareReceivedEggText
+	jp .done
+.declineEgg
+	xor a
+	ld [wDayCareEggReady], a ; gone
+	ld hl, DayCareKeepEggText
+	jp .done
+.noEgg
 	ld a, [wDayCareInUse]
 	and a
+	jr z, .offer
+	cp DAY_CARE_SLOTS
+	jr z, .chooseMon
+	ld hl, DayCareRaiseAnotherText ; one is here: another, or that one back?
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
 	jp nz, .daycareInUse
+	jr .deposit
+.chooseMon
+	callab DayCareCompatibility
+	ld hl, DayCarePlayWithOthersText
+	and a
+	jr z, .gotCompatibility
+	ld hl, DayCareDontLikeEachOtherText
+	cp BREED_LOW
+	jr z, .gotCompatibility
+	ld hl, DayCareGetAlongText
+	cp BREED_MEDIUM
+	jr z, .gotCompatibility
+	ld hl, DayCareGetAlongVeryWellText
+.gotCompatibility
+	call PrintText
+	ld hl, DayCareWhichBackText
+	call PrintText
+	call DayCareChooseMon
+	ld hl, DayCareComeAgainText
+	jp c, .done
+	and a
+	call nz, SwapDayCareMons ; the chosen one first
+	jp .daycareInUse
+.offer
 	ld hl, DayCareIntroText
 	call PrintText
 	call YesNoChoice
@@ -17,6 +71,7 @@ DayCareMText1:
 	and a
 	ld hl, DayCareComeAgainText
 	jp nz, .done
+.deposit
 	ld a, [wPartyCount]
 	dec a
 	ld hl, DayCareOnlyHaveOneMonText
@@ -35,6 +90,13 @@ DayCareMText1:
 	pop af
 	ld hl, DayCareAllRightThenText
 	jp c, .done
+	ld a, [wcf91]
+	cp EGG
+	ld hl, DayCareCantTakeEggText
+	jp z, .done
+	callab PartyHasOtherBattler
+	ld hl, DayCareLastMonText
+	jp nc, .done
 ;joenote - HM moves are not needed to travel between the daycare and the Cerulean Pokemon Center,
 ;			so disallowing HM moves does nothing to prevent a softlock here.
 ;			This can be commented out safely.
@@ -48,8 +110,11 @@ DayCareMText1:
 	call GetPartyMonName
 	ld hl, DayCareWillLookAfterMonText
 	call PrintText
-	ld a, 1
-	ld [wDayCareInUse], a
+	ld a, [wDayCareInUse]
+	and a
+	call nz, SwapDayCareMons ; the one already here goes second
+	ld hl, wDayCareInUse
+	inc [hl]
 	ld a, PARTY_TO_DAYCARE
 	ld [wMoveMonType], a
 	call MoveMon
@@ -62,9 +127,11 @@ DayCareMText1:
 	jp .done
 
 .daycareInUse
+	call OpenBox ; the day-care mon is in save RAM
 	xor a
-	ld hl, wDayCareMonName
+	ld hl, sDayCareMonName
 	call GetPartyMonName
+	call CloseBox
 	ld a, DAYCARE_DATA
 	ld [wMonDataLocation], a
 	call LoadMonData
@@ -75,23 +142,27 @@ DayCareMText1:
 
 	ld d, MAX_LEVEL
 	callab CalcExperience
-	ld hl, wDayCareMonExp
+	call OpenBox
+	ld hl, sDayCareMonExp
 	ld a, [hExperience]
 	ld [hli], a
 	ld a, [hExperience + 1]
 	ld [hli], a
 	ld a, [hExperience + 2]
 	ld [hl], a
+	call CloseBox
 	ld d, MAX_LEVEL
 
 .skipCalcExp
 	xor a
 	ld [wDayCareNumLevelsGrown], a
-	ld hl, wDayCareMonBoxLevel
+	call OpenBox
+	ld hl, sDayCareMonBoxLevel
 	ld a, [hl]
 	ld [wDayCareStartLevel], a
 	cp d
 	ld [hl], d
+	call CloseBox ; keeps the flags from cp
 	ld hl, DayCareMonNeedsMoreTimeText
 	jr z, .next
 	ld a, [wDayCareStartLevel]
@@ -152,8 +223,9 @@ DayCareMText1:
 	jp .leaveMonInDayCare
 
 .enoughMoney
+	ld hl, wDayCareInUse
+	dec [hl]
 	xor a
-	ld [wDayCareInUse], a
 	ld hl, wDayCareNumLevelsGrown
 	ld [hli], a
 	inc hl
@@ -170,8 +242,10 @@ DayCareMText1:
 	ld a, DAYCARE_TO_PARTY
 	ld [wMoveMonType], a
 	call MoveMon
-	ld a, [wDayCareMonSpecies]
+	call OpenBox
+	ld a, [sDayCareMonSpecies]
 	ld [wcf91], a
+	call CloseBox
 	ld a, [wPartyCount]
 	dec a
 	push af
@@ -194,8 +268,10 @@ DayCareMText1:
 	call PlayCry
 	
 ;joenote - prompt move learning and evolution if possible
-	ld a, [wDayCareMonSpecies]
+	call OpenBox
+	ld a, [sDayCareMonSpecies]
 	ld [wd11e], a
+	call CloseBox
 	call DaycareMoveLearning
 	call DaycareEvolution	;returns with z flag set if evolution did not happen
 	jr z, .doneEvos
@@ -234,17 +310,94 @@ DayCareMText1:
 	ld a, [hl]
 	ld [de], a
 
+	; the returned mon is last in the party; its name goes to wcd6d for the text
+	ld a, [wPartyCount]
+	dec a
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
+	ld a, [wDayCareInUse]
+	and a
+	call nz, SwapDayCareMons ; the one still here goes first
 	ld hl, DayCareGotMonBackText
 	jr .done
 
 .leaveMonInDayCare
 	ld a, [wDayCareStartLevel]
-	ld [wDayCareMonBoxLevel], a
+	call OpenBox
+	ld [sDayCareMonBoxLevel], a
+	call CloseBox
 
 .done
 	call PrintText
 	jp TextScriptEnd
 
+
+; swaps the two day-care mons in save RAM: the day care works on the first
+SwapDayCareMons:
+	call OpenBox
+	ld hl, sDayCareMonName
+	ld de, sDayCareMon2Name
+	ld c, DAY_CARE_DATA_LENGTH
+.loop
+	ld a, [de]
+	ld b, [hl]
+	ld [hli], a
+	ld a, b
+	ld [de], a
+	inc de
+	dec c
+	jr nz, .loop
+	jp CloseBox
+
+; a menu of the two day-care mons and CANCEL -> a = the one chosen (0 or 1),
+; carry if cancelled
+DayCareChooseMon:
+	call SaveScreenTilesToBuffer1
+	coord hl, 7, 4
+	lb bc, 5, 11
+	call TextBoxBorder
+	call OpenBox
+	coord hl, 9, 5
+	ld de, sDayCareMonName
+	call PlaceString
+	coord hl, 9, 7
+	ld de, sDayCareMon2Name
+	call PlaceString
+	call CloseBox
+	coord hl, 9, 9
+	ld de, DayCareCancelText
+	call PlaceString
+	ld hl, wTopMenuItemY
+	ld a, 5
+	ld [hli], a ; wTopMenuItemY
+	ld a, 8
+	ld [hli], a ; wTopMenuItemX
+	xor a
+	ld [hli], a ; wCurrentMenuItem
+	inc hl
+	ld a, 2
+	ld [hli], a ; wMaxMenuItem
+	ld a, A_BUTTON | B_BUTTON
+	ld [hli], a ; wMenuWatchedKeys
+	xor a
+	ld [hl], a ; wLastMenuItem
+	call HandleMenuInput
+	push af
+	call LoadScreenTilesFromBuffer1
+	pop af
+	bit BIT_B_BUTTON, a
+	jr nz, .cancel
+	ld a, [wCurrentMenuItem]
+	cp 2
+	jr z, .cancel
+	and a
+	ret
+.cancel
+	scf
+	ret
+
+DayCareCancelText:
+	db "CANCEL@"
 
 DaycareEvolution:
 ;sets z flag if no evolution happened
@@ -337,6 +490,56 @@ DaycareMoveLearning:
 	
 DayCareIntroText:
 	TX_FAR _DayCareIntroText
+	db "@"
+
+DayCareEggText:
+	TX_FAR _DayCareEggText
+	db "@"
+
+DayCareReceivedEggText:
+	TX_FAR _DayCareReceivedEggText
+	TX_SFX_ITEM_1
+	TX_FAR _DayCareTakeCareOfEggText
+	db "@"
+
+DayCareNoRoomForEggText:
+	TX_FAR _DayCareNoRoomForEggText
+	db "@"
+
+DayCareKeepEggText:
+	TX_FAR _DayCareKeepEggText
+	db "@"
+
+DayCareGetAlongVeryWellText:
+	TX_FAR _DayCareGetAlongVeryWellText
+	db "@"
+
+DayCareGetAlongText:
+	TX_FAR _DayCareGetAlongText
+	db "@"
+
+DayCareDontLikeEachOtherText:
+	TX_FAR _DayCareDontLikeEachOtherText
+	db "@"
+
+DayCarePlayWithOthersText:
+	TX_FAR _DayCarePlayWithOthersText
+	db "@"
+
+DayCareCantTakeEggText:
+	TX_FAR _DayCareCantTakeEggText
+	db "@"
+
+DayCareLastMonText:
+	TX_FAR _DayCareLastMonText
+	db "@"
+
+DayCareRaiseAnotherText:
+	TX_FAR _DayCareRaiseAnotherText
+	db "@"
+
+DayCareWhichBackText:
+	TX_FAR _DayCareWhichBackText
 	db "@"
 
 DayCareWhichMonText:

@@ -160,7 +160,7 @@ _SSAnne6Text_GymGuy_pikachu::
 	text "Your PIKACHU is"
 	line "really special!"
 	
-	para "In recongnition,"
-	line "I've made it able"
-	cont "to learn SURF!"
+	para "In recognition,"
+	line "your PIKACHU can"
+	cont "now learn SURF!"
 	prompt

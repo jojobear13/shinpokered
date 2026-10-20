@@ -136,7 +136,6 @@ PredefPointers::
 	add_predef MarkTownVisitedAndLoadMissableObjects
 	add_predef SetPartyMonTypes
 	add_predef CanLearnTM
-	add_predef TMToMove
 	add_predef _RunPaletteCommand
 	add_predef StarterDex
 	add_predef _AddPartyMon
@@ -170,13 +169,6 @@ PredefPointers::
 	add_predef BGLayerScrollingUpdate
 	add_predef _PrintNumber
 	add_predef GBCGamma
-	add_predef CritHitStatsPlayerPhysical
-	add_predef CritHitStatsPlayerSpecial
-	add_predef CritHitStatsEnemyPhysical
-	add_predef CritHitStatsEnemySpecial
-	add_predef BC999cap
-	add_predef PlayerDisableHandler
-	add_predef EnemyDisableHandler
 	add_predef SetAttackAnimPal
 	add_predef EndOfBattle_NuzlockeHandler
 	add_predef HealParty_NuzlockeHandler
@@ -191,8 +183,5 @@ PredefPointers::
 	add_predef SingleCPUSpeed
 	add_predef PrintPlayTime
 	add_predef DVPunnettSquare
-	add_predef GetCriticalHitProbability
-	add_predef ShimmerTransformationPlayer
-	add_predef ShimmerTransformationEnemy
 	add_predef ReadSuperRodData
 	add_predef _CalcStat

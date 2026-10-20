@@ -55,8 +55,8 @@ CeladonHotelCoinGuy:
 	predef AddBCDPredef	;add value in hl location to value in de location
 	
 	;is the pokemon shiny?
-	ld de, wPartyMon1DVs
-	callba ShinyDVsChecker2
+	ld de, wPartyMon1IVs
+	callba ShinyIVsChecker2
 	jr z, .payout
 	;if so, apply a 4x multiplier
 	ld de, hCoins + 1

@@ -2,8 +2,9 @@ db DEX_DODRIO ; pokedex id
 db 60 ; base hp
 db 110 ; base attack
 db 70 ; base defense
-db 100 ; base speed
-db 60 ; base special
+db 110 ; base speed
+db 60 ; base special attack
+db 60 ; base special defense
 db NORMAL ; species type 1
 db FLYING ; species type 2
 db 45 ; catch rate

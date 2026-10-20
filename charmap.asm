@@ -252,8 +252,10 @@ charmap ".", $E8
 
 charmap "▷", $EC
 charmap "▶", $ED
+charmap "◀", $EA ; drawn for the bag's pockets
 charmap "▲", $ED
 charmap "▼", $EE
+charmap "▴", $E9 ; filled up triangle, ▼ upside down (the move menu's effectiveness mark)
 charmap "♂", $EF
 charmap "¥", $F0
 charmap "×", $F1

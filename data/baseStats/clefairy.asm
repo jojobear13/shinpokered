@@ -3,9 +3,10 @@ db 70 ; base hp
 db 45 ; base attack
 db 48 ; base defense
 db 35 ; base speed
-db 60 ; base special
-db NORMAL ; species type 1
-db NORMAL ; species type 2
+db 60 ; base special attack
+db 65 ; base special defense
+db FAIRY ; species type 1
+db FAIRY ; species type 2
 db 150 ; catch rate
 db 68 ; base exp yield
 INCBIN CLEFAIRY_FR,0,1 ; 55, sprite dimensions

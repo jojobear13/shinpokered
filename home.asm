@@ -84,6 +84,43 @@ HideSprites::
 
 INCLUDE "home/copy.asm"
 
+; The day-care mon and the current PC box live in save RAM bank 0 (see
+; sLiveDataStart in sram.asm). Every access to them is bracketed by OpenBox
+; and CloseBox, which enable SRAM and select that bank. Brackets nest
+; (wBoxOpenDepth counts them) and SRAM is disabled again by the outermost
+; CloseBox. Both preserve every register and the flags.
+; Never hold a bracket open across a save or load (they select other banks
+; and disable SRAM when done) or across a picture decompression (it uses the
+; sprite buffers in the same bank and manages SRAM itself).
+OpenBox::
+	push af
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	xor a
+	ld [MBC1SRamBank], a
+	ld a, [wBoxOpenDepth]
+	inc a
+	jr CloseBox.store
+CloseBox::
+	push af
+	ld a, [wBoxOpenDepth]
+	and a
+	jr z, .disable ; an unmatched CloseBox still disables SRAM
+	dec a
+	jr nz, .store
+.disable
+	ld [MBC1SRamEnable], a ; a = SRAM_DISABLE
+.store
+	ld [wBoxOpenDepth], a
+	pop af
+	ret
+
+; a = number of mons in the current box (which is in save RAM)
+GetNumInBox::
+	call OpenBox
+	ld a, [sNumInBox]
+	jp CloseBox
+
 
 
 SECTION "Entry", ROM0 [$100]
@@ -312,7 +349,9 @@ LoadFrontSpriteByMonIndex::
 
 
 PlayCry::
-; Play monster a's cry.
+; Play monster a's cry (an egg has none).
+	cp EGG
+	ret z
 	call GetCryData
 	call PlaySound
 	jp WaitForSoundToFinish
@@ -423,6 +462,26 @@ HandlePartyMenuInput::
 	ld a, [wMenuItemToSwap]
 	and a
 	jp nz, .swappingPokemon
+	bit 1, b
+	jr nz, .notItemOnEgg
+	ld a, [wPartyMenuTypeOrMessageID]
+	cp USE_ITEM_PARTY_MENU
+	jr z, .usingItem
+	cp EVO_STONE_PARTY_MENU
+	jr nz, .notItemOnEgg
+.usingItem
+	ld a, [wCurrentMenuItem]
+	ld c, a
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl]
+	cp EGG
+	jr nz, .notItemOnEgg
+	ld a, SFX_DENIED ; no item works on an egg
+	call PlaySound
+	jp HandlePartyMenuInput
+.notItemOnEgg
 	pop af
 	ld [hTilesetType], a
 	bit 1, b
@@ -455,12 +514,12 @@ HandlePartyMenuInput::
 	ld [wMenuItemToSwap], a
 	ld [wPartyMenuTypeOrMessageID], a
 	call RedrawPartyMenu
-	jr HandlePartyMenuInput
+	jp HandlePartyMenuInput
 .handleSwap
 	ld a, [wCurrentMenuItem]
 	ld [wWhichPokemon], a
 	callba SwitchPartyMon
-	jr HandlePartyMenuInput
+	jp HandlePartyMenuInput
 
 DrawPartyMenu::
 	ld hl, DrawPartyMenu_
@@ -593,6 +652,7 @@ GetMonHeader::
 	ld de, wMonHeader
 	ld bc, MonBaseStatsEnd - MonBaseStats
 	call CopyData
+	callab Gen2PicHeader ; Crystal's pics instead, with the option on
 	jr .done
 .specialID
 	;joenote - dynamically get pic size of special ID
@@ -999,10 +1059,6 @@ ExclamationText::
 	TX_FAR _ExclamationText
 	db "@"
 
-GroundRoseText::
-	TX_FAR _GroundRoseText
-	db "@"
-
 BoulderText::
 	TX_FAR _BoulderText
 	db "@"
@@ -1124,6 +1180,8 @@ DisplayTextID::
 	jp z, DisplayPlayerBlackedOutText
 	cp TEXT_REPEL_WORE_OFF
 	jp z, DisplayRepelWoreOffText
+	cp TEXT_EGG_HATCHING
+	jp z, DisplayEggHatchingText
 	
 	;joenote - close if $FF is the textID or sprite index
 	cp $FF
@@ -1271,7 +1329,9 @@ DisplayPokemartDialogue::
 	call PrintText
 	pop hl
 	inc hl
-	call LoadItemList
+	ld a, [hl]
+	ld [wItemScratch], a
+	callab LoadMartInventory
 	ld a, PRICEDITEMLISTMENU
 	ld [wListMenuID], a
 	ld a, [H_LOADEDROMBANK]
@@ -1353,14 +1413,13 @@ PlayerBlackedOutText::
 	TX_FAR _PlayerBlackedOutText
 	db "@"
 
-DisplayRepelWoreOffText::
-	ld hl, RepelWoreOffText
-	call PrintText
-	jp AfterDisplayingTextID
+DisplayEggHatchingText::
+	callba HatchEggs
+	jp CloseTextDisplay
 
-RepelWoreOffText::
-	TX_FAR _RepelWoreOffText
-	db "@"
+DisplayRepelWoreOffText::
+	callba RepelWoreOff ; engine/items/repel_prompt.asm
+	jp AfterDisplayingTextID
 
 INCLUDE "engine/menu/start_menu.asm"
 
@@ -1581,11 +1640,9 @@ DisplayListMenuIDLoop::
 	pop hl
 	ld a,[wListMenuID]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - needed to make Mateo's move deleter/relearner work
-IF DEF(_MOVENPCS)
+;joenote - needed to make Mateo's move deleter/relearner work (and Fuchsia gym's move list)
 	cp a, MOVESLISTMENU
 	jr z, .skipStoringItemName
-ENDC
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	cp ITEMLISTMENU
 	jr nz, .skipGettingQuantity
@@ -1615,10 +1672,12 @@ ENDC
 	cp l ; is it a list of party pokemon or box pokemon?
 	ld hl, wPartyMonNicks
 	jr z, .getPokemonName
-	ld hl, wBoxMonNicks ; box pokemon names
+	ld hl, sBoxMonNicks ; box pokemon names
 .getPokemonName
 	ld a, [wWhichPokemon]
+	call OpenBox ; box names are in save RAM
 	call GetPartyMonName
+	call CloseBox
 .storeChosenEntry ; store the menu entry that the player chose and return
 	ld de, wcd6d
 	call CopyStringToCF4B ; copy name to wcf4b
@@ -1659,7 +1718,7 @@ ENDC
 	dec [hl]
 	jp DisplayListMenuIDLoop
 .startPressed	
-	homecall HandleBagData	;joenote - adding swappable bag space and organization
+	homecall HandleBagData	; sorts the PC's item box
 	jp DisplayListMenuIDLoop
 
 DisplayChooseQuantityMenu::
@@ -1858,7 +1917,7 @@ PrintListMenuEntries::
 	cp l ; is it a list of party pokemon or box pokemon?
 	ld hl, wPartyMonNicks
 	jr z, .getPokemonName
-	ld hl, wBoxMonNicks ; box pokemon names
+	ld hl, sBoxMonNicks ; box pokemon names
 .getPokemonName
 	ld a, [wWhichPokemon]
 	ld b, a
@@ -1867,7 +1926,9 @@ PrintListMenuEntries::
 	ld b, a
 	ld a, [wListScrollOffset]
 	add b
+	call OpenBox ; box names are in save RAM
 	call GetPartyMonName
+	call CloseBox
 	pop hl
 	jr .placeNameString
 .movesMenu
@@ -2003,11 +2064,15 @@ GetMonName::
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
 	ld a, [wd11e]
+	ld hl, EggMonName
+	cp EGG
+	jr z, .gotName
 	dec a
 	ld hl, MonsterNames
 	ld c, 10
 	ld b, 0
 	call AddNTimes
+.gotName
 	ld de, wcd6d
 	push de
 	ld bc, 10
@@ -2120,6 +2185,31 @@ GetItemName::
 ;	db "TM"
 ;HiddenPrefix::
 ;	db "HM"
+
+; a = a TM or HM item -> a = its machine number from 0, TechnicalMachines'
+; order (the TMs, then the HMs)
+MachineIndex::
+	sub TM_01
+	ret nc
+	add TM_01 - HM_01 + NUM_TMS
+	ret
+
+; a = a TM or HM item -> nz if the player owns it; keeps bc, de and hl
+CheckMachineOwned::
+	push bc
+	push de
+	push hl
+	call MachineIndex
+	ld c, a
+	ld b, FLAG_TEST
+	ld hl, wTMsOwned
+	predef FlagActionPredef
+	ld a, c
+	and a
+	pop hl
+	pop de
+	pop bc
+	ret
 
 ; sets carry if item is HM, clears carry if item is not HM
 ; Input: a = item ID
@@ -2395,9 +2485,6 @@ RunNPCMovementScript::
 
 EndNPCMovementScript::
 	jpba _EndNPCMovementScript
-
-EmptyFunc2::
-	ret
 
 ; stores hl in [wTrainerHeaderPtr]
 StoreTrainerHeaderPointer::
@@ -3067,16 +3154,6 @@ DecodeRLEList::
 	ret
 
 ; sets movement byte 1 for sprite [H_SPRITEINDEX] to $FE and byte 2 to [hSpriteMovementByte2]
-SetSpriteMovementBytesToFE::
-	push hl
-	call GetSpriteMovementByte1Pointer
-	ld [hl], $fe
-	call GetSpriteMovementByte2Pointer
-	ld a, [hSpriteMovementByte2]
-	ld [hl], a
-	pop hl
-	ret
-
 ; sets both movement bytes for sprite [H_SPRITEINDEX] to $FF
 SetSpriteMovementBytesToFF::
 	push hl
@@ -3216,12 +3293,6 @@ NoYesChoice::	;joenote - added this
 	call SaveScreenTilesToBuffer1
 	call InitNoYesTextBoxParameters
 	jr DisplayYesNoChoice
-
-Func_35f4::
-	ld a, TWO_OPTION_MENU
-	ld [wTextBoxID], a
-	call InitYesNoTextBoxParameters
-	jp DisplayTextBoxID
 
 InitYesNoTextBoxParameters::
 	xor a ; YES_NO_MENU
@@ -3878,11 +3949,10 @@ CalcStats::
 	ret
 
 ; calculates stat c of current mon
-; c: stat to calc (HP=1,Atk=2,Def=3,Spd=4,Spc=5)
-; b: consider stat exp?
-; hl: base ptr to stat exp values ([hl + 2*c - 1] and [hl + 2*c])
-; have to point hl to *Mon1HPExp - 1
-; if b=0, then hl should point to <battle_struct>HP
+; c: stat to calc (HP=1, Atk=2, Def=3, Spd=4, SpAtk=5, SpDef=6)
+; b: consider EVs?
+; hl: the mon's EVs (*Mon1EVs), which its IVs follow; if b=0, its IVs - NUM_STATS
+; (<battle_struct>IVs - NUM_STATS)
 ; requires that data be preloaded into wMonHeader using GetMonHeader
 CalcStat::
 	predef _CalcStat	;joenote - moved to make space in home bank
@@ -4476,6 +4546,101 @@ GivePokemon::
 	jpba _GivePokemon
 
 
+; a = a status bit mask (1 << BRN, FRZ, PAR or PSN), hl = a mon's two types
+; -> carry if its types keep the status off (Gen 9: Fire can't be burned, Ice
+; frozen, Electric paralyzed, Poison or Steel poisoned). Keeps bc, de and hl
+StatusTypeImmune::
+	push bc
+	ld b, FIRE
+	cp 1 << BRN
+	jr z, .check
+	ld b, ICE
+	cp 1 << FRZ
+	jr z, .check
+	ld b, ELECTRIC
+	cp 1 << PAR
+	jr z, .check
+	cp 1 << PSN
+	jr nz, .no
+	ld b, POISON
+	call .match
+	jr c, .done
+	ld b, STEEL
+.check
+	call .match
+.done
+	pop bc
+	ret
+.no
+	pop bc
+	and a
+	ret
+.match
+	ld a, [hl]
+	cp b
+	jr z, .found
+	inc hl
+	ld a, [hl]
+	dec hl
+	cp b
+	jr z, .found
+	and a
+	ret
+.found
+	scf
+	ret
+
+BattleRandom::
+; Link battles use a shared PRNG.
+
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jp nz, Random
+
+	push hl
+	push bc
+	ld a, [wLinkBattleRandomNumberListIndex]
+	ld c, a
+	ld b, 0
+	ld hl, wLinkBattleRandomNumberList
+	add hl, bc
+	inc a
+	ld [wLinkBattleRandomNumberListIndex], a
+	cp 9
+	ld a, [hl]
+	pop bc
+	pop hl
+	ret c
+
+; if we picked the last seed, we need to recalculate the nine seeds
+	push hl
+	push bc
+	push af
+
+; point to seed 0 so we pick the first number the next time
+	xor a
+	ld [wLinkBattleRandomNumberListIndex], a
+
+	ld hl, wLinkBattleRandomNumberList
+	ld b, 9
+.loop
+	ld a, [hl]
+	ld c, a
+; multiply by 5
+	add a
+	add a
+	add c
+; add 1
+	inc a
+	ld [hli], a
+	dec b
+	jr nz, .loop
+
+	pop af
+	pop bc
+	pop hl
+	ret
+
 Random::
 ; Return a random number in a.
 ; For battles, use BattleRandom.
@@ -4560,67 +4725,54 @@ SetMapTextPointer::
 	ld [wMapTextPtr + 1], a
 	ret
 	
-HandleSlpFrzClause::	;joenote - move to the main function
-	push bc
-	push hl
-	push de
-	callba _HandleSlpFrzClause
-	pop de
-	pop hl
-	pop bc
-	ret
 	
-Random_BiasDV::
-; Return a random number 0-15 in A and B with a bias towards higher numbers
+; a = move id -> a = its category: PHYSICAL, SPECIAL or STATUS (STATUS for
+; ids that aren't moves, like the X item animations). Preserves bc, de and hl.
+GetMoveCategory::
+	and a
+	jr z, .notMove
+	cp STRUGGLE + 1
+	jr nc, .notMove
 	push hl
-	push de
 	push bc
-	callba _Random_BiasDV
+	ld c, a
+	ld b, 0
+	ld hl, MoveCategories - 1
+	add hl, bc
+	ld a, [H_LOADEDROMBANK]
+	push af
+	ld a, BANK(MoveCategories)
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
+	ld c, [hl]
+	pop af
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
+	ld a, c
 	pop bc
-	ld b, e
-	ld a, d
-	pop de
 	pop hl
 	ret
-Random_DV::
-; Return a random number 0-15 in A and B with a adjustments for being a wild pokemon DV
-	push hl
-	push de
-	push bc
-	callba _Random_DV
-	pop bc
-	ld b, e
-	ld a, d
-	pop de
-	pop hl
+.notMove
+	ld a, STATUS
 	ret
 
-;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
-RefreshPartyMenu:
-	ld a, [wPartyMenuTypeOrMessageID]
-	push af
-	ld a, 6
-	ld [wPartyMenuTypeOrMessageID], a
-	call RedrawPartyMenu
-	pop af
-	ld [wPartyMenuTypeOrMessageID], a
-	ret
+
 
 StatModifierRatios:
-; first byte is numerator, second byte is denominator
-	db 25, 100  ; 0.25
-	db 28, 100  ; 0.28
-	db 33, 100  ; 0.33
-	db 40, 100  ; 0.40
-	db 50, 100  ; 0.50
-	db 66, 100  ; 0.66
-	db  1,   1  ; 1.00
-	db 15,  10  ; 1.50
-	db  2,   1  ; 2.00
-	db 25,  10  ; 2.50
-	db  3,   1  ; 3.00
-	db 35,  10  ; 3.50
-	db  4,   1  ; 4.00
+; first byte is numerator, second byte is denominator: Gen 9's stages, -6 to +6
+	db 2, 8
+	db 2, 7
+	db 2, 6
+	db 2, 5
+	db 2, 4
+	db 2, 3
+	db 2, 2
+	db 3, 2
+	db 4, 2
+	db 5, 2
+	db 6, 2
+	db 7, 2
+	db 8, 2
 
 
 

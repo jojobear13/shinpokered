@@ -26,7 +26,7 @@ SSAnne10Object:
 	object SPRITE_SLOWBRO, 11, 12, STAY, NONE, 8 ; person
 	object SPRITE_BALL, 20, 2, STAY, NONE, 9, ETHER
 	object SPRITE_BALL, 10, 2, STAY, NONE, 10, TM_44
-	object SPRITE_BALL, 12, 11, STAY, NONE, 11, MAX_POTION
+	object SPRITE_BALL, 12, 11, STAY, NONE, 11, AMULET_COIN
 
 	; warp-to
 	warp_to 2, 5, SS_ANNE_10_WIDTH ; SS_ANNE_4

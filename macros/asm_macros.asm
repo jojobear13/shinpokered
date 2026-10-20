@@ -60,12 +60,18 @@ ENDM
 ;\2 = X
 ;\3 = Y
 ;\4 = which tilemap (optional)
+; a tilemap address in a table: dwcoord x, y
+MACRO dwcoord
+	validateCoords \1, \2
+	dw wTileMap + SCREEN_WIDTH * (\2) + (\1)
+ENDM
+
 MACRO coord
 	validateCoords \2, \3
 	IF _NARG >= 4
-		ld \1, \4 + SCREEN_WIDTH * \3 + \2
+		ld \1, \4 + SCREEN_WIDTH * (\3) + (\2)
 	ELSE
-		ld \1, wTileMap + SCREEN_WIDTH * \3 + \2
+		ld \1, wTileMap + SCREEN_WIDTH * (\3) + (\2)
 	ENDC
 ENDM
 
@@ -75,9 +81,9 @@ ENDM
 MACRO aCoord
 	validateCoords \1, \2
 	IF _NARG >= 3
-		ld a, [\3 + SCREEN_WIDTH * \2 + \1]
+		ld a, [\3 + SCREEN_WIDTH * (\2) + (\1)]
 	ELSE
-		ld a, [wTileMap + SCREEN_WIDTH * \2 + \1]
+		ld a, [wTileMap + SCREEN_WIDTH * (\2) + (\1)]
 	ENDC
 ENDM
 
@@ -87,9 +93,9 @@ ENDM
 MACRO Coorda
 	validateCoords \1, \2
 	IF _NARG >= 3
-		ld [\3 + SCREEN_WIDTH * \2 + \1], a
+		ld [\3 + SCREEN_WIDTH * (\2) + (\1)], a
 	ELSE
-		ld [wTileMap + SCREEN_WIDTH * \2 + \1], a
+		ld [wTileMap + SCREEN_WIDTH * (\2) + (\1)], a
 	ENDC
 ENDM
 
@@ -99,9 +105,9 @@ ENDM
 MACRO dwCoord
 	validateCoords \1, \2
 	IF _NARG >= 3
-		dw \3 + SCREEN_WIDTH * \2 + \1
+		dw \3 + SCREEN_WIDTH * (\2) + (\1)
 	ELSE
-		dw wTileMap + SCREEN_WIDTH * \2 + \1
+		dw wTileMap + SCREEN_WIDTH * (\2) + (\1)
 	ENDC
 ENDM
 

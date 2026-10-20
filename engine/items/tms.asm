@@ -12,19 +12,6 @@ CanLearnTM:
 	ld b, FLAG_TEST
 	predef_jump FlagActionPredef
 
-; converts TM/HM number in wd11e into move number
-; HMs start at 51
-TMToMove:
-	ld a, [wd11e]
-	dec a
-	ld hl, TechnicalMachines
-	ld b, $0
-	ld c, a
-	add hl, bc
-	ld a, [hl]
-	ld [wd11e], a
-	ret
-
 ;takes a machine move in A, finds the corresponding arry bit offset, and puts that into C
 MachineMoveInC:
 	push hl
@@ -41,53 +28,28 @@ MachineMoveInC:
 	pop hl
 	ret
 
-;let pikachu learn surf
+;let pikachu learn surf, and dragonite fly: earned by a Pikachu winning the
+;S.S. Anne tournament and a Dragonite leading against Lance. (Shin marked
+;the mon itself with catch rate 168; that byte is the held item now, so the
+;feat is an event flag and applies to the species.)
 ;HL must equal wMonHLearnset and be called from CanLearnTM
 SpecialMachineMove:
-	call CheckGorgeousBox
-	ret nz
-
-	push hl
 	ld a, [wcf91]
-	ld b, a
-	ld hl, SpecialMachineMoveList - 1
-.loop
-	inc hl
-	ld a, [hli]
-	cp $ff
-	jr z, .ret_ff
-	cp b
-	jr nz, .loop
-.end_loop
-	ld a, [hl]
-	pop hl
-
+	cp PIKACHU
+	jr nz, .dragonite
+	CheckEvent EVENT_SURFING_PIKACHU
+	ret z
+	ld a, SURF
+	jr .teach
+.dragonite
+	cp DRAGONITE
+	ret nz
+	CheckEvent EVENT_FLYING_DRAGONITE
+	ret z
+	ld a, FLY
+.teach
 	call MachineMoveInC
 	ld b, FLAG_SET
 	predef_jump FlagActionPredef
 
-.ret_ff
-	pop hl
-	and a
-	ret
-	
-;ret z if the pokemon is holding a Gen 2 gorgeous box according to its catch rate
-CheckGorgeousBox:
-	push bc
-	push hl
-	ld a, [wWhichPokemon]
-	ld hl, wPartyMon1CatchRate
-	ld bc, wPartyMon2 - wPartyMon1
-	call AddNTimes
-	ld a, [hl]
-	cp 168
-	pop hl
-	pop bc
-	ret
-	
-SpecialMachineMoveList:
-	db PIKACHU, SURF
-	db DRAGONITE, FLY
-	db $ff
-		
 INCLUDE "data/tms.asm"

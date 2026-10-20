@@ -178,10 +178,27 @@ AIMoveChoiceModification1:
 	call ReadMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .checkBadMoves
-;joenote - do not use effects that end battle because this is a trainer battle and they do not work
+;Gen 9: Whirlwind and Roar drag out another of the player's mons, Teleport
+;switches the AI's own out; useless without one that could come in
 	ld a, [wEnemyMoveEffect]	;load the move effect
-	cp SWITCH_AND_TELEPORT_EFFECT	;see if it is a battle-ending effect
-	jp z, .heavydiscourage	;heavily discourage if so
+	cp SWITCH_AND_TELEPORT_EFFECT
+	jr nz, .notSwitchMove
+	push de
+	push hl
+	push bc
+	ld a, [wEnemyMoveNum]
+	cp TELEPORT
+	ld e, 0 ; the player's side
+	jr nz, .gotSwitchSide
+	inc e ; its own
+.gotSwitchSide
+	callab HasSwitchIn
+	pop bc
+	pop hl
+	pop de
+	jp z, .heavydiscourage
+	jr .endBadMoves
+.notSwitchMove
 ;and dont try to use splash either
 	cp SPLASH_EFFECT	
 	jp z, .heavydiscourage
@@ -224,14 +241,11 @@ AIMoveChoiceModification1:
 	ld a, [wPlayerMovePower]
 	and a
 	jp z, .heavydiscourage	;heavily discourage counter if enemy is using zero-power move
-	ld a, [wPlayerMoveType]
-	cp NORMAL
-	jr z, .countercheck_end	; continue on if countering a normal move
-	cp FIGHTING
-	jr z, .countercheck_end	; continue on if countering a fighting move
-	cp BIRD
-	jr z, .countercheck_end	; continue on if countering STRUGGLE or other typeless move
-	jp .heavydiscourage	;else heavily discourage since the player move type is not applicable to counter
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp PHYSICAL
+	jr z, .countercheck_end	; continue on if countering a physical move
+	jp .heavydiscourage	;else heavily discourage since counter only strikes back at physical moves
 .countercheck_end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -402,8 +416,8 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use moves that are blocked by mist
-	ld a, [wPlayerBattleStatus2]
-	bit PROTECTED_BY_MIST, a	;check for mist bit
+	ld a, [wPlayerMistTurns]
+	and a	;check for mist
 	jr z, .noMistImm	;if the mist bit is not set, then skip out of this block
 	ld a, [wEnemyMoveEffect]	;get the move effect into a
 	push hl
@@ -429,6 +443,8 @@ AIMoveChoiceModification1:
 	cp DEFENSE_UP1_EFFECT	
 	jr z, .do_def_check
 	cp DEFENSE_UP2_EFFECT
+	jr z, .do_def_check
+	cp SPECIAL_DEFENSE_UP2_EFFECT
 	jr nz, .nodefupmove
 .do_def_check
 	ld a, [wPlayerMoveEffect]
@@ -442,15 +458,20 @@ AIMoveChoiceModification1:
 .do_def_check_lightscreen
 	ld a, [wEnemyMoveEffect]	;get the move effect
 	cp LIGHT_SCREEN_EFFECT
+	jr z, .do_def_check_special
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; amnesia: special defense, like light screen
 	jr nz, .do_def_check_other
-	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
-	cp $09
-	jp c, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
+.do_def_check_special
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp PHYSICAL
+	jp z, .heavydiscourage	;at this point, heavy discourage light screen because player is using a physical move of 10+ power
 	jr .nodefupmove
 .do_def_check_other
-	ld a, [wPlayerMoveType]	;physical move types are numbers $00 to $08 while special is $14 to $1A
-	cp $14
-	jp nc, .heavydiscourage	;at this point, heavy discourage defense-boosting because player is using a special move of 10+ power
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jp z, .heavydiscourage	;at this point, heavy discourage defense-boosting because player is using a special move of 10+ power
 .nodefupmove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -486,7 +507,23 @@ AIMoveChoiceModification1:
 	;else can't be lowered anymore
 	jp .heavydiscourage
 .nostatdownmod
+	;Growth: useless only with both attack and special attack at +6
+	ld a, [wEnemyMoveEffect]
+	cp GROWTH_EFFECT
+	jr nz, .notGrowth
+	ld a, [wEnemyMonAttackMod]
+	cp $0d
+	jr c, .endstatmod
+	ld a, [wEnemyMonSpecialAttackMod]
+	cp $0d
+	jr c, .endstatmod
+	jp .heavydiscourage
+.notGrowth
 	;check for stat up effects
+	ld a, [wEnemyMoveEffect]	;get the move effect
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; outside the ranges below
+	ld a, MOD_SPECIAL_DEFENSE
+	jr z, .statupcheck
 	ld a, [wEnemyMoveEffect]	;get the move effect
 	cp ATTACK_UP1_EFFECT
 	jr c, .endstatmod	;if value is < the ATTACK_UP1_EFFECT value, jump out
@@ -543,18 +580,18 @@ AIMoveChoiceModification1:
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkscreen ;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_LIGHT_SCREEN_UP, a
+	ld a, [wEnemyLightScreenTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkreflect	;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_REFLECT_UP, a
+	ld a, [wEnemyReflectTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkmist	;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus2]
-	bit PROTECTED_BY_MIST, a
+	ld a, [wEnemyMistTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checksub	;check status, and heavily discourage if bit is set
@@ -607,7 +644,7 @@ AIMoveChoiceModification1:
 	ld b, a
 	ld a, 1	;force the enemy turn
 	ld [H_WHOSETURN], a
-	call HandleSlpFrzClause
+	call AIHandleSlpFrzClause
 	ld a, b
 	ld [H_WHOSETURN], a
 	pop bc
@@ -796,6 +833,8 @@ AIMoveChoiceModification2:
 	jr c, .nextMove
 	cp POISON_EFFECT
 	jr c, .preferMove
+	cp SPECIAL_DEFENSE_UP2_EFFECT ; amnesia, outside the ranges above
+	jr z, .preferMove
 	jr .nextMove
 .preferMove
 	dec [hl] ; slightly encourage this move
@@ -832,6 +871,16 @@ AIMoveChoiceModification3:
 	inc de
 	call ReadMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;the player's mon's ability stops this move: it has no effect, as for typing
+	push hl
+	push de
+	push bc
+	callab AIEnemyMoveBlocked
+	pop bc
+	pop de
+	pop hl
+	jp c, .heavydiscourage2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 ;don't use poison-effect moves on poison-tpe pokemon
 	ld a, [wEnemyMoveEffect]
@@ -843,8 +892,12 @@ AIMoveChoiceModification3:
 	ld a, [wBattleMonType]
 	cp POISON
 	jp z, .heavydiscourage2
+	cp STEEL
+	jp z, .heavydiscourage2
 	ld a, [wBattleMonType + 1]
 	cp POISON
+	jp z, .heavydiscourage2
+	cp STEEL
 	jp z, .heavydiscourage2
 .notpoisoneffect
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1044,9 +1097,10 @@ AIMoveChoiceModification3:
 	call StrCmpAtkSPA
 	jr z, .skipout6	;jump if stats equal
 	push af
-	ld a, [wEnemyMoveType]
-	cp FIRE
-	jr nc, .special_move
+	ld a, [wEnemyMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jr z, .special_move
 .physical_move
 	pop af
 	jp c, .lightlydiscourage	;jump if attack < special
@@ -1203,7 +1257,10 @@ AIMoveChoiceModification4:	;this unused routine now handles intelligent trainer 
 	ld a, [wEnemyMonSpeedMod]
 	cp b
 	call c, CondLDBA	;if a < b, then load a into b
-	ld a, [wEnemyMonSpecialMod]
+	ld a, [wEnemyMonSpecialAttackMod]
+	cp b
+	call c, CondLDBA	;if a < b, then load a into b
+	ld a, [wEnemyMonSpecialDefenseMod]
 	cp b
 	call c, CondLDBA	;if a < b, then load a into b
 	ld a, [wEnemyMonAccuracyMod]
@@ -1233,6 +1290,14 @@ AIMoveChoiceModification4:	;this unused routine now handles intelligent trainer 
 	ld a, [wPlayerMovePower]	;get the power of the player's move
 	cp $2	;regular damaging moves have power > 1
 	jr c, .skipSwitchEffectiveEnd	;skip out if the move is not a normal damaging move
+	push hl
+	push bc
+	push de
+	callab AIPlayerMoveBlocked	;no need to switch if this mon's ability stops the move
+	pop de
+	pop bc
+	pop hl
+	jp c, .skipSwitchEffectiveEnd
 	push hl
 	push bc
 	push de
@@ -1452,13 +1517,6 @@ TrainerAI:
 	cp LINK_STATE_BATTLING
 	ret z
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; caught in player's trapping move (e.g. wrap)
-	jr z, .notbeingtrapped
-	call CheckandResetSwitchBit	
-	jp nz, AISwitchIfEnoughMons	;switch if switch bit is set and stuck in the player's trapping move
-.notbeingtrapped
 ;	...otherwise
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - AI should not use actions if the null move has been selected
@@ -1936,19 +1994,14 @@ AISwitchIfEnoughMons:
 	ret
 
 SwitchEnemyMon:
+	callab EnemyTrapped ; Arena Trap: no switch, so no action
+	ccf
+	ret nc
+; Whirlwind, Roar and Teleport come in here, trapped or not
+WithdrawEnemyMon:
 	callba DoEnemyShinybit ;joenote - reset shiny checker bits
-;joenote - if player using trapping move, then end their move
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jr z, .preparewithdraw
-	ld hl, wPlayerBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] 
-	xor a
-	ld [wPlayerNumAttacksLeft], a
-	ld a, $FF
-	ld [wPlayerSelectedMove], a
-.preparewithdraw
 ; prepare to withdraw the active monster:
+	callab NaturalCureEnemy
 
 	ld a, [wEnemyMonPartyPos]
 	ld hl, wEnemyMon1HP
@@ -1975,10 +2028,24 @@ SwitchEnemyMon:
 	ld hl, wEnemyMonPP
 	ld bc, 4
 	call CopyData
+	ld a, [wEnemyMimicSlot] ; a mimicked move's PP go back to Mimic's
+	and a
+	jr z, .skiptransformed
+	ld hl, -NUM_MOVES - 1
+	add hl, de
+	ld e, a
+	ld d, 0
+	add hl, de
+	ld a, [wEnemyMimicPP]
+	ld [hl], a
 	
 .skiptransformed
+	ld a, [wForcedSwitchSlot]
+	and a
+	jr nz, .dragged ; the trainer didn't withdraw it
 	ld hl, AIBattleWithdrawText
 	call PrintText
+.dragged
 
 	; This wFirstMonsNotOutYet variable is abused to prevent the player from
 	; switching in a new mon in response to this switch.
@@ -2181,8 +2248,8 @@ AIUseXSpeed:
 	ld a, X_SPEED
 	jr AIIncreaseStat
 
-AIUseXSpecial:
-	call AIUseItemStrategyCheck_Special
+AIUseXSpecial: ; special attack only since the special split, so used like X Attack
+	call AIUseItemStrategyCheck_General
 	ret nc
 	ld b, $D
 	ld a, X_SPECIAL
@@ -2257,7 +2324,7 @@ StrCmpAtkSPA:	;joenote - function for AI to its attack and special stats
 	push de
 	push hl
 	ld de, wEnemyMonAttack 
-	ld hl, wEnemyMonSpecial
+	ld hl, wEnemyMonSpecialAttack
 	ld c, $2	;bytes to copy
 .spdcmploop	
 	ld a, [de]	
@@ -2354,9 +2421,10 @@ AIUseItemStrategyCheck_General:
 AIUseItemStrategyCheck_Physical:
 	call AIUseItemStrategyCheck_General
 	ret c
-	ld a, [wPlayerMoveType]
-	cp FIRE
-	jr nc, .fail	;clear carry if damaging move is special
+	ld a, [wPlayerMoveNum]
+	call GetMoveCategory
+	cp SPECIAL
+	jr z, .fail	;clear carry if damaging move is special
 .pass 
 	scf
 	ret
@@ -2364,16 +2432,15 @@ AIUseItemStrategyCheck_Physical:
 	xor a
 	ret
 
-;Sets carry flag if player is using a zero-power move or is using an item or switching or is using a special move
-AIUseItemStrategyCheck_Special:
-	call AIUseItemStrategyCheck_General
-	ret c
-	ld a, [wPlayerMoveType]
-	cp FIRE
-	jr nc, .pass	;set carry if damaging move is special
-.fail
-	xor a
-	ret
-.pass 
-	scf
+
+
+; the clause check, kept in this bank so the home bank needn't hold a wrapper
+AIHandleSlpFrzClause:
+	push bc
+	push hl
+	push de
+	callba _HandleSlpFrzClause
+	pop de
+	pop hl
+	pop bc
 	ret

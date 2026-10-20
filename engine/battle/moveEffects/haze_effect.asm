@@ -1,3 +1,4 @@
+; Gen 9: Haze resets every stat stage on both sides, and nothing else
 HazeEffect_:
 	ld a, $7
 ; store 7 on every stat mod
@@ -12,62 +13,20 @@ HazeEffect_:
 	ld hl, wEnemyMonUnmodifiedAttack
 	ld de, wEnemyMonAttack
 	call ResetStats
-; cure non-volatile status, but only for the target
-; joenote - do the non-volatile statuses even for the user as was originally intended
-	ld hl, wEnemyMonStatus
-	ld de, wEnemySelectedMove
-;	ld a, [H_WHOSETURN]
-;	and a
-;	jr z, .cureStatuses
-	xor a
-	ld [hl], a ; joenote - added
-	ld [wEnemyToxicCounter], a	;joenote - clear toxic counter
-	ld hl, wBattleMonStatus
-	dec de ; de is now wPlayerSelectedMove
-
-;.cureStatuses
-	;joenote - making sure to clear statuses and toxic counter
-	ld [wPlayerToxicCounter], a	;clear toxic counter
-	ld [hl], a ;clear status
-;	ld a, [hl]
-;	ld [hl], $0
-;	and SLP | (1 << FRZ)
-;	jr z, .cureVolatileStatuses
-; prevent the Pokemon from executing a move if it was asleep or frozen
-;joenote - causes a glitch with multi-turn moves like bide and hyper beam. don't do this.
-;	ld a, $ff
-;	ld [de], a
-
-;.cureVolatileStatuses
-	;xor a
-	ld [wPlayerDisabledMove], a
-	ld [wEnemyDisabledMove], a
-	ld hl, wPlayerDisabledMoveNumber
-	ld [hli], a
-	ld [hl], a
-	ld hl, wPlayerBattleStatus1
-	call CureVolatileStatuses
-	ld hl, wEnemyBattleStatus1
-	call CureVolatileStatuses
+; paralysis still halves speed
+	ld a, [H_WHOSETURN]
+	push af
+	callab ApplyBurnAndParalysisPenaltiesToPlayer
+	callab ApplyBurnAndParalysisPenaltiesToEnemy
+	pop af
+	ld [H_WHOSETURN], a
 	ld hl, PlayCurrentMoveAnimation
 	call CallBankF
 	ld hl, StatusChangesEliminatedText
 	jp PrintText
 
-CureVolatileStatuses:
-	res CONFUSED, [hl]
-	inc hl ; BATTSTATUS2
-	ld a, [hl]
-	; clear USING_X_ACCURACY, PROTECTED_BY_MIST, GETTING_PUMPED, and SEEDED statuses
-	and $ff ^((1 << USING_X_ACCURACY) | (1 << PROTECTED_BY_MIST) | (1 << GETTING_PUMPED) | (1 << SEEDED))
-	ld [hli], a ; BATTSTATUS3
-	ld a, [hl]
-	and %11110000 | (1 << TRANSFORMED) ; clear Bad Poison, Reflect and Light Screen statuses
-	ld [hl], a
-	ret
-
 ResetStatMods:
-	ld b, $8
+	ld b, NUM_STAT_MODS
 .loop
 	ld [hli], a
 	dec b
@@ -75,7 +34,7 @@ ResetStatMods:
 	ret
 
 ResetStats:
-	ld b, $8
+	ld b, (NUM_STATS - 1) * 2
 .loop
 	ld a, [hli]
 	ld [de], a

@@ -1,5 +1,5 @@
-;This is a debug feature that will set a pokemon's stat exp all to zero 
-;and set its DVs according to the quantity of the first four items slots in the bag
+;This is a debug feature that will set a pokemon's EVs all to zero
+;and set its IVs according to the quantity of the first six items slots in the bag
 
 DebugStatReset:
 ;make it not work for inside the cable club
@@ -23,37 +23,33 @@ DebugStatReset:
 	ret z
 	
 .init
-	ld hl, wPartyMon1HPExp
+	ld hl, wPartyMon1EVs
 	ld bc, (wPartyMon2 - wPartyMon1)
 	ld a, [wWhichPokemon]
 	call AddNTimes
 	
-	ld b, 5
-	sla b
+	ld b, NUM_STATS
 	xor a
 .loop
-	ld[hli], a
+	ld [hli], a
 	dec b
 	jr nz, .loop
 	
 	push de
-	ld d, 2
-	ld bc, wBagItems+1
-.loop2
-	ld a, [bc]
-	and $0f
-	swap a
-	ld [hl], a
-	inc bc 
-	inc bc
-	ld a, [bc]
-	and $0f
-	or [hl]
-	ld [hli], a
-	inc bc
-	inc bc
-	dec d
+	push hl ; the IVs follow the EVs
+	ld de, wIVScratch
+	ld hl, wBagItems + 1
+	ld b, NUM_STATS
+.loop2 ; each IV is a bag slot's quantity (mod 32)
+	ld a, [hli]
+	inc hl
+	and %11111
+	ld [de], a
+	inc de
+	dec b
 	jr nz, .loop2
+	pop de
+	callab PackIVsKeepFlags
 	pop de
 	
 	call WaitForSoundToFinish
@@ -63,9 +59,9 @@ DebugStatReset:
 	ret
 
 _TXTStatReset:
-	text "Reset STAT EXP to"
-	line "0 and reset DVs"
-	cont "to QTYs of 1st 4"
+	text "Reset EVs to 0"
+	line "and reset IVs"
+	cont "to QTYs of 1st 6"
 	cont "item slots on"
 	cont "this #MON?"
 	done

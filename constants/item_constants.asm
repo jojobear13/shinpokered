@@ -101,6 +101,64 @@ SAFARI_ROCK           EQU $16 ; overload
 	const FLOOR_10F     ; $5F
 	const FLOOR_11F     ; $60
 	const FLOOR_B4F     ; $61
+	const ZINC          ; $62 Gen 2's special defense vitamin
+; held items (Gen 2's, with a few later staples); the catch-rate byte of a
+; mon's data holds one
+FIRST_HELD_ITEM EQU const_value
+	const BLACK_BELT    ; $63
+	const CHARCOAL      ; $64
+	const DRAGON_FANG   ; $65
+	const HARD_STONE    ; $66
+	const MAGNET        ; $67
+	const MIRACLE_SEED  ; $68
+	const MYSTIC_WATER  ; $69
+	const NEVERMELTICE  ; $6A
+	const PINK_BOW      ; $6B
+	const POISON_BARB   ; $6C
+	const SHARP_BEAK    ; $6D
+	const SILVERPOWDER  ; $6E
+	const SOFT_SAND     ; $6F
+	const SPELL_TAG     ; $70
+	const TWISTEDSPOON  ; $71
+	const BERRY         ; $72
+	const GOLD_BERRY    ; $73
+	const SITRUS_BERRY  ; $74
+	const PRZCUREBERRY  ; $75
+	const MINT_BERRY    ; $76
+	const PSNCUREBERRY  ; $77
+	const ICE_BERRY     ; $78
+	const BURNT_BERRY   ; $79
+	const BITTER_BERRY  ; $7A
+	const MIRACLEBERRY  ; $7B
+	const MYSTERYBERRY  ; $7C
+	const LEFTOVERS     ; $7D
+	const QUICK_CLAW    ; $7E
+	const KINGS_ROCK    ; $7F
+	const SCOPE_LENS    ; $80
+	const BRIGHTPOWDER  ; $81
+	const FOCUS_BAND    ; $82
+	const LIGHT_BALL    ; $83
+	const THICK_CLUB    ; $84
+	const METAL_POWDER  ; $85
+	const LUCKY_EGG     ; $86
+	const AMULET_COIN   ; $87
+	const EVERSTONE     ; $88
+	const EXP_SHARE     ; $89
+	const SMOKE_BALL    ; $8A
+	const CLEANSE_TAG   ; $8B
+	const STICK         ; $8C
+	const LUCKY_PUNCH   ; $8D
+	const CHOICE_BAND   ; $8E
+	const CHOICE_SPECS  ; $8F
+	const CHOICE_SCARF  ; $90
+	const LIFE_ORB      ; $91
+	const EVIOLITE      ; $92
+	const FOCUS_SASH    ; $93
+	const METAL_COAT    ; $94 the new types' boosting items
+	const BLACKGLASSES  ; $95
+	const FAIRYFEATHER  ; $96
+	const DEXREPEL      ; $97 a key item: keeps away wild mons already caught
+NUM_ITEMS_AND_FLOORS EQU const_value - 1
 
 const_value = $C4
 
@@ -159,3 +217,13 @@ const_value = $C4
 	const TM_48         ; $F8
 	const TM_49         ; $F9
 	const TM_50         ; $FA
+
+; the bag's pockets (data/item_pockets.asm)
+	const_def
+	const POCKET_ITEMS
+	const POCKET_MEDICINE
+	const POCKET_BALLS
+	const POCKET_BATTLE
+	const POCKET_BERRIES
+	const POCKET_KEY
+NUM_POCKETS EQU const_value

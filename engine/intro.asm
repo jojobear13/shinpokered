@@ -347,18 +347,11 @@ PlayShootingStar:
 	ld c, 180
 	;call DelayFrames
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-;joenote - activate/deactivate gamma shader if select is pressed at copyright screen
-;		- Behavior is determined by the destination code in the rom header
+;joenote - activate the gamma shader if select is pressed at copyright screen
+;		- It starts off (hGBC is 1), as the original game had none
 	ld a, [hGBC]
 	and a
 	jr z, .endgammaloop	;do not bother if not in GBC mode
-	
-	;set the default based on the header destination code
-	ld b, a	;B is now 01
-	ld a, [$014A] ;read destination code from rom header (00 for JP or 01 for !JP)
-	xor $01	;invert the code (01 for JP or 00 for !JP)
-	add b ;(A = 02 for JP or 01 for !JP)
-	ld [hGBC], a	;set default shader state (02 for ON or 01 for OFF)
 	
 ;check if there is a save on file, and instead load the last known gamma setting if a save is found
 	ld a, SRAM_ENABLE
@@ -366,7 +359,7 @@ PlayShootingStar:
 	ld a, $1
 	ld [MBC1SRamBankingMode], a
 	ld [MBC1SRamBank], a
-	ld hl, sMainData + ($D886 - wMainDataStart)
+	ld hl, sMainData + (wEventFlags + EVENT_9FF / 8 - wMainDataStart) ; the gamma shader flags, EVENT_9FE and EVENT_9FF
 	bit 7, [hl]
 	jr z, .sramOff
 	ld a, 2
@@ -390,13 +383,9 @@ PlayShootingStar:
 	and SELECT
 	jr z, .skipgamma
 	
-	;toggle the shader from its default due to pressing SELECT
-	ld a, [$014A] ;read destination code from rom header (00 for JP or 01 for !JP)
-	xor $01	;invert the code (01 for JP or 00 for !JP)
-	ld b, a
+	;turn the shader on due to pressing SELECT
 	ld a, $02
-	sub b 	;A is now 01 for JP or 02 for !JP
-	ld [hGBC], a	;Toggle the shader state from the default
+	ld [hGBC], a
 	
 ;	Play a SFX and print some tiles to confirm that it worked
 	coord hl, $12, $11

@@ -181,10 +181,11 @@ PlaceEnemyHUDTiles:
 	
 	push de
 	push bc
-	;get attack DV
-	ld a, [wEnemyMonDVs]
-	swap a
-	and $0F
+	;get the gender byte: the first and third IV bytes xored
+	ld a, [wEnemyMonIVs]
+	ld e, a
+	ld a, [wEnemyMonIVs + 2]
+	xor e
 	ld e, a
 	;get species
 	ld a, [wEnemyMonSpecies]

@@ -3,9 +3,10 @@ db 25 ; base hp
 db 35 ; base attack
 db 70 ; base defense
 db 45 ; base speed
-db 95 ; base special
+db 95 ; base special attack
+db 55 ; base special defense
 db ELECTRIC ; species type 1
-db ELECTRIC ; species type 2
+db STEEL ; species type 2
 db 190 ; catch rate
 db 89 ; base exp yield
 INCBIN MAGNEMITE_FR,0,1 ; 55, sprite dimensions

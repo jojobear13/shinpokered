@@ -337,14 +337,14 @@ ScoreAIParty:
 .next0	
 	
 	;+2 score if faster than current player mon's speed
-	ld bc, $28	
+	ld bc, wPartyMon1Speed - wPartyMon1	
 	call GetRosterStructData
 	ld b, a	;store hi byte of speed in b
 	ld a, [wBattleMonSpeed]	;store hi byte of player mon speed in a
 	cp b
 	jr nz, .next1	;if bytes are not equal, then rely on carry bit to see which is greater
 	;else check the lo bytes
-	ld bc, $29
+	ld bc, wPartyMon1Speed + 1 - wPartyMon1
 	call GetRosterStructData
 	ld b, a	;store lo byte of speed in b
 	ld a, [wBattleMonSpeed + 1]	;store lo byte of player mon speed in a
@@ -381,7 +381,7 @@ ScoreAIParty:
 
 
 	;-5 for a mon with sleep counter > 1
-	ld bc, $04	;get status byte
+	ld bc, wPartyMon1Status - wPartyMon1	;get status byte
 	call GetRosterStructData
 	ld c, a	;back up the status byte in c
 	and SLP
@@ -501,17 +501,12 @@ ScoreAIParty:
 	call .minus	
 ;-15 to score if:
 ;	-> the 'mon currently being scored is not the active 'mon
-;	-> and the player is not using a trapping move against the AI
 ;this is to discourage switching a 'mon straight into a super-effective attack
-;but its safe to switch out of a trapping move because the player loses a turn
 	ld a, [wWhichPokemon]
 	ld b, a
 	ld a, [wEnemyMonPartyPos]
 	cp b
 	jp z, .playermoveloop
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jp nz, .playermoveloop	
 	ld b, 15
 	call .minus
 	jp .playermoveloop
@@ -693,10 +688,10 @@ ScoreAIParty:
 	ld [wAIPartyMonScores + 7], a
 	;override the current enemy mon typing with that from the roster pointer
 	push bc
-	ld bc, $05
+	ld bc, wPartyMon1Type1 - wPartyMon1
 	call GetRosterStructData
 	ld [wEnemyMonType], a
-	ld bc, $06
+	ld bc, wPartyMon1Type2 - wPartyMon1
 	call GetRosterStructData
 	ld [wEnemyMonType + 1], a
 	pop bc
@@ -775,7 +770,10 @@ AIAbortMonSendOut:
 	ld a, [wEnemyMonSpeedMod]
 	cp b
 	call c, .ldba	;if a < b, then load a into b
-	ld a, [wEnemyMonSpecialMod]
+	ld a, [wEnemyMonSpecialAttackMod]
+	cp b
+	call c, .ldba	;if a < b, then load a into b
+	ld a, [wEnemyMonSpecialDefenseMod]
 	cp b
 	call c, .ldba	;if a < b, then load a into b
 	ld a, [wEnemyMonAccuracyMod]
@@ -830,17 +828,17 @@ AIRosterScoringCheckIfHPBelowFraction:
 ;joenote - handle an 'a' value of 1
 	cp 1
 	jr nz, .not_one
-	ld bc, $22
+	ld bc, wPartyMon1MaxHP - wPartyMon1
 	call GetRosterStructData
 	ld d, a
-	ld bc, $01
+	ld bc, wPartyMon1HP - wPartyMon1
 	call GetRosterStructData
 	cp d	;a = HP MSB an d = MAXHP MSB so do a - d and set carry if negative
 	jr c, .return
-	ld bc, $23
+	ld bc, wPartyMon1MaxHP + 1 - wPartyMon1
 	call GetRosterStructData
 	ld d, a
-	ld bc, $02
+	ld bc, wPartyMon1HP + 1 - wPartyMon1
 	call GetRosterStructData
 	cp d	;a = HP LSB an d = MAXHP LSB so do a - d and set carry if negative
 	jp .return
@@ -848,10 +846,10 @@ AIRosterScoringCheckIfHPBelowFraction:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	cp $34
 	jr nz, .not3fourths
-	ld bc, $22
+	ld bc, wPartyMon1MaxHP - wPartyMon1
 	call GetRosterStructData
 	ld d, a
-	ld bc, $23
+	ld bc, wPartyMon1MaxHP + 1 - wPartyMon1
 	call GetRosterStructData
 	ld e, a
 	;de now holds the max hp value
@@ -879,10 +877,10 @@ AIRosterScoringCheckIfHPBelowFraction:
 	pop hl
 	;de now holds 3/4ths max hp
 	push de
-	ld bc, $01
+	ld bc, wPartyMon1HP - wPartyMon1
 	call GetRosterStructData
 	ld d, a
-	ld bc, $02
+	ld bc, wPartyMon1HP + 1 - wPartyMon1
 	call GetRosterStructData
 	ld c, a
 	ld a, d
@@ -899,7 +897,7 @@ AIRosterScoringCheckIfHPBelowFraction:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	push hl
 	ld [H_DIVISOR], a
-	ld bc, $22
+	ld bc, wPartyMon1MaxHP - wPartyMon1
 	add hl, bc
 	ld a, [hli]
 	ld [H_DIVIDEND], a
@@ -965,6 +963,24 @@ ChooseMovePPTrack:
 	and $f
 	cp b
 	jp z, .flagset
+;a Choice item allows only the move it locked in, while that has PP
+	ld a, [wEnemyChoiceLock]
+	and a
+	jr z, .notChoiceLocked
+	cp b
+	jr z, .notChoiceLocked
+	push hl
+	push bc
+	ld c, a
+	ld b, 0
+	ld hl, wEnemyMonPP - 1
+	add hl, bc
+	ld a, [hl]
+	and $3f
+	pop bc
+	pop hl
+	jp nz, .flagset
+.notChoiceLocked
 ;is the move non-existant?
 	ld a, [hl]
 	and a

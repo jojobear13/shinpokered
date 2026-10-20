@@ -55,6 +55,8 @@ LoadSAV0:
 	jp nz, SAVBadCheckSum
 
 .checkSumsMatched
+	call CheckLiveDataSnapshot ; the box and day care have their own checksum
+	jp nz, SAVBadCheckSum
 	ld hl, sPlayerName
 	ld de, wPlayerName
 	ld bc, NAME_LENGTH
@@ -82,10 +84,7 @@ LoadSAV0:
 	ld bc, wPartyDataEnd - wPartyDataStart
 	call CopyData
 
-	ld hl, sCurBoxData
-	ld de, wBoxDataStart
-	ld bc, wBoxDataEnd - wBoxDataStart
-	call CopyData
+	call LoadLiveDataSnapshot
 
 	and a
 	jp SAVGoodChecksum
@@ -103,10 +102,9 @@ LoadSAV1:
 	ld a, [sMainDataCheckSum] ; SAV's checksum
 	cp c
 	jr nz, SAVBadCheckSum
-	ld hl, sCurBoxData
-	ld de, wBoxDataStart
-	ld bc, wBoxDataEnd - wBoxDataStart
-	call CopyData
+	call CheckLiveDataSnapshot
+	jr nz, SAVBadCheckSum
+	call LoadLiveDataSnapshot
 	and a
 	jp SAVGoodChecksum
 
@@ -258,10 +256,7 @@ SaveSAVtoSRAM0:
 	ld bc, wPartyDataEnd - wPartyDataStart
 	call CopyData
 
-	ld hl, wBoxDataStart
-	ld de, sCurBoxData
-	ld bc, wBoxDataEnd - wBoxDataStart
-	call CopyData
+	call SaveLiveDataSnapshot ; leaves bank 1 selected for the checksum below
 
 	ld a, [hTilesetType]
 	ld [sTilesetType], a
@@ -277,6 +272,8 @@ SaveSAVtoSRAM0:
 
 ;This does not seem to be called by anything other than SaveSAVtoSRAM
 ;It only saves box data, unlike SaveSAVtoSRAM0 which saves many more things
+;The box (and day care) snapshot has its own checksum, so the main checksum
+;is left alone.
 SaveSAVtoSRAM1:
 	ld a, SRAM_ENABLE
 	ld [MBC1SRamEnable], a
@@ -284,15 +281,8 @@ SaveSAVtoSRAM1:
 	ld [MBC1SRamBankingMode], a
 	ld [MBC1SRamBank], a
 
-	ld hl, wBoxDataStart
-	ld de, sCurBoxData
-	ld bc, wBoxDataEnd - wBoxDataStart
-	call CopyData
+	call SaveLiveDataSnapshot
 
-	ld hl, sPlayerName
-	ld bc, sMainDataCheckSum - sPlayerName
-	call SAVCheckSum
-	ld [sMainDataCheckSum], a
 	xor a
 	ld [MBC1SRamBankingMode], a
 	ld [MBC1SRamEnable], a
@@ -332,6 +322,66 @@ SaveSAVtoSRAM:
 	call SaveSAVtoSRAM1	;not needed since SaveSAVtoSRAM0 already saves the box data | left in as a redundancy
 	jp SaveSAVtoSRAM2	;not needed since SaveSAVtoSRAM0 saves full man data and now the party data | left in as a redundancy
 
+; The live day care and current box (sLiveDataStart..sLiveDataEnd, SRAM bank
+; 0) are saved as a snapshot in bank 1 (sLiveDataSnapshot) with their own
+; checksum. These three expect SRAM to be enabled and leave bank 1 selected.
+SaveLiveDataSnapshot:
+	ld hl, sLiveDataStart
+	ld de, sLiveDataSnapshot
+	ld bc, sLiveDataEnd - sLiveDataStart
+	ld a, (1 << 4) | 0 ; bank 0 to bank 1
+	call CopySRAMBanked
+	ld hl, sLiveDataSnapshot
+	ld bc, sLiveDataEnd - sLiveDataStart
+	call SAVCheckSum
+	ld [sLiveDataSnapshotCheckSum], a
+	ret
+
+; returns nz if the snapshot does not match its checksum
+CheckLiveDataSnapshot:
+	ld a, 1
+	ld [MBC1SRamBank], a
+	ld hl, sLiveDataSnapshot
+	ld bc, sLiveDataEnd - sLiveDataStart
+	call SAVCheckSum
+	ld c, a
+	ld a, [sLiveDataSnapshotCheckSum]
+	cp c
+	ret
+
+LoadLiveDataSnapshot:
+	ld hl, sLiveDataSnapshot
+	ld de, sLiveDataStart
+	ld bc, sLiveDataEnd - sLiveDataStart
+	ld a, (0 << 4) | 1 ; bank 1 to bank 0
+	call CopySRAMBanked
+	ld a, 1
+	ld [MBC1SRamBank], a
+	ret
+
+CopySRAMBanked:
+; Copy bc bytes from hl in SRAM bank (a & $f) to de in SRAM bank (a >> 4).
+; SRAM must already be enabled. Leaves the destination bank selected.
+	ld [wSRAMCopyBanks], a
+.loop
+	ld a, [wSRAMCopyBanks]
+	and $f
+	ld [MBC1SRamBank], a
+	ld a, [hli]
+	push af
+	ld a, [wSRAMCopyBanks]
+	swap a
+	and $f
+	ld [MBC1SRamBank], a
+	pop af
+	ld [de], a
+	inc de
+	dec bc
+	ld a, b
+	or c
+	jr nz, .loop
+	ret
+
 SAVCheckSum:
 ;Check Sum (result[1 byte] is complemented)
 	ld d, 0
@@ -354,7 +404,7 @@ CalcIndividualBoxCheckSums:
 .loop
 	push bc
 	push de
-	ld bc, wBoxDataEnd - wBoxDataStart
+	ld bc, sBoxDataEnd - sBoxDataStart
 	call SAVCheckSum
 	pop de
 	ld [de], a
@@ -415,14 +465,16 @@ ChangeBox::
 	call GetBoxSRAMLocation
 	ld e, l
 	ld d, h
-	ld hl, wBoxDataStart
-	call CopyBoxToOrFromSRAM ; copy old box from WRAM to SRAM
+	ld hl, sBoxDataStart
+	ld c, 0 ; from the current box to the stored one
+	call CopyBoxToOrFromSRAM ; store the old box
 	ld a, [wCurrentMenuItem]
 	set 7, a
 	ld [wCurrentBoxNum], a
 	call GetBoxSRAMLocation
-	ld de, wBoxDataStart
-	call CopyBoxToOrFromSRAM ; copy new box from SRAM to WRAM
+	ld de, sBoxDataStart
+	ld c, 1 ; from the stored box to the current one
+	call CopyBoxToOrFromSRAM ; fetch the new box
 	ld hl, wMapTextPtr
 	ld de, wChangeBoxSavedMapTextPointer
 	ld a, [hli]
@@ -444,24 +496,38 @@ WhenYouChangeBoxText:
 	db "@"
 
 CopyBoxToOrFromSRAM:
-; copy an entire box from hl to de with b as the SRAM bank
+; Copy an entire box from hl to de, then mark the box it came from as empty.
+; b = SRAM bank of the stored box (2 or 3, from GetBoxSRAMLocation)
+; c = 0: from the current box (SRAM bank 0) to the stored box
+;     1: from the stored box to the current box
 	push hl
+	push bc
 	ld a, SRAM_ENABLE
 	ld [MBC1SRamEnable], a
 	ld a, $1
 	ld [MBC1SRamBankingMode], a
 	ld a, b
-	ld [MBC1SRamBank], a
-	ld bc, wBoxDataEnd - wBoxDataStart
-	call CopyData
+	swap a ; destination = the stored box's bank, source = bank 0
+	dec c
+	jr nz, .copy
+	ld a, b ; destination = bank 0, source = the stored box's bank
+.copy
+	ld bc, sBoxDataEnd - sBoxDataStart
+	call CopySRAMBanked
+	pop bc
 	pop hl
 
 ; mark the memory that the box was copied from as am empty box
+	ld a, [wSRAMCopyBanks]
+	and $f ; source bank
+	ld [MBC1SRamBank], a
 	xor a
 	ld [hli], a
 	dec a
 	ld [hl], a
 
+	ld a, b
+	ld [MBC1SRamBank], a
 	ld hl, sBox1 ; sBox7
 	ld bc, sBank2AllBoxesChecksum - sBox1
 	call SAVCheckSum
@@ -628,13 +694,13 @@ GetMonCountsForAllBoxes:
 	ld [MBC1SRamEnable], a
 	pop hl
 
-; copy the count for the current box from WRAM
+; copy the count for the current box
 	ld a, [wCurrentBoxNum]
 	and $7f
 	ld c, a
 	ld b, 0
 	add hl, bc
-	ld a, [wNumInBox]
+	call GetNumInBox ; the box is in save RAM
 	ld [hl], a
 
 	ret
