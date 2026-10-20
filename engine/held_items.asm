@@ -896,3 +896,72 @@ LoadMartInventory:
 	jp LoadItemList
 
 INCLUDE "data/mart_lists.asm"
+
+; Pickup: after a battle (not a link battle), each party mon with it that
+; holds nothing picks up an item 10% of the time, without a message. Gen 3's
+; items and odds.
+PartyPickup:
+	ld hl, wPartyMon1
+	ld a, [wPartyCount]
+	ld b, a
+	inc b
+.loop
+	dec b
+	ret z
+	push bc
+	push hl
+	ld de, wPartyMon1CatchRate - wPartyMon1
+	add hl, de
+	ld a, [hl]
+	and a
+	jr nz, .next
+	ld d, h
+	ld e, l ; de = the held item
+	pop hl
+	push hl
+	ld bc, wPartyMon1DVs + 2 - wPartyMon1
+	add hl, bc
+	ld c, [hl]
+	pop hl
+	push hl
+	ld a, [hl] ; species
+	call GetMonAbility
+	cp PICKUP
+	jr nz, .next
+	call Random
+	cp 26 ; 10%
+	jr nc, .next
+	call Random
+	ld c, a
+	ld hl, PickupItems
+.find
+	ld a, [hli]
+	and a
+	jr z, .found ; the last one
+	ld b, a
+	ld a, c
+	cp b
+	jr c, .found
+	inc hl
+	jr .find
+.found
+	ld a, [hl]
+	ld [de], a
+.next
+	pop hl
+	ld bc, wPartyMon2 - wPartyMon1
+	add hl, bc
+	pop bc
+	jr .loop
+
+PickupItems: ; below this random number (of 256), this item; 0 for the rest
+	db 77, SUPER_POTION  ; 30%
+	db 103, FULL_HEAL    ; 10%
+	db 129, ULTRA_BALL   ; 10%
+	db 155, RARE_CANDY   ; 10%
+	db 181, FULL_RESTORE ; 10%
+	db 207, REVIVE       ; 10%
+	db 233, NUGGET       ; 10%
+	db 246, PROTEIN      ; 5%
+	db 253, PP_UP        ; 3%
+	db 0, KINGS_ROCK     ; 1%

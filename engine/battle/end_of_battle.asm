@@ -25,6 +25,7 @@ EndOfBattle:
 	call DelayFrames
 	jr .evolution
 .notLinkBattle
+	callab PartyPickup
 	ld a, [wBattleResult]
 	and a
 	jr nz, .resetVariables

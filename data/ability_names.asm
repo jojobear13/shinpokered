@@ -36,6 +36,8 @@ AbilityNames: ; in the order of the ability constants
 	db "RUN AWAY@"
 	db "KEEN EYE@"
 	db "HYPER CUTTER@"
+	db "PICKUP@"
+	db "STICKY HOLD@"
 	db "SHED SKIN@"
 	db "GUTS@"
 	db "LIQUID OOZE@"

@@ -617,7 +617,7 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   in all. The ten that need something the game doesn't have yet are left
   empty (NO_ABILITY) in the species table, not cut from it, so they slot in
   later: Chlorophyll, Swift Swim, Sand Veil, Cloud Nine, Leaf Guard and
-  Hydration (weather), Sticky Hold and Pickup (held items), Cute Charm
+  Hydration (weather), Sticky Hold and Pickup (held items; both added since), Cute Charm
   (infatuation) and Magnet Pull (the Steel type). Oddish's, Bellsprout's,
   Exeggcute's, Tangela's, Sandshrew's and Magikarp's lines have no ability
   for now; Clefairy, Grimer and a dozen others have one of their two.
@@ -1015,9 +1015,20 @@ Held items (step E, part 5) are done.
   through. Layer 4's use is covered by the agreement test only (its switch
   rolls need a whole party).
 
-Every ability the 151 species have that works without weather, held items,
+**Two more abilities, now that held items exist.** **Pickup** (Meowth):
+after a battle other than a link battle, each party mon with it that holds
+nothing picks up an item 10% of the time, without a message, from Gen 3's
+list and odds (Super Potion 30%; Full Heal, Ultra Ball, Rare Candy, Full
+Restore, Revive and Nugget 10% each; Protein 5%, PP Up 3%, King's Rock 1%).
+**Sticky Hold** (Grimer, Muk) is in their slot and does nothing: no move
+here takes or swaps items. `tools/gen_abilities.py` no longer leaves them
+out; the ability ids after them moved up. Verified in
+`tests/test_held_item_field.py` (the 10% roll, each item's threshold, who
+picks up) and `tests/test_abilities.py` (the species' slots).
+
+Every ability the 151 species have that works without weather,
 infatuation or the Steel type now does what it does in Gen 9 (with the
-differences noted above); the ten that need those are empty slots in
+differences noted above); the eight that need those are empty slots in
 `data/mon_abilities.asm` until they exist.
 
 Steps A to D, the refactors, are done, and each compared identical apart

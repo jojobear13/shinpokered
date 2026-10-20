@@ -3,7 +3,8 @@ step E, part 5).
 
 Lucky Egg: x1.5 experience. Exp. Share: its holder counts as having fought.
 Amulet Coin: a trainer's prize money doubles. Everstone: no level-up
-evolution. (Cleanse Tag, in the wild encounter roll, has no test of its own:
+evolution. Pickup: after a battle, a mon with it that holds nothing picks
+up an item 10% of the time. (Cleanse Tag, in the wild encounter roll, has no test of its own:
 the roll needs a whole map.)
 """
 
@@ -11,6 +12,7 @@ import unittest
 
 from harness import shared_game
 from test_held_items import ITEMS
+from test_abilities import ABILITIES, TABLE
 from test_special_split import SPECIES
 
 
@@ -105,6 +107,49 @@ class EverstoneTest(unittest.TestCase):
         self.assertEqual(self.evolve("EVERSTONE"), (False, SPECIES["CHARMANDER"]))
         started, _ = self.evolve(None)
         self.assertTrue(started)
+
+
+class PickupTest(unittest.TestCase):
+    """PartyPickup, which EndOfBattle calls outside link battles."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.game = shared_game()
+
+    def pickup(self, mons, *rolls):
+        """mons: (species, ability slot, held item) per party mon."""
+        g = self.game
+        g.reset()
+        g.clear_random()
+        if rolls:
+            g.queue_random(*rolls)
+        g.poke("wPartyCount", len(mons))
+        for i, (species, slot, item) in enumerate(mons):
+            g.poke(f"wPartyMon{i + 1}Species", SPECIES[species])
+            g.poke(f"wPartyMon{i + 1}DVs", 0xFF, 0xFF, 0xF0 | slot)
+            g.poke(f"wPartyMon{i + 1}CatchRate", ITEMS[item] if item else 0)
+        g.call("PartyPickup")
+        self.assertEqual(g.random_used(), len(rolls))
+        return [g.peek(f"wPartyMon{i + 1}CatchRate") for i in range(len(mons))]
+
+    def test_odds_and_items(self):
+        self.assertEqual(dict(TABLE)["MEOWTH"][0], ABILITIES["PICKUP"])
+        meowth = ("MEOWTH", 0, None)
+        self.assertEqual(self.pickup([meowth], 26), [0])  # the 10% roll fails
+        cases = [(0, "SUPER_POTION"), (76, "SUPER_POTION"), (77, "FULL_HEAL"), (154, "RARE_CANDY"),
+                 (232, "NUGGET"), (233, "PROTEIN"), (246, "PP_UP"), (252, "PP_UP"),
+                 (253, "KINGS_ROCK"), (255, "KINGS_ROCK")]
+        for roll, item in cases:
+            with self.subTest(roll=roll):
+                self.assertEqual(self.pickup([meowth], 25, roll), [ITEMS[item]])
+
+    def test_who_picks_up(self):
+        mons = [("MEOWTH", 1, None),  # Technician
+                ("PIKACHU", 0, None),
+                ("MEOWTH", 0, "LEFTOVERS"),  # already holding something
+                ("MEOWTH", 0, None)]
+        self.assertEqual(self.pickup(mons, 0, 0), [0, 0, ITEMS["LEFTOVERS"], ITEMS["SUPER_POTION"]])
+        self.assertEqual(self.pickup([]), [])
 
 
 if __name__ == "__main__":
