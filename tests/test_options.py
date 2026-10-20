@@ -15,7 +15,7 @@ DEFAULTS = [
     ["30", "GEN 1", "OFF", "OFF", "OFF"],  # DISPLAY
     ["OFF"] * 6,  # CHALLENGE
     ["OFF"] * 4,  # CLAUSES
-    ["OFF"] * 6,  # EXTRAS
+    ["OFF"] * 7,  # EXTRAS
 ]
 
 

@@ -2252,7 +2252,7 @@ const_value = 0
 	const EVENT_8C9   ;alt enemy trainer moves       ; 8C9, (D860, bit 1)
 	const EVENT_WIN_HEAL      ;option: heal after trainer wins ; 8CA, (D860, bit 2)
 	const EVENT_BLACKOUT_RETURN ;option: offer a return after blacking out ; 8CB, (D860, bit 3)
-	const EVENT_8CC                                  ; 8CC, (D860, bit 4)
+	const EVENT_PC_IN_MENU    ;option: the PC in the start menu ; 8CC, (D860, bit 4)
 	const EVENT_8CD                                  ; 8CD, (D860, bit 5)
 	const EVENT_8CE                                  ; 8CE, (D860, bit 6)
 	const EVENT_8CF                                  ; 8CF, (D860, bit 7)

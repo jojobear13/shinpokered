@@ -15,17 +15,18 @@ SoftlockTeleport:
 	jp z, ShowDamageValues
 	cp D_DOWN + B_BUTTON + SELECT
 	ret nz
-	CheckEvent EVENT_GOT_POKEDEX
+	ld a, [wMaxMenuItem] ; only on EXIT, the last item
+	dec a
+	ld b, a
 	ld a, [wCurrentMenuItem]
+	cp b
+	ret nz
+	CheckEvent EVENT_GOT_POKEDEX
 	jr nz, .next
 	;do this stuff if pokedex has not been obtained
-	cp 5
-	ret nz
 	callba ItemUseNotTime
 	ret
 .next
-	cp 6 
-	ret nz
 	ld a, PALLET_TOWN
 	ld [wLastBlackoutMap], a
 	ld a, [wd732]
@@ -97,6 +98,7 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ResetEvent EVENT_8C9
 	ResetEvent EVENT_WIN_HEAL
 	ResetEvent EVENT_BLACKOUT_RETURN
+	ResetEvent EVENT_PC_IN_MENU
 
 	ResetEvent EVENT_9FE
 	ResetEvent EVENT_9FF

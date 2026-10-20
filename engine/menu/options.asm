@@ -88,13 +88,14 @@ OptionsPageClauses:
 	opt_event  OptTextBeamClause, OptHelpBeamClause, EVENT_8C8, OptValuesOffOn
 
 OptionsPageExtras:
-	db "EXTRAS@", 6
+	db "EXTRAS@", 7
 	opt_event  OptTextWinHeal, OptHelpWinHeal, EVENT_WIN_HEAL, OptValuesOffOn
 	opt_event  OptTextWarpBack, OptHelpWarpBack, EVENT_BLACKOUT_RETURN, OptValuesOffOn
 	opt_event  OptTextCatchUpExp, OptHelpCatchUpExp, EVENT_8D9, OptValuesOffOn
 	opt_custom OptTextRandomWild, OptHelpRandomWild, 3, GetRandomWildOption, SetRandomWildOption, OptValuesRandomWild
 	opt_event  OptTextRandomTrainers, OptHelpRandomTrainers, EVENT_8D8, OptValuesOffOn
 	opt_event  OptTextSafari, OptHelpSafari, EVENT_90F, OptValuesOffOn
+	opt_event  OptTextMenuPC, OptHelpMenuPC, EVENT_PC_IN_MENU, OptValuesOffOn
 
 DisplayOptionMenu:
 	call GBPalNormal ; ROCK TUNNEL's darkness doesn't reach the menu
@@ -667,6 +668,7 @@ RuleFlags:
 	rule_flag EVENT_90F ; the SAFARI ZONE event
 	rule_flag EVENT_WIN_HEAL
 	rule_flag EVENT_BLACKOUT_RETURN
+	rule_flag EVENT_PC_IN_MENU
 RuleFlagsEnd:
 
 NUM_RULE_FLAGS EQU (RuleFlagsEnd - RuleFlags) / 3
@@ -775,6 +777,7 @@ OptTextCatchUpExp:     db "CATCH-UP EXP@"
 OptTextRandomWild:     db "RANDOM WILD@"
 OptTextRandomTrainers: db "RANDOM TRNR@"
 OptTextSafari:         db "SAFARI EVENT@"
+OptTextMenuPC:         db "PC IN MENU@"
 
 ; the explanations: two lines of at most 18 letters
 OptHelpPage:
@@ -858,3 +861,6 @@ OptHelpRandomTrainers:
 OptHelpSafari:
 	db   "SAFARI ZONE: more"
 	next "kinds, better IVs.@"
+OptHelpMenuPC:
+	db   "Use the PC from"
+	next "the START menu.@"

@@ -31,11 +31,8 @@ RedisplayStartMenu::
 	and a
 	jr nz, .loop
 ; if the player pressed tried to go past the top item, wrap around to the bottom
-	CheckEvent EVENT_GOT_POKEDEX
-	ld a, 6 ; there are 7 menu items with the pokedex, so the max index is 6
-	jr nz, .wrapMenuItemId
-	dec a ; there are only 6 menu items without the pokedex
-.wrapMenuItemId
+	ld a, [wMaxMenuItem] ; the number of items (DrawStartMenu)
+	dec a
 	ld [wCurrentMenuItem], a
 	call EraseMenuCursor
 	jr .loop
@@ -43,12 +40,9 @@ RedisplayStartMenu::
 	bit 7, a
 	jr z, .buttonPressed
 ; if the player pressed tried to go past the bottom item, wrap around to the top
-	CheckEvent EVENT_GOT_POKEDEX
+	ld a, [wMaxMenuItem]
+	ld c, a
 	ld a, [wCurrentMenuItem]
-	ld c, 7 ; there are 7 menu items with the pokedex
-	jr nz, .checkIfPastBottom
-	dec c ; there are only 6 menu items without the pokedex
-.checkIfPastBottom
 	cp c
 	jr nz, .loop
 ; the player went past the bottom, so wrap to the top
@@ -64,23 +58,22 @@ RedisplayStartMenu::
 	and %00001010 ; was the Start button or B button pressed?
 	jp nz, CloseStartMenu
 	call SaveScreenTilesToBuffer2 ; copy background from wTileMap to wTileMapBackup2
-	CheckEvent EVENT_GOT_POKEDEX
-	ld a, [wCurrentMenuItem]
-	jr nz, .displayMenuItem
-	inc a ; adjust position to account for missing pokedex menu item
-.displayMenuItem
-	cp 0
+	callba StartMenuChoice ; which item it is, in e (the PC runs there)
+	ld a, e
+	and a
 	jp z, StartMenu_Pokedex
-	cp 1
+	dec a
 	jp z, StartMenu_Pokemon
-	cp 2
+	dec a
 	jp z, StartMenu_Item
-	cp 3
+	dec a
 	jp z, StartMenu_TrainerInfo
-	cp 4
+	dec a
 	jp z, StartMenu_SaveReset
-	cp 5
+	dec a
 	jp z, StartMenu_Option
+	dec a
+	jp nz, RedisplayStartMenu ; after the PC
 
 ; EXIT falls through to here
 CloseStartMenu::

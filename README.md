@@ -258,6 +258,8 @@ EXTRAS > RANDOM TRNR toggles randomization of non-special trainers.
 
 EXTRAS > CATCH-UP EXP toggles a catch-up EXP boost function for under-leveled pokemon.
 
+EXTRAS > PC IN MENU adds a PC to the start menu with full access to the PC (boxes, items, Oak's PC and more).
+
 Item, Sleep, Freeze, and Hyper Beam clauses can each be toggled on the CLAUSES page.
  
 The bag now supports an additional item list for an extra 20 slots of space!

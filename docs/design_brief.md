@@ -1791,7 +1791,7 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     CAP showing the current cap, SCALING, ALT. MOVES, NUZLOCKE), CLAUSES
     (ITEM, SLEEP, FREEZE, HYPER BEAM), EXTRAS (HEAL ON WIN, WARP BACK,
     CATCH-UP EXP, RANDOM WILD with OFF/TIER/FULL, RANDOM TRNR, SAFARI
-    EVENT).
+    EVENT, PC IN MENU).
   - **Data-driven**: each option is a 12-byte row (label, explanation,
     kind, mask or value count, address or getter, setter, value names). A
     bit option (`opt_bit`, `opt_event` for event flags) toggles a mask;
@@ -1813,3 +1813,18 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     every page, every explanation fits its box, text speed and RANDOM
     WILD's values, bit options, the level cap's value, and the rule flags
     surviving NEW GAME.
+- **PC IN MENU** (EXTRAS, off by default; `EVENT_PC_IN_MENU`, the unused
+  $8CC): the start menu gets a PC item after ITEM that opens the whole PC
+  (Bill's or someone's, the player's, Oak's, the League's and the printer)
+  as a Pokémon Center's does, and returns to the start menu after LOG OFF.
+  It is hidden in the link rooms.
+  - The start menu's items are no longer fixed: `DrawStartMenu` counts them
+    (`StartMenuItemCount`: six, the Pokédex, the PC) into `wMaxMenuItem`
+    and sizes the box to fit (eight items fill the screen's height). The
+    home bank's wrap-around reads `wMaxMenuItem` instead of checking the
+    Pokédex, and it asks the far routine `StartMenuChoice` which item was
+    chosen; the PC runs inside it. The home bank came out smaller.
+    `SoftlockTeleport`'s check for EXIT reads `wMaxMenuItem` too.
+  - `draw_start_menu.asm` moved out of bank 1 to a floating section.
+  - `tests/test_start_menu_pc.py`: what each item does with and without
+    the Pokédex and the option, and no PC in the link rooms.

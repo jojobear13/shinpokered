@@ -92,7 +92,6 @@ INCLUDE "engine/overworld/pokecenter.asm"
 INCLUDE "engine/overworld/set_blackout_map.asm"
 
 INCLUDE "engine/display_text_id_init.asm"
-INCLUDE "engine/menu/draw_start_menu.asm"
 
 INCLUDE "engine/overworld/cable_club_npc.asm"
 
@@ -1949,6 +1948,9 @@ INCLUDE "data/base_exp.asm"
 
 SECTION "Options Menu", ROMX
 INCLUDE "engine/menu/options.asm"
+
+SECTION "Draw Start Menu", ROMX
+INCLUDE "engine/menu/draw_start_menu.asm"
 
 ; out of bank 3, which is nearly full
 SECTION "Draw Badges", ROMX
