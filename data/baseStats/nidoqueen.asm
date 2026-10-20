@@ -1,6 +1,6 @@
 db DEX_NIDOQUEEN ; pokedex id
 db 90 ; base hp
-db 82 ; base attack
+db 92 ; base attack
 db 87 ; base defense
 db 76 ; base speed
 db 75 ; base special attack

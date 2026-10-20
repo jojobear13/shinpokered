@@ -1,6 +1,6 @@
 db DEX_DUGTRIO ; pokedex id
 db 35 ; base hp
-db 80 ; base attack
+db 100 ; base attack
 db 50 ; base defense
 db 120 ; base speed
 db 50 ; base special attack

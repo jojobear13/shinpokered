@@ -2,7 +2,7 @@ db DEX_PIDGEOT ; pokedex id
 db 83 ; base hp
 db 80 ; base attack
 db 75 ; base defense
-db 91 ; base speed
+db 101 ; base speed
 db 70 ; base special attack
 db 70 ; base special defense
 db NORMAL ; species type 1

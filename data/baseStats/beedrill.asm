@@ -1,6 +1,6 @@
 db DEX_BEEDRILL ; pokedex id
 db 65 ; base hp
-db 80 ; base attack
+db 90 ; base attack
 db 40 ; base defense
 db 75 ; base speed
 db 45 ; base special attack

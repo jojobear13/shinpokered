@@ -1,6 +1,6 @@
 db DEX_NIDOKING ; pokedex id
 db 81 ; base hp
-db 92 ; base attack
+db 102 ; base attack
 db 77 ; base defense
 db 85 ; base speed
 db 85 ; base special attack

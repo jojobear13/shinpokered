@@ -1,6 +1,6 @@
 db DEX_GOLEM ; pokedex id
 db 80 ; base hp
-db 110 ; base attack
+db 120 ; base attack
 db 130 ; base defense
 db 45 ; base speed
 db 55 ; base special attack

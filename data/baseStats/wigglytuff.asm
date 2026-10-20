@@ -3,7 +3,7 @@ db 140 ; base hp
 db 70 ; base attack
 db 45 ; base defense
 db 45 ; base speed
-db 75 ; base special attack
+db 85 ; base special attack
 db 50 ; base special defense
 db NORMAL ; species type 1
 db FAIRY ; species type 2

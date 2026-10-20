@@ -3,7 +3,7 @@ db 75 ; base hp
 db 80 ; base attack
 db 85 ; base defense
 db 50 ; base speed
-db 100 ; base special attack
+db 110 ; base special attack
 db 90 ; base special defense
 db GRASS ; species type 1
 db POISON ; species type 2

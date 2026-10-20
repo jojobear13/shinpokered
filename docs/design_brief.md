@@ -1106,6 +1106,24 @@ a new bank, `$35` ("Battle 2"), replacing the old code as it goes.
   test, dual types (Magneton's 4x Ground weakness), Typeless, the species'
   and moves' types, the names, poison against Steel types and Magnet Pull.
 
+### Part 2: species data
+
+- **Base stats** are Gen 9's, written by `tools/gen_species.py`. Gen 9
+  kept Gen 2's Special Attack and Special Defense for most species, so 20
+  changed: the Gen 6 and 7 buffs (Pidgeot's Speed 101, Alakazam's Special
+  Defense 95, Golem's Attack 120, Arbok, Dugtrio, Pikachu, Clefable and the
+  rest).
+- **Catch rates** are Gen 9's: Raticate 127, and Kadabra 100 and Pikachu
+  190 (the fork had lowered both to Yellow's).
+- **EV yields** (`data/ev_yields.asm`, two bits per stat) and **base
+  experience** (`data/base_exp.asm`, two bytes, since Chansey's 395 and
+  Mewtwo's 306 don't fit in one) are new tables by Pokédex number in bank
+  `$35`, for part 3. The base stats' own one-byte experience field is still
+  the one the game reads until then.
+- **Verified:** `tests/test_species_data.py` checks Gen 9 values for the
+  buffed species and a few others, the catch rates, and both tables as the
+  ROM holds them.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

@@ -1943,6 +1943,8 @@ INCLUDE "text/item_names.asm"
 SECTION "Battle 2", ROMX, BANK[$35]
 
 INCLUDE "engine/battle/type_effectiveness.asm"
+INCLUDE "data/ev_yields.asm"
+INCLUDE "data/base_exp.asm"
 
 
 SECTION "Rules Menu", ROMX

@@ -2,7 +2,7 @@ db DEX_ELECTRODE ; pokedex id
 db 60 ; base hp
 db 50 ; base attack
 db 70 ; base defense
-db 140 ; base speed
+db 150 ; base speed
 db 80 ; base special attack
 db 80 ; base special defense
 db ELECTRIC ; species type 1

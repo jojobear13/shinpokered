@@ -3,7 +3,7 @@ db 60 ; base hp
 db 45 ; base attack
 db 50 ; base defense
 db 70 ; base speed
-db 80 ; base special attack
+db 90 ; base special attack
 db 80 ; base special defense
 db BUG ; species type 1
 db FLYING ; species type 2
