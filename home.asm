@@ -4518,6 +4518,50 @@ GivePokemon::
 	jpba _GivePokemon
 
 
+; a = a status bit mask (1 << BRN, FRZ, PAR or PSN), hl = a mon's two types
+; -> carry if its types keep the status off (Gen 9: Fire can't be burned, Ice
+; frozen, Electric paralyzed, Poison or Steel poisoned). Keeps bc, de and hl
+StatusTypeImmune::
+	push bc
+	ld b, FIRE
+	cp 1 << BRN
+	jr z, .check
+	ld b, ICE
+	cp 1 << FRZ
+	jr z, .check
+	ld b, ELECTRIC
+	cp 1 << PAR
+	jr z, .check
+	cp 1 << PSN
+	jr nz, .no
+	ld b, POISON
+	call .match
+	jr c, .done
+	ld b, STEEL
+.check
+	call .match
+.done
+	pop bc
+	ret
+.no
+	pop bc
+	and a
+	ret
+.match
+	ld a, [hl]
+	cp b
+	jr z, .found
+	inc hl
+	ld a, [hl]
+	dec hl
+	cp b
+	jr z, .found
+	and a
+	ret
+.found
+	scf
+	ret
+
 BattleRandom::
 ; Link battles use a shared PRNG.
 

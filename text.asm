@@ -1252,6 +1252,11 @@ _IsFrozenText::
 	line "is frozen solid!"
 	prompt
 
+_ThawedOutText::
+	text "<USER>"
+	line "thawed out!"
+	prompt
+
 _FullyParalyzedText::
 	text "<USER>'s"
 	line "fully paralyzed!"

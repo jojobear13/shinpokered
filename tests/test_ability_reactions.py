@@ -135,12 +135,12 @@ class ReactionTest(unittest.TestCase):
             with self.subTest(turn=turn):
                 self.assertEqual(self.synchronize(turn, PSN), PSN)
                 self.assertEqual(g.peek(user_prefix + "BattleStatus3") & BADLY_POISONED, 0)
-                self.assertEqual(self.synchronize(turn, PSN, toxic=True), PSN)
+                self.assertEqual(self.synchronize(turn, PSN, toxic=True), PSN | 1 << 7)  # TOX: bad poison stays
                 self.assertEqual(g.peek(user_prefix + "BattleStatus3") & BADLY_POISONED, BADLY_POISONED)
                 self.assertEqual(self.synchronize(turn, BRN), BRN)
                 self.assertEqual(g.peek16(user_mon + "Attack"), 100)  # burn halves damage, not the stat
                 self.assertEqual(self.synchronize(turn, PAR), PAR)
-                self.assertEqual(g.peek16(user_mon + "Speed"), 25)
+                self.assertEqual(g.peek16(user_mon + "Speed"), 50)  # paralysis halves it
                 # types and abilities that can't have it
                 self.assertEqual(self.synchronize(turn, PSN, user_types=(POISON_TYPE, NORMAL)), 0)
                 self.assertEqual(self.synchronize(turn, BRN, user_types=(WATER, FIRE)), 0)
@@ -222,7 +222,7 @@ class TurnAbilityTest(unittest.TestCase):
         for turn in (0, 1):
             with self.subTest(turn=turn):
                 self.assertEqual(self.residual(turn, "SHED_SKIN", PSN, (85,)), (0, 160))  # cured before the damage
-                self.assertEqual(self.residual(turn, "SHED_SKIN", PSN, (86,)), (PSN, 150))
+                self.assertEqual(self.residual(turn, "SHED_SKIN", PSN, (86,)), (PSN, 140))  # poison: 1/8
                 self.assertEqual(self.residual(turn, "SHED_SKIN", 3, (0,)), (0, 160))
                 self.assertEqual(self.residual(turn, "SHED_SKIN", 0), (0, 160))  # no roll without a status
 

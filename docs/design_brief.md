@@ -1224,6 +1224,43 @@ a new bank, `$35` ("Battle 2"), replacing the old code as it goes.
   minimum of 1) and every critical hit stage's threshold. The accuracy test
   models the net stage; the badge test checks there are none.
 
+### Part 5: status conditions
+
+As in Gen 9 (Showdown's implementation, where Bulbapedia is vague):
+
+- **Sleep** lasts 1-3 turns: the counter is 2-4 (one random number, a 3
+  rerolled), the mon wakes when it reaches 0 and moves that turn, as the fork
+  already did. Rest's 3 is Gen 9's two turns asleep.
+- **Freeze**: a 20% chance (51 in 256) to thaw at the start of the frozen
+  mon's turn, and move; Fire moves still thaw a frozen target.
+- **Paralysis** halves speed (`HalveSpeedDueToParalysis`, Gen 1 quartered
+  it; curing it doubles it back) and fully paralyzes 25% of the time (64 in
+  256, was 63).
+- **Confusion** makes a mon hurt itself 1/3 of the time (85 in 256), for the
+  same 1-4 turns (Gen 9's counter of 2-5, decreased before the check).
+- **Residual damage**: poison and Leech Seed 1/8 of max HP (Liquid Ooze's
+  Leech Seed too), burn 1/16, bad poison 1/16 times its counter; each at
+  least 1.
+- **Bad poison stays bad poison** through a switch: the status byte's spare
+  bit 7 (`TOX`, always with `PSN`) marks it, Toxic and Synchronize set it,
+  and a mon sent out with it gets its toxic flag back with the counter from
+  1. Every cure clears the whole status byte, so the bit never outlives the
+  poison.
+- **Type immunities** (`StatusTypeImmune`, bank 0): Fire types can't be
+  burned, Ice types frozen, Electric types paralyzed, Poison and Steel types
+  poisoned, from any move or ability. Gen 1's rule that a move's side effect
+  can't hit its own type (Body Slam couldn't paralyze a Normal type) is gone.
+  Thunder Wave still can't hit Ground types. (Powder moves against Grass
+  types come with part 6's move flags.)
+- **Not changed**: poison still hurts outside battle, a field mechanic Gen
+  5 dropped.
+- **Verified:** `tests/test_status.py` checks each turn-start roll at its
+  threshold (thaw, full paralysis, confusion), the sleep counter rolls, every
+  residual fraction and the toxic sequence, bad poison on send-out, the type
+  immunities (Thunder Wave on Electric, Ground and Normal types) and the
+  speed halving. The ability and item tests that had Gen 1's numbers (Leech
+  Seed, Leftovers after poison, Shed Skin, Synchronize) have Gen 9's.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

@@ -1541,7 +1541,7 @@ NaturalCureEnemy:
 	ret
 
 ; Leech Seed on a mon with Liquid Ooze hurts the seeder by what it would have
-; healed: 1/16 of the seeded mon's max HP, at least 1, as the seeded mon (whose
+; healed: 1/8 of the seeded mon's max HP (Gen 9), at least 1, as the seeded mon (whose
 ; turn it is) lost. Called as the seeder would heal; returns carry if it did
 ; this.
 LiquidOozeLeechSeed:
@@ -1558,12 +1558,12 @@ LiquidOozeLeechSeed:
 	ld a, [hli]
 	ld b, a
 	ld c, [hl]
-	ld a, 4
-.divideBy16
+	ld a, 3
+.divideBy8
 	srl b
 	rr c
 	dec a
-	jr nz, .divideBy16
+	jr nz, .divideBy8
 	ld a, b
 	or c
 	jr nz, .gotAmount
@@ -1912,35 +1912,28 @@ GiveUserStatus:
 	ret nz ; the foe has a status already
 	ld a, e
 	ld b, EFFECT_KIND_SLEEP
-	ld c, -1
 	and SLP
 	jr nz, .gotKind
 	ld a, e
 	ld b, EFFECT_KIND_POISON
-	ld c, POISON
 	bit PSN, a
 	jr nz, .gotKind
 	ld b, EFFECT_KIND_BURN
-	ld c, FIRE
 	bit BRN, a
 	jr nz, .gotKind
 	ld b, EFFECT_KIND_PARALYSIS
-	ld c, ELECTRIC
 	bit PAR, a
 	ret z
-.gotKind ; b = the kind, c = the type that can't have it (-1 for none)
+.gotKind ; b = the kind
 	ld hl, wBattleMonType1
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .gotUserTypes
 	ld hl, wEnemyMonType1
 .gotUserTypes
-	ld a, [hli]
-	cp c
-	ret z
-	ld a, [hl]
-	cp c
-	ret z
+	ld a, e
+	call StatusTypeImmune ; Gen 9's type immunities
+	ret c
 	push de
 	call UserAbility
 	ld d, a
@@ -1970,7 +1963,7 @@ GiveUserStatus:
 	jr nz, .poisoned
 	bit BRN, a
 	jr nz, .burned
-	callab QuarterSpeedDueToParalysis
+	callab HalveSpeedDueToParalysis
 	ld hl, SynchronizeParalyzedText
 	jr .print
 .burned
@@ -1996,6 +1989,13 @@ GiveUserStatus:
 	set BADLY_POISONED, [hl]
 	xor a
 	ld [de], a
+	ld hl, wEnemyMonStatus
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotToxicStatus
+	ld hl, wBattleMonStatus
+.gotToxicStatus
+	set TOX, [hl]
 	ld hl, SynchronizeBadlyPoisonedText
 .print
 	call PrintText

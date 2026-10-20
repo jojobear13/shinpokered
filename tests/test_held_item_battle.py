@@ -362,7 +362,7 @@ class BerryTest(unittest.TestCase):
         g.poke(prefix + "BattleStatus1", CONFUSED if confused else 0)
         g.poke(prefix + "BattleStatus3", 0)
         g.poke16(mon + "Attack", 50)
-        g.poke16(mon + "Speed", 25)
+        g.poke16(mon + "Speed", 50)  # paralysis halves it
         g.poke("wPlayerMonNumber", 1)
         g.poke("wPartyMon2CatchRate", ITEMS[item])
         g.poke("wEnemyMonPartyPos", 3)
@@ -438,7 +438,7 @@ class ResidualItemTest(unittest.TestCase):
             self.assertEqual(self.residual(turn, "LEFTOVERS", 100), 110)
             self.assertEqual(self.residual(turn, "LEFTOVERS", 160), 160)
             self.assertEqual(self.residual(turn, "LEFTOVERS", 155), 160)  # capped
-            self.assertEqual(self.residual(turn, "LEFTOVERS", 100, PSN), 100)  # +10, then poison's 10
+            self.assertEqual(self.residual(turn, "LEFTOVERS", 100, PSN), 90)  # +10, then poison's 20 (1/8)
 
     def test_berry_at_the_end_of_a_turn(self):
         for turn in (0, 1):

@@ -829,10 +829,9 @@ HurtByLeechSeedText:
 	TX_FAR _HurtByLeechSeedText
 	db "@"
 
-; decreases the mon's current HP by 1/16 of the Max HP (multiplied by number of toxic ticks if active)
-; note that the toxic ticks are considered even if the damage is not poison (hence the Leech Seed glitch)
-; joenote - This has been fixed.
-; since a pkmn cannot be both burned and poisoned, burn is unaffected by this problem.
+; decreases the mon's current HP by Gen 9's residual damage: 1/8 of its max HP
+; for poison and Leech Seed, 1/16 for burn, and 1/16 times the toxic counter
+; (which goes up first) for bad poison. At least 1.
 ; hl: HP pointer
 ; bc (out): total damage
 HandlePoisonBurnLeechSeed_DecreaseOwnHP:
@@ -850,32 +849,32 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 	rr c
 	srl b
 	rr c
-	srl c
-	srl c         ; c = max HP/16 (assumption: HP < 1024)
-	ld a, c
-	and a
-	jr nz, .nonZeroDamage
-	inc c         ; damage is at least 1
-.nonZeroDamage
+	srl c         ; c = max HP / 8 (HP < 1024)
+	ld b, 0
+	ld a, [wUnusedC000]
+	bit 6, a	; Leech Seed?
+	res 6, a 	;(reset the bit without affecting flags)
+	ld [wUnusedC000], a
+	jr nz, .leechSeed ; 1/8, and not the toxic counter
+	pop hl
+	push hl
+	inc hl
+	inc hl
+	inc hl ; the status
+	bit PSN, [hl]
+	jr z, .sixteenth ; burn
 	ld hl, wPlayerBattleStatus3
 	ld de, wPlayerToxicCounter
 	ld a, [H_WHOSETURN]
 	and a
-	jr z, .playersTurn
+	jr z, .gotStatus3
 	ld hl, wEnemyBattleStatus3
 	ld de, wEnemyToxicCounter
-.playersTurn
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - If this bit is set, this function is being called for leech seed.
-;			Do not do Toxic routines
-	ld a, [wUnusedC000]
-	bit 6, a	;check if this is for leech seed
-	res 6, a 	;(reset the bit without affecting flags)
-	ld [wUnusedC000], a
-	jr nz, .noToxic	;if so, then do not increment the toxic counter or multiply the damage for toxic
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.gotStatus3
 	bit BADLY_POISONED, [hl]
-	jr z, .noToxic
+	jr z, .atLeastOne ; poison: 1/8
+	srl c ; bad poison: 1/16 times the counter
+	call .atLeastOneC
 	ld a, [de]    ; increment toxic counter
 	inc a
 	ld [de], a
@@ -886,6 +885,12 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 	jr nz, .toxicTicksLoop
 	ld b, h       ; bc = damage * toxic counter
 	ld c, l
+	jr .noToxic
+.sixteenth
+	srl c
+.leechSeed
+.atLeastOne
+	call .atLeastOneC
 .noToxic
 	pop hl
 	inc hl
@@ -908,6 +913,13 @@ HandlePoisonBurnLeechSeed_DecreaseOwnHP:
 .noOverkill
 	call UpdateCurMonHPBar
 	pop hl
+	ret
+
+.atLeastOneC
+	ld a, c
+	and a
+	ret nz
+	inc c
 	ret
 
 ; adds bc to enemy HP
@@ -2118,6 +2130,7 @@ LoadEnemyMonFromParty:	;function for link battles
 	jr nz, .statModLoop
 	ld a, [wWhichPokemon]
 	ld [wEnemyMonPartyPos], a
+	call RestoreEnemyBadPoison
 	jpab LoadEnemyAbility
 
 SendOutMon:
@@ -2155,6 +2168,13 @@ SendOutMon:
 	ld [wPlayerDisabledMove], a
 	ld [wPlayerDisabledMoveNumber], a
 	ld [wPlayerMonMinimized], a
+	ld [wPlayerToxicCounter], a
+	ld hl, wBattleMonStatus
+	call IsBadlyPoisoned
+	jr nc, .notBadlyPoisoned
+	ld hl, wPlayerBattleStatus3
+	set BADLY_POISONED, [hl] ; Gen 9: still bad poison, the counter from 1 again
+.notBadlyPoisoned
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
 	ld hl, wEnemyBattleStatus1
@@ -4055,6 +4075,15 @@ CheckStatusConditions:
 .checkIfFrozen
 	bit FRZ, [hl] ; frozen?
 	jr z, .checkIfTrapped
+; Gen 9: a 20% chance to thaw out, and move
+	call BattleRandom
+	cp 51
+	jr nc, .stillFrozen
+	res FRZ, [hl]
+	ld hl, ThawedOutText
+	call PrintText
+	jr .checkIfTrapped
+.stillFrozen
 	ld hl, IsFrozenText
 	call PrintText
 	ld hl, StatusCheckUsedMove
@@ -4150,7 +4179,7 @@ CheckStatusConditions:
 	add CONF_ANIM - 1 ; CONF_ANIM - 1 for the player, CONF_ANIM for the enemy
 	call PlayMoveAnimation
 	call BattleRandom
-	cp $80 ; 50% chance to hurt itself
+	cp 171 ; Gen 9: a 1/3 chance to hurt itself
 	jr c, .checkIfTriedToUseDisabledMove
 	ld hl, StatusCheckStatus1
 	call GetSideAddr
@@ -4189,7 +4218,7 @@ CheckStatusConditions:
 	bit PAR, [hl]
 	jr z, .checkIfUsingBide
 	call BattleRandom
-	cp $3F ; 25% to be fully paralyzed
+	cp $40 ; 25% to be fully paralyzed
 	jr nc, .checkIfUsingBide
 	ld hl, FullyParalyzedText
 	call PrintText
@@ -4391,6 +4420,10 @@ FastAsleepText:
 
 WokeUpText:
 	TX_FAR _WokeUpText
+	db "@"
+
+ThawedOutText:
+	TX_FAR _ThawedOutText
 	db "@"
 
 IsFrozenText:
@@ -6161,7 +6194,30 @@ LoadEnemyMonData:
 .end_set_sendout
 	pop af
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	call RestoreEnemyBadPoison
 	jpab LoadEnemyAbility
+
+; a badly poisoned enemy mon sent out is still badly poisoned (Gen 9), with
+; the toxic counter from 1 again
+RestoreEnemyBadPoison:
+	xor a
+	ld [wEnemyToxicCounter], a
+	ld hl, wEnemyMonStatus
+	call IsBadlyPoisoned
+	ret nc
+	ld hl, wEnemyBattleStatus3
+	set BADLY_POISONED, [hl]
+	ret
+
+; hl = a status -> carry if it is bad poison (PSN and TOX)
+IsBadlyPoisoned:
+	ld a, [hl]
+	and (1 << PSN) | (1 << TOX)
+	cp (1 << PSN) | (1 << TOX)
+	scf
+	ret z
+	and a
+	ret
 
 ; calls BattleTransition to show the battle transition animation and initializes some battle variables
 DoBattleTransitionAndInitBattleVariables:
@@ -6302,50 +6358,32 @@ ApplyBurnAndParalysisPenaltiesToEnemy:
 
 ApplyBurnAndParalysisPenalties:
 	ld [H_WHOSETURN], a
-	call QuarterSpeedDueToParalysis
+	call HalveSpeedDueToParalysis
 	jp HalveAttackDueToBurn
 
-QuarterSpeedDueToParalysis:
+; Gen 9: paralysis halves speed
+HalveSpeedDueToParalysis:
+	ld hl, wEnemyMonSpeed
+	ld de, wEnemyMonStatus
 	ld a, [H_WHOSETURN]
 	and a
-	jr z, .playerTurn
-.enemyTurn ; quarter the player's speed
-	ld a, [wBattleMonStatus]
+	jr z, .gotMon
+	ld hl, wBattleMonSpeed
+	ld de, wBattleMonStatus
+.gotMon
+	ld a, [de]
 	and 1 << PAR
-	ret z ; return if player not paralysed
-	ld hl, wBattleMonSpeed + 1
-	ld a, [hld]
-	ld b, a
+	ret z
 	ld a, [hl]
 	srl a
-	rr b
-	srl a
-	rr b
 	ld [hli], a
-	or b
-	jr nz, .storePlayerSpeed
-	ld b, 1 ; give the player a minimum of at least one speed point
-.storePlayerSpeed
-	ld [hl], b
-	ret
-.playerTurn ; quarter the enemy's speed
-	ld a, [wEnemyMonStatus]
-	and 1 << PAR
-	ret z ; return if enemy not paralysed
-	ld hl, wEnemyMonSpeed + 1
-	ld a, [hld]
 	ld b, a
 	ld a, [hl]
-	srl a
-	rr b
-	srl a
-	rr b
-	ld [hli], a
+	rr a
+	ld [hl], a
 	or b
-	jr nz, .storeEnemySpeed
-	ld b, 1 ; give the enemy a minimum of at least one speed point
-.storeEnemySpeed
-	ld [hl], b
+	ret nz
+	inc [hl] ; at least 1
 	ret
 
 ; Gen 9: burn halves a physical move's damage (DamageModifiers), not the stat
@@ -6940,13 +6978,13 @@ SleepEffect:
 	ld [bc], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .setSleepCounter
-; set target's sleep counter to a random number between 1 and 7
+; set target's sleep counter to 2-4: asleep for 1-3 turns (Gen 9), as the
+; mon wakes when it reaches 0 and moves that turn
 	call BattleRandom
-	and $7
-	;joenote - sleep for at least +1 count since attacks can now happen on wakeup
-	;also made this more efficient
-	cp $2
-	jr c, .setSleepCounter
+	and $3
+	cp $3
+	jr nc, .setSleepCounter ; 0-2
+	add 2
 	ld [de], a
 	call PlayCurrentMoveAnimation2
 	ld hl, FellAsleepText
@@ -6972,7 +7010,7 @@ PoisonEffect:
 	ld de, wEnemyMoveEffect
 .poisonEffect
 	call CheckTargetSubstitute
-	jr nz, .noEffect ; can't poison a substitute target
+	jp nz, .noEffect ; can't poison a substitute target
 	ld a, [hli]
 	ld b, a
 	and a
@@ -7027,6 +7065,13 @@ PoisonEffect:
 	set BADLY_POISONED, [hl] ; else set Toxic battstatus
 	xor a
 	ld [de], a
+	ld hl, wEnemyMonStatus
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotToxicStatus
+	ld hl, wBattleMonStatus
+.gotToxicStatus
+	set TOX, [hl] ; it stays bad poison through a switch
 	ld hl, BadlyPoisonedText
 	jr .continue
 .normalPoison
@@ -7092,14 +7137,6 @@ FreezeBurnParalyzeEffect:
 	ld a, [wEnemyMonStatus]
 	and a
 	jp nz, CheckDefrost ; can't inflict status if opponent is already statused
-	ld a, [wPlayerMoveType]
-	ld b, a
-	ld a, [wEnemyMonType1]
-	cp b ; do target type 1 and move type match?
-	ret z  ; return if they match (an ice move can't freeze an ice-type, body slam can't paralyze a normal-type, etc.)
-	ld a, [wEnemyMonType2]
-	cp b ; do target type 2 and move type match?
-	ret z  ; return if they match
 	ld a, [wPlayerMoveEffect]
 	cp PARALYZE_SIDE_EFFECT1 + 1 ; 10% status effects are 04, 05, 06 so 07 will set carry for those
 	ld b, $1a ; 0x1A/0x100 or 26/256 = 10.2%~ chance
@@ -7111,6 +7148,9 @@ FreezeBurnParalyzeEffect:
 	call RollSideEffect
 	pop bc
 	ret nc ; do nothing if random value is >= 1A or 4D [no status applied]
+	ld hl, wEnemyMonType1
+	call SideEffectTypeImmune
+	ret c
 	ld a, b ; what type of effect is this?
 	cp BURN_SIDE_EFFECT1
 	jr z, .burn
@@ -7119,7 +7159,7 @@ FreezeBurnParalyzeEffect:
 ; .paralyze
 	ld a, 1 << PAR
 	ld [wEnemyMonStatus], a
-	call QuarterSpeedDueToParalysis ; quarter speed of affected mon
+	call HalveSpeedDueToParalysis ; halve the speed of the affected mon
 	ld a, ANIM_A9
 	call PlayBattleAnimation
 	jp PrintMayNotAttackText ; print paralysis text
@@ -7146,14 +7186,6 @@ opponentAttacker:
 	ld a, [wBattleMonStatus] ; mostly same as above with addresses swapped for opponent
 	and a
 	jp nz, CheckDefrost
-	ld a, [wEnemyMoveType]
-	ld b, a
-	ld a, [wBattleMonType1]
-	cp b
-	ret z
-	ld a, [wBattleMonType2]
-	cp b
-	ret z
 	ld a, [wEnemyMoveEffect]
 	cp PARALYZE_SIDE_EFFECT1 + 1
 	ld b, $1a
@@ -7165,6 +7197,9 @@ opponentAttacker:
 	call RollSideEffect
 	pop bc
 	ret nc
+	ld hl, wBattleMonType1
+	call SideEffectTypeImmune
+	ret c
 	ld a, b
 	cp BURN_SIDE_EFFECT1
 	jr z, .burn
@@ -7172,7 +7207,7 @@ opponentAttacker:
 	jr z, .freeze
 	ld a, 1 << PAR
 	ld [wBattleMonStatus], a
-	call QuarterSpeedDueToParalysis
+	call HalveSpeedDueToParalysis
 	jp PrintMayNotAttackText
 .burn
 	ld a, 1 << BRN
@@ -7190,6 +7225,21 @@ opponentAttacker:
 	ld [wBattleMonStatus], a
 	ld hl, FrozenText
 	jp PrintText
+
+; b = a burn, freeze or paralysis side effect, hl = the target's types ->
+; carry if they keep it off (Gen 9: Fire burn, Ice freeze, Electric paralysis)
+SideEffectTypeImmune:
+	ld a, b
+	ld c, 1 << BRN
+	cp BURN_SIDE_EFFECT1
+	jr z, .gotStatus
+	ld c, 1 << FRZ
+	cp FREEZE_SIDE_EFFECT
+	jr z, .gotStatus
+	ld c, 1 << PAR
+.gotStatus
+	ld a, c
+	jp StatusTypeImmune
 
 BurnedText:
 	TX_FAR _BurnedText
@@ -7401,7 +7451,7 @@ UpdateStatDone:
 	call PrintText
 
 ; these shouldn't be here
-	;call QuarterSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
+	;call HalveSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
 	;jp HalveAttackDueToBurn ; apply attack penalty to the player whose turn is not, if it's burned
 ;joenote - now to fix this to properly apply the BRN and PAR stat penalties.
 ;In pokemon generation 1, stat-ups are always dealt to a pkmn's self on its own turn.
@@ -7432,7 +7482,7 @@ UpdateStatDone:
 	call HalveAttackDueToBurn	;the active pkmn has a new recalculated attack. the non-active pkmn applies brn penalty to its opponent.
 	jr .skip_end
 .skip_par
-	call QuarterSpeedDueToParalysis	;the active pkmn has a new recalculated speed. the non-active pkmn applies par penalty to its opponent.
+	call HalveSpeedDueToParalysis	;the active pkmn has a new recalculated speed. the non-active pkmn applies par penalty to its opponent.
 .skip_end
 	ld a, [H_WHOSETURN]	;load the inverted turn
 	xor $1	;revert the turn back to normal
@@ -7639,7 +7689,7 @@ UpdateLoweredStatDone:
 ; These where probably added given that a stat-down move affecting speed or attack will override
 ; the stat penalties from paralysis and burn respectively.
 ; But they are always called regardless of the stat affected by the stat-down move.
-	;call QuarterSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
+	;call HalveSpeedDueToParalysis ; apply speed penalty to the player whose turn is not, if it's paralyzed
 	;jp HalveAttackDueToBurn ; apply attack penalty to the player whose turn is not, if it's burned
 ;joenote - now to fix this to properly apply the BRN and PAR stat penalties.
 ;In pokemon generation 1, stat-downs are always dealt to an opponent during the active pkmn's turn.
@@ -7666,7 +7716,7 @@ UpdateLoweredStatDone:
 	call HalveAttackDueToBurn	;the non-active pkmn has a new recalculated attack. the active pkmn applies brn penalty to its opponent.
 	jr .skip_end
 .skip_par
-	call QuarterSpeedDueToParalysis	;the non-active pkmn has a new recalculated speed. the active pkmn applies par penalty to its opponent.
+	call HalveSpeedDueToParalysis	;the non-active pkmn has a new recalculated speed. the active pkmn applies par penalty to its opponent.
 .skip_end
 	pop de	;restore de from the stack
 	ret	;remember to return 

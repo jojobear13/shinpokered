@@ -4,6 +4,8 @@ PSN EQU 3
 BRN EQU 4
 FRZ EQU 5
 PAR EQU 6
+TOX EQU 7 ; with PSN: badly poisoned, which Gen 9 keeps through a switch (the
+          ; toxic counter starts again)
 SLP_NOMOVE EQU %110	;joenote - sleep counter for when choosing won't be used on wakeup
 
 ; volatile statuses 1

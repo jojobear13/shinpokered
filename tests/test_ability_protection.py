@@ -289,7 +289,7 @@ class HPTest(unittest.TestCase):
         for turn in (0, 1):
             mon = SIDES[turn][1]
             prefix = SIDES[turn][0]
-            for ability, expected in (("MAGIC_GUARD", 200), ("NO_ABILITY", 200 - 12 - 12)):
+            for ability, expected in (("MAGIC_GUARD", 200), ("NO_ABILITY", 200 - 25 - 25)):
                 with self.subTest(turn=turn, ability=ability):
                     self.setup_mons()
                     set_abilities(g, turn, ability, "NO_ABILITY")
@@ -309,8 +309,8 @@ class HPTest(unittest.TestCase):
                 g.poke(H_WHOSETURN, turn)
                 g.poke(SIDES[turn][0] + "BattleStatus2", SEEDED)
                 g.call("HandlePoisonBurnLeechSeed", max_frames=3000)
-                self.assertEqual(g.peek16(SIDES[turn][1] + "HP"), 200 - 12)
-                self.assertEqual(g.peek16(SIDES[turn][2] + "HP"), 200 - 12)  # the seeder
+                self.assertEqual(g.peek16(SIDES[turn][1] + "HP"), 200 - 25)  # Leech Seed: 1/8
+                self.assertEqual(g.peek16(SIDES[turn][2] + "HP"), 200 - 25)  # the seeder
 
     def test_liquid_ooze_drain(self):
         g = self.game

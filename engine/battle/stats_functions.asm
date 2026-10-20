@@ -105,8 +105,7 @@ UndoBurnParStats:
 	and 1 << PAR	;test for paralyze 
 	jr z, .return
 	ld a, $04
-	ld [de], a	;set speed to be doubled (done twice) to undo the stat change of BRN
-	call DoubleSelectedStats
+	ld [de], a	;set speed to be doubled to undo paralysis's halving
 	call DoubleSelectedStats
 .return
 	xor a
