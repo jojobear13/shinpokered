@@ -4497,9 +4497,15 @@ HandleSelfConfusionDamage:
 	ld [hli], a
 	xor a
 	ld [hl], a
+	ld a, [wPlayerMoveNum]
+	push af
+	xor a
+	ld [wPlayerMoveNum], a ; no move: the physical stats, whatever the last move was
 	call GetDamageVarsForPlayerAttack
 	call CalculateDamage ; ignores AdjustDamageForMoveType (type-less damage), RandomizeDamage,
 	                     ; and MoveHitTest (always hits)
+	pop af
+	ld [wPlayerMoveNum], a
 	pop af
 	pop hl
 	ld [hl], a
@@ -6908,8 +6914,14 @@ EnemyHandleSelfConfusionDamage:
 	ld [hli], a
 	xor a
 	ld [hl], a
+	ld a, [wEnemyMoveNum]
+	push af
+	xor a
+	ld [wEnemyMoveNum], a ; no move: the physical stats, whatever the last move was
 	call GetDamageVarsForEnemyAttack
 	call CalculateDamage
+	pop af
+	ld [wEnemyMoveNum], a
 	pop af
 	pop hl
 	ld [hl], a

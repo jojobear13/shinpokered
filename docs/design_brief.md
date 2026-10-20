@@ -1067,6 +1067,15 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   changed 9 of 600 random whole turns, all of them the player's evasion
   rising or its accuracy falling. Recommended upstream.
 
+- **Fixed: a confused mon's self-hit could use its special stats** (a bug
+  of this branch's physical/special split, not upstream's). `GetDamageVars`
+  picks the stats by the move number, which the self-hit didn't set, so it
+  went by the mon's last move: after a special one, its Special Attack
+  against the foe's Special Defense (386 damage instead of 27 in the test).
+  The self-hit now has no move while its damage is worked out, which means
+  the physical stats, and the number is put back. Test:
+  `tests/test_confusion_self_hit.py`.
+
 ## Known facts that are easy to get wrong
 
 - 16-bit values are big-endian in battle and party structures, but the HP bar
