@@ -40,7 +40,3 @@ EGG_ABILITY_KEPT EQU 205 ; out of 256 (80%): the egg has the mother's ability sl
 	const BREED_INFO_GROUP2
 	const BREED_INFO_GENDER ; "♂", "♀", or 0 for none
 BREED_INFO_LENGTH EQU const_value
-
-; the party icon for an egg (engine/mon_party_sprites.asm): tiles $28 on in
-; vSprites, free between the other icons' first frames
-EGG_ICON EQU $A

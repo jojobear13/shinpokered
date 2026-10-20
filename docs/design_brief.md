@@ -1716,3 +1716,20 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     numbers queued), Ditto and Nidoran, the Everstone, laying, cycles and
     Flame Body, giving, hatching, the PC, healing, names, the last-battler
     rule, and the man's offer.
+- **A party icon for every species.** The party menu, the naming screen and
+  the trade animation used ten shared icon types (`MonPartyData`); each
+  Pokémon now has its own two-frame icon, from "MINIDEX 001-251" by Chamber,
+  Solo993, Blue Emerald, Lake, Neslug and Pikachu25 (free to use with credit;
+  credited in the README). `tools/gen_party_icons.py` turns the sheet
+  (`gfx/sources/minidex_001-251.gif`) into `gfx/party_icons_1.png` and
+  `_2.png`, one frame each, 16x16 by Pokédex number with the egg's last
+  (its second frame one pixel lower, so it wiggles), mapping the sheet's
+  colours to the Game Boy's: the peach skin light grey, the body colour dark
+  grey, the outline black. They're 9.5 KB a frame, in two banks of their
+  own. When the party menu draws, each party slot's icon is copied to its
+  own tiles (slot n: sprite tiles 4n, and $40 + 4n for the second frame);
+  the naming screen and the trade load their one species' icon into slot
+  0's. The old icon types' graphics are gone except the two pieces the
+  trade's cable circle uses. Every icon now animates by swapping frames
+  (the Poké Ball and helix icons used to bob instead). On the Game Boy
+  Color, the icons still take the party menu's one sprite palette.

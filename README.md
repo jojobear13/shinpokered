@@ -1749,6 +1749,7 @@ EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLAN
 - CreamElDudJafar for GB Printer backporting
 - Gambler Keegan for Alt Trainer Move consulting and curation
 - powderpup for box covers using Sugimori cardass art
+- Chamber, Solo993, Blue Emerald, Lake, Neslug and Pikachu25 for the party menu icons ("MINIDEX 001-251")
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
 - TheFakeMateo/RegularLuna 

@@ -1964,6 +1964,14 @@ INCLUDE "engine/menu/moves_screen.asm"
 
 SECTION "Breeding", ROMX
 INCLUDE "engine/breeding.asm"
+
+; the party icons (engine/mon_party_sprites.asm), by Pokédex number then the
+; egg's, from "MINIDEX 001-251" by Chamber, Solo993, Blue Emerald, Lake,
+; Neslug and Pikachu25 (tools/gen_party_icons.py)
+SECTION "Party Icons 1", ROMX
+PartyIcons1: INCBIN "gfx/party_icons_1.2bpp"
+SECTION "Party Icons 2", ROMX
+PartyIcons2: INCBIN "gfx/party_icons_2.2bpp"
 INCLUDE "custom_functions/func_soundtest.asm"
 INCLUDE "custom_functions/func_emuchecks.asm"
 
