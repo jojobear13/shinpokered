@@ -2630,15 +2630,14 @@ OldManItemList:
 	db POKE_BALL, 50
 	db -1
 
-DisplayPlayerBag:
-	; get the pointer to player's bag when in a normal battle
-	ld hl, wNumBagItems
-	ld a, l
-	ld [wListPointer], a
-	ld a, h
-	ld [wListPointer + 1], a
+DisplayPlayerBag: ; the full-screen bag, by pocket
+	ld a, ITEMLISTMENU
+	ld [wListMenuID], a
+	callab BagMenu
+	jp c, DisplayBattleMenu ; go back to battle menu if an item was not selected
+	jr UseBagItem
 
-DisplayBagMenu:
+DisplayBagMenu: ; the old man's
 	xor a
 	ld [wPrintItemPrices], a
 	ld a, ITEMLISTMENU

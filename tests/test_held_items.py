@@ -193,7 +193,7 @@ class HoldingTest(unittest.TestCase):
     def test_take_with_a_full_bag(self):
         g = self.game
         self.party(items=(ITEMS["LEFTOVERS"], 0))
-        full = [(name, 1) for name in HELD[:20]]  # 20 kinds: the bag's limit
+        full = [(name, 1) for name in HELD if name != "LEFTOVERS"][:40]  # 40 kinds: the bag's limit
         self.bag(*full)
         g.poke("wWhichPokemon", 0)
         g.call("TakeHeldItem", max_frames=4000)

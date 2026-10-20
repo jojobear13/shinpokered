@@ -55,6 +55,7 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; draw money text box
+	callba SortBag ; the bag's order
 	ld hl, wNumBagItems
 	ld a, l
 	ld [wListPointer], a

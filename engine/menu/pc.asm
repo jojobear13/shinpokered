@@ -154,17 +154,11 @@ AccessedMyPCText:
 	db "@"
 
 ; removes one of the specified item ID [hItemToRemoveID] from bag (if existent)
-;joenote - altered this function to work with the backup bag space
 RemoveItemByID:
-	call .search	;search regular bag space
-	jp nz, RemoveItemFromInventory	;remove if found, and we're done here
-;else handle the backup bag space
-	callba BackupBagSwap	;swap with backup bag inventory
-	call .search			;search the backup bag inventory
-	call nz, RemoveItemFromInventory	;remove if found
-	callba BackupBagSwap	;swap it back
+	call .search
+	jp nz, RemoveItemFromInventory	;remove if found
 	ret
-	
+
 .search	;returns with z if not found, and with nz if found
 	ld hl, wBagItems
 	ld a, [hItemToRemoveID]

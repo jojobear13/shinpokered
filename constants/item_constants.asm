@@ -216,3 +216,14 @@ const_value = $C4
 	const TM_48         ; $F8
 	const TM_49         ; $F9
 	const TM_50         ; $FA
+
+; the bag's pockets (data/item_pockets.asm)
+	const_def
+	const POCKET_ITEMS
+	const POCKET_MEDICINE
+	const POCKET_BALLS
+	const POCKET_BATTLE
+	const POCKET_BERRIES
+	const POCKET_TMHM
+	const POCKET_KEY
+NUM_POCKETS EQU const_value

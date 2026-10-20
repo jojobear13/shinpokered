@@ -95,6 +95,7 @@ PlayerPCDeposit:
 	call PrintText
 	jp PlayerPCMenu
 .loop
+	callba SortBag ; the bag's order
 	ld hl, WhatToDepositText
 	call PrintText
 	ld hl, wNumBagItems

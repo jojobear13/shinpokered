@@ -3128,14 +3128,6 @@ wRoute18GateCurScript:: ; d669
 	ds 30
 wTempFieldMoveSlots::	;joenote - for field move slot
 	ds 6
-wBagBackupSpace::	;joenote - added to expand the bag space (42 bytes long)
-wBagNumBackup::
-	ds 1
-wBagItemsBackup::
-	ds BAG_ITEM_CAPACITY * 2
-wBagItemsBackupTerminator::
-	ds 1
-wBagBackupSpaceEnd::
 wGameProgressFlagsEnd::
 
 
@@ -3613,6 +3605,18 @@ wEnemyMimicPP::
 wForcedSwitchSlot:: ; the slot (1-4) the enemy's Roar-dragged mon comes from, 0 for the AI's pick
 	ds 1
 wSideConditionsEnd::
+
+; the bag screen (engine/menu/bag_menu.asm)
+wBagPocket:: ; the pocket shown (POCKET_*), kept between visits
+	ds 1
+wBagCursor:: ; the entry the cursor is on (the pocket's count for CANCEL)
+	ds 1
+wBagScroll:: ; the first entry shown
+	ds 1
+wBagPocketList:: ; the pocket's count, then each entry's index in the bag
+	ds 1 + BAG_ITEM_CAPACITY
+wSortInventory:: ; SortInventory: the inventory being sorted
+	ds 2
 
 ; free up to the stack at $df00
 

@@ -1700,7 +1700,7 @@ ENDC
 	dec [hl]
 	jp DisplayListMenuIDLoop
 .startPressed	
-	homecall HandleBagData	;joenote - adding swappable bag space and organization
+	homecall HandleBagData	; sorts the PC's item box
 	jp DisplayListMenuIDLoop
 
 DisplayChooseQuantityMenu::

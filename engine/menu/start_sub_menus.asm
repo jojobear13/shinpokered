@@ -336,20 +336,9 @@ StartMenu_Item:
 	call PrintText
 	jr .exitMenu
 .notInCableClubRoom
-	ld bc, wNumBagItems
-	ld hl, wListPointer
-	ld a, c
-	ld [hli], a
-	ld [hl], b ; store item bag pointer in wListPointer (for DisplayListMenuID)
-	xor a
-	ld [wPrintItemPrices], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
-	ld a, [wBagSavedMenuItem]
-	ld [wCurrentMenuItem], a
-	call DisplayListMenuID
-	ld a, [wCurrentMenuItem]
-	ld [wBagSavedMenuItem], a
+	callab BagMenu ; the full-screen bag, by pocket
 	jr nc, .choseItem
 .exitMenu
 	call LoadScreenTilesFromBuffer2 ; restore saved screen
@@ -357,13 +346,6 @@ StartMenu_Item:
 	call UpdateSprites
 	jp RedisplayStartMenu
 .choseItem
-; erase menu cursor (blank each tile in front of an item name)
-	ld a, " "
-	Coorda 5, 4
-	Coorda 5, 6
-	Coorda 5, 8
-	Coorda 5, 10
-	call PlaceUnfilledArrowMenuCursor
 	xor a
 	ld [wMenuItemToSwap], a
 	ld a, [wcf91]

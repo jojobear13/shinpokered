@@ -1585,3 +1585,19 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   logo never had them); the main menu shows v0.5.0, and the link handshake
   digits are 0.0.5.0, so it won't link with Shin's builds.
 
+- **The bag screen**: Shin's SELECT-swapped second bag is gone (its WRAM
+  backup is freed). The bag holds 40 kinds (`BAG_ITEM_CAPACITY`) and opens
+  full screen (`engine/menu/bag_menu.asm`, `BagMenu`), from the START menu
+  and in battle: a header with the pocket's name between ◀ and ▶, and six
+  two-line entries (the name, then "×NN" except for key items), then CANCEL.
+  LEFT/RIGHT change pocket (ITEMS, MEDICINE, BALLS, BATTLE ITEMS, BERRIES,
+  TMs/HMs, KEY ITEMS); the pocket, cursor and scroll are remembered.
+  `tools/gen_item_pockets.py` writes `data/item_pockets.asm`: each item's
+  pocket and `ItemSortList`, every item in pocket order. The bag is put in
+  that order (`SortBag`) when the bag screen, the PC's deposit list or the
+  mart's sell list opens, never while an item is being added or removed
+  (those go by the index the bag had). `BagMenu` returns as
+  `DisplayListMenuID` did, so USE/TOSS and the battle item code are
+  unchanged; overworld sprites are hidden while it is open. The old man's
+  demo still uses the old list. START in the PC's item box still sorts it.
+  `tests/test_bag.py`.
