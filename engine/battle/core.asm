@@ -95,7 +95,6 @@ SpecialEffects:
 SpecialEffectsCont:
 ; damaging moves whose effect is executed prior to damage calculation
 	db THRASH_PETAL_DANCE_EFFECT
-	db TRAPPING_EFFECT
 	db -1
 
 SlidePlayerAndEnemySilhouettesOnScreen:
@@ -471,16 +470,9 @@ EnemyRanText:
 	db "@"
 
 MainInBattleLoop:
+	callab SideConditionsEndOfTurn ; the turn before ends: screens and Mist count down
 	call RunEntryAbilities
-;joenote - zero the damage from last round if not using a trapping move
-	ld a, [wEnemyBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jr nz, .no_trapping_moves
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jr nz, .no_trapping_moves
 	call ZeroLastDamage	;joenote - prevent counter shenanigans of all sorts
-.no_trapping_moves
 ;joenote - clear custom battle flags
 	ld a, [wUnusedC000]
 	res 7, a	;reset the bit that causes counter to miss
@@ -546,16 +538,8 @@ MainInBattleLoop:
 ;	and (1 << FRZ)  ; is mon frozen?	;joedebug - sleep won't waste turn
 ;	jr nz, .selectEnemyMove ; if so, jump
 	ld a, [wPlayerBattleStatus1]
-	and (1 << STORING_ENERGY) | (1 << USING_TRAPPING_MOVE) ; check player is using Bide or using a multi-turn attack like wrap
+	bit STORING_ENERGY, a ; check player is using Bide
 	jr nz, .selectEnemyMove ; if so, jump
-	ld a, [wEnemyBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; check if enemy is using a multi-turn attack like wrap
-	jr z, .selectPlayerMove ; if not, jump
-; enemy is using a multi-turn attack like wrap, so player is trapped and cannot execute a move
-	ld a, $ff
-	ld [wPlayerSelectedMove], a
-	jr .selectEnemyMove
-.selectPlayerMove
 	ld a, [wActionResultOrTookBattleTurn]
 	and a ; has the player already used the turn (e.g. by using an item, trying to run or switching pokemon)
 	jr nz, .selectEnemyMove
@@ -586,29 +570,10 @@ MainInBattleLoop:
 	sub 4
 	jr c, .noLinkBattle
 ; the link battle enemy has switched mons
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; check if using multi-turn move like Wrap
-	jr z, .specialMoveNotUsed
-	ld a, [wPlayerMoveListIndex]
-	ld hl, wBattleMonMoves
-	ld c, a
-	ld b, 0
-	add hl, bc
-	ld a, [hl]
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;joenote - fixing the check for metronome and mirror move
-	cp METRONOME ; a MIRROR MOVE check is missing, might lead to a desync in link battles
-	             ; when combined with multi-turn moves
-	jr z, .loadMetroOrMirror
-	cp MIRROR_MOVE
-	jr z, .loadMetroOrMirror
-	jr .specialMoveNotUsed
-.loadMetroOrMirror
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld [wPlayerSelectedMove], a
-.specialMoveNotUsed
 	callab SwitchEnemyMon	;joedebug - both AI and link enemy use this to switch
 .noLinkBattle
+	ld a, 1
+	ld [wTurnPending], a ; both sides have chosen: the turn will end
 	callab ComparePriority ; Gen 9's priority brackets
 	jr nc, .compareSpeed
 	jp nz, .playerMovesFirst
@@ -666,7 +631,6 @@ MainInBattleLoop:
 	call HandlePoisonBurnLeechSeed
 	jp z, HandlePlayerMonFainted
 	call DrawHUDsAndHPBars
-	call CheckNumAttacksLeft
 	jp MainInBattleLoop
 .playerMovesFirst	;joenote - reorganizing this so enemy AI item use and switching has priority over player moves
 ;#1 - handle enemy switching or using an item
@@ -707,7 +671,6 @@ MainInBattleLoop:
 	call HandlePoisonBurnLeechSeed
 	jp z, HandleEnemyMonFainted
 	call DrawHUDsAndHPBars
-	call CheckNumAttacksLeft
 	jp MainInBattleLoop
 
 
@@ -796,6 +759,31 @@ HandlePoisonBurnLeechSeed:
 	call PrintText
 	pop hl
 .notLeechSeeded
+	push hl
+	callab BoundTurnEnd ; carry: still bound, so hurt (wd11e = the move)
+	pop hl
+	jr nc, .notBound
+	push hl
+	ld a, [H_WHOSETURN]
+	push af
+	xor $1
+	ld [H_WHOSETURN], a
+	xor a
+	ld [wAnimationType], a
+	ld a, [wd11e]
+	call PlayMoveAnimation ; the binding move, from the binder
+	pop af
+	ld [H_WHOSETURN], a
+	pop hl
+	ld a, [wUnusedC000]
+	set 6, a ; 1/8 of max HP, like Leech Seed
+	ld [wUnusedC000], a
+	call HandlePoisonBurnLeechSeed_DecreaseOwnHP
+	push hl
+	ld hl, HurtByBindingText
+	call PrintText
+	pop hl
+.notBound
 	ld a, [hli]
 	or [hl]
 	ret nz          ; test if fainted
@@ -815,6 +803,10 @@ HurtByBurnText:
 
 HurtByLeechSeedText:
 	TX_FAR _HurtByLeechSeedText
+	db "@"
+
+HurtByBindingText:
+	TX_FAR _HurtByBindingText
 	db "@"
 
 ; decreases the mon's current HP by Gen 9's residual damage: 1/8 of its max HP
@@ -981,22 +973,6 @@ UpdateCurMonHPBar:
 	ld [wHPBarType], a
 	predef UpdateHPBar2
 	pop bc
-	ret
-
-CheckNumAttacksLeft:
-	ld a, [wPlayerNumAttacksLeft]
-	and a
-	jr nz, .checkEnemy
-; player has 0 attacks left
-	ld hl, wPlayerBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] ; player not using multi-turn attack like wrap any more
-.checkEnemy
-	ld a, [wEnemyNumAttacksLeft]
-	and a
-	ret nz
-; enemy has 0 attacks left
-	ld hl, wEnemyBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] ; enemy not using multi-turn attack like wrap any more
 	ret
 
 HandleEnemyMonFainted:
@@ -2165,8 +2141,6 @@ SendOutMon:
 .notBadlyPoisoned
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
-	ld hl, wEnemyBattleStatus1
-	res USING_TRAPPING_MOVE, [hl]
 	ld a, $1
 	ld [H_WHOSETURN], a
 	ld a, POOF_ANIM
@@ -2701,14 +2675,6 @@ UseBagItem:
 	and a ; was the item used successfully?
 	jp z, BagWasSelected ; if not, go back to the bag menu
 
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; is the player using a multi-turn move like wrap?
-	jr z, .checkIfMonCaptured
-	call DecAttackPlayer
-	jr nz, .checkIfMonCaptured
-	ld hl, wPlayerBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] ; not using multi-turn move any more
-
 .checkIfMonCaptured
 	ld a, [wCapturedMonSpecies]
 	and a ; was the enemy mon captured with a ball?
@@ -2884,24 +2850,6 @@ PartyMenuOrRockOrRun:
 SwitchPlayerMon:	;joedebug - this is where the player switches
 	callab NaturalCurePlayer
 	callba DoPlayerShinybit ;joenote - reset shiny checker bits
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - if enemy using trapping move, then end their move
-;Note that SelectEnemyMove has not been run yet.
-	ld a, [wEnemyBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jr z, .preparewithdraw
-	ld hl, wEnemyBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] 
-	xor a
-	ld [wEnemyNumAttacksLeft], a
-	ld a, $FF	; FF is a Do Nothing move
-	ld [wEnemySelectedMove], a
-	;don't let enemy change the selected move during the next picking function
-	ld a, [wUnusedC000]
-	set 2, a
-	ld [wUnusedC000], a
-.preparewithdraw
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	callab RetreatMon
 	ld c, 50
 	call DelayFrames
@@ -3541,13 +3489,6 @@ SelectEnemyMove:
 	jp z, .linkedOpponentUsedStruggle
 	cp LINKBATTLE_NO_ACTION
 	jr z, .unableToSelectMove_general
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - check and reset flag for being unable to select a move
-	ld hl, wUnusedC000
-	bit 2, [hl]
-	res 2, [hl]
-	jr nz, .unableToSelectMove_general
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	cp 4
 	ret nc
 	ld [wEnemyMoveListIndex], a
@@ -3556,6 +3497,9 @@ SelectEnemyMove:
 	ld b, 0
 	add hl, bc
 	ld a, [hl]
+	jp .done
+.unableToSelectMove_general
+	ld a, $ff
 	jp .done
 .noLinkBattle	;the following handles selection stuff for an AI opponent
 	ld a, [wEnemyBattleStatus2]
@@ -3574,27 +3518,8 @@ SelectEnemyMove:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ret nz
 	ld a, [wEnemyBattleStatus1]
-	and (1 << USING_TRAPPING_MOVE) | (1 << STORING_ENERGY) ; using a trapping move like wrap or bide
+	bit STORING_ENERGY, a ; using bide
 	ret nz
-
-;joenote - check and reset flag for being unable to select a move
-	ld hl, wUnusedC000
-	bit 2, [hl]
-	res 2, [hl]
-	jr nz, .unableToSelectMove_AI
-	
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; caught in player's trapping move (e.g. wrap)
-	jr z, .canSelectMove
-	
-.unableToSelectMove_AI
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	call nz, NoAttackAICall	;joenote - get ai routines. flag register is preserved
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.unableToSelectMove_general
-	ld a, $ff
-	jr .done
-.canSelectMove
 	ld hl, wEnemyMonMoves+1 ; 2nd enemy move
 	ld a, [hld]
 	and a
@@ -4081,17 +4006,7 @@ CheckStatusConditions:
 	ld hl, StatusCheckMoveDone ; can't move this turn
 	jp .returnToSideHL
 
-.checkIfTrapped
-	ld hl, StatusCheckOpponentStatus1
-	call GetSideAddr
-	ld a, [hl]
-	bit USING_TRAPPING_MOVE, a ; is the opponent using a multi-turn move like wrap?
-	jp z, .checkIfFlinched
-	ld hl, CantMoveText
-	call PrintText
-	ld hl, StatusCheckMoveDone ; can't move this turn
-	jp .returnToSideHL
-
+.checkIfTrapped ; Gen 9: a bound mon still moves
 .checkIfFlinched
 	ld hl, StatusCheckStatus1
 	call GetSideAddr
@@ -4217,7 +4132,7 @@ CheckStatusConditions:
 	; clear bide, thrashing, charging up, and trapping moves such as warp (already cleared for confusion damage)
 	;joenote: also clear invulnerablility (fly/dig) to prevent invincibility glitch
 	ld a, [hl]
-	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE) | (1 << USING_TRAPPING_MOVE))
+	and $ff ^ ((1 << STORING_ENERGY) | (1 << THRASHING_ABOUT) | (1 << CHARGING_UP) | (1 << INVULNERABLE))
 	ld [hl], a
 	push hl
 	ld hl, StatusCheckMoveEffect
@@ -4288,7 +4203,7 @@ CheckStatusConditions:
 
 .checkIfThrashingAbout
 	bit THRASHING_ABOUT, [hl] ; is mon using thrash or petal dance?
-	jr z, .checkIfUsingMultiturnMove
+	jr z, .checkIfUsingRage
 	ld hl, StatusCheckMoveNum
 	call GetSideAddr
 	ld a, THRASH
@@ -4314,24 +4229,6 @@ CheckStatusConditions:
 	pop af
 	ld [hl], a
 	pop hl ; skip DecrementPP
-	jp .returnToHL
-
-.checkIfUsingMultiturnMove
-	bit USING_TRAPPING_MOVE, [hl] ; is mon using multi-turn move?
-	jp z, .checkIfUsingRage
-	ld hl, AttackContinuesText
-	call PrintText
-	ld hl, StatusCheckAnimationType ; skip damage calculation (deal damage equal to last hit),
-	                                ; DecrementPP and MoveHitTest
-	call GetSideAddr
-	call DecAttackSide ; did multi-turn move end?
-	jp nz, .returnToHL
-	push hl
-	ld hl, StatusCheckMonSpecies
-	call GetSideAddr
-	ld a, [hl]
-	pop hl
-	call PlayEndTrappingMove
 	jp .returnToHL
 
 .checkIfUsingRage
@@ -4458,9 +4355,6 @@ ThrashingAboutText:
 	TX_FAR _ThrashingAboutText
 	db "@"
 
-AttackContinuesText:
-	TX_FAR _AttackContinuesText
-	db "@"
 
 CantMoveText:
 	TX_FAR _CantMoveText
@@ -5201,8 +5095,6 @@ ApplyAttackToPokemon:
 	jr z, .superFangEffect
 	cp SPECIAL_DAMAGE_EFFECT
 	jr z, .specialDamage
-	cp TRAPPING_EFFECT	;joenote - clear hyper beam if target hit with trapping effect
-	call z, ClearHyperBeam
 	ld a, [hBattleSide]
 	ld hl, DamageTargetAttackerMovePower
 	call GetAddrFromTable
@@ -5636,8 +5528,8 @@ MoveHitTest:
 ; FLASH, CONVERSION*, HAZE*, SCREECH, LIGHT SCREEN*, REFLECT*
 ; the moves that are marked with an asterisk are not affected since this
 ; function is not called when those moves are used
-	ld a, [wEnemyBattleStatus2]
-	bit PROTECTED_BY_MIST, a ; is mon protected by mist?
+	ld a, [wEnemyMistTurns] ; is the enemy's side protected by mist?
+	and a
 	jp nz, .moveMissed
 .skipEnemyMistCheck
 	ld a, [wPlayerBattleStatus2]
@@ -5663,8 +5555,8 @@ MoveHitTest:
 	jr .skipPlayerMistCheck
 .playerMistCheck
 ; similar to enemy mist check
-	ld a, [wPlayerBattleStatus2]
-	bit PROTECTED_BY_MIST, a ; is mon protected by mist?
+	ld a, [wPlayerMistTurns] ; is the player's side protected by mist?
+	and a
 	jp nz, .moveMissed
 .skipPlayerMistCheck
 	ld a, [wEnemyBattleStatus2]
@@ -5711,21 +5603,6 @@ MoveHitTest:
 	ld [hl], a
 	inc a
 	ld [wMoveMissed], a
-	ld a, [H_WHOSETURN]
-	and a
-	jr z, .playerTurn2
-.enemyTurn2
-	ld hl, wEnemyBattleStatus1
-	jr .endTrapping
-.playerTurn2
-	ld hl, wPlayerBattleStatus1
-.endTrapping
-	res USING_TRAPPING_MOVE, [hl] ; end multi-turn attack e.g. wrap
-	inc hl
-	inc hl
-	ld a, [hl]
-	sub TRAPPING_COUNT_BIT
-	ld [hl], a	;joenote - undo increment trapping spam counter
 	ret
 
 ; values for player turn
@@ -8138,56 +8015,11 @@ DugAHoleText:
 	TX_FAR _DugAHoleText
 	db "@"
 
+; Gen 9: the target is bound for 4-5 turns, not through a substitute
 TrappingEffect:
-;joenote - make it so the effect won't take hold if target has type immunity
-	ld hl, wUnusedC000
-	set 3, [hl]
-	ld hl, wPlayerBattleStatus1
-	ld de, wPlayerNumAttacksLeft
-	ld a, [H_WHOSETURN]
-	and a
-	jr z, .trappingEffect
-	ld hl, wUnusedC000
-	res 3, [hl]
-	ld hl, wEnemyBattleStatus1
-	ld de, wEnemyNumAttacksLeft
-.trappingEffect
-	bit USING_TRAPPING_MOVE, [hl]
+	call CheckTargetSubstitute
 	ret nz
-	
-	push hl
-	push bc
-	push de
-	callab AIGetTypeEffectiveness
-	pop de
-	pop bc
-	pop hl
-	ld a, [wTypeEffectiveness]
-	and a
-	ret z
-	
-	;call ClearHyperBeam ; since this effect is called before testing whether the move will hit,
-                        ; the target won't need to recharge even if the trapping move missed
-						;joenote - will do this later under ApplyAttackToEnemy/Player functions
-	set USING_TRAPPING_MOVE, [hl] ; mon is now using a trapping move
-	call BattleRandom ; 3/8 chance for 2 and 3 attacks, and 1/8 chance for 4 and 5 attacks
-	and $3
-	cp $2
-	jr c, .setTrappingCounter
-	call BattleRandom
-	and $3
-.setTrappingCounter
-	inc a
-	ld [de], a
-;joenote - have the trapping effect user get its speed temporarily reduced until stats get recalculated
-;	callba ReduceSpeed
-;joenote - increment a trapping spam counter that checks for consecutive usage of trapping moves
-	inc hl
-	inc hl	;now points to xBattleStatus3
-	ld a, [hl]
-	add TRAPPING_COUNT_BIT
-	ld [hl], a	;else increment the consecutive use counter
-	ret
+	jpab BindTarget
 
 MistEffect:
 	jpab MistEffect_
@@ -8653,21 +8485,6 @@ PlaySelectedAnimation:
 	ld [H_WHOSETURN], a
 	ret 
 
-
-;joenote - function to play an animation to signify the last attack of a trapping move
-PlayEndTrappingMove:
-	push hl
-	push bc
-	push de
-	ld e, POOF_ANIM
-	ld a, [H_WHOSETURN]
-	xor $01
-	ld d, a
-	call PlaySelectedAnimation
-	pop de
-	pop bc
-	pop hl
-	ret
 
 ;joenote - consolidate this to save a bit of space
 DecAttackPlayer:

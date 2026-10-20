@@ -1,13 +1,15 @@
+; Gen 9: the user's side is protected for 5 turns, through switches
 MistEffect_:
-	ld hl, wPlayerBattleStatus2
+	ld hl, wPlayerMistTurns
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .mistEffect
-	ld hl, wEnemyBattleStatus2
+	ld hl, wEnemyMistTurns
 .mistEffect
-	bit PROTECTED_BY_MIST, [hl] ; is mon protected by mist?
+	ld a, [hl]
+	and a ; is the side protected by mist?
 	jr nz, .mistAlreadyInUse
-	set PROTECTED_BY_MIST, [hl] ; mon is now protected by mist
+	ld [hl], 5
 	callab PlayCurrentMoveAnimation
 	ld hl, ShroudedInMistText
 	jp PrintText

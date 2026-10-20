@@ -24,11 +24,11 @@ NAMES = {v: k for k, v in TYPES.items()}
 
 SIDES = {
     # side: (attacker, defender, attacker unmodified, defender unmodified,
-    #        attacker stages, defender stages, defender status 3, move)
+    #        attacker stages, defender stages, defender's side, move)
     "player": ("wBattleMon", "wEnemyMon", "wPlayerMonUnmodified", "wEnemyMonUnmodified",
-               "wPlayerMon", "wEnemyMon", "wEnemyBattleStatus3", "wPlayerMove"),
+               "wPlayerMon", "wEnemyMon", "wEnemy", "wPlayerMove"),
     "enemy": ("wEnemyMon", "wBattleMon", "wEnemyMonUnmodified", "wPlayerMonUnmodified",
-              "wEnemyMon", "wPlayerMon", "wPlayerBattleStatus3", "wEnemyMove"),
+              "wEnemyMon", "wPlayerMon", "wPlayer", "wEnemyMove"),
 }
 RATIOS = [(2, 8), (2, 7), (2, 6), (2, 5), (2, 4), (2, 3), (2, 2),
           (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (8, 2)]
@@ -76,8 +76,8 @@ def model(game, side, roll):
             damage = min(damage * 2, 0xFFFF)
     if not special and game.peek(attacker + "Status") & BRN:
         damage //= 2
-    screen = 1 << (1 if special else 2)
-    if not crit and game.peek(status3) & screen:
+    screen = "LightScreenTurns" if special else "ReflectTurns"
+    if not crit and game.peek(status3 + screen):
         damage //= 2
     return {"base": base, "wDamage": max(damage, 1)}
 
@@ -129,7 +129,8 @@ class DamageTest(unittest.TestCase):
         g.poke("wEnemyMonType", 0x15, 0x15)
         g.poke("wBattleMonLevel", 50)
         g.poke("wBattleMonStatus", status)
-        g.poke("wEnemyBattleStatus3", screens)
+        g.poke("wEnemyReflectTurns", screens & 1)
+        g.poke("wEnemyLightScreenTurns", screens >> 1)
         g.poke16("wPlayerMonUnmodifiedAttack", 100)
         g.poke16("wEnemyMonUnmodifiedDefense", 100)
         g.poke("wPlayerMonAttackMod", a_stage)
@@ -142,9 +143,9 @@ class DamageTest(unittest.TestCase):
         self.assertEqual(self.setup_simple()["wDamage"], 37)
         self.assertEqual(self.setup_simple(crit=1)["wDamage"], 55)
         self.assertEqual(self.setup_simple(status=BRN)["wDamage"], 18)
-        self.assertEqual(self.setup_simple(screens=1 << 2)["wDamage"], 18)  # Reflect
-        self.assertEqual(self.setup_simple(screens=1 << 2, crit=1)["wDamage"], 55)  # not on a crit
-        self.assertEqual(self.setup_simple(screens=1 << 1)["wDamage"], 37)  # Light Screen: special only
+        self.assertEqual(self.setup_simple(screens=1)["wDamage"], 18)  # Reflect
+        self.assertEqual(self.setup_simple(screens=1, crit=1)["wDamage"], 55)  # not on a crit
+        self.assertEqual(self.setup_simple(screens=2)["wDamage"], 37)  # Light Screen: special only
         # crits leave out the attacker's drops and the defender's raises
         self.assertEqual(self.setup_simple(a_stage=5, crit=1)["wDamage"], 55)
         self.assertEqual(self.setup_simple(d_stage=9, crit=1)["wDamage"], 55)

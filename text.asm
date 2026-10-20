@@ -1307,10 +1307,12 @@ _ThrashingAboutText::
 	line "thrashing about!"
 	done
 
-_AttackContinuesText::
-	text "<USER>'s"
-	line "attack continues!"
-	done
+_HurtByBindingText::
+	text "<USER>'s hurt"
+	line "by @"
+	TX_RAM wcd6d
+	text "!"
+	prompt
 
 _CantMoveText::
 	text "<USER>"
@@ -2308,8 +2310,8 @@ _ConvertedTypeText::
 	prompt
 
 _StatusChangesEliminatedText::
-	text "All STATUS changes"
-	line "are eliminated!"
+	text "All stat changes"
+	line "were eliminated!"
 	prompt
 
 _StartedSleepingEffect::

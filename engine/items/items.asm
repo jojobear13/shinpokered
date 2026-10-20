@@ -2010,8 +2010,8 @@ ItemUseGuardSpec:
 	ld a, [wIsInBattle]
 	and a
 	jp z, ItemUseNotTime
-	ld hl, wPlayerBattleStatus2
-	set PROTECTED_BY_MIST, [hl] ; Mist bit
+	ld a, 5 ; Mist on the player's side for 5 turns
+	ld [wPlayerMistTurns], a
 	jp PrintItemUseTextAndRemoveItem
 
 ItemUseSuperRepel:

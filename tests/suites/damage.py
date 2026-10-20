@@ -35,8 +35,6 @@ def party_offset(game, field):
     return game.addr("wPartyMon1" + field) - game.addr("wPartyMon1")
 
 FIRE = 0x14
-HAS_LIGHT_SCREEN_UP = 1
-HAS_REFLECT_UP = 2
 LINK_STATE_BATTLING = 4
 
 H_BATTLE_SIDE = 0xFFE2  # hBattleSide
@@ -155,8 +153,10 @@ def setup(game, rng):
     for side in ("wPlayerBattleStatus", "wEnemyBattleStatus"):
         for i in (1, 2):
             game.poke(f"{side}{i}", rng.randint(0, 255))
-        screens = rng.choice([0, 1 << HAS_LIGHT_SCREEN_UP, 1 << HAS_REFLECT_UP, 0b110])
-        game.poke(f"{side}3", (rng.randint(0, 255) & ~0b110) | screens)
+        game.poke(f"{side}3", rng.randint(0, 255))
+    for side in ("wPlayer", "wEnemy"):  # Gen 9's screens: turns left on the side
+        for screen in ("ReflectTurns", "LightScreenTurns"):
+            game.poke(side + screen, rng.choice([0, 0, rng.randint(1, 5)]))
     for mods in ("wPlayerMonAttackMod", "wEnemyMonAttackMod"):
         game.poke(mods, *[rng.choice([7, 7, rng.randint(1, 13)]) for _ in range(NUM_USED_STAT_MODS)])
     game.poke("wMoveMissed", 0)

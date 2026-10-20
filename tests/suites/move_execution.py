@@ -82,6 +82,13 @@ def setup(game, rng):
         if name in game.symbols:
             game.poke(name, 0 if rng.random() < 0.7 else rng.randint(0, 5))
 
+    for name in ("wPlayerReflectTurns", "wEnemyReflectTurns", "wPlayerLightScreenTurns",
+                 "wEnemyLightScreenTurns", "wPlayerMistTurns", "wEnemyMistTurns"):  # Gen 9's side conditions
+        if name in game.symbols:
+            game.poke(name, 0 if rng.random() < 0.7 else rng.randint(1, 5))
+    for name in ("wPlayerBoundTurns", "wEnemyBoundTurns"):  # binding has its own tests
+        if name in game.symbols:
+            game.poke(name, 0)
     for name in ("wPlayerAbility", "wEnemyAbility", "wAbilityFlags"):
         if name in game.symbols:  # no abilities: those have their own tests
             game.poke(name, 0)

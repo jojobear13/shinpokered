@@ -1,29 +1,16 @@
 ; Gen 9's per-move data the Gen 1 move struct has no room for
 
 ; Who moves first by priority (Gen 9's brackets): carry if the priorities
-; decide it, then nz for the player first, z for the enemy. Shin's trapping
-; clause puts a second trapping move in a row last
+; decide it, then nz for the player first, z for the enemy
 ComparePriority:
 	ld a, [wPlayerSelectedMove]
 	call MovePriority
 	ld b, a
 	push bc
-	callab CheckLowerPlayerPriority ; z: the trapping clause
-	pop bc
-	jr nz, .gotPlayer
-	ld b, -7
-.gotPlayer
-	push bc
 	ld a, [wEnemySelectedMove]
 	call MovePriority
 	pop bc
 	ld c, a
-	push bc
-	callab CheckLowerEnemyPriority
-	pop bc
-	jr nz, .gotEnemy
-	ld c, -7
-.gotEnemy
 	ld a, b
 	xor $80 ; signed to unsigned
 	ld b, a

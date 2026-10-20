@@ -24,6 +24,7 @@ GetMonAbility:
 ; set wPlayerAbility or wEnemyAbility from the mon just sent out, and clear
 ; what the side's last mon's ability had set up
 LoadPlayerAbility:
+	call FreeBoundMons
 	xor a
 	ld [wPlayerChoiceLock], a
 	ld hl, wAbilityFlags
@@ -33,6 +34,7 @@ LoadPlayerAbility:
 	ld hl, wPlayerAbility
 	jr LoadBattleMonAbility
 LoadEnemyAbility:
+	call FreeBoundMons
 	xor a
 	ld [wEnemyChoiceLock], a
 	ld hl, wAbilityFlags
@@ -1494,6 +1496,7 @@ AbilityResidual:
 	and a
 	ret
 .magicGuard
+	callab BoundTurnEnd ; no damage, but the turns still count
 	ld hl, wBattleMonHP
 	ld a, [H_WHOSETURN]
 	and a
@@ -2278,10 +2281,15 @@ Intimidate:
 	ld a, [H_WHOSETURN]
 	and a
 	ld a, [wEnemyBattleStatus2]
+	ld hl, wEnemyMistTurns
 	jr z, .gotTargetStatus
 	ld a, [wPlayerBattleStatus2]
+	ld hl, wPlayerMistTurns
 .gotTargetStatus
-	and (1 << HAS_SUBSTITUTE_UP) | (1 << PROTECTED_BY_MIST)
+	bit HAS_SUBSTITUTE_UP, a
+	jr nz, .notLowered
+	ld a, [hl]
+	and a ; Mist
 	jr nz, .notLowered
 	ld a, [H_WHOSETURN]
 	xor 1
@@ -2451,9 +2459,28 @@ ForewarnPower:
 ; Arena Trap: the mon whose turn it isn't (a = which) can't flee or switch out
 ; unless it's a Flying or Ghost type, or has Levitate. a = 0 for the player's
 ; mon, 1 for the enemy's; carry if trapped. Not in link battles, where each
-; side's own game decides
+; side's own game decides. A mon bound by Wrap and co. can't leave either,
+; unless it's a Ghost type (Gen 9)
 SideTrapped:
 	ld e, a
+	ld hl, wPlayerBoundTurns
+	and a
+	jr z, .gotBound
+	inc hl
+.gotBound
+	ld a, [hl]
+	and a
+	jr z, .notBound
+	call .types
+	ld a, [hli]
+	cp GHOST
+	jr z, .notBound
+	ld a, [hl]
+	cp GHOST
+	jr z, .notBound
+	scf
+	ret
+.notBound
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jr z, .free
@@ -2542,6 +2569,13 @@ RunAwayOrTrapped:
 	ret
 .runAway
 	scf
+	ret
+
+; a mon leaving the field frees the mons bound to it, and itself
+FreeBoundMons:
+	xor a
+	ld [wPlayerBoundTurns], a
+	ld [wEnemyBoundTurns], a
 	ret
 
 ; Transform copies the target's ability too (the mon whose turn it is

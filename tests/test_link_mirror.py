@@ -49,6 +49,11 @@ PAIRS = [
     ("wPlayerMoveListIndex", "wEnemyMoveListIndex", 1),
     ("wPlayerAbility", "wEnemyAbility", 1),
     ("wPlayerChoiceLock", "wEnemyChoiceLock", 1),
+    ("wPlayerBoundTurns", "wEnemyBoundTurns", 1),
+    ("wPlayerBoundMove", "wEnemyBoundMove", 1),
+    ("wPlayerReflectTurns", "wEnemyReflectTurns", 1),
+    ("wPlayerLightScreenTurns", "wEnemyLightScreenTurns", 1),
+    ("wPlayerMistTurns", "wEnemyMistTurns", 1),
     ("wPartyCount", "wEnemyPartyCount", 1),
 ]
 # mirrored, but PP is spent differently by the two sides (the player's when it

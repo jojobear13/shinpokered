@@ -3577,6 +3577,33 @@ wDamageScratch:: ; BaseDamage: power, level, attack, defense
 wEvoScratch:: ; PastEvolutionLevel: a species' evolutions
 	ds EVO_SCRATCH_LENGTH
 
+; Gen 9's binding and side conditions, each the player's then the enemy's;
+; cleared as a battle starts
+wSideConditions::
+wPlayerBoundTurns:: ; the turns left (+1) the mon is bound by Wrap and co., 0 if free
+	ds 1
+wEnemyBoundTurns::
+	ds 1
+wPlayerBoundMove:: ; the move binding it
+	ds 1
+wEnemyBoundMove::
+	ds 1
+wPlayerReflectTurns:: ; the turns left of each screen and Mist on the side
+	ds 1
+wEnemyReflectTurns::
+	ds 1
+wPlayerLightScreenTurns::
+	ds 1
+wEnemyLightScreenTurns::
+	ds 1
+wPlayerMistTurns::
+	ds 1
+wEnemyMistTurns::
+	ds 1
+wTurnPending:: ; both sides have chosen this turn; it ends as the battle loop comes round
+	ds 1
+wSideConditionsEnd::
+
 ; free up to the stack at $df00
 
 

@@ -38,6 +38,12 @@ InitBattleVariables:
 	ld [hli], a
 	dec b
 	jr nz, .loop
+	ld hl, wSideConditions
+	ld b, wSideConditionsEnd - wSideConditions
+.sideConditionsLoop
+	ld [hli], a
+	dec b
+	jr nz, .sideConditionsLoop
 	inc a ; POUND
 	ld [wTestBattlePlayerSelectedMove], a
 	ld a, [wCurMap]

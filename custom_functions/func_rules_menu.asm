@@ -21,7 +21,6 @@ RuleFlags:
 	rule RulesTextItem,       EVENT_8DB ; item clause
 	rule RulesTextSleep,      EVENT_8DC ; sleep clause
 	rule RulesTextFreeze,     EVENT_8DD ; freeze clause
-	rule RulesTextTrap,       EVENT_8C5 ; trapping move clause
 	rule RulesTextHyperBeam,  EVENT_8C8 ; hyper beam clause
 	rule RulesTextSafari,     EVENT_90F ; special safari zone event
 RuleFlagsRowsEnd:
@@ -260,8 +259,6 @@ RulesTextSleep:
 	db " SLEEP CLAUSE@"
 RulesTextFreeze:
 	db " FREEZE CLAUSE@"
-RulesTextTrap:
-	db " TRAP CLAUSE@"
 RulesTextHyperBeam:
 	db " H.BEAM CLAUSE@"
 RulesTextSafari:

@@ -355,21 +355,20 @@ DamageModifiers:
 	dec a
 	jr z, .noScreen
 	ld a, [hBattleSide]
-	and BATTLE_SIDE_ENEMY
-	ld a, [wEnemyBattleStatus3]
-	jr z, .gotScreens
-	ld a, [wPlayerBattleStatus3]
-.gotScreens
 	ld b, a
-	ld a, [hBattleSide]
-	bit BATTLE_SIDE_SPECIAL_F, a
-	ld a, b
-	jr nz, .lightScreen
-	bit HAS_REFLECT_UP, a
-	jr .gotScreen
-.lightScreen
-	bit HAS_LIGHT_SCREEN_UP, a
+	and BATTLE_SIDE_ENEMY
+	ld hl, wEnemyReflectTurns ; the target's side
+	jr z, .gotSide
+	ld hl, wPlayerReflectTurns
+.gotSide
+	bit BATTLE_SIDE_SPECIAL_F, b
+	jr z, .gotScreen
+	ASSERT wPlayerLightScreenTurns - wPlayerReflectTurns == 2
+	inc hl
+	inc hl
 .gotScreen
+	ld a, [hl]
+	and a
 	jr z, .noScreen
 	lb bc, 1, 2
 	call ScaleDamage16

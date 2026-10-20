@@ -399,8 +399,8 @@ AIMoveChoiceModification1:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - do not use moves that are blocked by mist
-	ld a, [wPlayerBattleStatus2]
-	bit PROTECTED_BY_MIST, a	;check for mist bit
+	ld a, [wPlayerMistTurns]
+	and a	;check for mist
 	jr z, .noMistImm	;if the mist bit is not set, then skip out of this block
 	ld a, [wEnemyMoveEffect]	;get the move effect into a
 	push hl
@@ -551,18 +551,18 @@ AIMoveChoiceModification1:
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkscreen ;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_LIGHT_SCREEN_UP, a
+	ld a, [wEnemyLightScreenTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkreflect	;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus3]
-	bit HAS_REFLECT_UP, a
+	ld a, [wEnemyReflectTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checkmist	;check status, and heavily discourage if bit is set
-	ld a, [wEnemyBattleStatus2]
-	bit PROTECTED_BY_MIST, a
+	ld a, [wEnemyMistTurns]
+	and a
 	jp nz, .heavydiscourage
 	jr .endstacking
 .checksub	;check status, and heavily discourage if bit is set
@@ -1488,13 +1488,6 @@ TrainerAI:
 	cp LINK_STATE_BATTLING
 	ret z
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a ; caught in player's trapping move (e.g. wrap)
-	jr z, .notbeingtrapped
-	call CheckandResetSwitchBit	
-	jp nz, AISwitchIfEnoughMons	;switch if switch bit is set and stuck in the player's trapping move
-.notbeingtrapped
 ;	...otherwise
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - AI should not use actions if the null move has been selected
@@ -1976,17 +1969,6 @@ SwitchEnemyMon:
 	ccf
 	ret nc
 	callba DoEnemyShinybit ;joenote - reset shiny checker bits
-;joenote - if player using trapping move, then end their move
-	ld a, [wPlayerBattleStatus1]
-	bit USING_TRAPPING_MOVE, a
-	jr z, .preparewithdraw
-	ld hl, wPlayerBattleStatus1
-	res USING_TRAPPING_MOVE, [hl] 
-	xor a
-	ld [wPlayerNumAttacksLeft], a
-	ld a, $FF
-	ld [wPlayerSelectedMove], a
-.preparewithdraw
 ; prepare to withdraw the active monster:
 	callab NaturalCureEnemy
 

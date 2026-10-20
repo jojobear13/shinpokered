@@ -23,7 +23,7 @@ NORMAL, FLYING, GHOST, GRASS, ELECTRIC, WATER = 0x00, 0x02, 0x08, 0x16, 0x17, 0x
 PSN, BRN, PAR = 1 << 3, 1 << 4, 1 << 6
 BADLY_POISONED = 1 << 0
 ENTRY_PLAYER, ENTRY_ENEMY = 1 << 3, 1 << 4
-HAS_SUBSTITUTE_UP, PROTECTED_BY_MIST = 1 << 4, 1 << 1
+HAS_SUBSTITUTE_UP = 1 << 4
 MOD_ATTACK, MOD_SPECIAL_ATTACK = 0, 3
 
 
@@ -40,6 +40,7 @@ class EntryTest(unittest.TestCase):
         for i in (1, 2, 3):
             g.poke(f"wPlayerBattleStatus{i}", 0)
             g.poke(f"wEnemyBattleStatus{i}", 0)
+        g.poke("wPlayerMistTurns", 0, 0)
         for mon, prefix in (("wBattleMon", "wPlayerMon"), ("wEnemyMon", "wEnemyMon")):
             g.poke16(mon + "HP", 100)
             g.poke(mon + "Status", 0)
@@ -81,10 +82,13 @@ class EntryTest(unittest.TestCase):
                 self.setup("INTIMIDATE", blocker)
                 self.run_entry()
                 self.assertEqual(self.mods(1)[MOD_ATTACK], 7)
-        for status in (HAS_SUBSTITUTE_UP, PROTECTED_BY_MIST):
-            with self.subTest(status=status):
+        for blocked in ("substitute", "mist"):
+            with self.subTest(blocked=blocked):
                 self.setup("INTIMIDATE", "NO_ABILITY")
-                self.game.poke("wEnemyBattleStatus2", status)
+                if blocked == "substitute":
+                    self.game.poke("wEnemyBattleStatus2", HAS_SUBSTITUTE_UP)
+                else:
+                    self.game.poke("wEnemyMistTurns", 3)
                 self.run_entry()
                 self.assertEqual(self.mods(1)[MOD_ATTACK], 7)
         self.setup("INTIMIDATE", "NEUTRALIZING_GAS")

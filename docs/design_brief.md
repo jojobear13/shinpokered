@@ -1261,6 +1261,52 @@ As in Gen 9 (Showdown's implementation, where Bulbapedia is vague):
   speed halving. The ability and item tests that had Gen 1's numbers (Leech
   Seed, Leftovers after poison, Shed Skin, Synchronize) have Gen 9's.
 
+### Part 6: move behaviours
+
+In progress, one commit per group:
+
+- **Priority** is Gen 9's brackets, from a table generated from PokeAPI
+  (`tools/gen_move_data.py` → `data/move_priorities.asm`): Quick Attack +1,
+  Bide +1, Counter -5, Whirlwind, Roar and Teleport -6. `ComparePriority`
+  (bank `$35`) compares them signed; Quick Claw and speed decide ties.
+- **Secondary-effect chances** are each move's Gen 9 chance, from the same
+  script (`data/move_chances.asm`, out of 256, 255 for always):
+  `MoveSecondaryChance` overrides the effect's own chance before Serene
+  Grace and Shield Dust. Gen 9's high critical-hit moves come from the
+  same script (`data/move_crit_moves.asm`).
+- **Binding moves** (Wrap, Bind, Fire Spin, Clamp): the user is no longer
+  locked in and the target no longer loses its turns. A hit binds the
+  target, not through a substitute or an immunity, for 4-5 turns
+  (`wPlayerBoundTurns`/`wEnemyBoundTurns`, 5-6, counted down after each of
+  the bound mon's turns; the last frees it, "was freed from WRAP!"). Each
+  turn it takes 1/8 of its max HP (Magic Guard: none, but the turns still
+  count). It can't flee or switch out unless it's a Ghost type (the
+  `SideTrapped` check Arena Trap uses, so the switch menu, running and the
+  AI all respect it). Either mon leaving the field frees it. Shin's
+  trapping clause, the AI's "switch out of a trapping move" and the
+  "attack continues" text go; the rules menu loses its TRAP CLAUSE row
+  (its link nybble bit stays, unused).
+- **Reflect, Light Screen and Mist** are side conditions for 5 turns
+  (`wPlayerReflectTurns` ... `wEnemyMistTurns`), kept through switches.
+  They count down as each turn ends: `wTurnPending` is set once both sides
+  have chosen, and the battle loop's next pass (`SideConditionsEndOfTurn`)
+  counts down and says "Your team's REFLECT wore off!" / "The foe's ...".
+  Guard Spec. is Mist for 5 turns. The status bits they used are free.
+- **Haze** resets every stat stage on both sides and nothing else: status,
+  Leech Seed, confusion, Focus Energy, Disable and screens stay (Gen 1's
+  Haze cured the target's status). Paralysis still halves speed after it.
+- **Verified:** `tests/test_move_data.py` (priority brackets, chances) and
+  `tests/test_side_conditions.py` (binding duration, damage, immunity,
+  switching, freeing on send-out, screens and Mist for 5 turns, the
+  end-of-turn countdown, Haze). In the emulator, a wild battle against a
+  Snorlax showed "can't escape!", "hurt by WRAP", "was freed from WRAP!",
+  Reflect failing while up, and Mist. The damage and link mirror suites
+  read the screens' new counters.
+- **Still to do in this part:** Substitute, Counter, Bide, Rage, Disable,
+  Mimic, Mirror Move, Conversion, Whirlwind and Roar, Struggle, multi-hit
+  odds, recoil and crash damage, Low Kick, Psywave, powder moves, thawing
+  and never-miss flags.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here
