@@ -1935,4 +1935,11 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   mon KO'd (the poisoned foe takes poison before "Use next"), and the
   player's mon fainting to poison after its KO (fainted text, then both
   replaced).
+- **Multi-hit critical hits** (checked, not a bug): every hit after the
+  first re-rolls `CriticalHitTest` and its damage, for both sides, so a
+  critical first hit doesn't carry over. Over 300 seeded Fury Attack turns
+  each way, no hit after a critical first hit was critical, and later hits
+  were critical about 1 time in 22, near Gen 9's 1 in 24.
+  `tests/test_multi_hit_crits.py` keeps it so (a hook on
+  `PrintCriticalOHKOText` records each hit's flag and damage).
 
