@@ -224,6 +224,5 @@ const_value = $C4
 	const POCKET_BALLS
 	const POCKET_BATTLE
 	const POCKET_BERRIES
-	const POCKET_TMHM
 	const POCKET_KEY
 NUM_POCKETS EQU const_value

@@ -1901,6 +1901,10 @@ _OopsYouDontHaveEnoughRoomText::
 	text "Oops! You don't"
 	line "have enough room.@@"
 
+_AlreadyOwnMachineText::
+	text "You already have"
+	line "that one!@@"
+
 _OhFineThenText::
 	text "Oh, fine then.@@"
 

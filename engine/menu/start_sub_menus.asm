@@ -39,7 +39,7 @@ StartMenu_Pokemon:
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; display pokemon menu options
 	ld hl, wFieldMoves
-	lb bc, 2, 12 ; max menu item ID, top menu item Y
+	lb bc, 3, 10 ; max menu item ID, top menu item Y
 	ld e, NUM_FIELD_MOVES+1	;joenote - increase field moves that can be listed
 .adjustMenuVariablesLoop
 	dec e
@@ -83,6 +83,9 @@ StartMenu_Pokemon:
 	jr z, .choseSwitch
 	dec b
 	cp b
+	jr z, .choseMoves
+	dec b
+	cp b
 	jp z, .choseStats
 	ld c, a
 	ld b, 0
@@ -98,6 +101,10 @@ StartMenu_Pokemon:
 	ld [wPartyMenuTypeOrMessageID], a
 	call GoBackToPartyMenu
 	jp .checkIfPokemonChosen
+.choseMoves
+	callab MovesScreen
+	call ReloadMapData
+	jp StartMenu_Pokemon
 .choseStats
 	call ClearSprites
 	xor a ; PLAYER_PARTY_DATA

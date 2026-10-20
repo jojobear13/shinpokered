@@ -44,6 +44,11 @@ InitPlayerData2:
 	ld hl, wNumBagItems
 	call InitializeEmptyList
 
+	ld hl, wTMsOwned
+	ld bc, (NUM_MACHINES + 7) / 8
+	xor a
+	call FillMemory
+
 	ld hl, wNumBoxItems
 	call InitializeEmptyList
 

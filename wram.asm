@@ -2526,6 +2526,10 @@ wBagItems:: ; d31e
 wBagItemsTerminator::	;holds FF when the bag becomes full
 	ds 1 ; end
 
+wTMsOwned:: ; a flag per TM and HM (MachineIndex's order): they're owned, not carried
+	ds (NUM_MACHINES + 7) / 8
+	ds 1
+
 wPlayerMoney:: ; d347
 	ds 3 ; BCD
 
@@ -3617,6 +3621,28 @@ wBagPocketList:: ; the pocket's count, then each entry's index in the bag
 	ds 1 + BAG_ITEM_CAPACITY
 wSortInventory:: ; SortInventory: the inventory being sorted
 	ds 2
+
+; the MOVES screen (engine/menu/moves_screen.asm)
+wMovesSlotCursor:: ; the slot the cursor is on (NUM_MOVES for the field move slot)
+	ds 1
+wMovesSlot:: ; the slot being changed
+	ds 1
+wMovesCursor:: ; the choice the cursor is on
+	ds 1
+wMovesScroll:: ; the first choice shown
+	ds 1
+wMovesSpecies::
+	ds 1
+wMovesMachine:: ; the machine being checked (MachineIndex's order)
+	ds 1
+wMovesNumber:: ; for printing; a pointer
+	ds 2
+wMovesData:: ; a move's Moves entry
+	ds 6
+wMovesChoices:: ; the count, then (move, where from) pairs: the level, or the TM or HM; move 0 is REMOVE
+	ds 1 + MAX_MOVE_CHOICES * 2
+wMovesLearnset:: ; the mon's evolutions and learnset
+	ds MOVES_LEARNSET_LENGTH
 
 ; free up to the stack at $df00
 

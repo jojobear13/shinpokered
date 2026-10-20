@@ -23,9 +23,9 @@ def learnsets():
     with open(os.path.join(REPO_ROOT, "data", "evos_moves.asm")) as f:
         text = f.read()
     for name, body in re.findall(r"^(\w+)EvosMoves:\n(.*?)\n(?=\w+EvosMoves:|\Z)", text, re.M | re.S):
-        if "; Learnset\n" not in body:
+        if "; Learnset" not in body:
             continue
-        part = body.split("; Learnset\n", 1)[1].split("\tdb 0\n", 1)[0]
+        part = re.split(r"; Learnset[^\n]*\n", body, 1)[1].split("\tdb 0\n", 1)[0]
         yield name, [(int(l), m) for l, m in re.findall(r"\tdb (\d+), (\w+)", part)]
 
 

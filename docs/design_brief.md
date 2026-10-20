@@ -1586,12 +1586,13 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   digits are 0.0.5.0, so it won't link with Shin's builds.
 
 - **The bag screen**: Shin's SELECT-swapped second bag is gone (its WRAM
-  backup is freed). The bag holds 40 kinds (`BAG_ITEM_CAPACITY`) and opens
+  backup is freed). The bag holds 36 kinds (`BAG_ITEM_CAPACITY`) and opens
   full screen (`engine/menu/bag_menu.asm`, `BagMenu`), from the START menu
   and in battle: a header with the pocket's name between ◀ and ▶, and six
   two-line entries (the name, then "×NN" except for key items), then CANCEL.
   LEFT/RIGHT change pocket (ITEMS, MEDICINE, BALLS, BATTLE ITEMS, BERRIES,
-  TMs/HMs, KEY ITEMS); the pocket, cursor and scroll are remembered.
+  KEY ITEMS; TMs and HMs aren't in the bag, see below); the pocket, cursor
+  and scroll are remembered.
   `tools/gen_item_pockets.py` writes `data/item_pockets.asm`: each item's
   pocket and `ItemSortList`, every item in pocket order. The bag is put in
   that order (`SortBag`) when the bag screen, the PC's deposit list or the
@@ -1601,3 +1602,36 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   unchanged; overworld sprites are hidden while it is open. The old man's
   demo still uses the old list. START in the PC's item box still sorts it.
   `tests/test_bag.py`.
+- **TMs and HMs are owned, not carried.** Getting one (a gift, an item
+  ball, a hidden item, a mart, the prize corner) sets its flag in
+  `wTMsOwned` (7 bytes after the bag, which went from 40 kinds to 36 to make
+  room; `MachineIndex` numbers them in `TechnicalMachines`' order, TMs then
+  HMs) instead of adding it to the bag: `AddItemToInventory_` handles it
+  and always succeeds. Marts sell an owned TM no more and an unowned one one
+  at a time; the prize corner won't trade for one already owned. NEW GAME
+  and NEW GAME+ clear the flags. The TM item-use code is left in place but
+  can no longer be reached. Pewter's TM34 speech says TMs never run out.
+- **The MOVES screen** (party menu → MOVES, `engine/menu/moves_screen.asm`):
+  the mon's four moves with their PP and its field move slot (Shin's
+  temporary field move: usable outside battle only), and below them the
+  highlighted move's type, category, power, accuracy and PP. A slot opens
+  the list of what can go there: REMOVE (not for a mon's only move; the
+  moves after it move up), then its starting moves, its learnset up to its
+  level (marked L and the level), then each owned TM and HM it can learn
+  (marked TM05, HM01...); the field move slot lists field moves only.
+  Choosing one puts it in the slot (or the first empty one) with its full
+  PP, and PP Ups go with the old move, as in Gen 9. The party submenu is
+  STATS, MOVES, SWITCH, CANCEL, so it shows at most four field moves
+  (`NUM_FIELD_MOVES`): a mon with four field moves no longer lists its
+  field-slot move or TAKE there. Shin's move deleter and relearner NPCs in
+  Saffron are still there, though the MOVES screen does both for free.
+  `tests/test_moves_screen.py` checks the lists against a model built from
+  the data files, for six mons and every slot, and learning, replacing,
+  removing and the field slot; it also found that the learnset parser in
+  `tests/test_learnsets.py` skipped entries whose "; Learnset" line had a
+  comment (Pikachu's, among others), which it no longer does.
+- **`coord` and the other screen-position macros** now put their row and
+  column in parentheses, so `coord hl, 0, TOP - 1` means row TOP - 1 (it
+  meant row TOP, one column to the left). No existing call used an
+  expression the change affects, so the ROM is otherwise unchanged; the bag screen had
+  hit it.

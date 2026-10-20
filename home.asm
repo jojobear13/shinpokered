@@ -2164,6 +2164,31 @@ GetItemName::
 ;HiddenPrefix::
 ;	db "HM"
 
+; a = a TM or HM item -> a = its machine number from 0, TechnicalMachines'
+; order (the TMs, then the HMs)
+MachineIndex::
+	sub TM_01
+	ret nc
+	add TM_01 - HM_01 + NUM_TMS
+	ret
+
+; a = a TM or HM item -> nz if the player owns it; keeps bc, de and hl
+CheckMachineOwned::
+	push bc
+	push de
+	push hl
+	call MachineIndex
+	ld c, a
+	ld b, FLAG_TEST
+	ld hl, wTMsOwned
+	predef FlagActionPredef
+	ld a, c
+	and a
+	pop hl
+	pop de
+	pop bc
+	ret
+
 ; sets carry if item is HM, clears carry if item is not HM
 ; Input: a = item ID
 IsItemHM::

@@ -592,14 +592,14 @@ DisplayFieldMoveMonMenu:
 	jr nz, .fieldMovesExist
 
 ; no field moves
-	coord hl, 11, 11
-	ld b, 5
+	coord hl, 11, 9
+	ld b, 7
 	ld c, 7
 	call TextBoxBorder
 	call UpdateSprites
 	ld a, 12
 	ld [hFieldMoveMonMenuTopMenuItemX], a
-	coord hl, 13, 12
+	coord hl, 13, 10
 	ld de, PokemonMenuEntries
 	jp PlaceString
 
@@ -608,13 +608,13 @@ DisplayFieldMoveMonMenu:
 
 ; Calculate the text box position and dimensions based on the leftmost X coord
 ; of the field move names before adjusting for the number of field moves.
-	coord hl, 0, 11
+	coord hl, 0, 9
 	ld a, [wFieldMovesLeftmostXCoord]
 	dec a
 	ld e, a
 	ld d, 0
 	add hl, de
-	ld b, 5
+	ld b, 7
 	ld a, 18
 	sub e
 	ld c, a
@@ -639,7 +639,7 @@ DisplayFieldMoveMonMenu:
 	call UpdateSprites
 
 ; Calculate the position of the first field move name to print.
-	coord hl, 0, 12
+	coord hl, 0, 10
 	ld a, [wFieldMovesLeftmostXCoord]
 	inc a
 	ld e, a
@@ -688,7 +688,7 @@ DisplayFieldMoveMonMenu:
 	pop hl
 	ld a, [wFieldMovesLeftmostXCoord]
 	ld [hFieldMoveMonMenuTopMenuItemX], a
-	coord hl, 0, 12
+	coord hl, 0, 10
 	ld a, [wFieldMovesLeftmostXCoord]
 	inc a
 	ld e, a
@@ -711,6 +711,7 @@ FieldMoveNames:
 
 PokemonMenuEntries:
 	db   "STATS"
+	next "MOVES"
 	next "SWITCH"
 	next "CANCEL@"
 
@@ -793,9 +794,9 @@ GetMonFieldMoves:
 	cp $FF
 	jr z, .done
 	
-;	ld a, [wNumFieldMoves]
-;	cp NUM_MOVES
-;	jr nc, .done
+	ld a, [wNumFieldMoves] ; no room for a fifth
+	cp NUM_FIELD_MOVES
+	jr nc, .done
 	
 	ld a, [wWhichPokemon]
 	ld c, a
@@ -816,7 +817,7 @@ GetMonFieldMoves:
 	ld c, 1
 	ld d, $FF
 	ld hl, FieldMoveDisplayData
-	jr .fieldMoveLoop
+	jp .fieldMoveLoop
 
 ; Format: [Move id], [name index], [leftmost tile]
 ; Move id = id of move

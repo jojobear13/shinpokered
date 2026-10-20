@@ -14,7 +14,7 @@ from harness import REPO_ROOT, shared_game
 from test_held_items import ITEMS
 
 POCKETS = ["POCKET_ITEMS", "POCKET_MEDICINE", "POCKET_BALLS", "POCKET_BATTLE",
-           "POCKET_BERRIES", "POCKET_TMHM", "POCKET_KEY"]
+           "POCKET_BERRIES", "POCKET_KEY"]
 
 
 def _pocket_data():
@@ -41,7 +41,7 @@ POCKET_OF, SORT_ORDER = _pocket_data()
 
 
 def pocket(item):
-    return POCKETS.index("POCKET_TMHM") if item >= ITEMS["HM_01"] else POCKET_OF[item]
+    return POCKET_OF[item]
 
 
 class BagTest(unittest.TestCase):
@@ -74,8 +74,7 @@ class BagTest(unittest.TestCase):
 
     def test_sort_list_covers_every_item(self):
         self.assertEqual(sorted(SORT_ORDER), sorted(set(SORT_ORDER)))
-        self.assertLessEqual(set(SORT_ORDER), set(POCKET_OF) | set(range(ITEMS["HM_01"], ITEMS["TM_50"] + 1)))
-        self.assertLessEqual(set(range(ITEMS["HM_01"], ITEMS["TM_50"] + 1)), set(SORT_ORDER))
+        self.assertLessEqual(set(SORT_ORDER), set(POCKET_OF))  # TMs and HMs aren't in the bag
         pockets = [pocket(item) for item in SORT_ORDER]
         self.assertEqual(pockets, sorted(pockets))
 

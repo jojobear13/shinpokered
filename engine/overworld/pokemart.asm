@@ -152,6 +152,14 @@ DisplayPokemartDialogue_:
 	jr c, .returnToMainPokemartMenu ; if the player closed the menu
 	ld a, 99
 	ld [wMaxItemQuantity], a
+	ld a, [wcf91]
+	cp HM_01
+	jr c, .chooseQuantity
+	call CheckMachineOwned ; a TM is owned for good: one, once
+	jp nz, .alreadyOwned
+	ld a, 1
+	ld [wMaxItemQuantity], a
+.chooseQuantity
 	xor a
 	ld [hHalveItemPrices], a ; don't halve item prices when buying
 	call DisplayChooseQuantityMenu
@@ -214,6 +222,10 @@ DisplayPokemartDialogue_:
 	ld hl, PokemartNotEnoughMoneyText
 	call PrintText
 	jr .returnToMainPokemartMenu
+.alreadyOwned
+	ld hl, PokemartAlreadyOwnMachineText
+	call PrintText
+	jp .buyMenuLoop
 .bagFull
 	ld hl, PokemartItemBagFullText
 	call PrintText
@@ -246,6 +258,11 @@ PokemartNotEnoughMoneyText:
 
 PokemartItemBagFullText:
 	TX_FAR _PokemartItemBagFullText
+	db "@"
+
+PokemartAlreadyOwnMachineText:
+	TX_FAR _AlreadyOwnMachineText
+	TX_WAIT
 	db "@"
 
 PokemonSellingGreetingText:

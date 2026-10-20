@@ -11,7 +11,7 @@ MAX_LEVEL EQU 100
 ENCOUNTER_TILE_COORD_X EQU 8
 ENCOUNTER_TILE_COORD_Y EQU 9
 
-NUM_FIELD_MOVES     EQU 5
+NUM_FIELD_MOVES     EQU 4 ; as many as fit above STATS, MOVES, SWITCH and CANCEL
 TAKE_ITEM_MENU_ENTRY EQU 10 ; after the field moves in FieldMoveNames
 
 NUM_MOVES     EQU 4
@@ -36,7 +36,13 @@ PARTY_LENGTH EQU 6
 MONS_PER_BOX EQU 20
 NUM_BOXES    EQU 12
 
-BAG_ITEM_CAPACITY EQU 40 ; one bag (Shin had two of 20), shown by pocket
+BAG_ITEM_CAPACITY EQU 36 ; one bag (Shin had two of 20), shown by pocket; TMs and HMs aren't in it
+NUM_TMS EQU 50
+NUM_HMS EQU 5
+NUM_MACHINES EQU NUM_TMS + NUM_HMS
+
+MAX_MOVE_CHOICES EQU 96 ; the MOVES screen's list: a learnset, 4 starting moves, every TM and HM
+MOVES_LEARNSET_LENGTH EQU 64 ; the longest evolutions-and-learnset entry fits (tests/test_moves_screen.py)
 PC_ITEM_CAPACITY  EQU 50
 
 HOF_MON           EQU $10

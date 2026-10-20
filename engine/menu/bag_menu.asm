@@ -192,10 +192,8 @@ BagLoadPocket:
 .scrollOK
 	ret
 
-; a = an item -> a = its pocket (POCKET_*); keeps bc, de and hl
+; a = an item (not a TM or HM) -> a = its pocket (POCKET_*); keeps bc, de and hl
 ItemPocket::
-	cp HM_01
-	jr nc, .tmhm
 	push hl
 	push bc
 	dec a
@@ -207,15 +205,12 @@ ItemPocket::
 	pop bc
 	pop hl
 	ret
-.tmhm
-	ld a, POCKET_TMHM
-	ret
 
 BagDrawScreen:
 	coord hl, 0, 0
 	lb bc, 1, 18
 	call TextBoxBorder
-	coord hl, 0, (BAG_TOP - 1)
+	coord hl, 0, BAG_TOP - 1
 	lb bc, BAG_ROWS * 2, 18
 	call TextBoxBorder
 	coord hl, 1, 1
@@ -330,7 +325,7 @@ BagCancelText:
 	db "CANCEL@"
 
 PocketNames:
-	dw .items, .medicine, .balls, .battle, .berries, .tmhm, .key
+	dw .items, .medicine, .balls, .battle, .berries, .key
 .items
 	db "ITEMS@"
 .medicine
@@ -341,7 +336,5 @@ PocketNames:
 	db "BATTLE ITEMS@"
 .berries
 	db "BERRIES@"
-.tmhm
-	db "TMs/HMs@"
 .key
 	db "KEY ITEMS@"

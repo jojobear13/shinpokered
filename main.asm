@@ -1963,6 +1963,9 @@ INCLUDE "custom_functions/func_move_secrets.asm"
 INCLUDE "custom_functions/func_linkbattlecomms.asm"
 INCLUDE "custom_functions/func_bag.asm"
 INCLUDE "engine/menu/bag_menu.asm"
+
+SECTION "Moves Screen", ROMX
+INCLUDE "engine/menu/moves_screen.asm"
 INCLUDE "custom_functions/func_soundtest.asm"
 INCLUDE "custom_functions/func_emuchecks.asm"
 
