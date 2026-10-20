@@ -1,71 +1,71 @@
 ; mart inventories are below
-; they are texts
+; they are texts: $FE and an index into MartInventories
 ;joenote - added moon stone, fossils, amber, pp_up, all kinds of TMs
 
 ; Viridian
 ViridianCashierText::
-	TX_MART POKE_BALL, ANTIDOTE, PARLYZ_HEAL, BURN_HEAL, TM_37, TM_41
+	db $FE, 0 ; mart: its list is in data/mart_lists.asm
 
 ; Pewter
 PewterCashierText::
-	TX_MART POKE_BALL, POTION, ESCAPE_ROPE, ANTIDOTE, BURN_HEAL, AWAKENING, PARLYZ_HEAL, ETHER, TM_16, TM_42
+	db $FE, 1 ; mart: its list is in data/mart_lists.asm
 
 ; Cerulean
 CeruleanCashierText::
-	TX_MART POKE_BALL, POTION, ESCAPE_ROPE, REPEL, ANTIDOTE, BURN_HEAL, AWAKENING, PARLYZ_HEAL, TM_04, TM_34
+	db $FE, 2 ; mart: its list is in data/mart_lists.asm
 
 ; Bike shop
-	TX_MART BICYCLE
+	db $FE, 3 ; mart: its list is in data/mart_lists.asm
 
 ; Vermilion
 VermilionCashierText::
-	TX_MART POKE_BALL, SUPER_POTION, ICE_HEAL, AWAKENING, PARLYZ_HEAL, REPEL, TM_12, TM_45
+	db $FE, 4 ; mart: its list is in data/mart_lists.asm
 
 ; Lavender
 LavenderCashierText::
-	TX_MART GREAT_BALL, SUPER_POTION, REVIVE, ESCAPE_ROPE, SUPER_REPEL, ANTIDOTE, BURN_HEAL, ICE_HEAL, PARLYZ_HEAL, MAX_ETHER, TM_11, TM_28, TM_44, TM_48
+	db $FE, 5 ; mart: its list is in data/mart_lists.asm
 
 ; Celadon Dept. Store 2F (1)
 CeladonMart2Clerk1Text::
-	TX_MART GREAT_BALL, SUPER_POTION, REVIVE, SUPER_REPEL, ANTIDOTE, BURN_HEAL, ICE_HEAL, AWAKENING, PARLYZ_HEAL
+	db $FE, 6 ; mart: its list is in data/mart_lists.asm
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Clerk2Text::
-	TX_MART TM_32, TM_33, TM_02, TM_07, TM_23, TM_01, TM_05, TM_09, TM_17
+	db $FE, 7 ; mart: its list is in data/mart_lists.asm
 
 ; Celadon Dept. Store 4F
 CeladonMart4ClerkText::
-	TX_MART POKE_DOLL, FIRE_STONE, THUNDER_STONE, WATER_STONE, LEAF_STONE
+	db $FE, 8 ; mart: its list is in data/mart_lists.asm
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Clerk1Text::
-	TX_MART X_ACCURACY, GUARD_SPEC, DIRE_HIT, X_ATTACK, X_DEFEND, X_SPEED, X_SPECIAL
+	db $FE, 9 ; mart: its list is in data/mart_lists.asm
 
 ; Celadon Dept. Store 5F (2)
 CeladonMart5Clerk2Text::
-	TX_MART HP_UP, PP_UP, PROTEIN, IRON, CARBOS, CALCIUM, TM_08, TM_20, TM_36
+	db $FE, 10 ; mart: its list is in data/mart_lists.asm
 
 ; Fuchsia
 FuchsiaCashierText::
-	TX_MART ULTRA_BALL, GREAT_BALL, SUPER_POTION, HYPER_POTION, REVIVE, FULL_HEAL, SUPER_REPEL, TM_30, TM_31, TM_39, TM_49, TM_50
+	db $FE, 11 ; mart: its list is in data/mart_lists.asm
 
 ; unused? joenote - repurposing for a new vendor on celadon dept store floor 3
 CeladonMart3ClerkText::
 	;TX_MART GREAT_BALL, HYPER_POTION, SUPER_POTION, FULL_HEAL, REVIVE
-	TX_MART MASTER_BALL, MAX_REVIVE, RARE_CANDY, MOON_STONE, DOME_FOSSIL, HELIX_FOSSIL, OLD_AMBER, EXP_ALL
+	db $FE, 12 ; mart: its list is in data/mart_lists.asm
 
 ; Cinnabar
 CinnabarCashierText::
-	TX_MART ULTRA_BALL, GREAT_BALL, HYPER_POTION, MAX_REPEL, ESCAPE_ROPE, FULL_HEAL, REVIVE, MAX_ELIXER, TM_03, TM_06, TM_13, TM_21, TM_40, TM_46
+	db $FE, 13 ; mart: its list is in data/mart_lists.asm
 
 ; Saffron
 SaffronCashierText::
-	TX_MART GREAT_BALL, HYPER_POTION, MAX_REPEL, ESCAPE_ROPE, FULL_HEAL, REVIVE, ELIXER, TM_10, TM_18, TM_19, TM_35
+	db $FE, 14 ; mart: its list is in data/mart_lists.asm
 
 ; Indigo
 IndigoCashierText::
-	TX_MART ULTRA_BALL, FULL_RESTORE, MAX_POTION, FULL_HEAL, REVIVE, MAX_REPEL, TM_22, TM_25, TM_26, TM_27, TM_29, TM_38, TM_43, TM_47
+	db $FE, 15 ; mart: its list is in data/mart_lists.asm
 	
 ;joenote - add drink stand
 DrinkStandText::
-	TX_MART FRESH_WATER, SODA_POP, LEMONADE
+	db $FE, 16 ; mart: its list is in data/mart_lists.asm

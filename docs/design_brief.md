@@ -26,7 +26,7 @@ checked.
 | Resource | Size | Free | Notes |
 |---|---|---|---|
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
-| ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
+| ROM bank 0 (always loaded) | 16 KB | 246 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). Moving the marts' item lists to bank `$34` (held items, part 5) freed about 150 more. The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
 | Battle engine bank ($0F) | 16 KB | 98 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
 | WRAM | 8 KB | **1083 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move); held items 5 (each side's Choice lock, what a Focus item saved, 2 scratch bytes). Still allocate new state through this table |
@@ -419,7 +419,7 @@ and the budget table above is updated.
 | B (done) | Damage pipeline, structural (decision 3): merge `{Player,Enemy}CanExecuteMove` and `{Player,Enemy}CalcMoveDamage`, read the level via the side table, remove `SwapPlayerAndEnemyLevels`, install empty hook tables and the S3 stage with n = 16. First add a `tests/suites/` suite that drives the whole `CalcMoveDamage` path (today only `damage_vars` and `apply_attack` are covered) | New suite identical across the two builds, including random consumption; `make test` | 0 |
 | C (done) | Merge `Check{Player,Enemy}StatusConditions` with 16 explicit side checks. First add a status-conditions suite (sleep, freeze, paralysis, confusion, flinch, Disable, Hyper Beam recharge) using `skip_delays()` and `auto_buttons()` | Suite identical across builds; `make test` | 0 (battle bank gains ~300 lines of room) |
 | D (done) | Current box to save RAM (decision 2): accessor, own checksum, ~90 call sites in 15 files, day-care mon included | New spec tests for deposit, withdraw, catch with a full party, box change and checksum repair; existing suites still identical (battle does not touch the box); a save-and-reload run in the emulator | WRAM 8 → ~1130 |
-| E (parts 1-4 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move (a table by move id, `GetMoveCategory`), read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (an ability slot bit; the logic in bank 9, reached by far-call hooks in the battle engine); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 53 WRAM bytes (a third DV byte and a sixth stat in every party and battle struct); natures 1; abilities 15; weather 1 planned |
+| E (parts 1-5 done) | First mechanics, on the `claude/mechanics` branch (decision 8), one commit each with a spec test, in this order because each later one depends on the stats the earlier ones define: (1) Special split: Special Attack and Special Defense with Gen 2's base stats, separate DVs (decision 6), shared Special stat experience, a Special Defense stat stage, Gen 2's move effects (Amnesia, Growth, Psychic's side effect) and Light Screen on Special Defense; (2) physical/special split: a category per move (a table by move id, `GetMoveCategory`), read in S0; (3) natures (`CalcStats`), the 25 Gen 9 natures over the five stats, neutral for trainers' Pokémon, shown on the status screen; (4) abilities (an ability slot bit; the logic in bank 9, reached by far-call hooks in the battle engine); (5) held items (item byte, wild item table, `Mon1BCDScore` fix); (6) weather (map-and-time at battle start, S3 hook, one battle-only byte) | `tests/test_*.py` per mechanic; `compare_builds.py --suite` on every suite a mechanic should not affect | Special split: 53 WRAM bytes (a third DV byte and a sixth stat in every party and battle struct); natures 1; abilities 15; weather 1 planned |
 | F | Day/night (decision 5): `GetTimeOfDay`, palette handling per hardware, three encounter tables per outdoor map, time evolutions. Then map regions (decision 4) when the first non-Kanto map is designed | Spec tests poke the clock and check phase, palette value and encounter table; an emulator run across a phase change | 0, then 2 bytes for regions |
 | G | Link checks (decision 7): version byte, per-turn checksum, mirror test | Two harness instances linked by their serial ports, or a scripted exchange, showing the draw path on an injected mismatch | 0 |
 
@@ -957,6 +957,38 @@ drawing from `Random` instead, 39 of the 96 targeted turns fail.
   `tests/test_held_item_field.py`, except Cleanse Tag, whose roll needs a
   whole map; the Everstone test checks that the evolution starts without it
   (the harness can't run the evolution scene to the end).
+
+**Step E, part 5 done: where held items come from** (your choice: all four
+sources).
+
+- **Wild mons** hold their species' common item 23% of the time and its rare
+  one 2% (Gen 2's rates), from `data/wild_held_items.asm`: FireRed and
+  LeafGreen's lists, with Gen 3 berries under their Gen 2 names, plus a few
+  Gen 2 touches (Pikachu's Light Ball, Snorlax's Leftovers, Chansey's Lucky
+  Punch and Lucky Egg). The roll is made when the wild mon is loaded, so a
+  caught mon keeps what it held.
+- **Trainers**: each gym leader's ace, the Elite Four's and the champion's
+  (and a few of their other mons) hold items, from
+  `data/trainer_held_items.asm`, applied after the party is read.
+- **Marts.** Celadon's 4F sells the type boosters (with 5F's first clerk),
+  2F's first clerk and Saffron sell berries, Pewter and Cerulean the Berry
+  (and Cerulean the PrzCureBerry). The mart lists are texts read from the
+  map's bank, so they had to live in bank 0, which had 98 bytes free; they
+  now live in bank `$34` (`data/mart_lists.asm`), and each mart's text keeps
+  only `$FE` and the list's index, which `DisplayPokemartDialogue` hands to
+  `LoadMartInventory`. That freed bank 0 instead of costing it. The longest
+  list (14 items) exactly fills `wItemList`.
+- **Field items**: 18 Poké Balls lying around now hold a held item instead
+  of a common one (for example a Quick Claw in Viridian Forest, Leftovers on
+  Route 12 instead of an Iron, a Choice Band in Victory Road).
+- **Verified:** `tests/test_held_item_sources.py` checks the wild rolls at
+  their thresholds (and that species without items roll nothing), the
+  table's species and items, trainers' items through `ReadTrainer` (leaders,
+  the champion's three teams, an ordinary trainer holding nothing), every
+  mart list loading through its index, the lists fitting the buffer, and
+  that at least 15 field items are held items.
+
+Held items (step E, part 5) are done.
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the

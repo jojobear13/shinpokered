@@ -1308,7 +1308,9 @@ DisplayPokemartDialogue::
 	call PrintText
 	pop hl
 	inc hl
-	call LoadItemList
+	ld a, [hl]
+	ld [wItemScratch], a
+	callab LoadMartInventory
 	ld a, PRICEDITEMLISTMENU
 	ld [wListMenuID], a
 	ld a, [H_LOADEDROMBANK]

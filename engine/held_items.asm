@@ -2,8 +2,8 @@
 ; did the same); 0 for none
 
 ; The enemy mon's held item, for its battle struct (written at de): a
-; trainer's mon's from its party data, a wild mon's from the wild item table
-; (none yet). Preserves de
+; trainer's mon's from its party data, a wild mon's from WildHeldItems.
+; Preserves de
 GetEnemyHeldItem:
 	ld a, [wIsInBattle]
 	cp 2
@@ -18,9 +18,35 @@ GetEnemyHeldItem:
 	ld [de], a
 	ret
 .wild
-	xor a
+	push de
+	ld a, [wEnemyMonSpecies]
+	ld b, a
+	ld hl, WildHeldItems
+.find
+	ld a, [hli]
+	cp -1
+	jr z, .none
+	cp b
+	jr z, .found
+	inc hl
+	inc hl
+	jr .find
+.found
+	call Random
+	cp 59 ; 23%
+	jr c, .gotItem
+	inc hl
+	cp 59 + 5 ; 2%
+	jr c, .gotItem
+.none
+	ld hl, .noItem
+.gotItem
+	ld a, [hl]
+	pop de
 	ld [de], a
 	ret
+.noItem
+	db 0
 
 ; A mon being added to a party: none, unless it's the wild mon being caught,
 ; which keeps its own. Written at de; preserves de
@@ -813,3 +839,60 @@ AmuletCoinMoney:
 	ld hl, wAmountMoneyWon + 2
 	ld c, 3
 	predef_jump AddBCDPredef
+
+INCLUDE "data/wild_held_items.asm"
+
+; the items the gym leaders', the Elite Four's and the Champion's mons hold
+; (TrainerHeldItemsData), after their party is read
+TrainerHeldItems:
+	ld hl, TrainerHeldItemsData
+.find
+	ld a, [hli]
+	and a
+	ret z
+	ld b, a
+	ld a, [wTrainerClass]
+	cp b
+	ld a, [hli]
+	ld c, [hl] ; c = how many
+	inc hl
+	jr nz, .next
+	ld b, a
+	ld a, [wTrainerNo]
+	cp b
+	jr z, .found
+.next
+	ld b, 0
+	add hl, bc
+	jr .find
+.found
+	ld de, wEnemyMon1CatchRate
+.loop
+	ld a, [hli]
+	ld [de], a
+	push hl
+	ld hl, wEnemyMon2 - wEnemyMon1
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	dec c
+	jr nz, .loop
+	ret
+
+INCLUDE "data/trainer_held_items.asm"
+
+; Load the mart inventory numbered [wItemScratch] into wItemList.
+LoadMartInventory:
+	ld a, [wItemScratch]
+	add a
+	ld e, a
+	ld d, 0
+	ld hl, MartInventories
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp LoadItemList
+
+INCLUDE "data/mart_lists.asm"
