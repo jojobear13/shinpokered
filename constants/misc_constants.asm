@@ -279,6 +279,7 @@ DEF BIT_GEN2_SPRITES		EQU 0			; Crystal's pics (engine/gen2_pics.asm)
 DEF TYPE_HINT_MASK		EQU %00000110	; the move menu's effectiveness marks (engine/battle/type_chart.asm):
 DEF TYPE_HINT_ON		EQU %00000010	; always
 DEF TYPE_HINT_LEARNED	EQU %00000100	; for the matchups wTypeChartSeen has
+DEF BIT_HP_PERCENT		EQU 3			; the foe's HP as a percentage (engine/battle/hp_percent.asm)
 
 ; the type chart's rows and columns: NORMAL to STEEL ($00-$09, BIRD's unused
 ; slot included), then FIRE to FAIRY ($14-$1C)

@@ -11,8 +11,8 @@ OPT_LENGTH = 12
 
 # the value each option shows after InitOptions on a new save (None: none)
 DEFAULTS = [
-    ["MEDIUM", "ON", "SHIFT", "MONO", None],  # GAME
-    ["30", "GEN 1", "OFF", "OFF", "OFF", "OFF"],  # DISPLAY
+    ["MEDIUM", "ON", "SHIFT", "MONO", "OFF", None],  # GAME
+    ["30", "GEN 1", "OFF", "OFF", "OFF", "OFF", "OFF"],  # DISPLAY
     ["OFF"] * 6,  # CHALLENGE
     ["OFF"] * 4,  # CLAUSES
     ["OFF"] * 7,  # EXTRAS

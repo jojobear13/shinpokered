@@ -218,6 +218,9 @@ if __name__ == "__main__":
     unittest.main()
 
 
+EXP_SHARE_ON = 0x8D1
+
+
 class GainExperienceTest(unittest.TestCase):
     """The whole routine: who gains what, and the EVs."""
 
@@ -225,7 +228,7 @@ class GainExperienceTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def test_party(self):
+    def party(self, share_on):
         g = self.game
         g.reset()
         g.skip_delays()
@@ -251,11 +254,20 @@ class GainExperienceTest(unittest.TestCase):
         g.poke("wPlayerMonNumber", 0)
         g.poke("wEnemyMonSpecies", SPECIES["PIDGEY"])
         g.poke("wEnemyMonLevel", 8)
+        g.poke("wNumBagItems", 0)
+        g.poke("wBagItems", 0xFF)
+        g.poke(f"wEventFlags+{EXP_SHARE_ON // 8}", share_on << EXP_SHARE_ON % 8)
         g.call("GainExperience", max_frames=20000)
 
         def exp(i):
             data = g.peek(f"wPartyMon{i}Exp", 3)
             return data[0] << 16 | data[1] << 8 | data[2]
+        return exp
+
+    def test_party(self):
+        """EXP. SHARE on (Gen 9): the rest of the team gains half, EVs too."""
+        g = self.game
+        exp = self.party(share_on=1)
         full = scaled_exp_model(50, 8, 10, 1)
         half = scaled_exp_model(50, 8, 10, 2)
         self.assertEqual(exp(1) - 1000, full)
@@ -264,6 +276,14 @@ class GainExperienceTest(unittest.TestCase):
         self.assertEqual(g.peek("wPartyMon1EVs", 6), [0, 0, 0, 1, 0, 0])  # Pidgey: 1 speed
         self.assertEqual(g.peek("wPartyMon2EVs", 6), [0, 0, 0, 1, 0, 0])
         self.assertEqual(g.peek("wPartyMon3EVs", 6), [0] * 6)
+
+    def test_party_share_off(self):
+        """EXP. SHARE off (the default): only the mon that took part gains."""
+        g = self.game
+        exp = self.party(share_on=0)
+        self.assertEqual(exp(1) - 1000, scaled_exp_model(50, 8, 10, 1))
+        self.assertEqual(exp(2), 1000)
+        self.assertEqual(g.peek("wPartyMon2EVs", 6), [0] * 6)
 
     def test_level_up_uses_the_ivs_and_evs(self):
         g = self.game

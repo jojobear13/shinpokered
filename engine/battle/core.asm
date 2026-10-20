@@ -2350,6 +2350,7 @@ DrawEnemyHUDAndHPBar:
 	ld [wHPBarType], a
 	coord hl, 2, 2
 	call DrawHPBar
+	callab DrawEnemyHPPercent ; the HP PERCENT option
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ld hl, wEnemyHPBarColor

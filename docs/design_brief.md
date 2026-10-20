@@ -1888,4 +1888,28 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - **README**: rewritten as a compact list of every change (this fork's, then
   Shin's, with what this fork replaced), credits and screenshots
   (`screenshots/fork/`); Shin's README is kept as `docs/shin_readme.md`.
+- **Fixes and options (after the README)**:
+  - Level-up text: a mon that didn't take part never printed "gained", so
+    "grew to level" used whatever name `wcd6d` held (another mon's, or a
+    move's). `LevelUpPokemon` now loads the mon's own name.
+  - EXP on catch: `GainExperience` left `wWhichPokemon` at the party's end,
+    so the ball (removed by its bag index) wasn't used up; and the thrown
+    ball's sprite stayed over the level-up boxes. `CaughtMonExperience`
+    keeps `wWhichPokemon` and clears the sprites first.
+  - Shin's Pikachu SURF / Dragonite FLY secret marked the mon with catch
+    rate 168, which is now the held item byte (an invalid item). The feats
+    set `EVENT_SURFING_PIKACHU` / `EVENT_FLYING_DRAGONITE`, which unlock
+    the move for the species (`SpecialMachineMove`).
+  - Abilities that do nothing are gone: Sticky Hold is dropped, and a slot
+    whose ability can't work gives way to the species' other ability, or
+    to its hidden one if that works (`tools/gen_abilities.py`).
+  - EXP. SHARE (GAME, off): on, Gen 9's always-on Exp. Share; off, only the
+    mons that took part gain, or with EXP ALL in the bag the rest gain half
+    (`RestOfTeamGainsExp`; `EVENT_EXP_SHARE_ON`, $8D1).
+  - HP PERCENT (DISPLAY, off): the enemy HUD's "HP:" becomes a percentage
+    in a 3x5 font drawn into tiles $D0-$D1 (kana slots, blank in the
+    English font); the second keeps the bar's left end
+    (`engine/battle/hp_percent.asm`).
+  - Tests: `test_move_secret.py`, `test_hp_percent.py`, and the share on and
+    off in `test_growth.py`.
 

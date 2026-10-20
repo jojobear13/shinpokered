@@ -64,11 +64,12 @@ SPOT_CHECKS = {
     "PINSIR": ("HYPER_CUTTER", "MOLD_BREAKER"),
     "CHANSEY": ("NATURAL_CURE", "SERENE_GRACE"),
     "MAGNEMITE": ("MAGNET_PULL", "STURDY"),
-    # weather and infatuation leave slots empty
-    "CLEFAIRY": ("NO_ABILITY", "MAGIC_GUARD"),
-    "GRIMER": ("STENCH", "STICKY_HOLD"),  # empty until held items
+    # an ability that does nothing here (weather, infatuation, Sticky Hold)
+    # gives way to the other one, or to a hidden one that works
+    "CLEFAIRY": ("MAGIC_GUARD", "MAGIC_GUARD"),
+    "GRIMER": ("STENCH", "STENCH"),
     "MEOWTH": ("PICKUP", "TECHNICIAN"),
-    "ODDISH": ("NO_ABILITY", "NO_ABILITY"),
+    "ODDISH": ("RUN_AWAY", "RUN_AWAY"),
     "MAGIKARP": ("NO_ABILITY", "NO_ABILITY"),
 }
 
@@ -90,7 +91,7 @@ class AbilityDataTest(unittest.TestCase):
 
     def test_unworkable_abilities_are_absent(self):
         for name in ("CHLOROPHYLL", "SWIFT_SWIM", "SAND_VEIL", "CLOUD_NINE", "LEAF_GUARD",
-                     "HYDRATION", "CUTE_CHARM"):
+                     "HYDRATION", "CUTE_CHARM", "STICKY_HOLD"):
             self.assertNotIn(name, ABILITIES)
 
     def test_names_fit(self):
@@ -305,7 +306,7 @@ class StatusScreenAbilityTest(unittest.TestCase):
         g = self.game
         tilemap = g.addr("wTileMap")
         for species, slot, name in (("KOFFING", 1, "NEUTRAL. GAS"), ("PIKACHU", 0, "STATIC"),
-                                    ("ODDISH", 1, "NO ABILITY")):
+                                    ("ODDISH", 1, "RUN AWAY")):
             with self.subTest(species=species, slot=slot):
                 g.reset()
                 g.poke(tilemap, *[0x7F] * (SCREEN_WIDTH * 18))

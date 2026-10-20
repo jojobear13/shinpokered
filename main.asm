@@ -1955,6 +1955,9 @@ INCLUDE "engine/items/held_item_use.asm"
 SECTION "Repel Prompt", ROMX
 INCLUDE "engine/items/repel_prompt.asm"
 
+SECTION "HP Percent", ROMX
+INCLUDE "engine/battle/hp_percent.asm"
+
 SECTION "Type Chart", ROMX
 INCLUDE "engine/battle/type_chart.asm"
 

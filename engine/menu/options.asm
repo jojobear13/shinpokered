@@ -56,21 +56,23 @@ NUM_OPTION_PAGES EQU (@ - OptionPages) / 2
 
 ; each page: its name, its number of options, then the options (at most 7)
 OptionsPageGame:
-	db "GAME@", 5
+	db "GAME@", 6
 	opt_custom OptTextTextSpeed, OptHelpTextSpeed, 4, GetTextSpeedOption, SetTextSpeedOption, OptValuesTextSpeed
 	opt_bit    OptTextAnimation, OptHelpAnimation, wOptions, 1 << BIT_BATTLE_ANIMATION, OptValuesOnOff
 	opt_bit    OptTextStyle, OptHelpStyle, wOptions, 1 << BIT_BATTLE_SHIFT, OptValuesStyle
 	opt_custom OptTextAudio, OptHelpAudio, 4, GetAudioOption, SetAudioOption, OptValuesAudio
+	opt_event  OptTextExpShare, OptHelpExpShare, EVENT_EXP_SHARE_ON, OptValuesOffOn
 	opt_action OptTextSoundTest, OptHelpSoundTest, OptionsSoundTest
 
 OptionsPageDisplay:
-	db "DISPLAY@", 6
+	db "DISPLAY@", 7
 	opt_bit    OptTextFrameRate, OptHelpFrameRate, wUnusedD721, 1 << 4, OptValuesFrameRate
 	opt_bit    OptTextSprites, OptHelpSprites, wDisplayOptions, 1 << BIT_GEN2_SPRITES, OptValuesSprites
 	opt_custom OptTextMoreColor, OptHelpMoreColor, 2, GetMoreColorOption, SetMoreColorOption, OptValuesOffOn
 	opt_custom OptTextColorFix, OptHelpColorFix, 2, GetColorFixOption, SetColorFixOption, OptValuesOffOn
 	opt_event  OptTextSymbols, OptHelpSymbols, EVENT_90E, OptValuesOffOn
 	opt_custom OptTextTypeHint, OptHelpTypeHint, 3, GetTypeHintOption, SetTypeHintOption, OptValuesTypeHint
+	opt_bit    OptTextHPPercent, OptHelpHPPercent, wDisplayOptions, 1 << BIT_HP_PERCENT, OptValuesOffOn
 
 OptionsPageChallenge:
 	db "CHALLENGE@", 6
@@ -687,6 +689,7 @@ RuleFlags:
 	rule_flag EVENT_WIN_HEAL
 	rule_flag EVENT_BLACKOUT_RETURN
 	rule_flag EVENT_PC_IN_MENU
+	rule_flag EVENT_EXP_SHARE_ON
 RuleFlagsEnd:
 
 NUM_RULE_FLAGS EQU (RuleFlagsEnd - RuleFlags) / 3
@@ -783,6 +786,8 @@ OptTextMoreColor:      db "MORE COLOR@"
 OptTextColorFix:       db "COLOR FIX@"
 OptTextSymbols:        db "SYMBOLS@"
 OptTextTypeHint:       db "TYPE HINT@"
+OptTextHPPercent:      db "HP PERCENT@"
+OptTextExpShare:       db "EXP. SHARE@"
 OptTextHardMode:       db "HARD MODE@"
 OptTextAISwitching:    db "AI SWITCHING@"
 OptTextLevelCap:       db "LEVEL CAP@"
@@ -838,6 +843,12 @@ OptHelpSymbols:
 OptHelpTypeHint:
 	db   "▴▼ marks on moves;"
 	next "LEARNED: once seen@"
+OptHelpHPPercent:
+	db   "The foe's HP as a"
+	next "percentage.@"
+OptHelpExpShare:
+	db   "ON: the whole team"
+	next "gains EXP (Gen 9).@"
 OptHelpHardMode:
 	db   "Tougher trainers,"
 	next "no battle REVIVEs.@"

@@ -724,16 +724,22 @@ ItemUseBallText04:
 	db "@"
 
 ; Gen 6+: the party gains experience and EVs for a caught mon as for one
-; defeated (not in the Safari Zone, where none of them battle)
+; defeated (not in the Safari Zone, where none of them battle). It keeps
+; wcf91, wd11e and wWhichPokemon, which the rest of the catch reads.
 CaughtMonExperience:
 	ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
 	ret z
+	call ClearSprites ; the thrown ball, which would sit over the stat boxes
 	ld a, [wcf91]
 	push af
 	ld a, [wd11e]
 	push af
+	ld a, [wWhichPokemon] ; the ball's place in the bag, to use it up
+	push af
 	callab GainExperience
+	pop af
+	ld [wWhichPokemon], a
 	pop af
 	ld [wd11e], a
 	pop af

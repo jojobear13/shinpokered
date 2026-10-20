@@ -8,9 +8,9 @@
 ;Feel free to take this file and implement it for your own pokered-based project.
 ;This takes about the same time to run as the original code, but at least it is easier to manage and modify.
 
-;Gen 9's experience: every non-fainted party mon gains it, those that took part
-;(or hold an Exp. Share) in full and the rest half (Gen 9's Exp. Share is always
-;on), by Gen 7+'s level-scaled formula (ScaledExp), then x1.5 if traded, x1.5
+;Gen 9's experience: the party mons that took part (or hold an Exp. Share) gain
+;it in full; with the EXP. SHARE option on (Gen 9's always-on Exp. Share), or
+;else with the EXP ALL in the bag, the rest of the team gains half, by Gen 7+'s level-scaled formula (ScaledExp), then x1.5 if traded, x1.5
 ;with a Lucky Egg, x1.2 past the level it could have evolved at. Each of them
 ;gains the enemy's EV yield too.
 GainExperience:
@@ -39,7 +39,7 @@ GainExperience:
 	ld a, [hli]
 	or [hl]
 	jp z, .nextMon ; fainted: nothing
-; its share: 1 if it took part, else 2
+; its share: 1 if it took part, else 2 if the rest of the team gains half
 	ld a, [wWhichPokemon]
 	inc a
 	ld b, a
@@ -50,7 +50,11 @@ GainExperience:
 	jr nz, .findBit
 	ld a, 1
 	jr c, .gotShare
-	inc a
+	push hl
+	call RestOfTeamGainsExp
+	pop hl
+	jp z, .nextMon ; no share: no EXP and no EVs, as in the original game
+	ld a, 2
 	ld [wBoostExpByExpAll], a
 .gotShare
 	ld [wExpScratch + 1], a
@@ -138,6 +142,14 @@ ENDC
 	ld [hl], a
 	pop bc
 	predef_jump FlagActionPredef ; jump out to set the fought current enemy flag for the mon that is currently active
+
+; nz if the party mons that didn't take part gain half: the EXP. SHARE option
+; (Gen 9) or, without it, the EXP ALL in the bag
+RestOfTeamGainsExp:
+	CheckEvent EVENT_EXP_SHARE_ON
+	ret nz
+	ld b, EXP_ALL
+	jp IsItemInBag
 
 TeamGainedExpText:
 	TX_FAR _TeamGainedExpText
@@ -481,6 +493,11 @@ ENDC
 ;all done dealing with the active pokemon in battle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 .printGrewLevelText
+; its own name: a mon that didn't take part never printed "gained", so
+; wcd6d still held another mon's name or a move's
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
 	ld hl, GrewLevelText
 	call PrintText
 	xor a ; PLAYER_PARTY_DATA

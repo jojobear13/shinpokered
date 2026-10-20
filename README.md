@@ -25,6 +25,7 @@ Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blu
 <tr><td align="center"><img src="screenshots/fork/dexrepel_aide.png" width="240"><br><sub>DEXREPEL aide (Route 12 gate)</sub></td><td align="center"><img src="screenshots/fork/dexrepel_aide_given.png" width="240"><br><sub>DEXREPEL explained</sub></td><td align="center"><img src="screenshots/fork/dexrepel_bag.png" width="240"><br><sub>DEXREPEL in KEY ITEMS</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/dexrepel_on.png" width="240"><br><sub>DEXREPEL on</sub></td><td align="center"><img src="screenshots/fork/repel_prompt.png" width="240"><br><sub>Use another repel?</sub></td><td align="center"><img src="screenshots/fork/repel_prompt_used.png" width="240"><br><sub>Repel reused</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/catch_exp.png" width="240"><br><sub>EXP on catch</sub></td><td align="center"><img src="screenshots/fork/catch_exp_levelup.png" width="240"><br><sub>Level-up from a catch</sub></td><td align="center"><img src="screenshots/fork/warp_back_prompt.png" width="240"><br><sub>WARP BACK after a blackout</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/hp_percent.png" width="240"><br><sub>HP PERCENT</sub></td></tr>
 </table>
 
 ## Changes from Shin Pokémon (this fork)
@@ -71,15 +72,15 @@ Every option starts as the original game played; everything extra is off by defa
 - Gen 9 base stats and catch rates (e.g. Pidgeot Spe 101, Pikachu 190, Kadabra 100).
 - DVs and stat experience replaced by Gen 9 IVs (0-31) and EVs (252/510 caps).
 - Gen 3+ stat formula; Gen 9 EV yields; Gen 7+ scaled experience formula.
-- All party members gain experience (Gen 9 always-on Exp. Share): participants full, others half.
+- EXP. SHARE option (off by default): ON, the rest of the team gains half (Gen 9's always-on Exp. Share); OFF, only the mons that took part (or hold an Exp. Share) gain, unless EXP ALL is in the bag.
 - x1.2 exp at or past evolution level; trainer-battle x1.5 exp bonus removed.
 - Gender and shininess derived from IVs; shiny odds 1/4096.
 - 25 natures (from IVs), +10%/-10%; trainer mons outside hard mode are Hardy.
 - Hard-mode trainer mons get EVs (level x 85/100 per stat).
 - Abilities: each species has its Gen 9 non-hidden abilities, chosen by an IV bit.
-- Abilities: Adaptability, Anger Point, Arena Trap, Battle Armor, Blaze, Clear Body, Competitive, Compound Eyes, Cursed Body, Damp, Download, Dry Skin, Early Bird, Effect Spore, Filter, Flame Body, Flash Fire, Forewarn, Guts, Hyper Cutter, Illuminate, Immunity, Inner Focus, Insomnia, Intimidate, Iron Fist, Keen Eye, Levitate, Lightning Rod, Limber, Liquid Ooze, Magic Guard, Magnet Pull, Mold Breaker, Natural Cure, Neutralizing Gas, No Guard, Oblivious, Overgrow, Own Tempo, Pickup, Poison Point, Pressure, Reckless, Rivalry, Rock Head, Run Away, Scrappy, Serene Grace, Shed Skin, Shell Armor, Shield Dust, Skill Link, Sniper, Soundproof, Static, Stench, Sticky Hold, Sturdy, Swarm, Synchronize, Tangled Feet, Technician, Thick Fat, Tinted Lens, Torrent, Trace, Vital Spirit, Volt Absorb, Water Absorb, Water Veil.
-- Weather and infatuation abilities (Chlorophyll, Swift Swim, Sand Veil, Cloud Nine, Leaf Guard, Hydration, Cute Charm) are empty slots.
-- Sticky Hold has no effect (no move takes items); Pickup finds Gen 3 items 10% after battle.
+- Abilities: Adaptability, Anger Point, Arena Trap, Battle Armor, Blaze, Clear Body, Competitive, Compound Eyes, Cursed Body, Damp, Download, Dry Skin, Early Bird, Effect Spore, Filter, Flame Body, Flash Fire, Forewarn, Guts, Hyper Cutter, Illuminate, Immunity, Inner Focus, Insomnia, Intimidate, Iron Fist, Keen Eye, Levitate, Lightning Rod, Limber, Liquid Ooze, Magic Guard, Magnet Pull, Mold Breaker, Natural Cure, Neutralizing Gas, No Guard, Oblivious, Overgrow, Own Tempo, Pickup, Poison Point, Pressure, Reckless, Rivalry, Rock Head, Run Away, Scrappy, Serene Grace, Shed Skin, Shell Armor, Shield Dust, Skill Link, Sniper, Soundproof, Static, Stench, Sturdy, Swarm, Synchronize, Tangled Feet, Technician, Thick Fat, Tinted Lens, Torrent, Trace, Vital Spirit, Volt Absorb, Water Absorb, Water Veil.
+- Abilities that would do nothing (weather and infatuation ones, and Sticky Hold) are replaced by the species' other ability, or its hidden ability if that works (Oddish Run Away, Gloom Stench, Vileplume Effect Spore); Exeggcute, Exeggutor, Tangela, Sandshrew, Sandslash, Magikarp and the Bellsprout line have none.
+- Pickup finds Gen 3 items 10% after battle.
 - Held items (52): BLACK BELT, CHARCOAL, DRAGON FANG, HARD STONE, MAGNET, MIRACLE SEED, MYSTIC WATER, NEVERMELTICE, PINK BOW, POISON BARB, SHARP BEAK, SILVERPOWDER, SOFT SAND, SPELL TAG, TWISTEDSPOON, METAL COAT, BLACKGLASSES, FAIRYFEATHER.
 - Held items, continued: BERRY, GOLD BERRY, SITRUS BERRY, PRZCUREBERRY, MINT BERRY, PSNCUREBERRY, ICE BERRY, BURNT BERRY, BITTER BERRY, MIRACLEBERRY, MYSTERYBERRY.
 - Held items, continued: LEFTOVERS, QUICK CLAW, KING'S ROCK, SCOPE LENS, BRIGHTPOWDER, FOCUS BAND, FOCUS SASH, LIGHT BALL, THICK CLUB, METAL POWDER, STICK, LUCKY PUNCH, CHOICE BAND, CHOICE SPECS, CHOICE SCARF, LIFE ORB, EVIOLITE.
@@ -109,8 +110,9 @@ Every option starts as the original game played; everything extra is off by defa
 - Bag opens full screen with auto-sorted pockets: ITEMS, MEDICINE, BALLS, BATTLE ITEMS, BERRIES, KEY ITEMS.
 - Bag holds 36 kinds; LEFT/RIGHT change pocket.
 - OPTION screen: five pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS) with two-line explanations.
-- GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, SOUND TEST.
-- DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT.
+- GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
+- DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
+- HP PERCENT: the enemy HUD shows its HP as a percentage (Showdown-style) in place of "HP:".
 - CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
 - EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR, SAFARI EVENT, PC IN MENU.
@@ -133,7 +135,7 @@ Every option starts as the original game played; everything extra is off by defa
 - New item ZINC (raises SpD), sold with vitamins in Celadon; Calcium raises SpA only.
 - Vitamins give 10 EVs up to the caps, at any level.
 - Mist Stone sets all IVs to 31; M.Gene rerolls IVs at 16 or higher.
-- Exp. All has no effect.
+- EXP ALL: with EXP. SHARE off, the rest of the team gains half.
 - DEXREPEL key item: Oak's aide, Route 12 gate 2F, for 80 kinds caught.
 - DEXREPEL toggles on/off; while on, owned species don't appear (shinies still can).
 - Held item sources: wild mons (23% common, 2% rare), gym leaders, Elite Four, champion.
@@ -162,6 +164,9 @@ Every option starts as the original game played; everything extra is off by defa
 - Transform desynced link battles (only the player's move index was reset).
 - Substitute HP check only read the low byte (256 HP left failed).
 - Party icons not reloaded after swapping mons; overworld sprites drawn over the hatch scene.
+- Level-up text for a mon that didn't take part used another mon's name or a move's name.
+- Catching with EXP on catch: the ball wasn't used up, and the thrown ball was drawn over the level-up boxes.
+- Shin's Pikachu/Dragonite move secret marked the mon with catch rate 168, now its held item byte; it is an event flag now.
 - Status screen EVs (SELECT) were shifted two columns left, so the nature marks covered their middle digit.
 
 #### Removed from Shin
@@ -182,8 +187,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Link handshake version 0.0.5.0: won't link with Shin builds.
 
 #### Known issues
-- Shin's Pikachu/Dragonite move secret marks the Pokémon with catch rate 168; that byte is now the held item, so the mark reads as an invalid held item and the secret may not work.
-- Weather and infatuation abilities are not implemented (those species' slots are empty).
+- Weather and infatuation are not implemented, so abilities needing them are left out (see Pokémon data).
 - New moves reuse existing animations; a few secondary effects are not implemented (listed above).
 
 ## Changes from vanilla made by Shin Pokémon
@@ -386,7 +390,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Lv.100 Chansey in the lead: 1/256 shinies, which get through Repels.
 - Shiny mercy: after a trainer's shiny, the next wild Pokémon is shiny.
 - Pay Day lead cries at lucky slots and payout modes.
-- Pikachu that wins the tournament can learn Surf; Dragonite that beats Lance can learn Fly (catch rate 168; see Known issues).
+- Pikachu that wins the tournament can learn Surf; Dragonite that beats Lance can learn Fly (this fork: an event flag that unlocks it for the species).
 - Mt. Moon Magikarp seller tutors Dragon Rage, Pay Day and Fly.
 - Psyduck learns Amnesia; joke tutors for Lick, Agility, Drill Peck, Hypnosis, Leech Seed and the fossil moves.
 - Ninja Scyther (Ghost type) via a solo Koga win, with Koga as its tutor.
@@ -431,7 +435,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Uncapped post-game vitamins → Gen 9 vitamins (+10 EVs, at any level).
 - Debug DV reset → EVs zeroed, IVs from the first six bag quantities.
 - Chief and coin-gentleman DV scoring → average of six IVs.
-- EXP ALL fixes and the trainer-battle x1.5 → EXP ALL does nothing; Gen 9 always-on Exp. Share.
+- EXP ALL fixes and the trainer-battle x1.5 → the EXP. SHARE option (Gen 9) or, with it off, EXP ALL gives the rest of the team half.
 - Nuzlocke death mark in catch rate ($05; Gen 2 Poké Ball) → an IV flag bit.
 - Catch-rate byte → held item.
 - Gameshark addresses → may not match: the box and day care moved to save RAM.

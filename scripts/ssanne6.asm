@@ -183,10 +183,7 @@ SetSurfingPikachu:
 	cp PIKACHU
 	jr nz, .return
 .set
-	ld bc, $0007
-	add hl, bc
-	ld a, 168
-	ld [hl], a
+	SetEvent EVENT_SURFING_PIKACHU
 	ld hl, SSAnne6Text_GymGuy_pikachu
 	call PrintText
 .return

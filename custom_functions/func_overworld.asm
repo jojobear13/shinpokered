@@ -99,6 +99,7 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ResetEvent EVENT_WIN_HEAL
 	ResetEvent EVENT_BLACKOUT_RETURN
 	ResetEvent EVENT_PC_IN_MENU
+	ResetEvent EVENT_EXP_SHARE_ON
 
 	ResetEvent EVENT_9FE
 	ResetEvent EVENT_9FF
