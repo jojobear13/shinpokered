@@ -1952,6 +1952,9 @@ INCLUDE "engine/menu/options.asm"
 SECTION "Held Item Use", ROMX
 INCLUDE "engine/items/held_item_use.asm"
 
+SECTION "Repel Prompt", ROMX
+INCLUDE "engine/items/repel_prompt.asm"
+
 SECTION "Type Chart", ROMX
 INCLUDE "engine/battle/type_chart.asm"
 

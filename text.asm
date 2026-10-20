@@ -2488,6 +2488,23 @@ _RepelWoreOffText::
 	line "wore off."
 	done
 
+_RepelUseAnotherText::
+	text "REPEL's effect"
+	line "wore off."
+
+	para "Use another"
+	line "@"
+	TX_RAM wcd6d
+	text "?"
+	done
+
+_RepelUsedAnotherText::
+	text "<PLAYER> used"
+	line "@"
+	TX_RAM wcd6d
+	text "!"
+	done
+
 _PokemartBuyingGreetingText::
 	text "Take your time."
 	done

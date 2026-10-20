@@ -603,6 +603,7 @@ ItemUseBall:
 
 	ld hl, ItemUseBallText05
 	call PrintText
+	call CaughtMonExperience
 
 ; Clear a flag to indicate that the player has caught a pokemon with a ball throw at least once
 	CheckEvent EVENT_01B
@@ -721,6 +722,24 @@ ItemUseBallText04:
 ;"Shoot! It was so close too!"
 	TX_FAR _ItemUseBallText04
 	db "@"
+
+; Gen 6+: the party gains experience and EVs for a caught mon as for one
+; defeated (not in the Safari Zone, where none of them battle)
+CaughtMonExperience:
+	ld a, [wBattleType]
+	cp BATTLE_TYPE_SAFARI
+	ret z
+	ld a, [wcf91]
+	push af
+	ld a, [wd11e]
+	push af
+	callab GainExperience
+	pop af
+	ld [wd11e], a
+	pop af
+	ld [wcf91], a
+	ret
+
 ItemUseBallText05:
 ;"All right! {MonName} was caught!"
 ;play sound
@@ -1761,6 +1780,8 @@ ItemUseRepelCommon:
 	jp nz, ItemUseNotTime
 	ld a, b
 	ld [wRepelRemainingSteps], a
+	ld a, [wcf91] ; to offer another when it wears off (RepelWoreOff)
+	ld [wLastRepelUsed], a
 	jp PrintItemUseTextAndRemoveItem
 
 ; handles X Accuracy item

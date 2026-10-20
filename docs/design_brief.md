@@ -1869,4 +1869,16 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   - `tests/test_dexrepel.py`: owned species kept away only while on, the
     REPEL still works, using it toggles (not in battle), and it's a key item
     in the key pocket.
+- **EXP on catch** (Gen 6+): after "<mon> was caught!", `CaughtMonExperience`
+  runs `GainExperience` as a defeat would: experience (with the Exp. Share
+  rules and level-ups, move learning included) and the caught mon's EV
+  yield for the party. Not in the Safari Zone, where none of the party
+  battles, nor for the old man's catch. It keeps `wcf91` and `wd11e`, which
+  the rest of the catch (the Pokédex, adding the mon) reads.
+- **"Use another?"** (Gen 6+): when a repel wears off, `RepelWoreOff` (the
+  far routine `DisplayRepelWoreOffText` now calls) offers another of the
+  kind last used (`wLastRepelUsed`, set by `ItemUseRepelCommon`; not saved,
+  as the repel's steps aren't) if the bag has one. YES uses it (its steps,
+  one fewer in the bag, the bag's sound); otherwise the old text alone.
+- `tests/test_qol_catch_repel.py`.
 

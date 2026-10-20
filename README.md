@@ -258,6 +258,8 @@ EXTRAS > RANDOM TRNR toggles randomization of non-special trainers.
 
 EXTRAS > CATCH-UP EXP toggles a catch-up EXP boost function for under-leveled pokemon.
 
+Catching a wild pokemon gives your party EXP and EVs as defeating it would (except in the Safari Zone), and when a repel wears off you're asked whether to use another of the same kind.
+
 Catch 80 kinds of pokemon and PROF.OAK's aide upstairs in the Route 12 gate gives you the DEXREPEL, a key item: while it's on, wild pokemon you've already caught won't appear (shinies still can).
 
 DISPLAY > TYPE HINT marks how effective each move would be on the battle move menu: ON always, or LEARNED only for type matchups you've already seen an attack make ("?" until then).

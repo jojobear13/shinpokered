@@ -1418,13 +1418,8 @@ DisplayEggHatchingText::
 	jp CloseTextDisplay
 
 DisplayRepelWoreOffText::
-	ld hl, RepelWoreOffText
-	call PrintText
+	callba RepelWoreOff ; engine/items/repel_prompt.asm
 	jp AfterDisplayingTextID
-
-RepelWoreOffText::
-	TX_FAR _RepelWoreOffText
-	db "@"
 
 INCLUDE "engine/menu/start_menu.asm"
 

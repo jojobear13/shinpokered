@@ -3675,6 +3675,8 @@ wHoFSlot:: ; the Hall of Fame slot being recorded (eggs are skipped)
 	ds 1
 wPartyIconSpecies:: ; the species whose icon each party slot's sprite tiles hold
 	ds PARTY_LENGTH
+wLastRepelUsed:: ; the kind of repel last used, offered again when it wears off (0: none)
+	ds 1
 
 ; free up to the stack at $df00
 
