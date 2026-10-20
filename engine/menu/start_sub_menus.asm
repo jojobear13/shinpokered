@@ -134,6 +134,10 @@ StartMenu_Pokemon:
 	dw .dig
 	dw .teleport
 	dw .softboiled
+	dw .takeItem
+.takeItem
+	callab TakeHeldItem
+	jp StartMenu_Pokemon
 .fly
 	bit 2, a ; does the player have the Thunder Badge?
 	jp z, .newBadgeRequired

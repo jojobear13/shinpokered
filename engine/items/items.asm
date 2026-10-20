@@ -13,6 +13,8 @@ UseItem_:
 	ld a, [wcf91] ;contains item_ID
 	cp HM_01
 	jp nc, ItemUseTMHM
+	cp FIRST_HELD_ITEM
+	jp nc, ItemUseHeldItem
 	ld hl, ItemUsePtrTable
 	dec a
 	add a
@@ -110,6 +112,136 @@ ItemUsePtrTable:
 	dw ItemUsePPRestore  ; MAX_ETHER
 	dw ItemUsePPRestore  ; ELIXER
 	dw ItemUsePPRestore  ; MAX_ELIXER
+
+; a held item, used from the bag, is given to a party mon; one it was holding
+; goes back in the bag
+ItemUseHeldItem:
+	ld a, [wIsInBattle]
+	and a
+	jp nz, ItemUseNotTime
+	ld a, [wWhichPokemon] ; the item's place in the bag
+	push af
+	ld a, [wcf91]
+	push af
+	ld a, USE_ITEM_PARTY_MENU
+	ld [wPartyMenuTypeOrMessageID], a
+	ld a, $ff
+	ld [wUpdateSpritesEnabled], a
+	call DisplayPartyMenu
+	pop bc ; b = the item
+	jr c, .canceled
+	ld a, b
+	ld [wcf91], a
+	call GetPartyMonHeldItemAddr
+	ld a, [hl]
+	and a
+	jr z, .notHolding
+; take the old one back first: that needs room in the bag
+	push hl
+	ld [wcf91], a
+	ld a, 1
+	ld [wItemQuantity], a
+	ld hl, wNumBagItems
+	call AddItemToInventory
+	pop hl
+	jr nc, .bagFull
+	call PrintTookHeldItem
+	ld a, b
+	ld [wcf91], a
+	call GetPartyMonHeldItemAddr
+.notHolding
+	ld [hl], b
+	ld a, b
+	ld [wd11e], a
+	call GetItemName
+	call CopyStringToCF4B
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
+	ld hl, NowHoldingItemText
+	call PrintText
+	pop af
+	ld [wWhichPokemon], a ; the bag place, to take the item out
+	ld hl, wNumBagItems
+	ld a, 1
+	ld [wItemQuantity], a
+	jp RemoveItemFromInventory
+.bagFull
+	ld hl, BagFullHeldItemText
+	call PrintText
+.canceled
+	xor a
+	ld [wActionResultOrTookBattleTurn], a ; item not used
+	pop af
+	ld [wWhichPokemon], a
+	ret
+
+; hl = the held item of party mon wWhichPokemon; preserves bc
+GetPartyMonHeldItemAddr:
+	push bc
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMon1CatchRate
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	pop bc
+	ret
+
+; TAKE on the party menu: party mon wWhichPokemon's held item goes in the bag
+TakeHeldItem:
+	call GetPartyMonHeldItemAddr
+	ld a, [hl]
+	and a
+	ret z
+	push hl
+	ld [wcf91], a
+	ld a, 1
+	ld [wItemQuantity], a
+	ld hl, wNumBagItems
+	call AddItemToInventory
+	pop hl
+	jr nc, HeldItemBagFull
+	ld [hl], 0
+	; fall through
+; "Took <item> from <mon>." for the item in wcf91
+PrintTookHeldItem:
+	push bc
+	ld a, [wcf91]
+	ld [wd11e], a
+	call GetItemName
+	call CopyStringToCF4B
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMonNicks
+	call GetPartyMonName
+	ld hl, TookHeldItemText
+	call PrintText
+	pop bc
+	ret
+
+HeldItemBagFull:
+	ld hl, BagFullHeldItemText
+	jp PrintText
+
+NowHoldingItemText:
+	text "@"
+	TX_RAM wcd6d
+	text " is now"
+	line "holding @"
+	TX_RAM wcf4b
+	text "."
+	prompt
+
+TookHeldItemText:
+	text "Took @"
+	TX_RAM wcf4b
+	text ""
+	line "from @"
+	TX_RAM wcd6d
+	text "."
+	prompt
+
+BagFullHeldItemText:
+	TX_FAR _NoMoreRoomForItemText
+	db "@"
 
 ItemUseBall:
 
@@ -3025,7 +3157,8 @@ IsKeyItem_:
 	push af
 	ld hl, KeyItemBitfield
 	ld de, wBuffer
-	ld bc, 15 ; only 11 bytes are actually used
+	ld bc, (NUM_ITEMS_AND_FLOORS + 7) / 8
+	ASSERT (NUM_ITEMS_AND_FLOORS + 7) / 8 <= 30 ; wBuffer's size
 	call CopyData
 	pop af
 	dec a
@@ -3498,7 +3631,9 @@ UseCustomMedicine:
 	ld a, b
 	or $88
 	ld [hli], a
-	ld a, c
+	ld a, [hl]
+	and 1 << NUZLOCKE_DEAD_F ; keep the nuzlocke mark
+	or c
 	or $80
 	ld [hl], a
 	pop hl

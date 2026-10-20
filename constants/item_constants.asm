@@ -101,6 +101,59 @@ SAFARI_ROCK           EQU $16 ; overload
 	const FLOOR_10F     ; $5F
 	const FLOOR_11F     ; $60
 	const FLOOR_B4F     ; $61
+; held items (Gen 2's, with a few later staples); the catch-rate byte of a
+; mon's data holds one
+FIRST_HELD_ITEM EQU const_value
+	const BLACK_BELT    ; $62
+	const CHARCOAL      ; $63
+	const DRAGON_FANG   ; $64
+	const HARD_STONE    ; $65
+	const MAGNET        ; $66
+	const MIRACLE_SEED  ; $67
+	const MYSTIC_WATER  ; $68
+	const NEVERMELTICE  ; $69
+	const PINK_BOW      ; $6A
+	const POISON_BARB   ; $6B
+	const SHARP_BEAK    ; $6C
+	const SILVERPOWDER  ; $6D
+	const SOFT_SAND     ; $6E
+	const SPELL_TAG     ; $6F
+	const TWISTEDSPOON  ; $70
+	const BERRY         ; $71
+	const GOLD_BERRY    ; $72
+	const SITRUS_BERRY  ; $73
+	const PRZCUREBERRY  ; $74
+	const MINT_BERRY    ; $75
+	const PSNCUREBERRY  ; $76
+	const ICE_BERRY     ; $77
+	const BURNT_BERRY   ; $78
+	const BITTER_BERRY  ; $79
+	const MIRACLEBERRY  ; $7A
+	const MYSTERYBERRY  ; $7B
+	const LEFTOVERS     ; $7C
+	const QUICK_CLAW    ; $7D
+	const KINGS_ROCK    ; $7E
+	const SCOPE_LENS    ; $7F
+	const BRIGHTPOWDER  ; $80
+	const FOCUS_BAND    ; $81
+	const LIGHT_BALL    ; $82
+	const THICK_CLUB    ; $83
+	const METAL_POWDER  ; $84
+	const LUCKY_EGG     ; $85
+	const AMULET_COIN   ; $86
+	const EVERSTONE     ; $87
+	const EXP_SHARE     ; $88
+	const SMOKE_BALL    ; $89
+	const CLEANSE_TAG   ; $8A
+	const STICK         ; $8B
+	const LUCKY_PUNCH   ; $8C
+	const CHOICE_BAND   ; $8D
+	const CHOICE_SPECS  ; $8E
+	const CHOICE_SCARF  ; $8F
+	const LIFE_ORB      ; $90
+	const EVIOLITE      ; $91
+	const FOCUS_SASH    ; $92
+NUM_ITEMS_AND_FLOORS EQU const_value - 1
 
 const_value = $C4
 

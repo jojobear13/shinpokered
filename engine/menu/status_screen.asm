@@ -561,6 +561,7 @@ StatusScreen2:
 	coord hl, 9, 1
 	call PlaceString
 	callab PrintStatusScreenAbility
+	callab PrintStatusScreenHeldItem
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3

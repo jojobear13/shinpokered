@@ -28,7 +28,7 @@ checked.
 | ROM | 1 MB (64 banks) | ~169 KB inside the 51 switchable banks in use, plus banks 52-63 (192 KB) completely empty | The cartridge type (MBC3, `-m 0x13`: RAM and battery, no real-time clock) allows 2 MB, so the ROM can double |
 | ROM bank 0 (always loaded) | 16 KB | 98 bytes | Shared helpers must live here to be callable from every bank cheaply. Step D's accessors took 55 bytes, after removing the unused `FarCopyData3` (30). The fixed "Home" section at `$61` is full |
 | ROM bank 3 | 16 KB | 1230 bytes | Holds the item, catching, `MoveMon`, status-screen and day-care code. Moving `DrawBadges` and its badge graphics out freed 1261; the special split took 34 |
-| Battle engine bank ($0F) | 16 KB | 130 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
+| Battle engine bank ($0F) | 16 KB | 124 bytes | Was 21 before the merges started; the special split took 59, the physical/special split, move-menu marks and Counter most of the rest. Abilities live in bank 9 and cost bank $0F only their far-call hooks; moving `CalcHitChance` to bank 9 paid for most of part 3's |
 | WRAM | 8 KB | **1088 bytes** (end of WRAM to `$deff`) | Step D moved the current box and the day-care mon to save RAM, freeing 1177 bytes; the special split took 53 (a third DV byte and a sixth stat in every party and battle struct), natures 1, abilities 15 (each side's ability in battle, a flags byte, a side effect's chance as abilities change it, and an 11-byte snapshot of the target before each move). Still allocate new state through this table |
 | HRAM | 127 bytes | 4 bytes: `$FFA8`, `$FFD9`, `$FFDF`, `$FFE3` (`$FFE2` is `hBattleSide` since step A) | Checked against every named and literal reference in the source. `$FF9E` looks free but is the third byte of `H_SAVEDNUMTOPRINT`. Confirm each byte with a canary run (decision 2) before first use. `ldh` is a byte shorter and a cycle faster than a WRAM load, and `H_WHOFIRST`/`H_WHOSETURN` already set the precedent for battle flags here |
 | Save RAM | 32 KB (4 banks) | ~6.3 KB | Bank 0: 783 (the live box and day care took 1177), bank 1: 2779, banks 2-3: 1453 each |
@@ -857,6 +857,44 @@ random abilities, plus 96 targeted ones where Static, Effect Spore, Cursed
 Body, Poison Point, Stench, Serene Grace, Shed Skin and Shield Dust get to
 roll, all agree. Checked that it bites: with one game's `AbilityRandom`
 drawing from `Random` instead, 39 of the 96 targeted turns fail.
+
+**Step E, part 5 begun: held items, the items and holding them.**
+
+- **The set** (your choice: Gen 2's plus later staples): 15 type boosters
+  (Gen 2's names, no Dark or Steel), Gen 2's ten berries plus the Sitrus
+  Berry, Leftovers, Quick Claw, King's Rock, Scope Lens, BrightPowder, Focus
+  Band, Light Ball, Thick Club, Metal Powder, Lucky Egg, Amulet Coin,
+  Everstone, Exp. Share, Smoke Ball, Cleanse Tag, Stick, Lucky Punch, and
+  Choice Band, Specs and Scarf, Life Orb, Eviolite and Focus Sash: 49 new
+  item ids, `$62`-`$92` (`FIRST_HELD_ITEM`), after the elevator floors.
+  Names, prices and key-item bits are extended to match; the key-item
+  lookup copied a fixed 15 bytes of its bitfield and now copies what the ids
+  need.
+- **Holding.** The catch-rate byte is the held item (decision 6). Using a
+  held item from the bag gives it to a party mon (not in battle); one it was
+  holding goes back in the bag, unless the bag is full. A mon holding an item
+  gets TAKE on its party-menu list, as a field-move-like entry. Page 2 of the
+  status screen names the item under the mon's name. New party mons hold
+  nothing (it used to copy the species' catch rate); a caught wild mon keeps
+  its battle struct's byte; a trainer's mon's battle struct takes its party
+  data's item (`GetEnemyHeldItem`); Transform copies everything in that
+  block but the item, as in Gen 9. Items do nothing in battle yet.
+- **Conflicts resolved.** `Mon1BCDScore` mode 1 reads the species' catch
+  rate from its base stats. Nuzlocke mode marked dead mons by writing a value
+  into that byte; the mark is now bit 1 of the third DV byte (natures, stats
+  and the ability slot ignore it), and the M.Gene's reroll keeps it.
+- **Space.** Bank 1 couldn't take the longer name and price tables, so both
+  moved to bank 9 (every reader uses `BANK(...)`); the DV generators
+  (`engine/random.asm`, reached only by far calls) moved from bank 4 to bank
+  9 to make room for TAKE and the status-screen line.
+- **Harness.** `menu_choices` now patches `HandleMenuInput_`, which the party
+  menu calls directly, so tests can pick a party mon.
+- **Verified:** `tests/test_held_items.py` checks ids, names, prices and
+  key-item bits; giving, swapping, giving in battle (refused), TAKE and TAKE
+  with a full bag, TAKE on the menu only when holding; the enemy's item for
+  trainer and wild battles, new mons holding nothing, Transform keeping the
+  user's item, the status-screen line; and the Nuzlocke mark. In the
+  emulator: TAKE on the party menu and LEFTOVERS on the status screen.
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the

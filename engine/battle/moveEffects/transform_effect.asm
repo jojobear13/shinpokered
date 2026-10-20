@@ -66,7 +66,22 @@ TransformEffect_:
 	inc de	;point to type 1
 	inc bc
 	inc bc
+	push de
+	inc de
+	inc de
+	ld a, [de] ; the user's own held item, which Transform doesn't copy
+	pop de
+	push af
 	call CopyData
+	pop af
+	push de
+	dec de
+	dec de
+	dec de
+	dec de
+	dec de
+	ld [de], a
+	pop de
 ;	call CopyDataTransform	;joenote - want to do a special copy that doesn't copy the transform move and replaces it
 	;de is now pointing to DVs
 	ld a, [H_WHOSETURN]

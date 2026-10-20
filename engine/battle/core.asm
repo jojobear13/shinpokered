@@ -7164,8 +7164,7 @@ LoadEnemyMonData:
 	ld a, [hli]            ; copy type 2
 	ld [de], a
 	inc de
-	ld a, [hli]            ; copy catch rate
-	ld [de], a
+	callab GetEnemyHeldItem ; in the catch-rate byte, at de
 	inc de
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?

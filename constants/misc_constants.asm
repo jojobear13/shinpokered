@@ -12,6 +12,7 @@ ENCOUNTER_TILE_COORD_X EQU 8
 ENCOUNTER_TILE_COORD_Y EQU 9
 
 NUM_FIELD_MOVES     EQU 5
+TAKE_ITEM_MENU_ENTRY EQU 10 ; after the field moves in FieldMoveNames
 
 NUM_MOVES     EQU 4
 NUM_STATS     EQU 6 ; HP, attack, defense, speed, special attack, special defense
@@ -236,7 +237,9 @@ PAL_SIZE EQU NUM_COLORS * 2
 NUM_ACTIVE_PALS EQU 4
 
 ;joenote - catch rate given to pokemon marked as dead for nuzlocke mode
-DEAD EQU $05
+; nuzlocke mode: a dead mon has this bit set in the third byte of its DVs (a
+; spare bit; the catch-rate byte, which held the old mark, is the held item)
+NUZLOCKE_DEAD_F EQU 1
 
 ; wOptions
 DEF TEXT_DELAY_FAST   		EQU %00000001	; 1

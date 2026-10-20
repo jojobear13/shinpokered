@@ -707,6 +707,7 @@ FieldMoveNames:
 	db "DIG@"
 	db "TELEPORT@"
 	db "SOFTBOILED@"
+	db "TAKE@" ; a held item, not a field move
 
 PokemonMenuEntries:
 	db   "STATS"
@@ -765,6 +766,27 @@ GetMonFieldMoves:
 	jr .loop
 .done
 	pop hl
+; a mon holding an item can have it taken
+	ld a, [wNumFieldMoves]
+	cp NUM_FIELD_MOVES
+	ret nc
+	push hl
+	ld a, [wWhichPokemon]
+	ld hl, wPartyMon1CatchRate
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	ld a, [hl]
+	pop hl
+	and a
+	ret z
+	ld [hl], TAKE_ITEM_MENU_ENTRY
+	ld hl, wNumFieldMoves
+	inc [hl]
+	ld a, [wFieldMovesLeftmostXCoord]
+	cp $0C ; "TAKE" is as long as "SURF"
+	ret c
+	ld a, $0C
+	ld [wFieldMovesLeftmostXCoord], a
 	ret
 .tempfieldmove	;joenote - for field move slot
 	ld a, d 

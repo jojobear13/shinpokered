@@ -227,7 +227,8 @@ class Game:
         """Make the next menus pick these items, in order, as if the player
         moved the cursor and pressed A (item 0 is the first, so YES in a
         yes/no box). Replaces HandleMenuInput, so the cursor-moving UI itself
-        is not exercised; everything the menu leads to runs as normal. Using
+        is not exercised; everything the menu leads to runs as normal (the party
+menu included). Using
         more menus than choices were queued is an error."""
         if len(items) > MENU_QUEUE_LEN:
             raise HarnessError("menu queue is full")
@@ -236,8 +237,10 @@ class Game:
             self.memory[MENU_QUEUE + i] = item
         if not self._menu_patched:
             item = self.addr("wCurrentMenuItem")
+            # HandleMenuInput falls through into HandleMenuInput_, which the
+            # party menu calls directly: patching the latter covers both
             self.patch(
-                "HandleMenuInput",
+                "HandleMenuInput_",
                 0xE5,  # push hl
                 0x21, MENU_INDEX & 0xFF, MENU_INDEX >> 8,  # ld hl, MENU_INDEX
                 0x7E,  # ld a, [hl]

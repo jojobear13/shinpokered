@@ -164,8 +164,11 @@ Mon1BCDScore:
 .next1
 	cp 1
 	jr nz, .default
-	;calculate a = $FF - wPartyMon1CatchRate
-	ld a, [wPartyMon1CatchRate]
+	;calculate a = $FF - the species' catch rate (the struct byte is the held item)
+	ld a, [wPartySpecies]
+	ld [wd0b5], a
+	call GetMonHeader
+	ld a, [wMonHCatchRate]
 	ld b, a
 	ld a, $FF
 	sub b

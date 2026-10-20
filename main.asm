@@ -50,8 +50,7 @@ INCLUDE "engine/battle/safari_zone.asm"
 INCLUDE "engine/titlescreen.asm"
 INCLUDE "engine/load_mon_data.asm"
 
-INCLUDE "data/item_prices.asm"
-INCLUDE "text/item_names.asm"
+; item prices and names are in bank 9 (with the held items), out of bank 1
 ;INCLUDE "text/unused_names.asm"	;joenote - free up space in bank 1
 
 INCLUDE "engine/overworld/oam.asm"
@@ -248,7 +247,6 @@ INCLUDE "engine/battle/moveEffects/conversion_effect.asm"
 INCLUDE "engine/battle/moveEffects/haze_effect.asm"
 INCLUDE "engine/battle/moveEffects/substitute_effect.asm"	;joenote - moved this here to make room elsewhere
 INCLUDE "engine/battle/get_trainer_name.asm"
-INCLUDE "engine/random.asm"
 
 ;joenote - adding exp bar
 IF DEF(_EXPBAR)
@@ -604,6 +602,10 @@ INCLUDE "engine/overworld/pewter_guys.asm"
 INCLUDE "engine/multiply_divide.asm"
 INCLUDE "engine/menu/natures.asm"
 INCLUDE "engine/abilities.asm"
+INCLUDE "engine/held_items.asm"
+INCLUDE "data/item_prices.asm"
+INCLUDE "text/item_names.asm"
+INCLUDE "engine/random.asm" ; out of bank 4, which is nearly full
 INCLUDE "engine/game_corner_slots.asm"
 
 SECTION "Battle (bank A)", ROMX, BANK[$A]
