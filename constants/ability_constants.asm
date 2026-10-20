@@ -75,8 +75,3 @@
 	const COMPETITIVE      ; $46
 	const NEUTRALIZING_GAS ; $47
 NUM_ABILITIES EQU const_value - 1
-
-; bits of a move's flags (data/move_flags.asm)
-MOVE_CONTACT_F EQU 0
-MOVE_PUNCH_F   EQU 1
-MOVE_SOUND_F   EQU 2

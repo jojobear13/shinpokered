@@ -3602,6 +3602,14 @@ wEnemyMistTurns::
 	ds 1
 wTurnPending:: ; both sides have chosen this turn; it ends as the battle loop comes round
 	ds 1
+wPlayerMimicSlot:: ; the slot (1-4) Mimic filled until the mon leaves, 0 for none
+	ds 1
+wEnemyMimicSlot::
+	ds 1
+wPlayerMimicPP:: ; Mimic's own PP, for the party mon
+	ds 1
+wEnemyMimicPP::
+	ds 1
 wSideConditionsEnd::
 
 ; free up to the stack at $df00

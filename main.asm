@@ -1634,7 +1634,6 @@ Plateau_Block:     INCBIN "gfx/blocksets/plateau.bst"
 
 SECTION "bank1A",ROMX,BANK[$1A]
 
-INCLUDE "engine/battle/decrement_pp.asm"
 
 Version_GFX:
 IF (DEF(_RED) || DEF(_GREEN))
@@ -1949,6 +1948,7 @@ INCLUDE "engine/battle/exp_formula.asm"
 INCLUDE "engine/battle/damage.asm"
 INCLUDE "engine/battle/move_data.asm"
 INCLUDE "engine/battle/side_conditions.asm"
+INCLUDE "engine/battle/decrement_pp.asm"
 INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 

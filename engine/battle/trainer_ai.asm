@@ -1997,6 +1997,16 @@ SwitchEnemyMon:
 	ld hl, wEnemyMonPP
 	ld bc, 4
 	call CopyData
+	ld a, [wEnemyMimicSlot] ; a mimicked move's PP go back to Mimic's
+	and a
+	jr z, .skiptransformed
+	ld hl, -NUM_MOVES - 1
+	add hl, de
+	ld e, a
+	ld d, 0
+	add hl, de
+	ld a, [wEnemyMimicPP]
+	ld [hl], a
 	
 .skiptransformed
 	ld hl, AIBattleWithdrawText

@@ -1321,9 +1321,53 @@ In progress, one commit per group:
   the recoil fractions and rounding, crash damage around a substitute,
   Psywave's ends and reroll, and Low Kick against four species; the damage
   model reads Low Kick's table.
-- **Still to do in this part:** Substitute, Counter, Bide, Rage, Disable,
-  Mimic, Mirror Move, Conversion, Whirlwind and Roar, powder moves, thawing
-  and never-miss flags.
+- **Move flags**: `data/move_flags.asm` (now from `tools/gen_move_data.py`,
+  which also covers the new moves through their PokeAPI ids) gains Gen 9's
+  mirror, defrost, powder and bypass-substitute flags, and a never-miss
+  flag for moves with no accuracy. `UserMoveHasFlag` and `MoveHasFlag`
+  (bank `$34`) take the mask in `e`: `callab` overwrites `bc` (it loads its
+  return address there), so nothing can be passed in `c` across it.
+- **The hit test**: powders (Sleep Powder, Stun Spore, Poison Powder,
+  Spore) don't affect Grass types ("is unaffected", `wMoveMissed` 2).
+  Never-miss moves (Swift, Struggle, Whirlwind, Roar, Mimic, Mirror Move,
+  Transform, Haze...) skip the accuracy roll but still can't hit a mon in
+  the air or underground (Gen 1's Swift could).
+- **Substitute**: costs a quarter of max HP and needs more than that (the
+  fork's check only looked at the low byte, so 256 HP left failed); it
+  breaks at 0 HP (Gen 1's survived at 0), and a broken one counts only the
+  HP it had (`wDamage`, which recoil, drain and Counter read). Moves with
+  the bypass flag (Growl, Roar, Sing, Supersonic, Screech, Whirlwind,
+  Disable, Mimic, Haze) go through it (`CheckTargetSubstitute`); drain
+  moves hit it (Gen 5+), Leech Seed still doesn't.
+- **Counter** was already Gen 9's (physical moves of any type, twice the
+  damage this turn).
+- **Bide** always stores for two turns.
+- **Rage** follows Gen 7, its last generation: the mon isn't locked in, each
+  hit it takes raises its Attack, and choosing another move ends it. The
+  fork's 2-3 turn counter and accuracy reset go.
+- **Disable** picks the target's last move (not a random one) and fails if
+  there is none, it was Struggle, it has no PP or a move is already
+  disabled; it lasts 4 of the target's turns (counting this one if it
+  hasn't moved). The fork's `PlayerDisableHandler` and
+  `EnemyDisableHandler` predefs go.
+- **Mimic** copies the target's last move (not a chosen or random one) into
+  Mimic's slot with that move's full PP, until the user leaves the field;
+  it fails on Mimic, Transform, Struggle, no move, or a move the user
+  knows. The mimicked move's PP aren't the party mon's: `DecrementPP` and
+  `IncrementMovePP` skip the party copy for that slot
+  (`wPlayerMimicSlot`), and an enemy trainer's withdrawn mon gets Mimic's
+  own PP back (`wEnemyMimicPP`). `DecrementPP` moved to bank `$35` (bank
+  `$1A` was full).
+- **Mirror Move** copies only moves with the mirror flag (moves aimed at
+  another mon), so Swords Dance or Mirror Move itself fail.
+- **Verified:** `tests/test_move_rules.py` (15 tests: Disable and its
+  failures, Mimic and its PP, Mirror Move, powders against Grass, never-miss
+  without a roll, Growl through a substitute, Absorb hitting one, the
+  Substitute thresholds, breaking at 0 and counting its HP, Bide, Rage).
+  Writing them found `PowderBlocked` returning carry for every type below
+  Grass, and the flag mask lost across `callab`.
+- **Still to do in this part:** Conversion, Whirlwind, Roar and Teleport,
+  and the user thawing with a defrost move.
 
 ## Bugs found by the refactor
 

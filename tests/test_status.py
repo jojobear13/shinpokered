@@ -25,6 +25,7 @@ CONFUSED = 1 << 7
 SEEDED = 1 << 7
 BADLY_POISONED = 1 << 0
 EFFECTS = mx_effects()
+HYPNOSIS = 0x5F
 
 
 class TurnStartTest(unittest.TestCase):
@@ -90,6 +91,8 @@ class SleepTest(unittest.TestCase):
                 g.poke("wPlayerMonStatMods", *[7] * 8)
                 g.poke("wEnemyMonStatMods", *[7] * 8)
                 g.poke("wPlayerAbility", 0, 0)
+                g.poke("wPlayerMoveNum", HYPNOSIS)  # not a powder, and it has an accuracy
+                g.poke("wEnemyMonType1", TYPES["NORMAL"], TYPES["NORMAL"])
                 g.poke(H_WHOSETURN, 0)
                 g.queue_random(0, *rolls)  # the hit test, then the counter
                 g.call("SleepEffect", max_frames=5000)

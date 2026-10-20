@@ -95,3 +95,13 @@ const_value = 0
 ; fixed damage constants
 SONICBOOM_DAMAGE   EQU 20
 DRAGON_RAGE_DAMAGE EQU 40
+
+; bits of a move's flags (data/move_flags.asm, Gen 9's)
+MOVE_CONTACT_F    EQU 0
+MOVE_PUNCH_F      EQU 1
+MOVE_SOUND_F      EQU 2
+MOVE_MIRROR_F     EQU 3 ; Mirror Move can copy it
+MOVE_DEFROST_F    EQU 4 ; thaws its frozen user
+MOVE_POWDER_F     EQU 5 ; Grass types are immune
+MOVE_BYPASS_SUB_F EQU 6 ; goes through a substitute
+MOVE_NEVER_MISS_F EQU 7 ; skips the accuracy check

@@ -492,19 +492,6 @@ MainInBattleLoop:
 	xor a
 	ld [wFirstMonsNotOutYet], a
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - if raging, reset rage's accuracy here to prevent degradation
-;	and also decrement the rage counter
-	ld a, [wPlayerBattleStatus2]
-	bit USING_RAGE, a
-	jr z, .not_player_raging
-	call DecAttackPlayer
-	call DeactivateRageInA
-	ld [wPlayerBattleStatus2], a
-	ld a, $FF
-	ld [wPlayerMoveAccuracy], a
-.not_player_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if thrashing, reset the move accuracy here to prevent degradation
 	ld a, [wPlayerBattleStatus1]
 	bit THRASHING_ABOUT, a
@@ -514,9 +501,9 @@ MainInBattleLoop:
 .not_player_thrashing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, [wPlayerBattleStatus2]
-	and (1 << NEEDS_TO_RECHARGE) | (1 << USING_RAGE) ; check if the player is using Rage or needs to recharge
+	bit NEEDS_TO_RECHARGE, a ; check if the player needs to recharge
 	jr nz, .selectEnemyMove
-; the player is not using Rage and doesn't need to recharge
+; the player doesn't need to recharge
 	ld hl, wEnemyBattleStatus1
 	res FLINCHED, [hl] ; reset flinch bit
 	ld hl, wPlayerBattleStatus1
@@ -3456,19 +3443,6 @@ StatusMoveText:
 
 SelectEnemyMove:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - if raging, reset rage's accuracy here to prevent degradation
-;	and also decrement the rage counter
-	ld a, [wEnemyBattleStatus2]
-	bit USING_RAGE, a
-	jr z, .not_enemy_raging
-	call DecAttackEnemy
-	call DeactivateRageInA
-	ld [wEnemyBattleStatus2], a	
-	ld a, $FF
-	ld [wEnemyMoveAccuracy], a
-.not_enemy_raging
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - if thrashing, reset the move accuracy here to prevent degradation
 	ld a, [wEnemyBattleStatus1]
 	bit THRASHING_ABOUT, a
@@ -3503,7 +3477,7 @@ SelectEnemyMove:
 	jp .done
 .noLinkBattle	;the following handles selection stuff for an AI opponent
 	ld a, [wEnemyBattleStatus2]
-	and (1 << NEEDS_TO_RECHARGE) | (1 << USING_RAGE) ; need to recharge or using rage
+	bit NEEDS_TO_RECHARGE, a ; need to recharge
 	ret nz
 	ld hl, wEnemyBattleStatus1
 	ld a, [hl]
@@ -4036,13 +4010,6 @@ CheckStatusConditions:
 	and a
 	jr z, .checkIfConfused
 
-;joenote - fix a rare oversight with Disable
-; the Player and Enemy DisableHandler predefs are consecutive
-	ld a, [hBattleSide]
-	and BATTLE_SIDE_ENEMY
-	add (PlayerDisableHandlerPredef - PredefPointers) / 3
-	call Predef
-	ld a, [hl]
 
 	dec a
 	ld [hl], a
@@ -4231,22 +4198,17 @@ CheckStatusConditions:
 	pop hl ; skip DecrementPP
 	jp .returnToHL
 
-.checkIfUsingRage
-	ld hl, StatusCheckStatus2
+.checkIfUsingRage ; Gen 7: a raging mon isn't locked in; another move ends it
+	ld hl, StatusCheckSelectedMove
 	call GetSideAddr
 	ld a, [hl]
-	bit USING_RAGE, a ; is mon using rage?
+	cp RAGE
 	jp z, .done ; if we made it this far, mon can move normally this turn
-	ld a, RAGE
-	ld [wd11e], a
-	call GetMoveName
-	call CopyStringToCF4B
-	ld hl, StatusCheckMoveEffect
+	ld hl, StatusCheckStatus2
 	call GetSideAddr
-	xor a
-	ld [hl], a
-	ld hl, StatusCheckCanExecuteMove ; skip DecrementPP
-	; fall through
+	res USING_RAGE, [hl]
+	jp .done
+
 .returnToSideHL
 	call GetSideAddr
 .returnToHL
@@ -4296,8 +4258,6 @@ StatusCheckCalcMoveDamage:
 	dw PlayerCalcMoveDamage, EnemyCalcMoveDamage
 StatusCheckAnimationType:
 	dw getPlayerAnimationType, GetEnemyAnimationType
-StatusCheckCanExecuteMove:
-	dw PlayerCanExecuteMove, EnemyCanExecuteMove
 
 FastAsleepText:
 	TX_FAR _FastAsleepText
@@ -5328,10 +5288,18 @@ MirrorMoveCopyMove:
 	ld hl, wEnemySelectedMove
 .next
 	ld [hl], a
-	cp MIRROR_MOVE ; did the target Pokemon last use Mirror Move, and miss?
+	and a ; has the target used any move yet?
 	jr z, .mirrorMoveFailed
-	and a ; has the target selected any move yet?
-	jr nz, ReloadMoveData
+; Gen 9: only moves that target another mon can be mirrored
+	push de
+	push hl
+	ld d, a
+	ld e, 1 << MOVE_MIRROR_F
+	callab MoveHasFlag
+	pop hl
+	pop de
+	ld a, [hl]
+	jr c, ReloadMoveData
 .mirrorMoveFailed
 	ld hl, MirrorMoveFailedText
 	call PrintText
@@ -5417,6 +5385,10 @@ IncrementMovePP:
 	ld c, a
 	add hl, bc
 	inc [hl] ; increment PP in the currently battling pokemon memory location
+	push bc
+	call InMimicSlot
+	pop bc
+	ret z ; Gen 9: a mimicked move's PP are its own
 	ld h, d
 	ld l, e
 	add hl, bc
@@ -5459,18 +5431,9 @@ MoveHitTest:
 	and SLP ; is the target pokemon sleeping?
 	jp z, .moveMissed
 .swiftCheck
-	ld a, [de]
-	cp SWIFT_EFFECT
-	ret z ; Swift never misses (interestingly, Azure Heights lists this is a myth, but it appears to be true)
 	call CheckTargetSubstitute ; substitute check (note that this overwrites a)
 	jr z, .checkForDigOrFlyStatus
-; this code is buggy. it's supposed to prevent HP draining moves from working on substitutes.
-; since $7b79 overwrites a with either $00 or $01, it never works.
-	ld a, [de] ;joenote - reload the effect info so that drain moves & dreameater miss substitutes
-	cp DRAIN_HP_EFFECT
-	jp z, .moveMissed
-	cp DREAM_EATER_EFFECT
-	jp z, .moveMissed
+	ld a, [de] ; Gen 9: drain moves hit a substitute, Leech Seed doesn't
 	cp LEECH_SEED_EFFECT	;joenote - leech seed should miss a substitute
 	jp z, .moveMissed
 .checkForDigOrFlyStatus
@@ -5479,6 +5442,24 @@ MoveHitTest:
 	callab NoGuardActive ; No Guard hits it anyway
 	jp nc, .moveMissed
 .notInvulnerable
+	push hl
+	push de
+	push bc
+	callab PowderBlocked ; Gen 9: Grass types are immune to powders
+	pop bc
+	pop de
+	pop hl
+	jp c, .unaffected
+; Gen 9: moves with no accuracy (Swift, Struggle...) skip the rest
+	push hl
+	push de
+	push bc
+	ld e, 1 << MOVE_NEVER_MISS_F
+	callab UserMoveHasFlag
+	pop bc
+	pop de
+	pop hl
+	ret c
 	ld a, [H_WHOSETURN]
 	and a
 	jr nz, .enemyTurn
@@ -5566,6 +5547,14 @@ MoveHitTest:
 	ld [hli], a
 	ld [hl], a
 	inc a
+	ld [wMoveMissed], a
+	ret
+.unaffected
+	xor a
+	ld hl, wDamage
+	ld [hli], a
+	ld [hl], a
+	ld a, 2 ; "is unaffected"
 	ld [wMoveMissed], a
 	ret
 
@@ -7650,11 +7639,8 @@ BideEffect:
 	ld [de], a
 	ld [wPlayerMoveEffect], a
 	ld [wEnemyMoveEffect], a
-	call BattleRandom
-	and $1
-	inc a
-	inc a
-	ld [bc], a ; set Bide counter to 2 or 3 at random
+	ld a, 2
+	ld [bc], a ; Gen 9: two turns storing energy, then it strikes
 	ld a, [H_WHOSETURN]
 	add XSTATITEM_ANIM
 	jp PlayBattleAnimation2
@@ -8084,23 +8070,20 @@ ClearHyperBeam:	;for whoever's turn it is, clear their opponent's hyperbeam stat
 	pop hl
 	ret
 
-RageEffect:	;joenote - modified to last 2 to 3 turns
+; Gen 7: until the mon uses another move, each hit it takes raises its attack
+RageEffect:
 	ld hl, wPlayerBattleStatus2
-	ld bc, wPlayerNumAttacksLeft
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .player
 	ld hl, wEnemyBattleStatus2
-	ld bc, wEnemyNumAttacksLeft
 .player
 	set USING_RAGE, [hl] ; mon is now in "rage" mode
-	call BattleRandom
-	and $1
-	inc a
-	inc a
-	ld [bc], a ; set Rage counter to 2 or 3 at random
 	ret
 
+; Gen 9: the target's last move takes Mimic's slot, with its full PP, until
+; the user leaves the field. Fails if the target hasn't used a move, or used
+; Mimic, Transform or Struggle, or the user already knows it
 MimicEffect:
 	ld c, 50
 	call DelayFrames
@@ -8108,73 +8091,91 @@ MimicEffect:
 	ld a, [wMoveMissed]
 	and a
 	jr nz, .mimicMissed
-	ld a, [H_WHOSETURN]
-	and a
 	ld hl, wBattleMonMoves
-	ld a, [wPlayerBattleStatus1]
-	jr nz, .enemyTurn
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	jr nz, .letPlayerChooseMove
-	ld hl, wEnemyMonMoves
-	ld a, [wEnemyBattleStatus1]
-.enemyTurn
-	bit INVULNERABLE, a
-	jr nz, .mimicMissed
-.getRandomMove
-	push hl
-	call BattleRandom
-	and $3
-	ld c, a
-	ld b, $0
-	add hl, bc
-	ld a, [hl]
-	pop hl
-	and a
-	jr z, .getRandomMove
-	ld d, a
-	ld a, [H_WHOSETURN]
-	and a
-	ld hl, wBattleMonMoves
+	ld de, wPlayerMimicSlot
 	ld a, [wPlayerMoveListIndex]
-	jr z, .playerTurn
+	ld c, a
+	ld a, [wEnemyUsedMove]
+	ld b, a
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotSide
 	ld hl, wEnemyMonMoves
+	ld de, wEnemyMimicSlot
 	ld a, [wEnemyMoveListIndex]
-	jr .playerTurn
-.letPlayerChooseMove
-	ld a, [wEnemyBattleStatus1]
-	bit INVULNERABLE, a
-	jr nz, .mimicMissed
-	
-	call SaveScreenTilesToBuffer1	;joenote - need to save the tiles in case the opponent switched before mimic
-	
-	ld a, [wCurrentMenuItem]
-	push af
-	ld a, $1
-	ld [wMoveMenuType], a
-	call MoveSelectionMenu
-	call LoadScreenTilesFromBuffer1
-	ld hl, wEnemyMonMoves
-	ld a, [wCurrentMenuItem]
 	ld c, a
-	ld b, $0
-	add hl, bc
-	ld d, [hl]
-	pop af
-	ld hl, wBattleMonMoves
-.playerTurn
-	ld c, a
-	ld b, $0
-	add hl, bc
-	ld a, d
-	ld [hl], a
+	ld a, [wPlayerUsedMove]
+	ld b, a
+.gotSide
+	ld a, b
+	and a
+	jr z, .mimicMissed
+	cp STRUGGLE
+	jr nc, .mimicMissed
+	cp MIMIC
+	jr z, .mimicMissed
+	cp TRANSFORM
+	jr z, .mimicMissed
 	ld [wd11e], a
+	push hl
+	ld a, NUM_MOVES
+.known
+	push af
+	ld a, [hli]
+	cp b
+	jr z, .knownPop
+	pop af
+	dec a
+	jr nz, .known
+	pop hl
+	ld a, c
+	inc a
+	ld [de], a ; the slot Mimic filled
+	ld b, 0
+	add hl, bc
+	ld a, [wd11e]
+	ld [hl], a
+	ASSERT wEnemyMonPP - wEnemyMonMoves == wBattleMonPP - wBattleMonMoves
+	ld bc, wBattleMonPP - wBattleMonMoves
+	add hl, bc
+	ld a, [hl] ; Mimic's own PP, now used
+	ASSERT wEnemyMimicPP - wPlayerMimicPP == wEnemyMimicSlot - wPlayerMimicSlot
+	inc de
+	inc de ; its MimicPP
+	ld [de], a
+	ld d, h
+	ld e, l
+	ld a, [wd11e]
+	dec a
+	ld hl, Moves + 5 ; its PP field
+	ld bc, MoveEnd - Moves
+	call AddNTimes
+	ld bc, 1
+	ld a, BANK(Moves)
+	call FarCopyData ; the move's full PP
 	call GetMoveName
 	call PlayCurrentMoveAnimation
 	ld hl, MimicLearnedMoveText
 	jp PrintText
+.knownPop
+	pop af
+	pop hl
 .mimicMissed
 	jp PrintButItFailedText_
+
+; z if the move of the side whose turn it is is in the slot Mimic filled
+InMimicSlot:
+	ld a, [H_WHOSETURN]
+	and a
+	ld a, [wPlayerMimicSlot]
+	ld hl, wPlayerMoveListIndex
+	jr z, .gotSide
+	ld a, [wEnemyMimicSlot]
+	ld hl, wEnemyMoveListIndex
+.gotSide
+	dec a
+	cp [hl]
+	ret
 
 MimicLearnedMoveText:
 	TX_FAR _MimicLearnedMoveText
@@ -8187,6 +8188,10 @@ SplashEffect:
 	call PlayCurrentMoveAnimation
 	jp PrintNoEffectText
 
+; Gen 9: the target's last move can't be used for its next 4 turns (this
+; one among them if it hasn't moved yet: the count goes down as each of its
+; turns starts). Fails if it hasn't used a move, it was Struggle, it has no
+; PP, or a move is already disabled
 DisableEffect:
 	call MoveHitTest
 	ld a, [wMoveMissed]
@@ -8194,70 +8199,45 @@ DisableEffect:
 	jr nz, .moveMissed
 	ld de, wEnemyDisabledMove
 	ld hl, wEnemyMonMoves
+	ld bc, wEnemyUsedMove
 	ld a, [H_WHOSETURN]
 	and a
 	jr z, .disableEffect
 	ld de, wPlayerDisabledMove
 	ld hl, wBattleMonMoves
+	ld bc, wPlayerUsedMove
 .disableEffect
-; no effect if target already has a move disabled
 	ld a, [de]
 	and a
-	jr nz, .moveMissed
-.pickMoveToDisable
-	push hl		;preserve wBattleMonMoves/wEnemyMonMoves
-	call BattleRandom
-	and $3
-	ld c, a
-	ld b, $0
-	add hl, bc
-	ld a, [hl]
-	pop hl		;get back wBattleMonMoves/wEnemyMonMoves
+	jr nz, .moveMissed ; already a move disabled
+	ld a, [bc]
 	and a
-	jr z, .pickMoveToDisable ; loop until a non-00 move slot is found
+	jr z, .moveMissed
+	cp STRUGGLE
+	jr nc, .moveMissed
 	ld [wd11e], a ; store move number
-	push hl		;preserve wBattleMonMoves/wEnemyMonMoves
-	ld a, [H_WHOSETURN]
-	and a
-	ld hl, wBattleMonPP
-	jr nz, .enemyTurn
-;	ld a, [wLinkState]	;joenote - non-link enemy mons now have PP, so always run checks during disable effect
-;	cp LINK_STATE_BATTLING
-;	pop hl ; wEnemyMonMoves
-;	jr nz, .playerTurnNotLinkBattle
-; .playerTurnLinkBattle
-;	push hl
-	ld hl, wEnemyMonPP
-.enemyTurn
-	push hl		;preserve wEnemymonPP/wBattleMonPP
-	ld a, [hli]
-	or [hl]
+	lb bc, NUM_MOVES, 0
+.findSlot
+	cp [hl]
+	jr z, .foundSlot
 	inc hl
-	or [hl]
-	inc hl
-	or [hl]
-	and $3f
-	pop hl ;get back wBattleMonPP or wEnemyMonPP
-	jr z, .moveMissedPopHL ; nothing to do if all moves have no PP left
+	inc c
+	dec b
+	jr nz, .findSlot
+	jr .moveMissed
+.foundSlot
+	ASSERT wEnemyMonPP - wEnemyMonMoves == wBattleMonPP - wBattleMonMoves
+	push bc
+	ld bc, wBattleMonPP - wBattleMonMoves
 	add hl, bc
+	pop bc
 	ld a, [hl]
-	pop hl		;get back wBattleMonMoves/wEnemyMonMoves
-	and a
-	jr z, .pickMoveToDisable ; pick another move if this one had 0 PP
-;.playerTurnNotLinkBattle
-; non-link battle enemies have unlimited PP so the previous checks aren't needed
-	call BattleRandom
-	and $7
-	inc a ; 1-8 turns disabled
-
-	;joenote - will handle this a different way
-	;change the lower nybble (a = 0000xxxx) from [1,2,3,4,5,6,7,8] to instead be [9,A,B,C,D,E,F,0]
-	add 8
-	res 4, a	;clear bit in case nybble overflows from F to 0
-
+	and $3f
+	jr z, .moveMissed ; no PP left
 	inc c ; move 1-4 will be disabled
 	swap c
-	add c ; map disabled move to high nybble of wEnemyDisabledMove / wPlayerDisabledMove
+	ld a, c
+	or 5 ; the count, freed as it reaches 0
 	ld [de], a
 	call PlayCurrentMoveAnimation2
 	ld hl, wPlayerDisabledMoveNumber
@@ -8271,8 +8251,6 @@ DisableEffect:
 	call GetMoveName
 	ld hl, MoveWasDisabledText
 	jp PrintText
-.moveMissedPopHL
-	pop hl
 .moveMissed
 	jp PrintButItFailedText_
 
@@ -8343,6 +8321,8 @@ ParalyzedMayNotAttackText:
 	TX_FAR _ParalyzedMayNotAttackText
 	db "@"
 
+; nz if the target has a substitute the move whose turn it is doesn't go
+; through (Gen 9: sound moves and a few others do)
 CheckTargetSubstitute:
 	push hl
 	ld hl, wEnemyBattleStatus2
@@ -8353,8 +8333,19 @@ CheckTargetSubstitute:
 .next1
 	bit HAS_SUBSTITUTE_UP, [hl]
 	pop hl
+	ret z
+	push hl
+	push de
+	push bc
+	ld e, 1 << MOVE_BYPASS_SUB_F
+	callab UserMoveHasFlag
+	pop bc
+	pop de
+	pop hl
+	ld a, 0
+	ccf
+	adc a ; 1 (nz) unless it goes through
 	ret
-
 PlayCurrentMoveAnimation2:
 ; animation at MOVENUM will be played unless MOVENUM is 0
 ; plays wAnimationType 3 or 6
@@ -8478,12 +8469,6 @@ DecAttackSide:
 DecAttackNumAttacksLeft:
 	dw wPlayerNumAttacksLeft, wEnemyNumAttacksLeft
 
-;Battle status2 in "a"
-;resets the rage bit in "a" if zero flag is set
-DeactivateRageInA:
-	ret nz
-	res USING_RAGE, a
-	ret
 
 SpriteScalingAndInterlacing:
 	predef ScaleSpriteByTwo

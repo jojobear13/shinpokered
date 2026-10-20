@@ -29,6 +29,12 @@ DecrementPP:
 	                     ; its opponent, which is *not* the same as its real PP as part of your
 	                     ; party.  So we return, and don't do that part.
 
+	ld a, [wPlayerMimicSlot]
+	ld hl, wPlayerMoveListIndex
+	dec a
+	cp [hl]
+	ret z                ; Gen 9: a mimicked move's PP are its own, not the party mon's
+
 	ld hl, wPartyMon1PP  ; PP of first move (in party)
 	ld a, [wPlayerMonNumber] ; which mon in party is active
 	ld bc, wPartyMon2 - wPartyMon1

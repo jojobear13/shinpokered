@@ -165,4 +165,4 @@ MoveChances:
 	db   0 ; SUPER_FANG
 	db   0 ; SLASH
 	db   0 ; SUBSTITUTE
-	db   0 ; CONF_ANIM
+	db   0 ; STRUGGLE

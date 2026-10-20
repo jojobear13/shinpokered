@@ -170,8 +170,6 @@ PredefPointers::
 	add_predef BGLayerScrollingUpdate
 	add_predef _PrintNumber
 	add_predef GBCGamma
-	add_predef PlayerDisableHandler
-	add_predef EnemyDisableHandler
 	add_predef SetAttackAnimPal
 	add_predef EndOfBattle_NuzlockeHandler
 	add_predef HealParty_NuzlockeHandler

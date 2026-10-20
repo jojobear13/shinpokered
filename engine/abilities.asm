@@ -27,6 +27,7 @@ LoadPlayerAbility:
 	call FreeBoundMons
 	xor a
 	ld [wPlayerChoiceLock], a
+	ld [wPlayerMimicSlot], a
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_PLAYER_F, [hl]
 	set ENTRY_PENDING_PLAYER_F, [hl]
@@ -37,6 +38,7 @@ LoadEnemyAbility:
 	call FreeBoundMons
 	xor a
 	ld [wEnemyChoiceLock], a
+	ld [wEnemyMimicSlot], a
 	ld hl, wAbilityFlags
 	res FLASH_FIRE_ENEMY_F, [hl]
 	set ENTRY_PENDING_ENEMY_F, [hl]
@@ -117,6 +119,48 @@ GetMoveFlags:
 	ld a, [hl]
 	pop de
 	pop hl
+	ret
+
+; e = a mask of move flags -> carry if the move of the side whose turn it is
+; has one; preserves bc and de (callab can't pass c)
+UserMoveHasFlag:
+	xor a ; the move
+	call GetUserMoveField
+	jr MoveHasFlag.gotMove
+
+; carry if the move of the side whose turn it is is a powder and the target
+; is a Grass type (Gen 9)
+PowderBlocked:
+	ld e, 1 << MOVE_POWDER_F
+	call UserMoveHasFlag
+	ret nc
+	ld hl, wEnemyMonType1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotTarget
+	ld hl, wBattleMonType1
+.gotTarget
+	ld a, [hli]
+	cp GRASS
+	jr z, .grass
+	ld a, [hl]
+	cp GRASS
+	jr z, .grass
+	and a
+	ret
+.grass
+	scf
+	ret
+
+; d = a move, e = a mask of move flags -> carry if it has one; preserves bc
+; and de
+MoveHasFlag:
+	ld a, d
+.gotMove
+	call GetMoveFlags
+	and e
+	ret z ; carry clear
+	scf
 	ret
 
 ; hl = the user's move (wPlayerMoveNum or wEnemyMoveNum)
