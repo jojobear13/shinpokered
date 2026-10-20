@@ -11,7 +11,7 @@ import re
 import unittest
 
 from harness import REPO_ROOT, shared_game
-from suites import damage_vars
+from suites import damage as damage_vars
 
 SIDES = {
     "player": ("wBattleMon", "wEnemyMon", "wPlayerMove"),
@@ -71,7 +71,7 @@ class GetMoveCategoryTest(unittest.TestCase):
 
 
 class DamageStatsTest(unittest.TestCase):
-    """GetDamageVars picks the stats by category, whatever the move's type."""
+    """BaseDamage picks the stats by category, whatever the move's type."""
 
     @classmethod
     def setUpClass(cls):
@@ -79,6 +79,8 @@ class DamageStatsTest(unittest.TestCase):
 
     def test_crossover_moves_use_their_categorys_stats(self):
         g = self.game
+        unmodified = {"player": ("wPlayerMonUnmodified", "wEnemyMonUnmodified"),
+                      "enemy": ("wEnemyMonUnmodified", "wPlayerMonUnmodified")}
         for name, (expected, move_type) in CROSSOVERS.items():
             for side, (attacker, defender, move) in SIDES.items():
                 with self.subTest(move=name, side=side):
@@ -87,16 +89,22 @@ class DamageStatsTest(unittest.TestCase):
                     g.poke("wCriticalHitOrOHKO", 0)
                     for status3 in ("wPlayerBattleStatus3", "wEnemyBattleStatus3"):
                         g.poke(status3, 0)
+                    for mods in ("wPlayerMonAttackMod", "wEnemyMonAttackMod"):
+                        g.poke(mods, *[7] * 7)
                     g.poke(move + "Num", MOVES[name])
                     g.poke(move + "Power", 80)
                     g.poke(move + "Type", move_type)
-                    g.poke16(attacker + "Attack", 11)
-                    g.poke16(attacker + "SpecialAttack", 22)
-                    g.poke16(defender + "Defense", 33)
-                    g.poke16(defender + "SpecialDefense", 44)
-                    out = damage_vars.run(g, side)
-                    stats = (11, 33) if expected == "PHYSICAL" else (22, 44)
-                    self.assertEqual((out["b"], out["c"]), stats)
+                    g.poke(attacker + "Level", 50)
+                    mine, theirs = unmodified[side]
+                    g.poke16(mine + "Attack", 110)
+                    g.poke16(mine + "SpecialAttack", 220)
+                    g.poke16(theirs + "Defense", 330)
+                    g.poke16(theirs + "SpecialDefense", 440)
+                    g.poke(0xFFF3, 0 if side == "player" else 1)
+                    g.poke(damage_vars.H_BATTLE_SIDE, 0 if side == "player" else 1)
+                    g.call("BaseDamage")
+                    attack, defense = (110, 330) if expected == "PHYSICAL" else (220, 440)
+                    self.assertEqual(g.peek16("wDamage"), 22 * 80 * attack // defense // 50 + 2)
 
 
 if __name__ == "__main__":

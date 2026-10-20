@@ -108,26 +108,27 @@ class CritAndAccuracyTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def rate(self, item, species="RATTATA", rate=40, target_ability="NO_ABILITY", turn=0):
+    def stage(self, item, species="RATTATA", stage=0, target_ability="NO_ABILITY", turn=0):
         g = self.game
         g.reset()
         g.poke(H_WHOSETURN, turn)
         set_abilities(g, turn, "NO_ABILITY", target_ability)
         g.poke(SIDES[turn][1] + "CatchRate", ITEMS[item] if item else 0)
         g.poke(SIDES[turn][1] + "Species", SPECIES[species])
-        g.poke("wSideEffectChance", rate)
-        g.call("CritRateModifiers")
+        g.poke("wSideEffectChance", stage)
+        g.call("CritStageModifiers")
         return g.peek("wSideEffectChance")
 
     def test_crit_items(self):
+        # Gen 9's critical hit stages: Scope Lens +1, the Stick and Lucky Punch +2
         for turn in (0, 1):
-            self.assertEqual(self.rate(0, turn=turn), 40)
-            self.assertEqual(self.rate("SCOPE_LENS", turn=turn), 80)
-            self.assertEqual(self.rate("SCOPE_LENS", rate=200, turn=turn), 255)
-            self.assertEqual(self.rate("STICK", "FARFETCHD", turn=turn), 160)
-            self.assertEqual(self.rate("STICK", "RATTATA", turn=turn), 40)
-            self.assertEqual(self.rate("LUCKY_PUNCH", "CHANSEY", turn=turn), 160)
-            self.assertEqual(self.rate("SCOPE_LENS", target_ability="SHELL_ARMOR", turn=turn), 0)
+            self.assertEqual(self.stage(0, turn=turn), 0)
+            self.assertEqual(self.stage("SCOPE_LENS", turn=turn), 1)
+            self.assertEqual(self.stage("SCOPE_LENS", stage=2, turn=turn), 3)
+            self.assertEqual(self.stage("STICK", "FARFETCHD", turn=turn), 2)
+            self.assertEqual(self.stage("STICK", "RATTATA", turn=turn), 0)
+            self.assertEqual(self.stage("LUCKY_PUNCH", "CHANSEY", stage=1, turn=turn), 3)
+            self.assertEqual(self.stage("SCOPE_LENS", target_ability="SHELL_ARMOR", turn=turn), 0xFF)
 
     def test_bright_powder(self):
         g = self.game
@@ -390,7 +391,7 @@ class BerryTest(unittest.TestCase):
                 self.assertEqual(self.berry("MINT_BERRY", side, 150, 3)[1:], (0, False, 0))
                 self.assertEqual(self.berry("PSNCUREBERRY", side, 150, PSN)[1:], (0, False, 0))
                 self.assertEqual(self.berry("ICE_BERRY", side, 150, BRN)[1:], (0, False, 0))
-                self.assertEqual(self.game.peek16(("wBattleMon", "wEnemyMon")[side] + "Attack"), 100)
+                self.assertEqual(self.game.peek16(("wBattleMon", "wEnemyMon")[side] + "Attack"), 50)  # burn left the stat alone
                 self.assertEqual(self.berry("BURNT_BERRY", side, 150, FRZ)[1:], (0, False, 0))
                 self.assertEqual(self.berry("BITTER_BERRY", side, 150, confused=True)[1:], (0, False, 0))
                 self.assertEqual(self.berry("MIRACLEBERRY", side, 150, PSN)[1:], (0, False, 0))

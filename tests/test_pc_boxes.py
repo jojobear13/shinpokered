@@ -11,7 +11,7 @@ import unittest
 
 import boxes as bx
 from harness import shared_game
-from suites.damage_vars import SPECIES
+from suites.damage import SPECIES
 
 SEEDS = range(12)
 

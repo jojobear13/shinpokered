@@ -173,15 +173,11 @@ class AccuracyTest(unittest.TestCase):
     def setUpClass(cls):
         cls.game = shared_game()
 
-    RATIOS = [(25, 100), (28, 100), (33, 100), (40, 100), (50, 100), (66, 100), (1, 1),
-              (15, 10), (2, 1), (25, 10), (3, 1), (35, 10), (4, 1)]
-
     def model(self, accuracy, acc_mod, eva_mod):
-        value = accuracy
-        for mod in (acc_mod, 14 - eva_mod):
-            n, d = self.RATIOS[mod - 1]
-            value = max(value * n // d, 1)
-        return min(value, 255)
+        """Gen 9: one net stage, accuracy minus evasion, from -6 to +6."""
+        net = max(-6, min(6, acc_mod - eva_mod))
+        n, d = (3 + net, 3) if net >= 0 else (3, 3 - net)
+        return min(max(accuracy * n // d, 1), 255)
 
     def hit_chance(self, accuracy, acc_mod=7, eva_mod=7, user="NO_ABILITY", target="NO_ABILITY", turn=0,
                    confused=False):
@@ -198,7 +194,7 @@ class AccuracyTest(unittest.TestCase):
         g.call("CalcHitChance")
         return g.peek(prefix + "MoveAccuracy")
 
-    def test_matches_gen1_without_abilities(self):
+    def test_matches_gen9_without_abilities(self):
         rng = random.Random(3)
         for _ in range(60):
             accuracy, acc_mod, eva_mod, turn = rng.randint(1, 255), rng.randint(1, 13), rng.randint(1, 13), rng.randint(0, 1)

@@ -187,7 +187,7 @@ class ContactTest(unittest.TestCase):
                 self.assertEqual(self.contact(turn, "POISON_POINT", holder_badly_poisoned=True), PSN)
                 self.assertEqual(g.peek(SIDES[turn][0] + "BattleStatus3") & BADLY_POISONED, 0)
                 self.assertEqual(self.contact(turn, "FLAME_BODY"), BRN)
-                self.assertEqual(g.peek16(SIDES[turn][1] + "Attack"), 50)
+                self.assertEqual(g.peek16(SIDES[turn][1] + "Attack"), 100)  # burn halves damage, not the stat
 
     def test_effect_spore(self):
         for turn in (0, 1):

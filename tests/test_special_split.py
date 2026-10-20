@@ -3,8 +3,8 @@
 Special is now two stats, special attack and special defense, with Gen 2's
 base stats (Gen 9's since the Gen 9 pass), each with its own IV and EV (Gen
 9's growth, tests/ivs.py). Amnesia and Psychic's side effect work on special
-defense; Growth and X Special on special attack. The Volcano Badge boosts
-both.
+defense; Growth and X Special on special attack. (Badge boosts are gone since
+the Gen 9 pass.)
 """
 
 import os
@@ -20,7 +20,6 @@ from ivs import STAT_EVS, TRAINER_IVS, model_stats, nature, pack, unpack  # noqa
 STATS = ("MaxHP", "Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense")
 BASE_NAMES = ("hp", "attack", "defense", "speed", "special attack", "special defense")
 
-VOLCANOBADGE = 1 << 6
 MOD_SPECIAL_DEFENSE = 6
 
 
@@ -47,10 +46,6 @@ def base_stats(species_name):
     with open(path, encoding="utf-8") as f:
         text = f.read()
     return [int(re.search(rf"^db (\d+) ; base {stat}$", text, re.M).group(1)) for stat in BASE_NAMES]
-
-
-def badge_boost(value):
-    return min(value + (value >> 3), 999)
 
 
 class CalcStatsTest(unittest.TestCase):
@@ -152,8 +147,8 @@ class StatStageMoveTest(unittest.TestCase):
                 self.assertNotIn("error", out)
                 self.assertEqual(g.peek("wPlayerMonSpecialDefenseMod"), 9)
                 self.assertEqual(g.peek("wPlayerMonSpecialAttackMod"), 7)
-                # 300 doubled, then the Volcano Badge's boost reapplied to it alone
-                self.assertEqual(g.peek16("wBattleMonSpecialDefense"), badge_boost(600))
+                # 300 doubled (no badge boosts since the Gen 9 pass)
+                self.assertEqual(g.peek16("wBattleMonSpecialDefense"), 600)
                 self.assertEqual(g.peek16("wBattleMonSpecialAttack"), 200)
 
     def test_growth_raises_special_attack_by_one(self):
@@ -164,7 +159,7 @@ class StatStageMoveTest(unittest.TestCase):
                 self.assertNotIn("error", out)
                 self.assertEqual(g.peek("wPlayerMonSpecialAttackMod"), 8)
                 self.assertEqual(g.peek("wPlayerMonSpecialDefenseMod"), 7)
-                self.assertEqual(g.peek16("wBattleMonSpecialAttack"), badge_boost(300))
+                self.assertEqual(g.peek16("wBattleMonSpecialAttack"), 300)
                 self.assertEqual(g.peek16("wBattleMonSpecialDefense"), 300)
 
     def test_psychic_side_effect_lowers_special_defense(self):
@@ -181,37 +176,31 @@ class StatStageMoveTest(unittest.TestCase):
                 self.assertIn(mod, (6, 7))
                 if mod == 6:
                     lowered += 1
-                    self.assertEqual(g.peek16("wEnemyMonSpecialDefense"), 300 * 66 // 100)
+                    self.assertEqual(g.peek16("wEnemyMonSpecialDefense"), 300 * 2 // 3)  # Gen 9's -1
         self.assertGreater(lowered, 0, "the side effect should have triggered in some turns")
 
 
 class BadgeBoostTest(unittest.TestCase):
+    """Gen 9 has no badge boosts: ApplyBadgeStatBoosts leaves every stat alone."""
+
     @classmethod
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def boost(self, badges, changed_stage):
+    def test_no_boosts(self):
         g = self.game
-        g.reset()
-        g.poke("wLinkState", 0)
-        g.poke("wOptions", 0)
-        g.poke("wObtainedBadges", badges)
-        g.poke("wUnusedD71B", changed_stage)
-        values = {"Attack": 100, "Defense": 120, "Speed": 140, "SpecialAttack": 160, "SpecialDefense": 180}
-        for name, value in values.items():
-            g.poke16("wBattleMon" + name, value)
-        g.call("ApplyBadgeStatBoosts")
-        return {name: g.peek16("wBattleMon" + name) for name in values}
-
-    def test_volcano_badge_boosts_both_specials(self):
-        out = self.boost(VOLCANOBADGE, 0)
-        self.assertEqual(out, {"Attack": 100, "Defense": 120, "Speed": 140,
-                               "SpecialAttack": badge_boost(160), "SpecialDefense": badge_boost(180)})
-
-    def test_after_a_special_defense_change_only_it_is_boosted(self):
-        out = self.boost(0xFF, MOD_SPECIAL_DEFENSE + 1)
-        self.assertEqual(out, {"Attack": 100, "Defense": 120, "Speed": 140,
-                               "SpecialAttack": 160, "SpecialDefense": badge_boost(180)})
+        for changed_stage in (0, MOD_SPECIAL_DEFENSE + 1):
+            g.reset()
+            g.poke("wLinkState", 0)
+            g.poke("wOptions", 0)
+            g.poke("wObtainedBadges", 0xFF)
+            g.poke("wUnusedD71B", changed_stage)
+            values = {"Attack": 100, "Defense": 120, "Speed": 140, "SpecialAttack": 160, "SpecialDefense": 180}
+            for name, value in values.items():
+                g.poke16("wBattleMon" + name, value)
+            g.call("ApplyBadgeStatBoosts")
+            self.assertEqual({name: g.peek16("wBattleMon" + name) for name in values}, values)
+            self.assertEqual(g.peek("wUnusedD71B"), 0)
 
 
 class WildIVsTest(unittest.TestCase):

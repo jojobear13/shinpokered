@@ -15,7 +15,7 @@ import unittest
 from harness import Game, shared_game
 from suites import move_execution as mx
 from suites.apply_attack import H_WHOSETURN
-from suites.damage_vars import battle_struct_len, party_struct_len
+from suites.damage import battle_struct_len, party_struct_len
 from test_abilities import ABILITIES
 from test_ability_damage import MOVES
 from test_held_items import ITEMS

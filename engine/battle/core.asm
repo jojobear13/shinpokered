@@ -3906,12 +3906,11 @@ MirrorMoveCheck:
 	push hl
 	ld hl, wUnusedD155 
 	set 0, [hl]	;don't display that the substitute took damage for subsequent attacks
-	call CriticalHitTest
-	call GetDamageVarsForPlayerAttack
-	call CalculateDamage
-	callab AdjustDamageForMoveType
-	call ApplyDamageModifiers
-	call RandomizeDamage
+	callab CriticalHitTest
+	xor a
+	ld [hBattleSide], a
+	callab BaseDamage
+	callab DamageModifiers
 	pop hl
 	pop de
 	pop bc
@@ -4477,43 +4476,7 @@ HandleSelfConfusionDamage:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, HurtItselfText
 	call PrintText
-	ld hl, wEnemyMonDefense
-	ld a, [hli]
-	push af
-	ld a, [hld]
-	push af
-	ld a, [wBattleMonDefense]
-	ld [hli], a
-	ld a, [wBattleMonDefense + 1]
-	ld [hl], a
-	ld hl, wPlayerMoveEffect
-	push hl
-	ld a, [hl]
-	push af
-	xor a
-	ld [hli], a
-	ld [wCriticalHitOrOHKO], a ; self-inflicted confusion damage can't be a Critical Hit
-	ld a, 40 ; 40 base power
-	ld [hli], a
-	xor a
-	ld [hl], a
-	ld a, [wPlayerMoveNum]
-	push af
-	xor a
-	ld [wPlayerMoveNum], a ; no move: the physical stats, whatever the last move was
-	call GetDamageVarsForPlayerAttack
-	call CalculateDamage ; ignores AdjustDamageForMoveType (type-less damage), RandomizeDamage,
-	                     ; and MoveHitTest (always hits)
-	pop af
-	ld [wPlayerMoveNum], a
-	pop af
-	pop hl
-	ld [hl], a
-	ld hl, wEnemyMonDefense + 1
-	pop af
-	ld [hld], a
-	pop af
-	ld [hl], a
+	callab SelfHitDamage ; (whose turn it is: the player's)
 	xor a
 	ld [wAnimationType], a
 	
@@ -4981,155 +4944,6 @@ IgnoredOrdersText:
 	TX_FAR _IgnoredOrdersText
 	db "@"
 
-; sets b, c, d, and e for the CalculateDamage routine:
-; b = attacker's offensive stat and c = defender's defensive stat (both scaled to fit in a byte)
-; d = move power, e = attacker's level
-; returns z without setting the others if the move has no power
-GetDamageVarsForPlayerAttack:
-	xor a
-	jr GetDamageVars
-
-GetDamageVarsForEnemyAttack:
-	ld a, BATTLE_SIDE_ENEMY
-	; fall through
-
-; hBattleSide = the attacking side
-GetDamageVars:
-	ld [hBattleSide], a
-	ld hl, wDamage ; damage to eventually inflict, initialise to zero
-	ld [hl], 0
-	inc hl
-	ld [hl], 0
-	ld hl, .movePower
-	call GetAddrFromTable
-	ld a, [hli]
-	and a
-	ld d, a ; d = move power
-	ret z ; return if move power is zero
-	ld a, [hBattleSide]
-	ld hl, .moveNum
-	call GetAddrFromTable
-	ld a, [hl]
-	call GetMoveCategory ; the move's category, not its type, picks the stats
-	cp SPECIAL
-	jr nz, .gotCategory
-	ld a, [hBattleSide]
-	or BATTLE_SIDE_SPECIAL
-	ld [hBattleSide], a
-.gotCategory
-	ld a, [hBattleSide]
-	ld hl, .defenderStat
-	call GetAddrFromTable
-	ld a, [hli]
-	ld b, a
-	ld c, [hl] ; bc = defender's defense or special
-; Reflect doubles the defender's defense, and Light Screen doubles their special
-	push hl
-	ld a, [hBattleSide]
-	ld hl, .defenderStatus3
-	call GetAddrFromTable
-	ld a, [hBattleSide]
-	and BATTLE_SIDE_SPECIAL
-	ld a, [hl]
-	pop hl
-	jr nz, .checkLightScreen
-	bit HAS_REFLECT_UP, a
-	jr .checkedScreen
-.checkLightScreen
-	bit HAS_LIGHT_SCREEN_UP, a
-.checkedScreen
-	jr z, .critCheck
-	sla c
-	rl b
-; reflect and light screen boosts do not cap the stat at 999, so weird things will happen during stats scaling if
-; a Pokemon with 512 or more Defense has used Reflect, or if a Pokemon with 512 or more Special Defense has used Light Screen
-;;;;;joenote - adding in a 999 cap
-	predef BC999cap
-;;;
-.critCheck
-	ld a, [hBattleSide]
-	ld hl, .attackerStat
-	call GetAddrFromTable ; hl = attacker's attack or special
-	ld a, [wCriticalHitOrOHKO]
-	and a ; check for critical hit
-	jr z, .scaleStats
-; in the case of a critical hit, use both mons' stats from before any stat changes
-	ld a, [hBattleSide]
-	ld c, STAT_DEFENSE
-	bit BATTLE_SIDE_SPECIAL_F, a
-	jr z, .gotDefenderStat
-	ld c, STAT_SPECIAL_DEFENSE
-.gotDefenderStat
-	and BATTLE_SIDE_ENEMY
-	xor BATTLE_SIDE_ENEMY ; nonzero if the defender is the enemy's mon
-	call GetUnmodifiedStatAddr
-	ld a, [hli]
-	ld b, a
-	ld c, [hl]
-	push bc ; defender's unmodified defense or special
-	ld a, [hBattleSide]
-	ld c, STAT_ATTACK
-	bit BATTLE_SIDE_SPECIAL_F, a
-	jr z, .gotAttackerStat
-	ld c, STAT_SPECIAL_ATTACK
-.gotAttackerStat
-	and BATTLE_SIDE_ENEMY ; nonzero if the attacker is the enemy's mon
-	call GetUnmodifiedStatAddr ; hl = attacker's unmodified attack or special
-	pop bc
-;joenote - adjust stats for critical hits
-; the four CritHitStats predefs are ordered player physical, player special,
-; enemy physical, enemy special
-	ld a, [hBattleSide]
-	srl a ; a = 1 for a special move, carry = enemy attacking
-	jr nc, .gotCritHitStatsPredef
-	add 2
-.gotCritHitStatsPredef
-	add (CritHitStatsPlayerPhysicalPredef - PredefPointers) / 3
-	call Predef
-; if either the offensive or defensive stat is too large to store in a byte, scale both stats by dividing them by 4
-; this allows values with up to 10 bits (values up to 1023) to be handled
-; anything larger will wrap around
-.scaleStats
-	call GetDamageVarsScaleStats
-	ld b, l ; b = attacker's offensive stat (possibly scaled)
-	        ; (c already contains defender's defensive stat (possibly scaled))
-	push hl
-	ld a, [hBattleSide]
-	and BATTLE_SIDE_ENEMY
-	ld hl, .attackerLevel
-	call GetAddrFromTable
-	ld e, [hl] ; e = attacker's level
-	pop hl
-	;joenote - critical hits double the level in damage calculation instead of here
-	ld a, 1
-	and a
-	ret
-
-; indexed by player/enemy attacking
-.movePower
-	dw wPlayerMovePower, wEnemyMovePower
-.moveNum
-	dw wPlayerMoveNum, wEnemyMoveNum
-.attackerLevel
-	dw wBattleMonLevel, wEnemyMonLevel
-
-; indexed by hBattleSide: player physical, enemy physical, player special, enemy special
-.defenderStat
-	dw wEnemyMonDefense, wBattleMonDefense, wEnemyMonSpecialDefense, wBattleMonSpecialDefense
-.defenderStatus3
-	dw wEnemyBattleStatus3, wPlayerBattleStatus3, wEnemyBattleStatus3, wPlayerBattleStatus3
-.attackerStat
-	dw wBattleMonAttack, wEnemyMonAttack, wBattleMonSpecialAttack, wEnemyMonSpecialAttack
-
-ASSERT CritHitStatsPlayerSpecialPredef - CritHitStatsPlayerPhysicalPredef == 3
-ASSERT CritHitStatsEnemyPhysicalPredef - CritHitStatsPlayerPhysicalPredef == 3 * 2
-ASSERT CritHitStatsEnemySpecialPredef - CritHitStatsPlayerPhysicalPredef == 3 * 3
-
-;joenote - the damage calculation from the player's and enemy's move execution, merged
-; a = the attacking side (0 or BATTLE_SIDE_ENEMY)
-; returns carry to skip the rest of the damage steps and the hit test (moves with 0 BP,
-; and OHKO moves, whose accuracy test is part of their effect); otherwise the caller
-; goes on to check whether the move missed
 CalcMoveDamage:
 	ld [hBattleSide], a
 	ld hl, .moveEffect
@@ -5153,17 +4967,26 @@ CalcMoveDamage:
 	res 4, a
 	ld [wUnusedC000], a	;not a static move, so clear the flag
 ;;;;;;;;;;;;;;;;;;;;
-	call CriticalHitTest
+	callab CriticalHitTest
 	call HandleCounterMove
 	jr z, .checkIfMissed
 	ld a, [hBattleSide]
-	call GetDamageVars
-	call CalculateDamage
+	ld hl, .moveEffect
+	call GetAddrFromTable
+	ld a, [hl]
+	cp OHKO_EFFECT
+	jr nz, .notOHKO
+	call JumpToOHKOMoveEffect ; z if it missed (too slow)
 	jr z, .skipHitTest
-.static_skiphere	;joenote - skip here if a static damage move
+	jr .static_skiphere
+.notOHKO
+	callab BaseDamage
+	jr z, .skipHitTest ; no power
+	callab DamageModifiers
+	call MoveHitTest
+	jr .checkIfMissed
+.static_skiphere	;joenote - skip here if a static damage move (or a one-hit KO)
 	callab AdjustDamageForMoveType
-	call ApplyDamageModifiers
-	call RandomizeDamage
 	call MoveHitTest
 .checkIfMissed
 	and a
@@ -5175,12 +4998,6 @@ CalcMoveDamage:
 ; indexed by the attacking side
 .moveEffect
 	dw wPlayerMoveEffect, wEnemyMoveEffect
-
-; Stage S3 of the damage pipeline (docs/design_brief.md, decision 3): weather,
-; held items and abilities will scale wDamage here, once, by n/16, between the
-; type adjustment and the random factor. There are no modifiers yet.
-ApplyDamageModifiers:
-	jpab AbilityDamageModifiers
 
 ; hl = the entry for the side in bit 0 of hBattleSide in the two-entry table at hl
 ; preserves bc and de
@@ -5201,57 +5018,6 @@ GetAddrFromTable:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ret
-
-; hl = address of a mon's stat from before any stat changes in battle
-; a = 0 for the player's mon or nonzero for the enemy's mon, c = STAT_* constant
-GetUnmodifiedStatAddr:
-	and a
-	jr z, .playerMon
-	call GetEnemyMonStat
-	ld hl, H_PRODUCT + 2
-	ret
-.playerMon
-	ld a, c
-	dec a
-	add a
-	ld c, a
-	ld b, 0
-	ld hl, wPartyMon1MaxHP ; stats are stored in STAT_* order
-	add hl, bc
-	ld a, [wPlayerMonNumber]
-	ld bc, wPartyMon2 - wPartyMon1
-	jp AddNTimes
-
-GetDamageVarsScaleStats:	;joenote - consolidated into its own function to save space
-	ld a, [hli]
-	ld l, [hl]
-	ld h, a ; hl = offensive stat
-	or b ; is either high byte nonzero?
-	jr z, .next ; if not, we don't need to scale
-; bc /= 4 (scale defensive stat)
-	srl b
-	rr c
-	srl b
-	rr c
-; defensive stat can actually end up as 0, leading to a division by 0 freeze during damage calculation
-; hl /= 4 (scale offensive stat)
-	srl h
-	rr l
-	srl h
-	rr l
-	ld a, l
-	or h ; is the offensive stat 0?
-	jr nz, .next_0;joenote - move to custom section for fixing freeze
-	inc l ; if the offensive stat is 0, bump it up to 1
-;;;;;;;joenote fix aforementioned freeze
-.next_0
-	ld a, c	;load lo defense byte into 'a'
-	or b 	;OR 'a' with hi defense byte 'b'
-	jr nz, .next	;if defense not zero, then move on
-	inc c	;otherwise increment the low defense byte by 1
-;;;;;;;
-.next
 	ret
 
 ; get stat c of enemy mon
@@ -5312,297 +5078,11 @@ GetEnemyMonStat:
 	pop de
 	ret
 
-CalculateDamage:
-;Basic calculation function for unmodified damage. Caps at 999 damage. Minimum 1 Damage.
-; input:
-;   b: attack
-;   c: opponent defense
-;   d: base power
-;   e: level
-
-	ld a, [H_WHOSETURN] ; whose turn?
-	and a
-	ld a, [wPlayerMoveEffect]
-	jr z, .effect
-	ld a, [wEnemyMoveEffect]
-.effect
-
-; EXPLODE_EFFECT halves defense.
-	cp EXPLODE_EFFECT
-	jr nz, .ok
-	srl c
-	jr nz, .ok
-	inc c ; ...with a minimum value of 1 (used as a divisor later on)
-.ok
-
-; Multi-hit attacks may or may not have 0 bp.
-	cp TWO_TO_FIVE_ATTACKS_EFFECT
-	jr z, .skipbp
-	cp $1e
-	jr z, .skipbp
-
-; See if OHKO move can hit (having higher speed) and if so, input its damage.
-	cp OHKO_EFFECT
-	jp z, JumpToOHKOMoveEffect
-
-; Don't calculate damage for moves that don't do any.
-	ld a, d ; base power
-	and a
-	ret z
-.skipbp
-
-	xor a
-	ld hl, H_DIVIDEND
-	ldi [hl], a
-	ldi [hl], a
-	ld [hl], a
-
-; Multiply level by 2
-;joenote - made this more efficient by using shifts and rotates
-	ld a, e ; level
-;	add a
-;	jr nc, .nc
-;	push af
-;	ld a, 1
-;	ld [hl], a
-;	pop af
-;.nc
-	sla a
-	rl [hl]
-;joenote - double the effective level here if critical hit instead of GetDamageVars functions
-	push bc
-	ld b, a
-	ld a, [wCriticalHitOrOHKO]
-	cp 1
-	ld a, b
-	pop bc
-	jr c, .nocrit
-	sla a
-	rl [hl]
-.nocrit
-	inc hl
-	ldi [hl], a
-
-; Divide by 5
-	ld a, 5
-	ldd [hl], a
-	push bc
-	ld b, 4
-	call Divide
-	pop bc
-
-; Add 2
-	inc [hl]
-	inc [hl]
-	
-;joenote - ; Add 2 more if critical hit (very slight crit damage increase but greatly simplifies some algebra)
-	push af
-	ld a, [wCriticalHitOrOHKO]
-	cp 1
-	jr c, .nocrit2
-	inc [hl]
-	inc [hl]
-.nocrit2
-	pop af
-
-	inc hl ; multiplier
-
-; Multiply by attack base power
-	ld [hl], d
-	call Multiply
-
-; Multiply by attack stat
-	ld [hl], b
-	call Multiply
-
-; Divide by defender's defense stat
-	ld [hl], c
-	ld b, 4
-	call Divide
-
-; Divide by 50
-	ld [hl], 50
-	ld b, 4
-	call Divide
-
-	ld hl, wDamage
-	ld b, [hl]
-	ld a, [H_QUOTIENT + 3]
-	add b
-	ld [H_QUOTIENT + 3], a
-	jr nc, .asm_3dfd0
-
-	ld a, [H_QUOTIENT + 2]
-	inc a
-	ld [H_QUOTIENT + 2], a
-	and a
-	jr z, .asm_3e004
-
-.asm_3dfd0
-	ld a, [H_QUOTIENT]
-	ld b, a
-	ld a, [H_QUOTIENT + 1]
-	or a
-	jr nz, .asm_3e004
-
-	ld a, [H_QUOTIENT + 2]
-	cp 998 / $100
-	jr c, .asm_3dfe8
-	cp 998 / $100 + 1
-	jr nc, .asm_3e004
-	ld a, [H_QUOTIENT + 3]
-	cp 998 % $100
-	jr nc, .asm_3e004
-
-.asm_3dfe8
-	inc hl
-	ld a, [H_QUOTIENT + 3]
-	ld b, [hl]
-	add b
-	ld [hld], a
-
-	ld a, [H_QUOTIENT + 2]
-	ld b, [hl]
-	adc b
-	ld [hl], a
-	jr c, .asm_3e004
-
-	ld a, [hl]
-	cp 998 / $100
-	jr c, .asm_3e00a
-	cp 998 / $100 + 1
-	jr nc, .asm_3e004
-	inc hl
-	ld a, [hld]
-	cp 998 % $100
-	jr c, .asm_3e00a
-
-.asm_3e004
-; cap at 997
-	ld a, 997 / $100
-	ld [hli], a
-	ld a, 997 % $100
-	ld [hld], a
-
-.asm_3e00a
-; add 2
-	inc hl
-	ld a, [hl]
-	add 2
-	ld [hld], a
-	jr nc, .done
-	inc [hl]
-
-.done
-; minimum damage is 1
-	ld a, 1
-	and a
-	ret
-
 JumpToOHKOMoveEffect:
 	call JumpMoveEffect
 	ld a, [wMoveMissed]
 	dec a
 	ret
-
-
-;UnusedHighCriticalMoves:
-;	db KARATE_CHOP
-;	db RAZOR_LEAF
-;	db CRABHAMMER
-;	db SLASH
-;	db $FF
-
-; determines if attack is a critical hit
-; azure heights claims "the fastest pokémon (who are,not coincidentally,
-; among the most popular) tend to CH about 20 to 25% of the time."
-;joenote - re-wrote this a bit to clean it up and fix focus energy
-CriticalHitTest:
-	xor a
-	ld [wCriticalHitOrOHKO], a
-	ld a, [H_WHOSETURN]
-	and a
-	ld a, [wEnemyMonSpecies]
-	jr nz, .handleEnemy
-	ld a, [wBattleMonSpecies]
-.handleEnemy
-	ld [wd0b5], a
-	call GetMonHeader
-	ld a, [wMonHBaseSpeed]
-	ld b, a
-	srl b                        ; /2 for regular move (effective (base speed / 2)) --> base crit rate
-	ld a, [H_WHOSETURN]
-	and a
-	ld hl, wPlayerMovePower
-	ld de, wPlayerBattleStatus2
-	jr z, .calcCriticalHitProbability
-	ld hl, wEnemyMovePower
-	ld de, wEnemyBattleStatus2
-.calcCriticalHitProbability
-;joenote - this whole section is now moved into a predef in stats_functions.asm to give more versatility
-	predef GetCriticalHitProbability
-
-; ;normal hit is (base speed) / 2
-; ;focus energy is 2*(base speed) for a 4x crit rate
-; ;high crit move is 4*(base speed) for a 8x crit rate
-	; ld a, [hld]                  ; read base power from RAM
-; ;	and a
-; ;	ret z                        ; do nothing if zero
-; ;joenote - Also do not do a critical hit if a special damage move is being used (dragon rage, seismic toss, etc)
-; ;		- base power of 1 now signifies an expanded range to include moves like bide and counter 
-	; cp 2
-	; ret c	;do nothing if base power is 0 or 1
-	; dec hl
-	; ld c, [hl]                   ; read move id
-	; ld a, [de]
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	; bit GETTING_PUMPED, a        ; test for focus energy
-	; jr z, .noFocusEnergyUsed	 ;if getting pumped bit not set, then focus energy not used
-	; ;else focus energy was used
-	; sla b						 ;*2 for focus energy (effective +2x crit rate)
-	; jr c, .capcritical
-	; sla b						 ;*2 again for focus energy (effective +4x crit rate)
-	; jr c, .capcritical
-; .noFocusEnergyUsed
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	; ld hl, HighCriticalMoves     ; table of high critical hit moves
-; .Loop
-	; ld a, [hli]                  ; read move from move table
-	; cp c                         ; does it match the move about to be used?
-	; jr z, .HighCritical          ; if so, the move about to be used is a high critical hit ratio move
-	; inc a                        ; move on to the next move, FF terminates loop
-	; jr nz, .Loop                 ; check the next move in HighCriticalMoves
-	; jr .finishcalc         		 ; continue as a normal move
-; .HighCritical
-	; sla b                        ; *2 for high critical hit moves (effective +2x crit rate)
-	; jr c, .capcritical
-	; sla b                        ; *2 again for high critical hit moves (effective +4x crit rate)
-	; jr c, .capcritical
-	; sla b                        ; *2 again for high critical hit moves (effective +8x crit rate)
-	; jr nc, .finishcalc
-; .capcritical
-	; ld b, $ff					 ; cap at 255/256
-; .finishcalc
-
-	call BattleRandom            ; generates a random value, in "a"
-;joenote - this is redundant and seems like its messing with the statistical uniformity (somehow...)
-;	rlc a
-;	rlc a
-;	rlc a
-	cp b                         ; check a against calculated crit rate
-	ret nc                       ; no critical hit if no borrow
-	ld a, $1
-	ld [wCriticalHitOrOHKO], a   ; set critical hit flag
-	ret
-
-;joenote - moved this to go with the above predef 
-; high critical hit moves
-; HighCriticalMoves:
-	; db KARATE_CHOP
-	; db RAZOR_LEAF
-	; db CRABHAMMER
-	; db SLASH
-	; db $FF
 
 
 ;joenote
@@ -6234,42 +5714,6 @@ CalcHitChance:
 	jpab CalcHitChance_
 
 ; multiplies damage by a random percentage from ~85% to 100%
-RandomizeDamage:
-	ld hl, wDamage
-	ld a, [hli]
-	and a
-	jr nz, .DamageGreaterThanOne
-	ld a, [hl]
-	cp 2
-	ret c ; return if damage is equal to 0 or 1
-.DamageGreaterThanOne
-	xor a
-	ld [H_MULTIPLICAND], a
-	dec hl
-	ld a, [hli]
-	ld [H_MULTIPLICAND + 1], a
-	ld a, [hl]
-	ld [H_MULTIPLICAND + 2], a
-; loop until a random number greater than or equal to 217 is generated
-.loop
-	call BattleRandom
-	rrca
-	cp 217
-	jr c, .loop
-	ld [H_MULTIPLIER], a
-	call Multiply ; multiply damage by the random number, which is in the range [217, 255]
-	ld a, 255
-	ld [H_DIVISOR], a
-	ld b, $4
-	call Divide ; divide the result by 255
-; store the modified damage
-	ld a, [H_QUOTIENT + 2]
-	ld hl, wDamage
-	ld [hli], a
-	ld a, [H_QUOTIENT + 3]
-	ld [hl], a
-	ret
-
 ; for more detailed commentary, see equivalent function for player side (ExecutePlayerMove)
 ExecuteEnemyMove:
 	ld a, [wEnemySelectedMove]
@@ -6459,12 +5903,11 @@ EnemyCheckIfMirrorMoveEffect:
 	push hl
 	ld hl, wUnusedD155 
 	set 0, [hl]	;don't display that the substitute took damage for subsequent attacks
-	call CriticalHitTest
-	call GetDamageVarsForEnemyAttack
-	call CalculateDamage
-	callab AdjustDamageForMoveType
-	call ApplyDamageModifiers
-	call RandomizeDamage
+	callab CriticalHitTest
+	ld a, BATTLE_SIDE_ENEMY
+	ld [hBattleSide], a
+	callab BaseDamage
+	callab DamageModifiers
 	pop hl
 	pop de
 	pop bc
@@ -6505,42 +5948,7 @@ EnemyHandleSelfConfusionDamage:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld hl, HurtItselfText
 	call PrintText
-	ld hl, wBattleMonDefense
-	ld a, [hli]
-	push af
-	ld a, [hld]
-	push af
-	ld a, [wEnemyMonDefense]
-	ld [hli], a
-	ld a, [wEnemyMonDefense + 1]
-	ld [hl], a
-	ld hl, wEnemyMoveEffect
-	push hl
-	ld a, [hl]
-	push af
-	xor a
-	ld [hli], a
-	ld [wCriticalHitOrOHKO], a
-	ld a, 40
-	ld [hli], a
-	xor a
-	ld [hl], a
-	ld a, [wEnemyMoveNum]
-	push af
-	xor a
-	ld [wEnemyMoveNum], a ; no move: the physical stats, whatever the last move was
-	call GetDamageVarsForEnemyAttack
-	call CalculateDamage
-	pop af
-	ld [wEnemyMoveNum], a
-	pop af
-	pop hl
-	ld [hl], a
-	ld hl, wBattleMonDefense + 1
-	pop af
-	ld [hld], a
-	pop af
-	ld [hl], a
+	callab SelfHitDamage ; (whose turn it is: the enemy's)
 	xor a
 	ld [wAnimationType], a
 	ld [H_WHOSETURN], a
@@ -6940,136 +6348,16 @@ QuarterSpeedDueToParalysis:
 	ld [hl], b
 	ret
 
+; Gen 9: burn halves a physical move's damage (DamageModifiers), not the stat
 HalveAttackDueToBurn:
-	ld a, [H_WHOSETURN]
-	and a
-	jr z, .playerTurn
-.enemyTurn ; halve the player's attack
-	ld a, [wBattleMonStatus]
-	and 1 << BRN
-	ret z ; return if player not burnt
-	ld hl, wBattleMonAttack + 1
-	ld a, [hld]
-	ld b, a
-	ld a, [hl]
-	srl a
-	rr b
-	ld [hli], a
-	or b
-	jr nz, .storePlayerAttack
-	ld b, 1 ; give the player a minimum of at least one attack point
-.storePlayerAttack
-	ld [hl], b
-	ret
-.playerTurn ; halve the enemy's attack
-	ld a, [wEnemyMonStatus]
-	and 1 << BRN
-	ret z ; return if enemy not burnt
-	ld hl, wEnemyMonAttack + 1
-	ld a, [hld]
-	ld b, a
-	ld a, [hl]
-	srl a
-	rr b
-	ld [hli], a
-	or b
-	jr nz, .storeEnemyAttack
-	ld b, 1 ; give the enemy a minimum of at least one attack point
-.storeEnemyAttack
-	ld [hl], b
 	ret
 
+; Gen 9 has no badge boosts. Only clears the stat change wUnusedD71B noted
 ApplyBadgeStatBoosts:
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	jr z, .return ; return if link battle
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wOptions]	;load game options
-	bit BIT_BATTLE_HARD, a			;check for hard mode
-	jr z, .dobadgeboost	;if not hard mode, always apply badge boosts
-;joenote - only apply badge stat boosts in wild battles to keep parity with ai trainers
-	ld a, [wIsInBattle]
-	cp $1 ; is it a wild battle?
-	jr nz, .return ; return if not wild
-.dobadgeboost
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wObtainedBadges]
-	ld b, a
-	ld hl, wBattleMonAttack
-	ld de, BadgeStatBoosts
-; joenote - after a stat stage changes, only that stat was recalculated, so only
-; its boost is reapplied (wUnusedD71B holds its MOD_* index + 1). Accuracy and
-; evasion have no stat, so changing them reapplies nothing.
-.loop
-	ld a, [de]
-	inc de
-	and a
-	jr z, .return
-	ld c, a ; MOD_* + 1 of the stat at hl
-	ld a, [wUnusedD71B]
-	and a
-	jr z, .checkBadge ; boost every stat
-	cp MOD_ACCURACY + 1
-	jr z, .return
-	cp MOD_EVASION + 1
-	jr z, .return
-	cp c
-	jr nz, .next
-.checkBadge
-	ld a, [de]
-	and b
-	jr z, .next
-	push de
-	call .applyBoostToStat
-	pop de
-.next
-	inc de
-	inc hl
-	inc hl
-	jr .loop
-.return	;joenote - clear out stat mod address offset backup
 	xor a
 	ld [wUnusedD71B], a
 	ret
-; multiply stat at hl by 1.125
-; cap stat at 999
-.applyBoostToStat
-	ld a, [hli]
-	ld d, a
-	ld e, [hl]
-	srl d
-	rr e
-	srl d
-	rr e
-	srl d
-	rr e
-	ld a, [hl]
-	add e
-	ld [hld], a
-	ld a, [hl]
-	adc d
-	ld [hli], a
-	ld a, [hld]
-	sub 999 % $100
-	ld a, [hl]
-	sbc 999 / $100
-	ret c
-	ld a, 999 / $100
-	ld [hli], a
-	ld a, 999 % $100
-	ld [hld], a
-	ret
 
-; for each stat from attack on, in wBattleMon order: its MOD_* index + 1 and the
-; badge that boosts it. The Volcano Badge boosts both specials, as the Glacier
-; Badge does in Gen 2.
-BadgeStatBoosts:
-	db MOD_ATTACK + 1,          1 << BIT_BOULDERBADGE
-	db MOD_DEFENSE + 1,         1 << BIT_THUNDERBADGE
-	db MOD_SPEED + 1,           1 << BIT_SOULBADGE
-	db MOD_SPECIAL_ATTACK + 1,  1 << BIT_VOLCANOBADGE
-	db MOD_SPECIAL_DEFENSE + 1, 1 << BIT_VOLCANOBADGE
-	db 0
 
 ;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
 ; (moved out of the home bank: only battle code uses it)
@@ -7129,56 +6417,7 @@ PrintEmptyString:
 	db "@"
 
 
-BattleRandom:
-; Link battles use a shared PRNG.
 
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	jp nz, Random
-
-	push hl
-	push bc
-	ld a, [wLinkBattleRandomNumberListIndex]
-	ld c, a
-	ld b, 0
-	ld hl, wLinkBattleRandomNumberList
-	add hl, bc
-	inc a
-	ld [wLinkBattleRandomNumberListIndex], a
-	cp 9
-	ld a, [hl]
-	pop bc
-	pop hl
-	ret c
-
-; if we picked the last seed, we need to recalculate the nine seeds
-	push hl
-	push bc
-	push af
-
-; point to seed 0 so we pick the first number the next time
-	xor a
-	ld [wLinkBattleRandomNumberListIndex], a
-
-	ld hl, wLinkBattleRandomNumberList
-	ld b, 9
-.loop
-	ld a, [hl]
-	ld c, a
-; multiply by 5
-	add a
-	add a
-	add c
-; add 1
-	inc a
-	ld [hli], a
-	dec b
-	jr nz, .loop
-
-	pop af
-	pop bc
-	pop hl
-	ret
 
 
 HandleExplodingAnimation:

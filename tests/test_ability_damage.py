@@ -111,8 +111,9 @@ class DamageModifierTest(unittest.TestCase):
     def test_guts(self):
         for status in (SLP, PSN, PAR):
             self.assertEqual(self.run_s3(0, "GUTS", status=status), 150)
-        self.assertEqual(self.run_s3(1, "GUTS", status=BRN), 300)  # and burn's halving undone
-        self.assertEqual(self.run_s3(0, "GUTS", status=BRN, crit=1), 150)  # crits ignore burn already
+        # burn halves damage in DamageModifiers, which Guts skips: here it's just x1.5
+        self.assertEqual(self.run_s3(1, "GUTS", status=BRN), 150)
+        self.assertEqual(self.run_s3(0, "GUTS", status=BRN, crit=1), 150)
         self.assertEqual(self.run_s3(0, "GUTS", status=PSN, special=True), 100)
         self.assertEqual(self.run_s3(0, "GUTS", status=0), 100)
 
@@ -230,8 +231,8 @@ class BlockingTest(unittest.TestCase):
                 target_mon = SIDES[turn][2]
                 self.assertTrue(self.block("THUNDERSHOCK", "LIGHTNING_ROD", turn))
                 self.assertEqual(self.game.peek(target_prefix + "MonAttackMod", 7), [7, 7, 7, 8, 7, 7, 7])
-                # 100 at +1 is 150; the player's mon gets its badge boost (x1.125) back
-                self.assertEqual(self.game.peek16(target_mon + "SpecialAttack"), 168 if turn else 150)
+                # 100 at +1 is 150 (no badge boosts since the Gen 9 pass)
+                self.assertEqual(self.game.peek16(target_mon + "SpecialAttack"), 150)
                 self.assertTrue(self.block("THUNDER_WAVE", "LIGHTNING_ROD", turn, special_attack_stage=13))
                 self.assertEqual(self.game.peek(target_prefix + "MonAttackMod", 7)[MOD_SPECIAL_ATTACK], 13)
 

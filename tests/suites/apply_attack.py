@@ -11,7 +11,7 @@ import os
 import re
 
 from harness import REPO_ROOT, HarnessError
-from suites.damage_vars import battle_struct_len, ENEMY_SPECIES, SPECIES
+from suites.damage import battle_struct_len, ENEMY_SPECIES, SPECIES
 
 NAME = "apply_attack"
 

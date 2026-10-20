@@ -111,25 +111,13 @@ AdjustDamageForMoveType:
 	inc hl
 	rr [hl]
 	dec hl
-	call .zerocheck
-	ret
+	ret ; (Gen 9: a hit that doesn't miss does at least 1, in DamageModifiers)
 .double
 	inc hl
 	sla [hl]
 	dec hl
 	rl [hl]
 	call c, .overflow	;joenote - handle damage overflow
-	ret
-.zerocheck
-; if damage is 0, make the move miss
-; this only occurs if a move that would do 2 or 3 damage is 0.25x effective against the target
-	ld a, [hli]
-	ld b, a
-	ld a, [hld]
-	or b
-	ret nz
-	ld a, 2
-	ld [wMoveMissed], a	
 	ret
 .static_move
 	ld a, [wDamageMultipliers]

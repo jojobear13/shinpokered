@@ -9,7 +9,7 @@ options; delays, sound waits and button presses are skipped.
 
 from harness import HarnessError
 from suites.apply_attack import H_WHOSETURN, NAME_LENGTH, TERMINATOR, _hp
-from suites.damage_vars import (battle_struct_len, ENEMY_SPECIES, NUM_USED_STAT_MODS, PARTY_LENGTH,
+from suites.damage import (battle_struct_len, ENEMY_SPECIES, NUM_USED_STAT_MODS, PARTY_LENGTH,
                                 SPECIES, TYPES, _party, stat)
 
 NAME = "move_execution"
@@ -65,6 +65,10 @@ def setup(game, rng):
     enemy_moves = _mon(game, rng, "wEnemyMon", "wEnemyMonNick", ENEMY_SPECIES)
     _party(game, rng, "wPartyMons")
     _party(game, rng, "wEnemyMons")
+    # Gen 9's damage reads the stats from before stat stages
+    for mon, unmodified in (("wBattleMon", "wPlayerMonUnmodified"), ("wEnemyMon", "wEnemyMonUnmodified")):
+        for name in ("Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense"):
+            game.poke16(unmodified + name, game.peek16(mon + name))
 
     for side in ("wPlayerBattleStatus", "wEnemyBattleStatus"):
         for i in (1, 2, 3):

@@ -1,8 +1,10 @@
-"""Randomized battle states for GetDamageVarsForPlayerAttack/EnemyAttack.
+"""Randomized battle states for Gen 9's damage: BaseDamage, then
+DamageModifiers (engine/battle/damage.asm).
 
 setup() fills every piece of state those routines can read: both battle
-structs, both party blocks, the selected moves, screens, critical hits, stat
-experience pointers for trainer battles, and link battle state.
+structs and their unmodified stats and stages, both party blocks, the selected
+moves, statuses, screens, critical hits, and link battle state. Abilities and
+held items are left out (they have their own tests).
 """
 
 import os
@@ -10,7 +12,7 @@ import re
 
 from harness import REPO_ROOT
 
-NAME = "damage_vars"
+NAME = "damage"
 
 PARTY_LENGTH = 6
 MOVE_STRUCT_LEN = 6
@@ -37,10 +39,9 @@ HAS_LIGHT_SCREEN_UP = 1
 HAS_REFLECT_UP = 2
 LINK_STATE_BATTLING = 4
 
-ROUTINES = {
-    "player": "GetDamageVarsForPlayerAttack",
-    "enemy": "GetDamageVarsForEnemyAttack",
-}
+H_BATTLE_SIDE = 0xFFE2  # hBattleSide
+BATTLE_SIDE_ENEMY = 1
+UNMODIFIED = ("Attack", "Defense", "Speed", "SpecialAttack", "SpecialDefense")
 
 
 # species ids that aren't real Pokemon: the Pokemon Tower ghost and the
@@ -83,9 +84,9 @@ def category(move_id):
 
 ENEMY_SPECIES = _species_ids(include_enemy_only=True)
 
-# type ids that exist in the type table, including both sides of the
-# physical/special boundary at FIRE
-TYPES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A]
+# the type ids: Gen 6+'s eighteen and Struggle's typeless
+TYPES = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+         0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C]
 
 
 def stat(rng):
@@ -103,13 +104,22 @@ def _fill(game, rng, symbol, length):
     game.poke(symbol, *[rng.randint(0, 255) for _ in range(length)])
 
 
-def _battle_mon(game, rng, prefix):
+def unmodified_stat(rng):
+    """An unmodified stat: 1-999, weighted toward realistic values."""
+    return rng.randint(5, 400) if rng.random() < 0.8 else rng.choice([1, 2, 999, rng.randint(1, 999)])
+
+
+def _battle_mon(game, rng, prefix, unmodified):
     _fill(game, rng, prefix, battle_struct_len(game))
     game.poke(prefix + "Species", rng.choice(ENEMY_SPECIES if prefix == "wEnemyMon" else SPECIES))
     game.poke(prefix + "Level", rng.randint(1, 100))
+    game.poke(prefix + "Type", rng.choice(TYPES), rng.choice(TYPES))
     for name in STATS:
         game.poke16(prefix + name, stat(rng))
+    for name in UNMODIFIED:
+        game.poke16(unmodified + name, unmodified_stat(rng))
     game.poke(prefix + "CatchRate", 0)  # no held item: items have their own tests
+    game.poke(prefix + "Status", rng.choice([0, 0, 1 << 4, 1 << 3, 1 << 6, 2]))  # none, BRN, PSN, PAR, SLP
 
 
 def _party(game, rng, prefix):
@@ -134,8 +144,9 @@ def _move(game, rng, prefix):
 def setup(game, rng):
     """Write a random battle state. Uses only symbol names, so the same rng
     seed produces the same state on two different builds."""
-    _battle_mon(game, rng, "wBattleMon")
-    _battle_mon(game, rng, "wEnemyMon")
+    _battle_mon(game, rng, "wBattleMon", "wPlayerMonUnmodified")
+    _battle_mon(game, rng, "wEnemyMon", "wEnemyMonUnmodified")
+    game.poke("wPlayerAbility", 0, 0)
     _party(game, rng, "wPartyMons")
     _party(game, rng, "wEnemyMons")
     _move(game, rng, "wPlayerMove")
@@ -146,8 +157,10 @@ def setup(game, rng):
             game.poke(f"{side}{i}", rng.randint(0, 255))
         screens = rng.choice([0, 1 << HAS_LIGHT_SCREEN_UP, 1 << HAS_REFLECT_UP, 0b110])
         game.poke(f"{side}3", (rng.randint(0, 255) & ~0b110) | screens)
-    _fill(game, rng, "wPlayerMonAttackMod", NUM_USED_STAT_MODS)
-    _fill(game, rng, "wEnemyMonAttackMod", NUM_USED_STAT_MODS)
+    for mods in ("wPlayerMonAttackMod", "wEnemyMonAttackMod"):
+        game.poke(mods, *[rng.choice([7, 7, rng.randint(1, 13)]) for _ in range(NUM_USED_STAT_MODS)])
+    game.poke("wMoveMissed", 0)
+    game.poke("wUnusedC000", rng.randint(0, 255) & ~(1 << 4))  # not a fixed-damage move
 
     game.poke("wCriticalHitOrOHKO", rng.choice([0, 0, 1]))
     game.poke("wPlayerMonNumber", rng.randint(0, PARTY_LENGTH - 1))
@@ -167,19 +180,20 @@ def setup(game, rng):
 
 
 def run(game, side):
-    """Call the routine for one side and collect everything it produces."""
-    out = game.call(ROUTINES[side])
-    return {
-        "z": out["z"],
-        "a": out["a"],
-        "b": out["b"],
-        "c": out["c"],
-        "d": out["d"],
-        "e": out["e"],
-        "hl": out["hl"],
+    """BaseDamage, then (if the move has power) DamageModifiers, for one side."""
+    game.poke(0xFFF3, 0 if side == "player" else 1)  # H_WHOSETURN
+    game.poke(H_BATTLE_SIDE, 0 if side == "player" else BATTLE_SIDE_ENEMY)
+    out = game.call("BaseDamage")
+    result = {"z": out["z"], "base": game.peek16("wDamage")}
+    if not out["z"]:
+        game.call("DamageModifiers")
+    result.update({
         "wDamage": game.peek16("wDamage"),
-        "wCriticalHitOrOHKO": game.peek("wCriticalHitOrOHKO"),
-    }
+        "wDamageMultipliers": game.peek("wDamageMultipliers"),
+        "wMoveMissed": game.peek("wMoveMissed"),
+        "hBattleSide": game.peek(H_BATTLE_SIDE),
+    })
+    return result
 
 
 def cases():

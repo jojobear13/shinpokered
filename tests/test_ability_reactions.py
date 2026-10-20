@@ -138,7 +138,7 @@ class ReactionTest(unittest.TestCase):
                 self.assertEqual(self.synchronize(turn, PSN, toxic=True), PSN)
                 self.assertEqual(g.peek(user_prefix + "BattleStatus3") & BADLY_POISONED, BADLY_POISONED)
                 self.assertEqual(self.synchronize(turn, BRN), BRN)
-                self.assertEqual(g.peek16(user_mon + "Attack"), 50)
+                self.assertEqual(g.peek16(user_mon + "Attack"), 100)  # burn halves damage, not the stat
                 self.assertEqual(self.synchronize(turn, PAR), PAR)
                 self.assertEqual(g.peek16(user_mon + "Speed"), 25)
                 # types and abilities that can't have it

@@ -963,9 +963,8 @@ UserDamageAbilities:
 	dec a
 	ret nz
 	jr .oneAndAHalf
-.guts ; physical moves, when the user has a status condition; and burn doesn't
-      ; halve its attack (undone here, except on critical hits, which use the
-      ; stats from before burn)
+.guts ; physical moves, when the user has a status condition (and its burn
+      ; doesn't halve them: DamageModifiers)
 	ld a, [hBattleSide]
 	and BATTLE_SIDE_SPECIAL
 	ret nz
@@ -978,13 +977,7 @@ UserDamageAbilities:
 	ld a, [hl]
 	and a
 	ret z
-	bit BRN, a
-	jr z, .oneAndAHalf
-	ld a, [wCriticalHitOrOHKO]
-	and a
-	jr nz, .oneAndAHalf
-	lb bc, 3, 1 ; 1.5, times 2 for the burn
-	jp ScaleDamage
+	jr .oneAndAHalf
 .overgrow
 	ld a, GRASS
 	jr .pinch
@@ -1123,56 +1116,48 @@ CalcHitChance_:
 	jr c, .gotEvasion
 	ld c, 7
 .gotEvasion
-	ld a, $0e
+; Gen 9: one net stage, accuracy minus evasion, from -6 to +6
+	ld a, b
 	sub c
-	ld c, a ; c = 14 - EVASIONMOD (this "reflects" the value over 7, so that an increase in the target's evasion
-	       ; decreases the hit chance instead of increasing the hit chance)
-; zero the high bytes of the multiplicand
+	bit 7, a
+	jr nz, .negative
+	cp 6 + 1
+	jr c, .gotNet
+	ld a, 6
+	jr .gotNet
+.negative
+	cp -6
+	jr nc, .gotNet
+	ld a, -6
+.gotNet
+	add 6
+	add a
+	ld e, a
+	ld d, 0
+	push hl
 	xor a
 	ld [H_MULTIPLICAND], a
 	ld [H_MULTIPLICAND + 1], a
 	ld a, [hl]
-	ld [H_MULTIPLICAND + 2], a ; set multiplicand to move accuracy
-	push hl
-	ld d, $02 ; loop has two iterations
-; loop to do the calculations, the first iteration multiplies by the accuracy ratio and
-; the second iteration multiplies by the evasion ratio
-.loop
-	push bc
-	ld hl, StatModifierRatios  ; stat modifier ratios
-	dec b
-	sla b
-	ld c, b
-	ld b, $00
-	add hl, bc ; hl = address of stat modifier ratio
-	pop bc
+	ld [H_MULTIPLICAND + 2], a ; the move's accuracy
+	ld hl, AccuracyStageRatios
+	add hl, de
 	ld a, [hli]
-	ld [H_MULTIPLIER], a ; set multiplier to the numerator of the ratio
+	ld [H_MULTIPLIER], a
 	call Multiply
 	ld a, [hl]
-	ld [H_DIVISOR], a ; set divisor to the the denominator of the ratio
-	                 ; (the dividend is the product of the previous multiplication)
-	ld b, $04 ; number of bytes in the dividend
+	ld [H_DIVISOR], a
+	ld b, 4
 	call Divide
-	ld a, [H_QUOTIENT + 3]
-	ld b, a
 	ld a, [H_QUOTIENT + 2]
-	or b
-	jp nz, .nextCalculation
-; make sure the result is always at least one
-	ld [H_QUOTIENT + 2], a
-	ld a, $01
-	ld [H_QUOTIENT + 3], a
-.nextCalculation
-	ld b, c
-	dec d
-	jr nz, .loop
-	ld a, [H_QUOTIENT + 2]
-	and a ; is the calculated hit chance over 0xFF?
+	and a
 	ld a, [H_QUOTIENT + 3]
-	jr z, .storeAccuracy
-; if calculated hit chance over 0xFF
-	ld a, $ff ; set the hit chance to 0xFF
+	jr z, .notOver
+	ld a, $ff
+.notOver
+	and a
+	jr nz, .storeAccuracy
+	inc a ; at least 1
 .storeAccuracy
 	pop hl
 	ld [hl], a ; store the hit chance in the move accuracy variable
@@ -1335,48 +1320,21 @@ FoeTargetingEffects:
 	db LEECH_SEED_EFFECT, DISABLE_EFFECT, MIMIC_EFFECT, TRANSFORM_EFFECT
 	db -1
 
-; a random number, the way the battle draws them (BattleRandom: in a link
-; battle, from the shared list)
-AbilityRandom:
-	ld a, [wLinkState]
-	cp LINK_STATE_BATTLING
-	jp nz, Random
-	push hl
-	push bc
-	ld a, [wLinkBattleRandomNumberListIndex]
-	ld c, a
-	ld b, 0
-	ld hl, wLinkBattleRandomNumberList
-	add hl, bc
-	inc a
-	ld [wLinkBattleRandomNumberListIndex], a
-	cp 9
-	ld a, [hl]
-	pop bc
-	pop hl
-	ret c
-; the last of the nine: make the next nine
-	push hl
-	push bc
-	push af
-	xor a
-	ld [wLinkBattleRandomNumberListIndex], a
-	ld hl, wLinkBattleRandomNumberList
-	ld b, 9
-.loop
-	ld a, [hl]
-	ld c, a
-	add a
-	add a
-	add c
-	inc a
-	ld [hli], a
-	dec b
-	jr nz, .loop
-	pop af
-	pop bc
-	pop hl
-	ret
+; Gen 9's accuracy and evasion stages, by net stage from -6: numerator, denominator
+AccuracyStageRatios:
+	db 3, 9
+	db 3, 8
+	db 3, 7
+	db 3, 6
+	db 3, 5
+	db 3, 4
+	db 3, 3
+	db 4, 3
+	db 5, 3
+	db 6, 3
+	db 7, 3
+	db 8, 3
+	db 9, 3
 
 ; carry if either mon has No Guard
 NoGuardActive:
@@ -1466,7 +1424,7 @@ SturdyEndure:
 .notSash
 	cp FOCUS_BAND
 	ret nz
-	call AbilityRandom
+	call BattleRandom
 	cp 26 ; 10%
 	ret nc
 	ld a, FOCUS_BAND
@@ -1502,7 +1460,7 @@ AbilityResidual:
 	call GetUserStatus
 	and a
 	ret z ; carry clear
-	call AbilityRandom
+	call BattleRandom
 	cp 85 + 1 ; 1/3
 	jr nc, .done
 	callab UndoBurnParStats ; while the status still says which
@@ -1693,15 +1651,14 @@ SkillLink:
 	and a
 	ret
 
-; The critical hit rate (out of 256, in wSideEffectChance) after items and
-; abilities: Scope Lens doubles it, the Stick (Farfetch'd) and Lucky Punch
-; (Chansey) quadruple it, and the target's Battle Armor or Shell Armor stops
-; critical hits
-CritRateModifiers:
+; the critical hit stage in wSideEffectChance, for the user's item: Scope
+; Lens +1, the Stick (Farfetch'd) and Lucky Punch (Chansey) +2; $ff (none at
+; all) against Battle Armor or Shell Armor
+CritStageModifiers:
 	call UserItem
 	ld b, 1
 	cp SCOPE_LENS
-	jr z, .double
+	jr z, .add
 	ld c, FARFETCHD
 	cp STICK
 	jr z, .species
@@ -1719,16 +1676,10 @@ CritRateModifiers:
 	cp c
 	jr nz, .armor
 	inc b
-.double
-	ld hl, wSideEffectChance
-.doubleLoop
-	sla [hl]
-	jr nc, .doubled
-	ld [hl], $ff
-	jr .armor
-.doubled
-	dec b
-	jr nz, .doubleLoop
+.add
+	ld a, [wSideEffectChance]
+	add b
+	ld [wSideEffectChance], a
 .armor
 	call TargetAbilityForMove
 	cp BATTLE_ARMOR
@@ -1736,8 +1687,14 @@ CritRateModifiers:
 	cp SHELL_ARMOR
 	ret nz
 .none
-	xor a
+	ld a, $ff
 	ld [wSideEffectChance], a
+	ret
+
+; z if the user has Guts (its burn doesn't halve its physical moves)
+UserHasGuts:
+	call UserAbility
+	cp GUTS
 	ret
 
 ; carry if the user is using Rest and its Insomnia or Vital Spirit keeps it
@@ -1890,7 +1847,7 @@ CursedBody:
 	ld a, [hl]
 	and a
 	ret nz ; it already has a move disabled
-	call AbilityRandom
+	call BattleRandom
 	cp 77 ; 30%
 	ret nc
 	ld a, [bc]
@@ -2087,7 +2044,7 @@ ContactAbilities:
 	ld a, [hl]
 	cp GRASS
 	ret z
-	call AbilityRandom
+	call BattleRandom
 	ld e, 3 ; asleep for 3 turns
 	cp 28 ; 11%
 	jp c, GiveUserStatus
@@ -2099,7 +2056,7 @@ ContactAbilities:
 	jp c, GiveUserStatus
 	ret
 .roll
-	call AbilityRandom
+	call BattleRandom
 	cp 77 ; 30%
 	ret nc
 	jp GiveUserStatus
@@ -2204,7 +2161,7 @@ StenchFlinch:
 	ret z
 	cp SHIELD_DUST
 	ret z
-	call AbilityRandom
+	call BattleRandom
 	cp 26 ; 10%
 	ret nc
 	ld hl, wEnemyBattleStatus1

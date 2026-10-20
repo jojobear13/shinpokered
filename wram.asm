@@ -3572,6 +3572,8 @@ wMulCount::
 	ds 1
 wSqrtTarget:: ; ISqrt2_13's target, big-endian
 	ds 4
+wDamageScratch:: ; BaseDamage: power, level, attack, defense
+	ds 6
 wEvoScratch:: ; PastEvolutionLevel: a species' evolutions
 	ds EVO_SCRATCH_LENGTH
 

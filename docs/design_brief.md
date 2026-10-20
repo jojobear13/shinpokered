@@ -1185,6 +1185,45 @@ a new bank, `$35` ("Battle 2"), replacing the old code as it goes.
   stat formula for all 151 species and every nature; `test_abilities` the
   generators. In the emulator: the status screen's IVs and EVs.
 
+### Part 4: the damage formula, critical hits and stages
+
+- **Damage** (`engine/battle/damage.asm`, bank `$35`): `BaseDamage` is Gen
+  5+'s (2 x level / 5 + 2) x power x A / D / 50 + 2 with 16-bit stats (Gen 1
+  divided both by 4 past 255). A and D are the unmodified stats times Gen 9's
+  stage ratios (2/8 to 8/2), each 1-999; a critical hit leaves out the
+  attacker's drops and the defender's raises. `DamageModifiers` then applies
+  Gen 9's order: x1.5 critical hit, x85-100% at random (one battle random
+  number, 16 steps), STAB and type (`AdjustDamageForMoveType`), x1/2 for a
+  burned attacker's physical move unless it has Guts, x1/2 behind Reflect or
+  Light Screen except on a critical hit, then the abilities' and items'
+  modifiers. A hit that doesn't miss does at least 1 (Gen 1 made a 0 after
+  x1/4 miss). Explosion no longer halves Defense. Decision 3's stage order
+  (S0-S5) is replaced by this one; rounding is floor at each step.
+- **Critical hits** are Gen 9's stages: 1/24 (11 in 256), 1/8, 1/2, then
+  always, for +1 (Karate Chop, Razor Leaf, Crabhammer, Slash, Razor Wind,
+  Sky Attack; part 7 will take the list from Gen 9's data), +2 for Focus
+  Energy and Dire Hit, +1 Scope Lens, +2 the Stick and Lucky Punch; Battle
+  Armor and Shell Armor stop them. The Stadium-style and speed-based rates
+  are gone, in every mode.
+- **Stages** are Gen 9's ratios for the stored stats too, and accuracy is one
+  net stage, accuracy minus evasion, from 3/9 to 9/3.
+- **Burn** halves damage, not the Attack stat, so curing it changes no stat;
+  **badge boosts** are gone (Gen 9 has none).
+- **The confused self-hit** is Gen 9's: 40 power, the mon's own Attack
+  against its own Defense with their stages, x85-100%, never critical, and
+  no longer touched by the foe's Reflect.
+- **Space.** The Gen 1 routines (`GetDamageVars`, `CalculateDamage`,
+  `CriticalHitTest`, `RandomizeDamage` and the critical-hit stat predefs)
+  are gone, and `BattleRandom` moved to bank 0 so every bank can draw from
+  the link battle's shared list (the abilities' copy of it is gone too). Bank
+  `$0F` has 1725 bytes free.
+- **Verified:** `tests/test_damage.py` runs 600 random battle states
+  (`tests/suites/damage.py`, which replaces the Gen 1 `damage_vars` suite)
+  through `BaseDamage` and `DamageModifiers` against a Python model of the
+  chain, plus worked examples (crit, burn, screens, stages on crits, the
+  minimum of 1) and every critical hit stage's threshold. The accuracy test
+  models the net stage; the badge test checks there are none.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

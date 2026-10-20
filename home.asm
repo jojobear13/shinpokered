@@ -4518,6 +4518,57 @@ GivePokemon::
 	jpba _GivePokemon
 
 
+BattleRandom::
+; Link battles use a shared PRNG.
+
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jp nz, Random
+
+	push hl
+	push bc
+	ld a, [wLinkBattleRandomNumberListIndex]
+	ld c, a
+	ld b, 0
+	ld hl, wLinkBattleRandomNumberList
+	add hl, bc
+	inc a
+	ld [wLinkBattleRandomNumberListIndex], a
+	cp 9
+	ld a, [hl]
+	pop bc
+	pop hl
+	ret c
+
+; if we picked the last seed, we need to recalculate the nine seeds
+	push hl
+	push bc
+	push af
+
+; point to seed 0 so we pick the first number the next time
+	xor a
+	ld [wLinkBattleRandomNumberListIndex], a
+
+	ld hl, wLinkBattleRandomNumberList
+	ld b, 9
+.loop
+	ld a, [hl]
+	ld c, a
+; multiply by 5
+	add a
+	add a
+	add c
+; add 1
+	inc a
+	ld [hli], a
+	dec b
+	jr nz, .loop
+
+	pop af
+	pop bc
+	pop hl
+	ret
+
 Random::
 ; Return a random number in a.
 ; For battles, use BattleRandom.
@@ -4636,20 +4687,20 @@ GetMoveCategory::
 
 
 StatModifierRatios:
-; first byte is numerator, second byte is denominator
-	db 25, 100  ; 0.25
-	db 28, 100  ; 0.28
-	db 33, 100  ; 0.33
-	db 40, 100  ; 0.40
-	db 50, 100  ; 0.50
-	db 66, 100  ; 0.66
-	db  1,   1  ; 1.00
-	db 15,  10  ; 1.50
-	db  2,   1  ; 2.00
-	db 25,  10  ; 2.50
-	db  3,   1  ; 3.00
-	db 35,  10  ; 3.50
-	db  4,   1  ; 4.00
+; first byte is numerator, second byte is denominator: Gen 9's stages, -6 to +6
+	db 2, 8
+	db 2, 7
+	db 2, 6
+	db 2, 5
+	db 2, 4
+	db 2, 3
+	db 2, 2
+	db 3, 2
+	db 4, 2
+	db 5, 2
+	db 6, 2
+	db 7, 2
+	db 8, 2
 
 
 

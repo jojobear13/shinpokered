@@ -372,7 +372,7 @@ ItemTurnOrder:
 	call GetSideItem
 	cp QUICK_CLAW
 	ret nz
-	call AbilityRandom
+	call BattleRandom
 	cp 51 ; 20%
 	ret nc
 	inc b
