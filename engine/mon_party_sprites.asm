@@ -168,8 +168,13 @@ LoadPartyIcons:
 	ret
 
 ; a = a species (or EGG), e = a party slot -> its icon's two frames into the
-; slot's tiles: at once with the LCD off, else in V-blank
+; slot's tiles (and wPartyIconSpecies): at once with the LCD off, else in
+; V-blank
 LoadPartyIcon:
+	ld d, 0
+	ld hl, wPartyIconSpecies
+	add hl, de
+	ld [hl], a
 	call PartyIconOffset
 	push hl
 	ld l, e
@@ -244,11 +249,22 @@ PartyIconOffset:
 	ret
 
 WriteMonPartySpriteOAMByPartyIndex:
-; Write OAM blocks for the party mon in [hPartyMonIndex] (its icon is in its
-; slot's tiles).
+; Write OAM blocks for the party mon in [hPartyMonIndex], first loading its
+; icon into its slot's tiles if they hold another species' (after a swap, an
+; evolution or a hatch).
 	push hl
 	push de
 	push bc
+	ld a, [hPartyMonIndex]
+	ld e, a
+	ld d, 0
+	ld hl, wPartySpecies
+	add hl, de
+	ld a, [hl]
+	ld hl, wPartyIconSpecies
+	add hl, de
+	cp [hl]
+	call nz, LoadPartyIcon
 	ld a, [hPartyMonIndex]
 	add a
 	add a

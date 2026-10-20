@@ -3667,6 +3667,8 @@ wBreedEgg:: ; the egg being made, in the day care's layout
 	ds DAY_CARE_DATA_LENGTH
 wHoFSlot:: ; the Hall of Fame slot being recorded (eggs are skipped)
 	ds 1
+wPartyIconSpecies:: ; the species whose icon each party slot's sprite tiles hold
+	ds PARTY_LENGTH
 
 ; free up to the stack at $df00
 
