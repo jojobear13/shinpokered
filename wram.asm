@@ -3184,7 +3184,7 @@ wDayCareEggReady:: ; an egg is waiting at the day care (in sDayCareEgg)
 	ds 1
 wEggStepCounter:: ; every 256 steps the day care may lay an egg, and eggs in the party get closer to hatching
 	ds 1
-wSpriteOptions:: ; the extra options' SPRITES (BIT_GEN2_SPRITES); kept through NEW GAME as the options are
+wDisplayOptions:: ; the DISPLAY options' SPRITES (BIT_GEN2_SPRITES) and TYPE HINT (TYPE_HINT_MASK); kept through NEW GAME as the options are
 	ds 1
 	ds NUM_IVS - 3
 
@@ -3483,6 +3483,11 @@ wDayCareInUse:: ; da48
 ; how many mons are in the day care (0 to DAY_CARE_SLOTS); one is in
 ; sDayCareMon, a second in sDayCareMon2
 	ds 1
+
+wTypeChartSeen:: ; a flag per matchup the player has seen an attacking move
+; make: attacking type * NUM_CHART_TYPES + defending type (engine/battle/type_chart.asm);
+; NEW GAME+ keeps it
+	ds (NUM_CHART_TYPES * NUM_CHART_TYPES + 7) / 8
 
 wMainDataEnd::
 

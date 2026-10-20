@@ -274,7 +274,14 @@ DEF BIT_BATTLE_NOSWITCH		EQU 3		  	; bit 3
 DEF BATTLE_NOSWITCH  		EQU %00001000	; bit 3
 DEF BIT_ENH_GBC_COLORS		EQU 7		  	; bit 7
 DEF ENH_GBC_COLORS  		EQU %10000000	; bit 7
-; wSpriteOptions
+; wDisplayOptions
 DEF BIT_GEN2_SPRITES		EQU 0			; Crystal's pics (engine/gen2_pics.asm)
+DEF TYPE_HINT_MASK		EQU %00000110	; the move menu's effectiveness marks (engine/battle/type_chart.asm):
+DEF TYPE_HINT_ON		EQU %00000010	; always
+DEF TYPE_HINT_LEARNED	EQU %00000100	; for the matchups wTypeChartSeen has
+
+; the type chart's rows and columns: NORMAL to STEEL ($00-$09, BIRD's unused
+; slot included), then FIRE to FAIRY ($14-$1C)
+DEF NUM_CHART_TYPES		EQU 19
 DEF GEN2_PIC_HEADER_LENGTH	EQU 6			; Gen2PicHeaders' entries
 

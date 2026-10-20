@@ -7,7 +7,7 @@ SetDefaultNames:
 ;	push af
 	ld a, [wUnusedD721]	;joenote - preserve extra options
 	push af
-	ld a, [wSpriteOptions] ; and the sprites option
+	ld a, [wDisplayOptions] ; and the sprites option
 	push af
 	callba SaveRuleFlags ; and the rules, which are event flags
 	ld hl, wPlayerName
@@ -20,7 +20,7 @@ SetDefaultNames:
 	call FillMemory
 	callba RestoreRuleFlags
 	pop af
-	ld [wSpriteOptions], a
+	ld [wDisplayOptions], a
 	pop af
 	ld [wUnusedD721], a	;joenote - restore extra options
 ;	pop af
@@ -366,7 +366,7 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	ld a, [wPlayerID + 1]
 	ld l, a
 	push hl
-	ld a, [wSpriteOptions] ; and the sprites option
+	ld a, [wDisplayOptions] ; and the sprites option
 	push af
 
 	ld hl, wPlayerName
@@ -398,14 +398,16 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	;skip clearing the play clock
 	
 	ld hl, wSafariZoneGameOver
-	ld bc, wMainDataEnd - wSafariZoneGameOver
+	ld bc, wTypeChartSeen - wSafariZoneGameOver
 	xor a
 	call FillMemory
+
+	;skip clearing the type matchups seen
 
 	;skip clearing box pkmn data
 	
 	pop af
-	ld [wSpriteOptions], a
+	ld [wDisplayOptions], a
 	;restore the player ID
 	pop hl
 	ld a, l

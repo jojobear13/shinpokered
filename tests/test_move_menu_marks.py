@@ -4,7 +4,8 @@ On the move menu, the line above the move's type shows its category (PHYS,
 SPCL or STAT) on the left and its effectiveness against the enemy on the right:
 two up triangles for 4x, one for 2x, nothing for 1x, one down triangle for
 1/2x, two for 1/4x and a cross for no effect. Status moves get no mark, and
-fixed-damage moves only show the cross.
+fixed-damage moves only show the cross. These are with the DISPLAY option
+TYPE HINT on (test_type_chart.py has OFF and LEARNED).
 """
 
 import os
@@ -61,6 +62,7 @@ class MoveMenuMarksTest(unittest.TestCase):
         for move, move_type, effect, enemy_types, text, mark in CASES:
             with self.subTest(move=move, enemy=enemy_types):
                 g.reset()
+                g.poke("wDisplayOptions", 0b010)  # TYPE HINT: ON
                 g.poke(row, *[SPACE] * SCREEN_WIDTH)
                 g.poke("wPlayerMoveNum", MOVES[move])
                 g.poke("wPlayerMoveEffect", EFFECTS[effect])
@@ -82,6 +84,7 @@ class MoveMenuMarksTest(unittest.TestCase):
         for scope in (False, True):
             with self.subTest(silph_scope=scope):
                 g.reset()
+                g.poke("wDisplayOptions", 0b010)  # TYPE HINT: ON
                 g.poke(row, *[SPACE] * SCREEN_WIDTH)
                 g.poke("wPlayerMoveNum", MOVES["LICK"])
                 g.poke("wPlayerMoveEffect", EFFECTS["NO_ADDITIONAL_EFFECT"])

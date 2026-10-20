@@ -3357,7 +3357,7 @@ PrintMenuItem:
 	call GetCurrentMove
 	coord hl, 2, 10
 	predef PrintMoveType
-	call PrintMoveCategoryAndEffectiveness
+	callab PrintMoveCategoryAndEffectiveness
 .moveDisabled
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
@@ -3365,92 +3365,6 @@ PrintMenuItem:
 
 DisabledText:
 	db "disabled!@"
-
-; on the move menu, the line above the move's type: its category on the left
-; and how effective it would be against the enemy on the right: ▴▴ 4x, ▴ 2x,
-; nothing 1x, ▼ 1/2x, ▼▼ 1/4x, × no effect. Status moves get no mark, and
-; fixed-damage moves only show ×, since type only decides whether they hit.
-; There is no mark against a ghost the Silph Scope hasn't identified.
-PrintMoveCategoryAndEffectiveness:
-	ld a, [wPlayerMoveNum]
-	call GetMoveCategory
-	push af
-	ld de, PhysicalText
-	and a
-	jr z, .gotCategoryText
-	ld de, SpecialText
-	dec a
-	jr z, .gotCategoryText
-	ld de, StatusMoveText
-.gotCategoryText
-	coord hl, 1, 9
-	call PlaceString
-	pop af
-	cp STATUS
-	ret z
-	call IsGhostBattle
-	ret z ; an unidentified ghost: no hint at what it really is
-	ld a, [wPlayerMoveEffect]
-	ld hl, SetDamageEffects
-	ld de, 1
-	call IsInArray ; carry for fixed-damage moves
-	push af
-	ld a, [wTypeEffectiveness]
-	push af
-	ld a, [wUnusedC000]
-	push af
-	set 3, a ; the player's move against the enemy's types
-	ld [wUnusedC000], a
-	callab AIGetTypeEffectiveness
-	pop af
-	ld [wUnusedC000], a
-	ld a, [wTypeEffectiveness]
-	ld b, a
-	pop af
-	ld [wTypeEffectiveness], a
-	pop af
-	ld a, b
-	jr nc, .gotMultiplier
-	and a
-	ret nz ; fixed damage: only immunity matters
-.gotMultiplier
-	coord hl, 8, 9
-	and a
-	jr z, .noEffect
-	cp $05
-	jr c, .quarter
-	jr z, .half
-	cp $14
-	ret c ; neutral
-	jr z, .double
-	ld a, "▴" ; 4x
-	ld [hli], a
-	ld [hl], a
-	ret
-.double
-	inc hl
-	ld [hl], "▴"
-	ret
-.half
-	inc hl
-	ld [hl], "▼"
-	ret
-.quarter
-	ld a, "▼"
-	ld [hli], a
-	ld [hl], a
-	ret
-.noEffect
-	inc hl
-	ld [hl], "×"
-	ret
-
-PhysicalText:
-	db "PHYS@"
-SpecialText:
-	db "SPCL@"
-StatusMoveText:
-	db "STAT@"
 
 SelectEnemyMove:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3794,7 +3708,7 @@ MirrorMoveCheck:
 	cp 2
 	jr c, .zeropower_or_staticmove
 	call PrintCriticalOHKOText
-	callab DisplayEffectiveness
+	callab RecordAndDisplayEffectiveness
 .zeropower_or_staticmove
 	ld a, 1
 	ld [wMoveDidntMiss], a
@@ -4549,10 +4463,13 @@ PrintMoveFailureText:
 	ld de, wEnemyMoveEffect
 .playersTurn
 
-	ld hl, DoesntAffectMonText
 	ld a, [wDamageMultipliers]
 	and $7f
-	jr z, .gotTextToPrint	;0 for damage multipliers means defender is immune
+	jr nz, .notImmune	;0 for damage multipliers means defender is immune
+	callab RecordTypeMatchup ; keeps de
+	ld hl, DoesntAffectMonText
+	jr .gotTextToPrint
+.notImmune
 	
 	;joenote - Replace UnaffectedText with IsUnaffectedText
 	;It's the same thing in english, but it sounds better grammatically.
@@ -5786,7 +5703,7 @@ EnemyCheckIfMirrorMoveEffect:
 	cp 2
 	jr c, .zeropower_or_staticmove
 	call PrintCriticalOHKOText
-	callab DisplayEffectiveness
+	callab RecordAndDisplayEffectiveness
 .zeropower_or_staticmove
 	ld a, 1
 	ld [wMoveDidntMiss], a

@@ -7,7 +7,7 @@
 ; [wd11e] = a Pokédex number -> with the option on, wMonHPicBank,
 ; wMonHSpriteDim, wMonHFrontSprite and wMonHBackSprite from Gen2PicHeaders
 Gen2PicHeader:
-	ld a, [wSpriteOptions]
+	ld a, [wDisplayOptions]
 	bit BIT_GEN2_SPRITES, a
 	ret z
 	ld a, [wd11e]
@@ -30,7 +30,7 @@ IF DEF(_SWBACKS)
 	or 1
 	ret
 ELSE
-	ld a, [wSpriteOptions]
+	ld a, [wDisplayOptions]
 	and 1 << BIT_GEN2_SPRITES
 	ret
 ENDC

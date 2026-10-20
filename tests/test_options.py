@@ -12,7 +12,7 @@ OPT_LENGTH = 12
 # the value each option shows after InitOptions on a new save (None: none)
 DEFAULTS = [
     ["MEDIUM", "ON", "SHIFT", "MONO", None],  # GAME
-    ["30", "GEN 1", "OFF", "OFF", "OFF"],  # DISPLAY
+    ["30", "GEN 1", "OFF", "OFF", "OFF", "OFF"],  # DISPLAY
     ["OFF"] * 6,  # CHALLENGE
     ["OFF"] * 4,  # CLAUSES
     ["OFF"] * 7,  # EXTRAS
@@ -43,7 +43,7 @@ class OptionsTest(unittest.TestCase):
         g.reset()
         for i in range(0x100 // 8, 0xA00 // 8):  # every event flag but the story's first
             g.poke(f"wEventFlags+{i}", 0)
-        g.poke("wSpriteOptions", 0)
+        g.poke("wDisplayOptions", 0)
         g.call("InitOptions")
 
     def string(self, address, limit=40):

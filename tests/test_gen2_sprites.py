@@ -39,9 +39,9 @@ class Gen2SpritesTest(unittest.TestCase):
         g = self.game
         for name, n in DEX.items():
             with self.subTest(name=name):
-                g.poke("wSpriteOptions", 0)
+                g.poke("wDisplayOptions", 0)
                 dim, front, back, bank = self.header(SPECIES[name])
-                g.poke("wSpriteOptions", 1)
+                g.poke("wDisplayOptions", 1)
                 dim2, front2, back2, bank2 = self.header(SPECIES[name])
                 fbank, faddr = g.symbols[label(name) + "Front"]
                 bbank, baddr = g.symbols[label(name) + "Back"]
@@ -57,16 +57,16 @@ class Gen2SpritesTest(unittest.TestCase):
     def test_special_pics_stay(self):
         g = self.game
         ghost = SPECIES["MON_GHOST"] if "MON_GHOST" in SPECIES else 0xB8
-        g.poke("wSpriteOptions", 0)
+        g.poke("wDisplayOptions", 0)
         off = self.header(ghost)[:2]
-        g.poke("wSpriteOptions", 1)
+        g.poke("wDisplayOptions", 1)
         self.assertEqual(self.header(ghost)[:2], off)
 
     def test_new_game_plus_keeps_it(self):
         g = self.game
-        g.poke("wSpriteOptions", 1)
+        g.poke("wDisplayOptions", 1)
         g.call("DoNewGamePlus", max_frames=2000)
-        self.assertEqual(g.peek("wSpriteOptions"), 1)
+        self.assertEqual(g.peek("wDisplayOptions"), 1)
 
 
 if __name__ == "__main__":

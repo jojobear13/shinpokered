@@ -1787,7 +1787,7 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     map's sprites are hidden while it is open.
   - **Pages**: GAME (TEXT SPEED with INST./FAST/MEDIUM/SLOW, BATTLE ANIM,
     BTL. STYLE, AUDIO, SOUND TEST), DISPLAY (FRAME RATE, SPRITES, MORE
-    COLOR, COLOR FIX, SYMBOLS), CHALLENGE (HARD MODE, AI SWITCHING, LEVEL
+    COLOR, COLOR FIX, SYMBOLS, TYPE HINT), CHALLENGE (HARD MODE, AI SWITCHING, LEVEL
     CAP showing the current cap, SCALING, ALT. MOVES, NUZLOCKE), CLAUSES
     (ITEM, SLEEP, FREEZE, HYPER BEAM), EXTRAS (HEAL ON WIN, WARP BACK,
     CATCH-UP EXP, RANDOM WILD with OFF/TIER/FULL, RANDOM TRNR, SAFARI
@@ -1828,3 +1828,28 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   - `draw_start_menu.asm` moved out of bank 1 to a floating section.
   - `tests/test_start_menu_pc.py`: what each item does with and without
     the Pokédex and the option, and no PC in the link rooms.
+- **TYPE HINT: OFF / ON / LEARNED** (DISPLAY, off by default, as the
+  original game had no marks): the move menu's effectiveness marks
+  (`engine/battle/type_chart.asm`). LEARNED shows a mark only for matchups
+  the player has seen, and "?" for the rest.
+  - **The chart**: `wTypeChartSeen` (46 bytes at the end of the saved main
+    data) has a flag per attacking type and defending type, one way:
+    19 x 19 (NORMAL to STEEL with BIRD's unused slot, then FIRE to FAIRY).
+    NEW GAME clears it; NEW GAME+ keeps it, as it keeps the Pokédex.
+  - **Recording**: `RecordTypeMatchup` marks the move's type against each
+    of its target's types (a dual-type target counts as both matchups),
+    for either side's moves, when an attacking move with ordinary damage
+    (power 2 or more: no status moves, no fixed-damage ones) hits (the core
+    calls `RecordAndDisplayEffectiveness` where it called
+    `DisplayEffectiveness`) or doesn't affect its target by type
+    (`PrintMoveFailureText`'s immune branch). A miss records nothing.
+  - **Showing**: with LEARNED, the mark needs the move's type against both
+    of the enemy's types to be seen.
+  - The move menu's mark routine moved out of the full battle bank ($0F)
+    into the new file.
+  - `wSpriteOptions` is now `wDisplayOptions`: SPRITES in bit 0, TYPE HINT
+    in bits 1-2.
+  - `tests/test_type_chart.py`: dual types count both, direction, either
+    side, status and fixed-damage moves don't count, each matchup's own
+    bit, and the marks with OFF, ON and LEARNED. `test_move_menu_marks.py`
+    runs with ON.

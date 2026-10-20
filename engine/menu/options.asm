@@ -64,12 +64,13 @@ OptionsPageGame:
 	opt_action OptTextSoundTest, OptHelpSoundTest, OptionsSoundTest
 
 OptionsPageDisplay:
-	db "DISPLAY@", 5
+	db "DISPLAY@", 6
 	opt_bit    OptTextFrameRate, OptHelpFrameRate, wUnusedD721, 1 << 4, OptValuesFrameRate
-	opt_bit    OptTextSprites, OptHelpSprites, wSpriteOptions, 1 << BIT_GEN2_SPRITES, OptValuesSprites
+	opt_bit    OptTextSprites, OptHelpSprites, wDisplayOptions, 1 << BIT_GEN2_SPRITES, OptValuesSprites
 	opt_custom OptTextMoreColor, OptHelpMoreColor, 2, GetMoreColorOption, SetMoreColorOption, OptValuesOffOn
 	opt_custom OptTextColorFix, OptHelpColorFix, 2, GetColorFixOption, SetColorFixOption, OptValuesOffOn
 	opt_event  OptTextSymbols, OptHelpSymbols, EVENT_90E, OptValuesOffOn
+	opt_custom OptTextTypeHint, OptHelpTypeHint, 3, GetTypeHintOption, SetTypeHintOption, OptValuesTypeHint
 
 OptionsPageChallenge:
 	db "CHALLENGE@", 6
@@ -528,6 +529,23 @@ SetTextSpeedOption:
 	ld [wOptions], a
 	ret
 
+; the move menu's effectiveness marks: OFF, ON, or LEARNED
+; (engine/battle/type_chart.asm)
+GetTypeHintOption:
+	ld a, [wDisplayOptions]
+	and TYPE_HINT_MASK
+	rrca
+	ret
+
+SetTypeHintOption:
+	add a
+	ld b, a
+	ld a, [wDisplayOptions]
+	and $ff ^ TYPE_HINT_MASK
+	or b
+	ld [wDisplayOptions], a
+	ret
+
 ; MONO, then the three stereo mixes
 GetAudioOption:
 	ld a, [wOptions]
@@ -729,6 +747,8 @@ OptValuesSprites:
 	dw OptTextGen1, OptTextGen2
 OptValuesLevelCap:
 	dw OptTextOff, wcf4b ; GetLevelCapOption writes the cap there
+OptValuesTypeHint:
+	dw OptTextOff, OptTextOn, OptTextLearned
 OptValuesRandomWild:
 	dw OptTextOff, OptTextTier, OptTextFull
 
@@ -750,6 +770,7 @@ OptTextGen1:       db "GEN 1@"
 OptTextGen2:       db "GEN 2@"
 OptTextTier:       db "TIER@"
 OptTextFull:       db "FULL@"
+OptTextLearned:    db "LEARNED@"
 
 OptTextTextSpeed:      db "TEXT SPEED@"
 OptTextAnimation:      db "BATTLE ANIM@"
@@ -761,6 +782,7 @@ OptTextSprites:        db "SPRITES@"
 OptTextMoreColor:      db "MORE COLOR@"
 OptTextColorFix:       db "COLOR FIX@"
 OptTextSymbols:        db "SYMBOLS@"
+OptTextTypeHint:       db "TYPE HINT@"
 OptTextHardMode:       db "HARD MODE@"
 OptTextAISwitching:    db "AI SWITCHING@"
 OptTextLevelCap:       db "LEVEL CAP@"
@@ -813,6 +835,9 @@ OptHelpColorFix:
 OptHelpSymbols:
 	db   "Caught and gender"
 	next "marks in battle.@"
+OptHelpTypeHint:
+	db   "▴▼ marks on moves;"
+	next "LEARNED: once seen@"
 OptHelpHardMode:
 	db   "Tougher trainers,"
 	next "no battle REVIVEs.@"

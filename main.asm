@@ -1949,6 +1949,9 @@ INCLUDE "data/base_exp.asm"
 SECTION "Options Menu", ROMX
 INCLUDE "engine/menu/options.asm"
 
+SECTION "Type Chart", ROMX
+INCLUDE "engine/battle/type_chart.asm"
+
 SECTION "Draw Start Menu", ROMX
 INCLUDE "engine/menu/draw_start_menu.asm"
 
