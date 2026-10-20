@@ -45,6 +45,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Confusion self-hit 1/3 of the time; poison and Leech Seed 1/8, burn 1/16.
 - Toxic stays bad poison through a switch.
 - Poison, burn, Leech Seed, binding damage, Leftovers and residual abilities happen at the end of the round, faster mon first (Gen 4+), not after each mon's move.
+- Fainting works as in Gen 9: a mon that faints to a move is replaced only after the round's end-of-round effects, which the survivor still takes (none once a wild mon or a trainer's last mon faints); a mon fainting to poison doesn't stop the other's; Leech Seed and binding stop when their user is gone.
 - Type immunities to status: Fire/burn, Ice/freeze, Electric/paralysis, Poison and Steel/poison.
 - A move's side effect can now hit its own type (e.g. Body Slam paralyzes Normal types).
 - Priority uses Gen 9 brackets (Quick Attack +1, Counter -5, Roar/Whirlwind/Teleport -6, etc.).

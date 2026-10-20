@@ -1917,8 +1917,22 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   used to hit each mon right after its own move, as in Gen 1-3. They now
   run in `EndOfRound`, after both have moved: the faster mon first (a speed
   tie goes to the one that moved first, `H_WHOFIRST`, so link battles agree).
-  A round where a move makes a mon faint still skips them, as before; Gen 9
-  would still apply the survivor's.
+  Fainting follows Gen 9 (see below).
 - **HP PERCENT** shows the number alone (no % sign), right-aligned in the
   two tiles' columns 3-13, digits a column apart.
+- **Fainting as in Gen 9**: when a move makes a mon faint, the faint
+  (message, EXP) comes at once, then the survivor's end-of-round effects
+  (`EndOfRoundForSurvivor`, called by both faint handlers once the fainted
+  mon is gone and before anyone is sent out; `wEndOfRoundPending` marks a
+  round whose effects haven't run), then the replacements. None run once a
+  wild mon or a trainer's last mon faints, or the player blacks out. In
+  `EndOfRound`, a mon fainting to its own effect no longer stops the
+  other's. A mon left at 0 HP by its effects after the enemy fainted gets
+  its cry and "fainted!" text (`wInHandlePlayerMonFainted`). Leech Seed
+  doesn't drain into, and binding doesn't continue from, a fainted mon.
+  Checked in the emulator: a trainer's Rattata KO'd by a poisoned mon
+  (faint, EXP, poison, then EKANS), a wild KO (no poison), the player's
+  mon KO'd (the poisoned foe takes poison before "Use next"), and the
+  player's mon fainting to poison after its KO (fainted text, then both
+  replaced).
 

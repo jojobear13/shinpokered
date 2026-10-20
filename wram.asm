@@ -3606,6 +3606,8 @@ wPlayerMistTurns::
 	ds 1
 wEnemyMistTurns::
 	ds 1
+wEndOfRoundPending:: ; the round's end-of-round effects haven't run yet (EndOfRound)
+	ds 1
 wTurnPending:: ; both sides have chosen this turn; it ends as the battle loop comes round
 	ds 1
 wPlayerMimicSlot:: ; the slot (1-4) Mimic filled until the mon leaves, 0 for none

@@ -564,6 +564,7 @@ MainInBattleLoop:
 .noLinkBattle
 	ld a, 1
 	ld [wTurnPending], a ; both sides have chosen: the turn will end
+	ld [wEndOfRoundPending], a ; and its end-of-round effects are to come
 	callab ComparePriority ; Gen 9's priority brackets
 	jr nc, .compareSpeed
 	jp nz, .playerMovesFirst
@@ -655,9 +656,13 @@ MainInBattleLoop:
 
 ; Gen 4+: poison, burn, Leech Seed, binding, Leftovers and the residual
 ; abilities come at the end of the round, once both have moved, the faster
-; mon first (on a tie, the one that moved first). A round that ends in a
-; faint from a move skips them, as each mon's used to after its move.
+; mon first (on a tie, the one that moved first). As in Gen 9, a mon that
+; faints from one doesn't stop the other's, and replacements come after.
+; When a move makes a mon faint, the faint handlers run the survivor's
+; (EndOfRoundForSurvivor) before anyone is sent out.
 EndOfRound:
+	xor a
+	ld [wEndOfRoundPending], a
 	ld de, wBattleMonSpeed
 	ld hl, wEnemyMonSpeed
 	ld c, $2
@@ -670,25 +675,66 @@ EndOfRound:
 .tie
 	ld a, [H_WHOFIRST]
 .gotFirst
-	ld [H_WHOSETURN], a
 	push af
-	call HandlePoisonBurnLeechSeed
-	jr z, .firstFainted
-	call DrawHUDsAndHPBars
+	call ResidualIfAlive
 	pop af
 	xor $1
-	ld [H_WHOSETURN], a
-	call HandlePoisonBurnLeechSeed
-	jr z, .fainted
-	call DrawHUDsAndHPBars
+	call ResidualIfAlive
+	ld hl, wBattleMonHP
+	ld a, [hli]
+	or [hl]
+	jp z, HandlePlayerMonFainted ; (it sees to the enemy too, if both fainted)
+	ld hl, wEnemyMonHP
+	ld a, [hli]
+	or [hl]
+	jp z, HandleEnemyMonFainted
 	jp MainInBattleLoop
-.firstFainted
+
+; side a's end-of-round effects, if it still has HP
+ResidualIfAlive:
+	ld [H_WHOSETURN], a
+	ld hl, wBattleMonHP
+	and a
+	jr z, .gotHP
+	ld hl, wEnemyMonHP
+.gotHP
+	ld a, [hli]
+	or [hl]
+	ret z
+	call HandlePoisonBurnLeechSeed
+	jp DrawHUDsAndHPBars
+
+; a faint handler, once the fainted mon is gone and before anyone comes in:
+; if a move made it faint, side a (the survivor) still has its end-of-round
+; effects this round
+EndOfRoundForSurvivor:
+	ld b, a
+	ld a, [wEndOfRoundPending]
+	and a
+	ret z
+	xor a
+	ld [wEndOfRoundPending], a
+	ld a, [H_WHOSETURN]
+	push af
+	ld a, b
+	call ResidualIfAlive
 	pop af
-.fainted
+	ld [H_WHOSETURN], a
+	ret
+
+; z if the mon opposite H_WHOSETURN has no HP (keeps hl)
+OpponentFainted:
+	push hl
+	ld hl, wEnemyMonHP
 	ld a, [H_WHOSETURN]
 	and a
-	jp z, HandlePlayerMonFainted
-	jp HandleEnemyMonFainted
+	jr z, .gotHP
+	ld hl, wBattleMonHP
+.gotHP
+	ld a, [hli]
+	or [hl]
+	pop hl
+	ret
 
 
 ; a move, then what abilities do after it (H_WHOSETURN is still the attacker)
@@ -751,6 +797,8 @@ HandlePoisonBurnLeechSeed:
 	ld a, [de]
 	add a
 	jr nc, .notLeechSeeded
+	call OpponentFainted ; no seeder to drain into
+	jr z, .notLeechSeeded
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - set the bit that indicates leech seed is being handled
 	ld a, [wUnusedC000]
@@ -776,6 +824,8 @@ HandlePoisonBurnLeechSeed:
 	call PrintText
 	pop hl
 .notLeechSeeded
+	call OpponentFainted ; the binder is gone
+	jr z, .notBound
 	push hl
 	callab BoundTurnEnd ; carry: still bound, so hurt (wd11e = the move)
 	pop hl
@@ -1009,6 +1059,27 @@ HandleEnemyMonFainted:
 	ret z ; return if it's a wild battle
 	call AnyEnemyPokemonAliveCheck
 	jp z, TrainerBattleVictory
+; Gen 9: the round's end comes before the trainer's next mon
+	ld hl, wBattleMonHP
+	ld a, [hli]
+	or [hl]
+	jr z, .playerAlreadyFainted
+	xor a ; the player's side
+	call EndOfRoundForSurvivor
+	ld hl, wBattleMonHP
+	ld a, [hli]
+	or [hl]
+	jr nz, .playerAlreadyFainted
+	ld a, 1 ; its own faint, so its cry and "fainted!" text
+	ld [wInHandlePlayerMonFainted], a
+	call RemoveFaintedPlayerMon ; fainted to its own poison, burn...
+	xor a
+	ld [wInHandlePlayerMonFainted], a
+	call AnyPartyAlive
+	ld a, d
+	and a
+	jp z, HandlePlayerBlackOut
+.playerAlreadyFainted
 	ld hl, wBattleMonHP
 	ld a, [hli]
 	or [hl] ; does battle mon have 0 HP?
@@ -1311,6 +1382,8 @@ HandlePlayerMonFainted:
 	ld a, d
 	and a
 	jp z, HandlePlayerBlackOut
+	ld a, 1 ; Gen 9: the enemy's end of the round comes before the next mon
+	call EndOfRoundForSurvivor
 	ld hl, wEnemyMonHP
 	ld a, [hli]
 	or [hl] ; is enemy mon's HP 0?

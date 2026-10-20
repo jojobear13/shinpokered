@@ -15,6 +15,7 @@ InitBattleVariables:
 
 	xor a
 	ld [wActionResultOrTookBattleTurn], a
+	ld [wEndOfRoundPending], a
 	ld [wBattleResult], a
 	ld hl, wPartyAndBillsPCSavedMenuItem
 	ld [hli], a
