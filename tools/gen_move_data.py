@@ -8,6 +8,8 @@ https://github.com/PokeAPI/pokeapi/tree/master/data/v2/csv):
   data/move_priorities.asm  the moves whose priority isn't 0
   data/move_crit_moves.asm  the moves with a higher critical hit ratio
   data/move_flags.asm       each move's flags (MOVE_*_F), from move_flag_map.csv
+  data/moves.asm            power, type, accuracy and PP rewritten in place
+                            (effects stay hand-written)
 
 Moves are matched by id: the game's ids 1-165 are PokeAPI's.
 
@@ -80,3 +82,36 @@ with open(f"{repo}/data/move_flags.asm", "w") as f:
             bits.append("MOVE_NEVER_MISS_F")
         f.write(f"\tdb {' | '.join(f'1 << {b}' for b in bits) or '0'} ; {name}\n")
     f.write("MoveFlagsEnd:\n")
+
+# data/moves.asm: Gen 9's power, type, accuracy and PP for the moves with a
+# PokeAPI row. Kept as they are: power where PokeAPI has none (fixed damage,
+# OHKO and status moves: the engine reads 1 as "does damage"), Low Kick's
+# nominal power (LowKickPower sets it by weight) and the typeless (BIRD)
+# Struggle and Bide. No accuracy means it never misses (MOVE_NEVER_MISS_F):
+# 100 here.
+TYPES = {"normal": "NORMAL", "fighting": "FIGHTING", "flying": "FLYING", "poison": "POISON",
+         "ground": "GROUND", "rock": "ROCK", "bug": "BUG", "ghost": "GHOST", "steel": "STEEL",
+         "fire": "FIRE", "water": "WATER", "grass": "GRASS", "electric": "ELECTRIC",
+         "psychic": "PSYCHIC", "ice": "ICE", "dragon": "DRAGON", "dark": "DARK", "fairy": "FAIRY"}
+type_names = {int(r["id"]): r["identifier"] for r in csv.DictReader(open(f"{src}/types.csv"))}
+path = f"{repo}/data/moves.asm"
+out = []
+for line in open(path):
+    m = re.match(r"(\s*move )(\w+)(,\s*)(\w+)(,\s*)(\d+)(,\s*)(\w+)(,\s*)(\d+)(,\s*)(\d+)(.*)$", line.rstrip("\n"))
+    if not m or m.group(2) not in ids:
+        out.append(line)
+        continue
+    g = list(m.groups())
+    name = g[1]
+    r = row(ids[name])[0]
+    if r["power"] and name != "LOW_KICK":
+        g[5] = r["power"]
+    if g[7] != "BIRD":
+        g[7] = TYPES[type_names[int(r["type_id"])]]
+    g[9] = r["accuracy"] or "100"
+    g[11] = r["pp"]
+    for i in (5, 9, 11):  # keep the columns: right-align in the old field's width
+        width = len(m.group(i)) + len(m.group(i + 1)) - 1
+        g[i - 1] = "," + " " * max(1, width - len(g[i]))
+    out.append("".join(g) + "\n")
+open(path, "w").write("".join(out))

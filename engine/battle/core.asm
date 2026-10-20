@@ -35,6 +35,7 @@ ResidualEffects2:
 	db DEFENSE_UP1_EFFECT
 	db SPEED_UP1_EFFECT
 	db SPECIAL_UP1_EFFECT
+	db GROWTH_EFFECT
 	db ACCURACY_UP1_EFFECT
 	db EVASION_UP1_EFFECT
 	db ATTACK_DOWN1_EFFECT
@@ -5479,6 +5480,31 @@ MoveHitTest:
 	pop de
 	pop hl
 	ret c
+; Gen 6+: a Poison type's Toxic never misses
+	push hl
+	ld a, [H_WHOSETURN]
+	and a
+	ld a, [wPlayerMoveNum]
+	ld hl, wBattleMonType1
+	jr z, .gotToxicUser
+	ld a, [wEnemyMoveNum]
+	ld hl, wEnemyMonType1
+.gotToxicUser
+	cp TOXIC
+	jr nz, .notToxic
+	ld a, [hli]
+	cp POISON
+	jr z, .poisonToxic
+	ld a, [hl]
+	cp POISON
+	jr z, .poisonToxic
+.notToxic
+	pop hl
+	jr .accuracyChecks
+.poisonToxic
+	pop hl
+	ret
+.accuracyChecks
 	ld a, [H_WHOSETURN]
 	and a
 	jr nz, .enemyTurn
@@ -6754,8 +6780,8 @@ MoveEffectPointerTable:
 	 dw StatModifierDownEffect    ; SPEED_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; SPECIAL_DOWN_SIDE_EFFECT
 	 dw StatModifierDownEffect    ; SPECIAL_DEFENSE_DOWN_SIDE_EFFECT
-	 dw StatModifierDownEffect    ; unused effect
-	 dw StatModifierDownEffect    ; unused effect
+	 dw TriAttackEffect           ; TRI_ATTACK_EFFECT
+	 dw GrowthEffect              ; GROWTH_EFFECT
 	 dw StatModifierDownEffect    ; unused effect
 	 dw ConfusionSideEffect       ; CONFUSION_SIDE_EFFECT
 	 dw TwoToFiveAttacksEffect    ; TWINEEDLE_EFFECT
@@ -6961,6 +6987,47 @@ ExplodeEffect:
 	ld a, [de]
 	res SEEDED, a ; clear mon's leech seed status
 	ld [de], a
+	ret
+
+; Gen 9's Tri Attack: burn, paralysis or freeze, picked at random, by the
+; move's chance (MoveChances)
+TriAttackEffect:
+	call BattleRandom
+	and 3
+	cp 3
+	jr nc, TriAttackEffect
+	add BURN_SIDE_EFFECT1 ; then FREEZE_SIDE_EFFECT, PARALYZE_SIDE_EFFECT1
+	ld hl, wPlayerMoveEffect
+	ld b, a
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotEffect
+	ld hl, wEnemyMoveEffect
+.gotEffect
+	ld [hl], b
+	push hl
+	call FreezeBurnParalyzeEffect
+	pop hl
+	ld [hl], TRI_ATTACK_EFFECT
+	ret
+
+; Gen 5+ Growth: attack and special attack up one stage each
+GrowthEffect:
+	ld hl, wPlayerMoveEffect
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotEffect
+	ld hl, wEnemyMoveEffect
+.gotEffect
+	ld [hl], ATTACK_UP1_EFFECT
+	push hl
+	call StatModifierUpEffect
+	pop hl
+	ld [hl], SPECIAL_UP1_EFFECT
+	push hl
+	call StatModifierUpEffect
+	pop hl
+	ld [hl], GROWTH_EFFECT
 	ret
 
 FreezeBurnParalyzeEffect:
@@ -8061,7 +8128,22 @@ ChargeEffect:
 	ld a, [de]
 	ld [wChargeMoveNum], a
 	ld hl, ChargeMoveEffectText
-	jp PrintText
+	call PrintText
+	ld a, [wChargeMoveNum]
+	cp SKULL_BASH ; Gen 9: it raises defense as it charges
+	ret nz
+	ld hl, wPlayerMoveEffect
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotEffect
+	ld hl, wEnemyMoveEffect
+.gotEffect
+	ld [hl], DEFENSE_UP1_EFFECT
+	push hl
+	call StatModifierUpEffect
+	pop hl
+	ld [hl], CHARGE_EFFECT
+	ret
 
 ChargeMoveEffectText:
 	TX_FAR _ChargeMoveEffectText

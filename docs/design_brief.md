@@ -1391,6 +1391,33 @@ One commit per group:
   switch slot, and caught the enemy's move number surviving a dragged-out
   switch (the player's is cleared by `SendOutMon`; now both are).
 
+### Part 7: move data for the 165 moves
+
+- **Numbers**: `tools/gen_move_data.py` rewrites each move's power, type,
+  accuracy and PP in `data/moves.asm` from PokeAPI, in place (effects stay
+  hand-written). Kept: power where PokeAPI has none (fixed damage, OHKO and
+  status moves, where 1 means "does damage"), Low Kick's nominal 50 (its
+  power comes from the target's weight), and the typeless (`BIRD`) Struggle
+  and Bide; moves with no accuracy get 100 (their never-miss flag decides).
+  The fork had already modernised many; the rest change, e.g. Tackle 40/100,
+  Wing Attack 60, Fly 90, Thrash and Petal Dance 120, Blizzard 110/70, the
+  95s to 90, Leech Life 80/10, Self-Destruct 200, Explosion 250, Glare and
+  Disable 100% accurate, Recover 5 PP. Metronome is Normal.
+- **Effects remapped to Gen 9's**: Acid lowers Special Defense; Low Kick
+  doesn't flinch; String Shot lowers Speed two stages; Minimize raises
+  evasion two; Waterfall and Rock Slide flinch (20%, 30%); Dizzy Punch
+  confuses (20%); the chances come from `MoveChances`.
+- **New effects**: Tri Attack (`TRI_ATTACK_EFFECT`, the first unused
+  effect slot) burns, paralyzes or freezes, picked at random, 20% of the
+  time; Growth (`GROWTH_EFFECT`) raises Attack and Special Attack one stage
+  each. Skull Bash raises Defense as it charges. A Poison type's Toxic never
+  misses (Gen 6+).
+- **Not done**: Sky Attack's 30% flinch (the charge effect owns the effect
+  slot).
+- **Verified:** `tests/test_move_data_gen9.py` checks every move's power,
+  accuracy and PP against PokeAPI (when the CSVs are present) and the new
+  effects; Forewarn's Tackle is 40 now.
+
 ## Bugs found by the refactor
 
 Refactors must not change behaviour, so bugs they uncover are recorded here

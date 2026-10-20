@@ -77,8 +77,8 @@ const_value = 0
 	const SPEED_DOWN_SIDE_EFFECT     ; $46
 	const SPECIAL_DOWN_SIDE_EFFECT   ; $47
 	const SPECIAL_DEFENSE_DOWN_SIDE_EFFECT ; $48 with the other stat-down side effects
-	const UNUSED_EFFECT_49           ; $49
-	const UNUSED_EFFECT_4A           ; $4A
+	const TRI_ATTACK_EFFECT          ; $49 burn, paralysis or freeze at random
+	const GROWTH_EFFECT              ; $4A attack and special attack up 1
 	const UNUSED_EFFECT_4B           ; $4B
 	const CONFUSION_SIDE_EFFECT      ; $4C
 	const TWINEEDLE_EFFECT           ; $4D

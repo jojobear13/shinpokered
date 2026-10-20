@@ -154,7 +154,7 @@ class EntryTest(unittest.TestCase):
     def test_forewarn_power(self):
         g = self.game
         for move, power in (("FISSURE", 150), ("COUNTER", 120), ("SEISMIC_TOSS", 80), ("DRAGON_RAGE", 80),
-                            ("HYPER_BEAM", 150), ("TACKLE", 35), ("SWORDS_DANCE", 0)):
+                            ("HYPER_BEAM", 150), ("TACKLE", 40), ("SWORDS_DANCE", 0)):
             with self.subTest(move=move):
                 g.reset()
                 self.assertEqual(g.call("ForewarnPower", a=MOVES[move])["a"], power)
