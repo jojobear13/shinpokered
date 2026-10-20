@@ -842,6 +842,16 @@ AIMoveChoiceModification3:
 	inc de
 	call ReadMove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;the player's mon's ability stops this move: it has no effect, as for typing
+	push hl
+	push de
+	push bc
+	callab AIEnemyMoveBlocked
+	pop bc
+	pop de
+	pop hl
+	jp c, .heavydiscourage2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 ;don't use poison-effect moves on poison-tpe pokemon
 	ld a, [wEnemyMoveEffect]
@@ -1247,6 +1257,14 @@ AIMoveChoiceModification4:	;this unused routine now handles intelligent trainer 
 	ld a, [wPlayerMovePower]	;get the power of the player's move
 	cp $2	;regular damaging moves have power > 1
 	jr c, .skipSwitchEffectiveEnd	;skip out if the move is not a normal damaging move
+	push hl
+	push bc
+	push de
+	callab AIPlayerMoveBlocked	;no need to switch if this mon's ability stops the move
+	pop de
+	pop bc
+	pop hl
+	jp c, .skipSwitchEffectiveEnd
 	push hl
 	push bc
 	push de

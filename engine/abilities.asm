@@ -181,28 +181,28 @@ PrintStatusScreenAbility:
 AbilityBlocksMove:
 	call TakeMoveSnapshot
 	call PressureCostsPP
+	call MoveBlockedByAbility
+	ret nc
+	jp hl ; what the battle does about it
+
+; Whether an ability stops the move of the side whose turn it is, without
+; messages or changes: carry if so, with hl = what the battle does about it
+; (AbilityBlocksMove jumps there) and d = the ability. The trainer AI asks
+; this too (AIMoveBlockedByAbility).
+MoveBlockedByAbility:
 ; Damp, on either mon, stops Explosion and Self-Destruct
 	ld a, wPlayerMoveEffect - wPlayerMoveNum
 	call GetUserMoveField
 	cp EXPLODE_EFFECT
 	jr nz, .notExplosion
 	call UserAbility
+	ld hl, AbilityUserDamp
 	cp DAMP
-	jr nz, .userNotDamp
-	ld d, a
-	call PrintUserAbilityActivated
-	jr .cantUse
-.userNotDamp
+	jr z, .blocked
 	call TargetAbilityForMove
+	ld hl, AbilityTargetDamp
 	cp DAMP
-	jr nz, .notExplosion
-	ld d, a
-	call PrintAbilityActivated
-.cantUse
-	ld hl, AbilityCantUseMoveText
-	call PrintText
-	scf
-	ret
+	jr z, .blocked
 .notExplosion
 	ld hl, wEnemyBattleStatus1
 	ld a, [H_WHOSETURN]
@@ -221,11 +221,12 @@ AbilityBlocksMove:
 	cp STRUGGLE
 	ret z ; and carry clear
 	call GetMoveFlags
+	ld hl, AbilityDoesntAffect
 	bit MOVE_SOUND_F, a
 	jr z, .notSound
 	ld a, d
 	cp SOUNDPROOF
-	jp z, AbilityDoesntAffect
+	jr z, .blockedD
 .notSound
 	ld a, d
 	cp STURDY
@@ -233,10 +234,12 @@ AbilityBlocksMove:
 	ld a, wPlayerMoveEffect - wPlayerMoveNum
 	call GetUserMoveField
 	cp OHKO_EFFECT
-	jp z, AbilityDoesntAffect
+	ld hl, AbilityDoesntAffect
+	jr z, .blockedD
 .notSturdy
 ; the rest go by type, for moves that hit the target: damaging moves and
 ; Thunder Wave, the one status move of those types that targets the foe
+	call GetUserMove
 	ld a, e
 	cp THUNDER_WAVE
 	jr z, .targetsFoe
@@ -270,9 +273,12 @@ AbilityBlocksMove:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	push hl
-	call PrintAbilityActivated
-	ret ; to the handler
+.blockedD
+	ld a, d
+.blocked
+	ld d, a
+	scf
+	ret
 
 ; status moves: the conditions and stat drops abilities keep off (a damaging
 ; move's side effect is only kept off, in AbilitySideEffectChance)
@@ -285,13 +291,46 @@ AbilityBlocksMove:
 	call GetUserMoveField
 	call GetEffectKind
 	call AbilityPreventsEffect
-	jp c, AbilityDoesntAffect
+	ld hl, AbilityDoesntAffect
+	jr c, .blockedD
 	and a
+	ret
+
+; The trainer AI's question, with MoveBlockedByAbility's answer: would the
+; other mon's ability stop the enemy's move (as ReadMove read it), or the
+; player's? Carry if so. Nothing is printed or changed.
+AIEnemyMoveBlocked:
+	ld a, 1
+	jr AIMoveBlocked
+
+AIPlayerMoveBlocked:
+	xor a
+AIMoveBlocked:
+	ld hl, H_WHOSETURN
+	ld b, [hl]
+	ld [hl], a
+	push bc
+	call MoveBlockedByAbility
+	pop bc
+	ld a, b
+	ld [H_WHOSETURN], a
+	ret
+
+AbilityUserDamp:
+	call PrintUserAbilityActivated
+	jr AbilityCantUse
+
+AbilityTargetDamp:
+	call PrintAbilityActivated
+AbilityCantUse:
+	ld hl, AbilityCantUseMoveText
+	call PrintText
+	scf
 	ret
 
 AbilityImmunities: ; ability, the type it takes, what it does
 	db LEVITATE, GROUND
-	dw AbilityDoesntAffect.printed
+	dw AbilityDoesntAffect
 	db VOLT_ABSORB, ELECTRIC
 	dw AbilityHealsTarget
 	db WATER_ABSORB, WATER
@@ -547,6 +586,7 @@ GetMonHPForBar:
 
 ; heals the target by 1/4 of its max HP
 AbilityHealsTarget:
+	call PrintAbilityActivated
 	ld hl, wEnemyMonHP
 	ld a, [H_WHOSETURN]
 	and a
@@ -589,6 +629,7 @@ AbilityHealsTarget:
 
 ; Lightning Rod: the target's special attack goes up a stage
 AbilityRaisesSpecialAttack:
+	call PrintAbilityActivated
 	ld a, [H_WHOSETURN]
 	xor 1
 	ld c, MOD_SPECIAL_ATTACK
@@ -602,6 +643,7 @@ AbilityRaisesSpecialAttack:
 
 ; Flash Fire: the target's fire moves get stronger until it leaves
 AbilityFlashFire:
+	call PrintAbilityActivated
 	ld hl, wAbilityFlags
 	ld a, [H_WHOSETURN]
 	and a

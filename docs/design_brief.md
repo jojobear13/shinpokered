@@ -692,8 +692,8 @@ possible follow-up. `tests/suites/status_checks.py` covers it.
   entry abilities (Intimidate, Download) will use it.
 - **Move flags.** `data/move_flags.asm` gives each move Gen 9's contact,
   punch and sound flags (generated with the ability data).
-- **Not yet.** The trainer AI doesn't know about abilities, and the move
-  menu's effectiveness marks stay type-only (they shouldn't reveal the
+- **Not yet.** The trainer AI doesn't know about abilities (it does since
+  held items), and the move menu's effectiveness marks stay type-only (they shouldn't reveal the
   foe's ability anyway). Transform copying the ability comes with Trace.
 - **Verified (part 2):** `tests/test_ability_damage.py` checks each damage ability
   and its conditions on both sides, Mold Breaker and Neutralizing Gas,
@@ -833,7 +833,8 @@ abilities.**
   the fork's `DetermineMonGender` (species and Attack DV). **Transform**
   copies the target's ability, as from Gen 3.
 - **Still not done**: the trainer AI ignores abilities when choosing moves
-  and switches, and the move menu's marks ignore them by design.
+  and switches (done after held items), and the move menu's marks ignore
+  them by design.
 - **Verified:** `tests/test_ability_entry.py` checks Intimidate both ways
   and everything that stops it, Competitive's answer, both sides entering
   in speed order and only pending sides acting, Download's comparison
@@ -989,6 +990,30 @@ sources).
   that at least 15 field items are held items.
 
 Held items (step E, part 5) are done.
+
+**The trainer AI knows abilities.**
+
+- **One answer.** The battle's gate, `AbilityBlocksMove`, is split: its
+  decision is `MoveBlockedByAbility`, which prints and changes nothing and
+  returns what the battle does about the move, and the gate takes the
+  snapshot, applies Pressure and jumps there. The AI asks the same routine
+  (`AIEnemyMoveBlocked`, `AIPlayerMoveBlocked`, in bank `$34`), so the AI
+  and the battle can't disagree: Damp on either mon, Soundproof, Sturdy
+  against one-hit KO moves, Levitate and the absorbing abilities, and the
+  status and stat-drop protections, with Mold Breaker and Neutralizing Gas.
+- **Choosing moves.** Layer 3, the one that already weighs typing, gives a
+  move the player's mon's ability stops the same 5 points it gives a type
+  immunity. Like the typing check, it is skipped on the turn the player
+  switches in (the AI doesn't know the new mon yet).
+- **Switching.** Layer 4 no longer switches out to flee a super-effective
+  move this mon's ability stops (a Levitating mon facing Earthquake).
+- **Verified:** `tests/test_ai_abilities.py` checks the AI's answer against
+  the gate's in 300 random cases, either side's move, half of them moves
+  the abilities stop; a STAB move picked without the ability and dropped
+  with it, for each type-blocking ability; the 5 points for status moves;
+  moves that still work scoring the same; the enemy's Mold Breaker seeing
+  through. Layer 4's use is covered by the agreement test only (its switch
+  rolls need a whole party).
 
 Every ability the 151 species have that works without weather, held items,
 infatuation or the Steel type now does what it does in Gen 9 (with the
