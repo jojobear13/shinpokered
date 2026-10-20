@@ -2022,3 +2022,8 @@ INCLUDE "engine/printer/printer_pc_menu.asm"
 INCLUDE "engine/printer/diploma_page2.asm"
 DiplomaPikachuGraphics:  INCBIN "gfx/printer/diploma_pikachu.2bpp"
 DiplomaPikachuGraphicsEnd:
+
+; Gen 2 sprites (the extra options' SPRITES), Crystal's from pret's pokecrystal;
+; data/gen2_pics.asm then gives each species' pics a section of its own
+SECTION "Gen 2 Sprites", ROMX
+INCLUDE "engine/gen2_pics.asm"

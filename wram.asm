@@ -3185,7 +3185,9 @@ wDayCareEggReady:: ; an egg is waiting at the day care (in sDayCareEgg)
 	ds 1
 wEggStepCounter:: ; every 256 steps the day care may lay an egg, and eggs in the party get closer to hatching
 	ds 1
-	ds NUM_IVS - 2
+wSpriteOptions:: ; the extra options' SPRITES (BIT_GEN2_SPRITES); kept through NEW GAME as the options are
+	ds 1
+	ds NUM_IVS - 3
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200

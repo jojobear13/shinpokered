@@ -6686,12 +6686,14 @@ LoadMonBackPic:
 	ld hl,  wMonHBackSprite - wMonHeader
 	call UncompressMonSprite
 
-;joenote - needed for loading the 48x48 spaceworld back sprites
-IF DEF(_SWBACKS)
+;joenote - needed for loading the 48x48 spaceworld back sprites (and Gen 2's)
+	callba BackPicsAreLarge
+	jr z, .smallBack
 	callba LoadUncompressedBackPics
-ELSE
+	jr .gotBack
+.smallBack
 	call SpriteScalingAndInterlacing
-ENDC
+.gotBack
 
 	ld hl, vSprites
 	ld de, vBackPic

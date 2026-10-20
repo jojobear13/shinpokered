@@ -274,4 +274,7 @@ DEF BIT_BATTLE_NOSWITCH		EQU 3		  	; bit 3
 DEF BATTLE_NOSWITCH  		EQU %00001000	; bit 3
 DEF BIT_ENH_GBC_COLORS		EQU 7		  	; bit 7
 DEF ENH_GBC_COLORS  		EQU %10000000	; bit 7
+; wSpriteOptions
+DEF BIT_GEN2_SPRITES		EQU 0			; Crystal's pics (engine/gen2_pics.asm)
+DEF GEN2_PIC_HEADER_LENGTH	EQU 6			; Gen2PicHeaders' entries
 

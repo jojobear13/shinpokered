@@ -19,7 +19,7 @@ DisplayExtraOptionMenu:
 	call TextBoxBorder
 ;draw text box border for master options
 	coord hl, 0, 9
-	ld b, 3
+	ld b, 4
 	ld c, 18
 	call TextBoxBorder
 
@@ -35,6 +35,7 @@ DisplayExtraOptionMenu:
 	
 	call ShowBadgeCap	;joenote - show the level cap depending on badge
 	call ShowNuzlocke
+	call ShowSpriteSetting
 
 	call Delay3
 .loop
@@ -75,6 +76,8 @@ DisplayExtraOptionMenu:
 	jr z, .cursorNuzlocke
 	cp $C ; cursor over rules?
 	jr z, .cursorRules
+	cp $D ; cursor over sprites?
+	jr z, .cursorSprites
 	cp $10 ; is the cursor on Back?
 	jp z, .exitMenu
 	jr .getJoypadStateLoop
@@ -109,6 +112,9 @@ DisplayExtraOptionMenu:
 .cursorRules
 	callba DisplayRulesMenu
 	jp DisplayExtraOptionMenu
+.cursorSprites
+	call ToggleSpriteSetting
+	jp .getJoypadStateLoop
 
 .checkDirectionKeys
 	ld a, [wTopMenuItemY]
@@ -117,9 +123,9 @@ DisplayExtraOptionMenu:
 	bit BIT_D_UP, b ; Up pressed?
 	jr nz, .upPressed
 	bit BIT_D_LEFT, b ; Left pressed?
-	jr nz, .cursor_section
+	jp nz, .cursor_section
 	bit BIT_D_RIGHT, b ; Right pressed?
-	jr nz, .cursor_section
+	jp nz, .cursor_section
 	jp .getJoypadStateLoop
 .downPressed
 	cp 16
@@ -128,8 +134,8 @@ DisplayExtraOptionMenu:
 	cp 7
 	ld b, 3
 	jr z, .updateMenuVariables
-	cp 12
-	ld b, 4
+	cp 13
+	ld b, 3
 	jr z, .updateMenuVariables
 	;else
 	ld b, 1
@@ -142,7 +148,7 @@ DisplayExtraOptionMenu:
 	ld b, -3
 	jr z, .updateMenuVariables
 	cp 16
-	ld b, -4
+	ld b, -3
 	jr z, .updateMenuVariables
 	;else
 	ld b, -1
@@ -215,6 +221,11 @@ PlaceExtraOptionStrings:
 ;place rules text
 	coord hl, 1, 12
 	ld de, TextRules
+	call PlaceString
+
+;place sprites text
+	coord hl, 1, 13
+	ld de, TextSprites
 	call PlaceString
 
 	ret
@@ -541,6 +552,28 @@ TextNuzlocke:
 	db " NUZLOCKE@"
 TextRules:
 	db " RULES@"
+TextSprites:
+	db " SPRITES@"
+
+; the Pokémon's pictures: Gen 1's or Gen 2's (Crystal's; engine/gen2_pics.asm)
+ToggleSpriteSetting:
+	ld a, [wSpriteOptions]
+	xor 1 << BIT_GEN2_SPRITES
+	ld [wSpriteOptions], a
+	;fall through
+ShowSpriteSetting:
+	ld de, OptionMenuTextGen1
+	ld a, [wSpriteOptions]
+	bit BIT_GEN2_SPRITES, a
+	jr z, .print
+	ld de, OptionMenuTextGen2
+.print
+	coord hl, $E, $D
+	jp PlaceString
+OptionMenuTextGen1:
+	db "GEN 1@"
+OptionMenuTextGen2:
+	db "GEN 2@"
 	
 OptionMenuOnOffText:
 	dw OptionMenuTextON

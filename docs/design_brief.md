@@ -1736,3 +1736,41 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   trade's cable circle uses. Every icon now animates by swapping frames
   (the Poké Ball and helix icons used to bob instead). On the Game Boy
   Color, the icons still take the party menu's one sprite palette.
+- **SPRITES: GEN 1 / GEN 2** (extra options, under RULES). GEN 2 shows
+  Pokémon Crystal's sprites, fronts and backs, everywhere a Pokémon's
+  picture is: battle (the send-out animation included), the status screen,
+  the Pokédex, evolution, trades, the Hall of Fame, the title screen.
+  - **Source**: pret's pokecrystal disassembly, whose sprites are lossless
+    PNGs (a sheet ripped and saved as a downscaled lossy WebP couldn't be
+    used). `tools/gen_gen2_pics.py` fetches them and writes
+    `pic/gen2mon/<name>.png` (each front's first frame, its still pose,
+    40, 48 or 56 pixels square as Gen 1's are) and
+    `pic/gen2monback/<name>b.png` (48x48), grey from pret's palette
+    indices, and `data/gen2_pics.asm`. The build compresses them as it does
+    every pic.
+  - **Space**: each species' front and back are a section of their own, so
+    the linker keeps the pair in one bank (`wMonHPicBank` is shared) and
+    packs them into the ROM's free space: about 96 KB, all in banks already
+    in use. The ROM stays 1 MB (banks $36-$3F are still empty), so no 2 MB
+    expansion was needed.
+  - **How**: `GetMonHeader` far-calls `Gen2PicHeader` after copying a
+    species' base stats; with the option on, it overwrites `wMonHPicBank`,
+    `wMonHSpriteDim`, `wMonHFrontSprite` and `wMonHBackSprite` from
+    `Gen2PicHeaders` (by Pokédex number). Every picture goes through those
+    fields, so nothing downstream changed. The fossils' and the ghost's
+    special pictures are left alone. Gen 2's backs are 48x48, shown
+    unscaled: `LoadMonBackPic` asks `BackPicsAreLarge` (the Spaceworld
+    builds always; the others with the option on) instead of the build flag,
+    and uses the Spaceworld backs' path (`LoadUncompressedBackPics`). The
+    player's own back picture stays as each build has it.
+  - **The option** is bit `BIT_GEN2_SPRITES` of `wSpriteOptions`, a new
+    saved byte (the old fossil IVs' spare bytes), kept through NEW GAME (as
+    the other options are) and NEW GAME+.
+  - **Home bank**: to fit the far call, four routines nothing called were
+    removed (`GroundRoseText`, `EmptyFunc2`, `SetSpriteMovementBytesToFE`,
+    `Func_35f4`).
+  - **Not done**: on the Game Boy Color, the pictures keep each species'
+    Gen 1 palette.
+  - `tests/test_gen2_sprites.py`: every species' header with the option on
+    and off (pointers, bank, size against the pic file), the special
+    pictures, and NEW GAME+.

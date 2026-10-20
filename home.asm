@@ -652,6 +652,7 @@ GetMonHeader::
 	ld de, wMonHeader
 	ld bc, MonBaseStatsEnd - MonBaseStats
 	call CopyData
+	callab Gen2PicHeader ; Crystal's pics instead, with the option on
 	jr .done
 .specialID
 	;joenote - dynamically get pic size of special ID
@@ -1056,10 +1057,6 @@ TextScriptEnd::
 
 ExclamationText::
 	TX_FAR _ExclamationText
-	db "@"
-
-GroundRoseText::
-	TX_FAR _GroundRoseText
 	db "@"
 
 BoulderText::
@@ -2494,9 +2491,6 @@ RunNPCMovementScript::
 EndNPCMovementScript::
 	jpba _EndNPCMovementScript
 
-EmptyFunc2::
-	ret
-
 ; stores hl in [wTrainerHeaderPtr]
 StoreTrainerHeaderPointer::
 	ld a, h
@@ -3165,16 +3159,6 @@ DecodeRLEList::
 	ret
 
 ; sets movement byte 1 for sprite [H_SPRITEINDEX] to $FE and byte 2 to [hSpriteMovementByte2]
-SetSpriteMovementBytesToFE::
-	push hl
-	call GetSpriteMovementByte1Pointer
-	ld [hl], $fe
-	call GetSpriteMovementByte2Pointer
-	ld a, [hSpriteMovementByte2]
-	ld [hl], a
-	pop hl
-	ret
-
 ; sets both movement bytes for sprite [H_SPRITEINDEX] to $FF
 SetSpriteMovementBytesToFF::
 	push hl
@@ -3314,12 +3298,6 @@ NoYesChoice::	;joenote - added this
 	call SaveScreenTilesToBuffer1
 	call InitNoYesTextBoxParameters
 	jr DisplayYesNoChoice
-
-Func_35f4::
-	ld a, TWO_OPTION_MENU
-	ld [wTextBoxID], a
-	call InitYesNoTextBoxParameters
-	jp DisplayTextBoxID
 
 InitYesNoTextBoxParameters::
 	xor a ; YES_NO_MENU

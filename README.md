@@ -1750,6 +1750,7 @@ EDIT: This has largely been fixed by writing to VRAM during the HBLANK and VBLAN
 - Gambler Keegan for Alt Trainer Move consulting and curation
 - powderpup for box covers using Sugimori cardass art
 - Chamber, Solo993, Blue Emerald, Lake, Neslug and Pikachu25 for the party menu icons ("MINIDEX 001-251")
+- The pret team's pokecrystal disassembly for Pokémon Crystal's front and back sprites (the SPRITES: GEN 2 option)
 
 The following folks for their great tutorials, glitch videos, and explanations across the internet
 - TheFakeMateo/RegularLuna 

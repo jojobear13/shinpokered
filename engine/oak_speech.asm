@@ -7,6 +7,8 @@ SetDefaultNames:
 ;	push af
 	ld a, [wUnusedD721]	;joenote - preserve extra options
 	push af
+	ld a, [wSpriteOptions] ; and the sprites option
+	push af
 	callba SaveRuleFlags ; and the rules, which are event flags
 	ld hl, wPlayerName
 	ld bc, wMainDataEnd - wPlayerName ; the box is in save RAM now
@@ -17,6 +19,8 @@ SetDefaultNames:
 	xor a
 	call FillMemory
 	callba RestoreRuleFlags
+	pop af
+	ld [wSpriteOptions], a
 	pop af
 	ld [wUnusedD721], a	;joenote - restore extra options
 ;	pop af
@@ -362,6 +366,8 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	ld a, [wPlayerID + 1]
 	ld l, a
 	push hl
+	ld a, [wSpriteOptions] ; and the sprites option
+	push af
 
 	ld hl, wPlayerName
 	ld bc, wMainDataStart - wPlayerName
@@ -398,6 +404,8 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 
 	;skip clearing box pkmn data
 	
+	pop af
+	ld [wSpriteOptions], a
 	;restore the player ID
 	pop hl
 	ld a, l
