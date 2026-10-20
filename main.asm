@@ -500,11 +500,6 @@ INCLUDE "data/mapHeaders/saffronhouse1.asm"
 INCLUDE "scripts/saffronhouse1.asm"
 INCLUDE "data/mapObjects/saffronhouse1.asm"
 
-IF DEF(_MOVENPCS)
-;joenote - adding Mateo's move relearner/deleter files
-INCLUDE "scripts/move_deleter.asm"
-INCLUDE "scripts/move_relearner.asm"
-ENDC
 
 INCLUDE "data/mapHeaders/saffronhouse2.asm"
 INCLUDE "scripts/saffronhouse2.asm"

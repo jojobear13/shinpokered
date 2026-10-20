@@ -371,7 +371,14 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	;skip clearing pokedex data at wMainDataStart
 		
 	ld hl, wNumBagItems
-	ld bc, wCurrentBoxNum - wNumBagItems
+	ld bc, wTMsOwned - wNumBagItems
+	xor a
+	call FillMemory
+
+	;skip clearing the TMs and HMs owned
+
+	ld hl, wTMsOwnedEnd
+	ld bc, wCurrentBoxNum - wTMsOwnedEnd
 	xor a
 	call FillMemory
 

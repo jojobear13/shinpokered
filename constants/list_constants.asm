@@ -1,6 +1,6 @@
 ; list menu ID's
 PCPOKEMONLISTMENU  EQU $00 ; PC pokemon withdraw/deposit lists
-MOVESLISTMENU      EQU $01 ; XXX where is this used?	joenote - now used for move deleter/relearner
+MOVESLISTMENU      EQU $01 ; XXX where is this used?	the move lists (Fuchsia gym)
 PRICEDITEMLISTMENU EQU $02 ; Pokemart buy menu / Pokemart buy/sell choose quantity menu
 ITEMLISTMENU       EQU $03 ; Start menu Item menu / Pokemart sell menu
 SPECIALLISTMENU    EQU $04 ; list of special "items" e.g. floor list in elevators / list of badges

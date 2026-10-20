@@ -12,8 +12,10 @@ import unittest
 import boxes as bx
 from harness import shared_game
 from suites.damage import SPECIES
+from test_held_items import _hram
 
 SEEDS = range(12)
+H_RANDOM_ADD = _hram("hRandomAdd")
 
 
 class BoxTestCase(unittest.TestCase):
@@ -205,6 +207,92 @@ class DayCareTest(BoxTestCase):
                 self.assertEqual(back["data"][:bx.BOX_STRUCT_LEN], expected)
 
 
+    def test_swap_day_care_mons(self):
+        for seed in SEEDS[:4]:
+            with self.subTest(seed=seed):
+                rng, party, box = self.fresh(seed, 1, 0)
+                first, second = (bx.random_mon(rng, SPECIES, party=False) for _ in range(2))
+                bx.write_day_care(self.game, first, second)
+                self.game.call("SwapDayCareMons", max_frames=100)
+                self.assertEqual(bx.read_day_care_slot(self.game, 0), second)
+                self.assertEqual(bx.read_day_care_slot(self.game, 1), first)
+                self.game.call("SwapDayCareMons", max_frames=100)
+                self.assertEqual(bx.read_day_care_slot(self.game, 0), first)
+
+    def test_both_day_care_mons_gain_exp(self):
+        g = self.game
+        for count in (1, 2):
+            with self.subTest(count=count):
+                rng, party, box = self.fresh(count, 1, 0)
+                first, second = (bx.random_mon(rng, SPECIES, party=False) for _ in range(2))
+                bx.write_day_care(g, first, second)
+                g.poke("wDayCareInUse", count)
+                g.poke("sDayCareMonExp", 0, 0x10, 0)
+                g.poke("sDayCareMon2Exp", 0, 0x20, 0)
+                g.poke(H_RANDOM_ADD, 0)  # under the 7-in-256 roll
+                g.call("IncrementDayCareMonExp", max_frames=100)
+                gained = int.from_bytes(bytes(g.peek("sDayCareMonExp", 3)), "big") - 0x1000
+                self.assertGreater(gained, 0)
+                second_now = int.from_bytes(bytes(g.peek("sDayCareMon2Exp", 3)), "big")
+                self.assertEqual(second_now, 0x2000 + (gained if count == 2 else 0))
+
+    def test_choose_which_day_care_mon(self):
+        g = self.game
+        for choice, expected in ((0, (False, 0)), (1, (False, 1)), (2, (True, None))):
+            with self.subTest(choice=choice):
+                rng, party, box = self.fresh(choice, 1, 0)
+                bx.write_day_care(g, *(bx.random_mon(rng, SPECIES, party=False) for _ in range(2)))
+                g.menu_choices(choice)
+                out = g.call("DayCareChooseMon", max_frames=2000)
+                self.assertEqual(out["carry"], expected[0])
+                if not out["carry"]:
+                    self.assertEqual(out["a"], expected[1])
+
+
+class DayCareConversationTest(BoxTestCase):
+    """The day care man's whole conversation, two mons in and one back."""
+
+    def talk(self, *choices):
+        g = self.game
+        g.menu_choices(*choices)
+        bank, addr = g.symbols["DayCareMText1"]
+        g.call((bank, addr + 1), max_frames=20000)  # past TX_ASM
+
+    def add_mon(self, species, level):
+        g = self.game
+        g.poke("wMonDataLocation", 0)
+        g.poke("wIsInBattle", 0)
+        g.poke("wcf91", species)
+        g.poke("wd11e", species)
+        g.poke("wCurEnemyLVL", level)
+        g.call("AddPartyMon", max_frames=20000)
+
+    def test_two_in_one_back(self):
+        g = self.game
+        self.fresh(0, 0, 0)
+        g.poke("wPartyCount", 0, 0xFF)
+        g.poke("wDayCareInUse", 0)
+        g.poke("wPlayerMoney", 0x10, 0, 0)  # 100000
+        for species in SPECIES[:3]:
+            self.add_mon(species, 20)
+        party = bx.read_party(g)
+
+        self.talk(0, 1)  # yes, the second mon
+        self.assertEqual(g.peek("wDayCareInUse"), 1)
+        self.assertEqual(bx.read_day_care_slot(g, 0)["species"], party[1]["species"])
+
+        self.talk(0, 0)  # another: yes, the first mon
+        self.assertEqual(g.peek("wDayCareInUse"), 2)
+        self.assertEqual(bx.read_day_care_slot(g, 0)["species"], party[0]["species"])
+        self.assertEqual(bx.read_day_care_slot(g, 1)["species"], party[1]["species"])
+        self.assertEqual([m["species"] for m in bx.read_party(g)], [party[2]["species"]])
+
+        self.talk(1, 0)  # which one back: the second slot (party[1]); pay: yes
+        self.assertEqual(g.peek("wDayCareInUse"), 1)
+        self.assertEqual([m["species"] for m in bx.read_party(g)], [party[2]["species"], party[1]["species"]])
+        self.assertEqual(bx.read_day_care_slot(g, 0)["species"], party[0]["species"])
+
+
 class SaveTest(BoxTestCase):
     def save(self):
         self.game.call("SaveSAVtoSRAM", max_frames=2000)
@@ -219,17 +307,19 @@ class SaveTest(BoxTestCase):
                 rng, party, box = self.fresh(seed, 1 + seed % 6, seed % 21)
                 g = self.game
                 day_care = bx.random_mon(rng, SPECIES, party=False)
-                bx.write_day_care(g, day_care)
+                day_care2 = bx.random_mon(rng, SPECIES, party=False)
+                bx.write_day_care(g, day_care, day_care2)
                 self.save()
 
                 # scramble what was saved, then load it back
                 bx.write_party(g, [bx.random_mon(rng, SPECIES) for _ in range(2)])
                 bx.write_current_box(g, [bx.random_mon(rng, SPECIES, party=False)])
-                bx.write_day_care(g, bx.random_mon(rng, SPECIES, party=False))
+                bx.write_day_care(g, bx.random_mon(rng, SPECIES, party=False), bx.random_mon(rng, SPECIES, party=False))
                 self.assertEqual(self.load(), 2, "checksum should be good")
                 self.assertEqual(bx.read_party(g), party)
                 self.assertEqual(bx.read_current_box(g), box)
                 self.assertEqual(bx.read_day_care(g), day_care)
+                self.assertEqual(bx.read_day_care_slot(g, 1), day_care2)
 
     def test_corrupt_current_box_is_detected(self):
         for seed in SEEDS[:6]:

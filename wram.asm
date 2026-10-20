@@ -2526,8 +2526,9 @@ wBagItems:: ; d31e
 wBagItemsTerminator::	;holds FF when the bag becomes full
 	ds 1 ; end
 
-wTMsOwned:: ; a flag per TM and HM (MachineIndex's order): they're owned, not carried
+wTMsOwned:: ; a flag per TM and HM (MachineIndex's order): they're owned, not carried; NEW GAME+ keeps them
 	ds (NUM_MACHINES + 7) / 8
+wTMsOwnedEnd::
 	ds 1
 
 wPlayerMoney:: ; d347
@@ -3475,8 +3476,8 @@ wNumSafariBalls:: ; da47
 
 
 wDayCareInUse:: ; da48
-; 0 if no pokemon is in the daycare
-; 1 if pokemon is in the daycare
+; how many mons are in the day care (0 to DAY_CARE_SLOTS); one is in
+; sDayCareMon, a second in sDayCareMon2
 	ds 1
 
 wMainDataEnd::

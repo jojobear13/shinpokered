@@ -50,8 +50,9 @@ HOF_TEAM          EQU PARTY_LENGTH * HOF_MON
 HOF_TEAM_CAPACITY EQU 50
 
 NAME_LENGTH EQU 11
-; the day-care mon's nickname, OT name and box struct, kept together in save RAM
+; a day-care mon's nickname, OT name and box struct, kept together in save RAM
 DAY_CARE_DATA_LENGTH EQU 2 * NAME_LENGTH + 13 + NUM_STATS + NUM_IVS + NUM_MOVES * 2
+DAY_CARE_SLOTS EQU 2
 ITEM_NAME_LENGTH EQU 13
 
 A_BUTTON EQU %00000001
@@ -155,7 +156,7 @@ SLOTSMOUSE  EQU $1614
 NORMAL_PARTY_MENU    EQU 0
 USE_ITEM_PARTY_MENU  EQU 1
 BATTLE_PARTY_MENU    EQU 2
-TMHM_PARTY_MENU      EQU 3
+; 3 was the TM menu: TMs are taught on the MOVES screen
 SWAP_MONS_PARTY_MENU EQU 4
 EVO_STONE_PARTY_MENU EQU 5
 

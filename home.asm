@@ -1620,11 +1620,9 @@ DisplayListMenuIDLoop::
 	pop hl
 	ld a,[wListMenuID]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;joenote - needed to make Mateo's move deleter/relearner work
-IF DEF(_MOVENPCS)
+;joenote - needed to make Mateo's move deleter/relearner work (and Fuchsia gym's move list)
 	cp a, MOVESLISTMENU
 	jr z, .skipStoringItemName
-ENDC
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	cp ITEMLISTMENU
 	jr nz, .skipGettingQuantity

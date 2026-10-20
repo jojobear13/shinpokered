@@ -134,12 +134,25 @@ def read_day_care(game):
     )
 
 
-def write_day_care(game, mon):
-    """Put a box-format mon in the day care and mark it in use."""
-    game.poke("wDayCareInUse", 1)
-    game.poke("sDayCareMon", *mon["data"])
-    game.poke("sDayCareMonOT", *mon["ot"])
-    game.poke("sDayCareMonName", *mon["nick"])
+def write_day_care(game, mon, second=None):
+    """Put a box-format mon (and maybe a second) in the day care and mark them in use."""
+    game.poke("wDayCareInUse", 2 if second else 1)
+    for prefix, m in (("sDayCareMon", mon), ("sDayCareMon2", second)):
+        if m:
+            game.poke(prefix, *m["data"])
+            game.poke(prefix + "OT", *m["ot"])
+            game.poke(prefix + "Name", *m["nick"])
+
+
+def read_day_care_slot(game, slot):
+    """The mon in day-care slot 0 or 1, whether or not it's in use."""
+    prefix = "sDayCareMon2" if slot else "sDayCareMon"
+    return _mon(
+        game.peek(prefix + "Species"),
+        game.peek(prefix, BOX_STRUCT_LEN),
+        _name(game, prefix + "OT"),
+        _name(game, prefix + "Name"),
+    )
 
 
 # ------------------------------------------------------- random mons

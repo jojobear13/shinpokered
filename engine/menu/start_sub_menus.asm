@@ -407,8 +407,6 @@ StartMenu_Item:
 ; use item
 	ld [wPseudoItemID], a ; a must be 0 due to above conditional jump
 	ld a, [wcf91]
-	cp HM_01
-	jr nc, .useItem_partyMenu
 	ld hl, UsableItems_CloseMenu
 	ld de, 1
 	call IsInArray
@@ -449,9 +447,6 @@ StartMenu_Item:
 	ld a, [wIsKeyItem]
 	and a
 	jr nz, .skipAskingQuantity
-	ld a, [wcf91]
-	call IsItemHM
-	jr c, .skipAskingQuantity
 	call DisplayChooseQuantityMenu
 	inc a
 	jr z, .tossZeroItems

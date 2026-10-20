@@ -11,8 +11,6 @@ UseItem_:
 .nottrainerbattle
 
 	ld a, [wcf91] ;contains item_ID
-	cp HM_01
-	jp nc, ItemUseTMHM
 	cp FIRST_HELD_ITEM
 	jp nc, ItemUseHeldItem
 	cp ZINC
@@ -2651,122 +2649,6 @@ PPRestoredText:
 UnusableItem:
 	jp ItemUseNotTime
 
-ItemUseTMHM:
-	ld a, [wIsInBattle]
-	and a
-	jp nz, ItemUseNotTime
-	ld a, [wcf91]
-	sub TM_01
-	push af
-	jr nc, .skipAdding
-	add 55 ; if item is an HM, add 55
-.skipAdding
-	inc a
-	ld [wd11e], a
-	predef TMToMove ; get move ID from TM/HM ID
-	ld a, [wd11e]
-	ld [wMoveNum], a
-	call GetMoveName
-	call CopyStringToCF4B ; copy name to wcf4b
-	pop af
-	ld hl, BootedUpTMText
-	jr nc, .printBootedUpMachineText
-	ld hl, BootedUpHMText
-.printBootedUpMachineText
-	call PrintText
-	ld hl, TeachMachineMoveText
-	call PrintText
-	coord hl, 14, 7
-	lb bc, 8, 15
-	ld a, TWO_OPTION_MENU
-	ld [wTextBoxID], a
-	call DisplayTextBoxID ; yes/no menu
-	ld a, [wCurrentMenuItem]
-	and a
-	jr z, .useMachine
-	ld a, 2
-	ld [wActionResultOrTookBattleTurn], a ; item not used
-	ret
-.useMachine
-	ld a, [wWhichPokemon]
-	push af
-	ld a, [wcf91]
-	push af
-.chooseMon
-	ld hl, wcf4b
-	ld de, wTempMoveNameBuffer
-	ld bc, 14
-	call CopyData ; save the move name because DisplayPartyMenu will overwrite it
-	ld a, $ff
-	ld [wUpdateSpritesEnabled], a
-	ld a, TMHM_PARTY_MENU
-	ld [wPartyMenuTypeOrMessageID], a
-	call DisplayPartyMenu
-	push af
-	ld hl, wTempMoveNameBuffer
-	ld de, wcf4b
-	ld bc, 14
-	call CopyData
-	pop af
-	jr nc, .checkIfAbleToLearnMove
-; if the player canceled teaching the move
-	pop af
-	pop af
-	call GBPalWhiteOutWithDelay3
-	call ClearSprites
-	call RunDefaultPaletteCommand
-	jp LoadScreenTilesFromBuffer1 ; restore saved screen
-.checkIfAbleToLearnMove
-	predef CanLearnTM ; check if the pokemon can learn the move
-	push bc
-	ld a, [wWhichPokemon]
-	ld hl, wPartyMonNicks
-	call GetPartyMonName
-	pop bc
-	ld a, c
-	and a ; can the pokemon learn the move?
-	jr nz, .checkIfAlreadyLearnedMove
-; if the pokemon can't learn the move
-	ld a, SFX_DENIED
-	call PlaySoundWaitForCurrent
-	ld hl, MonCannotLearnMachineMoveText
-	call PrintText
-	jr .chooseMon
-.checkIfAlreadyLearnedMove
-	callab CheckIfMoveIsKnown ; check if the pokemon already knows the move
-	jr c, .chooseMon
-	predef LearnMove ; teach move
-	pop af
-	ld [wcf91], a
-	pop af
-	ld [wWhichPokemon], a
-	ld a, b
-	and a
-	ret z
-	xor a
-	cp c
-	ret c	;treat learning a field move from a TM the same as a HM
-	ld a, [wcf91]
-	call IsItemHM
-	ret c
-	jp RemoveUsedItem
-
-BootedUpTMText:
-	TX_FAR _BootedUpTMText
-	db "@"
-
-BootedUpHMText:
-	TX_FAR _BootedUpHMText
-	db "@"
-
-TeachMachineMoveText:
-	TX_FAR _TeachMachineMoveText
-	db "@"
-
-MonCannotLearnMachineMoveText:
-	TX_FAR _MonCannotLearnMachineMoveText
-	db "@"
-
 PrintItemUseTextAndRemoveItem:
 	ld hl, ItemUseText00
 	call PrintText
@@ -3053,11 +2935,6 @@ GetSelectedMoveOffset2:
 ; OUTPUT:
 ; clears carry flag if the item is tossed, sets carry flag if not
 TossItem_:
-	push hl
-	ld a, [wcf91]
-	call IsItemHM
-	pop hl
-	jr c, .tooImportantToToss
 	push hl
 	call IsKeyItem_
 	ld a, [wIsKeyItem]

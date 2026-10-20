@@ -5,6 +5,17 @@ _DayCareIntroText::
 	cont "your #MON?"
 	done
 
+_DayCareRaiseAnotherText::
+	text "Would you like me"
+	line "to raise another"
+	cont "#MON too?"
+	done
+
+_DayCareWhichBackText::
+	text "Which #MON do"
+	line "you want back?"
+	done
+
 _DayCareWhichMonText::
 	text "Which #MON"
 	line "should I raise?"

@@ -9,7 +9,26 @@ DayCareMText1:
 	call SaveScreenTilesToBuffer2
 	ld a, [wDayCareInUse]
 	and a
+	jr z, .offer
+	cp DAY_CARE_SLOTS
+	jr z, .chooseMon
+	ld hl, DayCareRaiseAnotherText ; one is here: another, or that one back?
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
 	jp nz, .daycareInUse
+	jr .deposit
+.chooseMon
+	ld hl, DayCareWhichBackText
+	call PrintText
+	call DayCareChooseMon
+	ld hl, DayCareComeAgainText
+	jp c, .done
+	and a
+	call nz, SwapDayCareMons ; the chosen one first
+	jp .daycareInUse
+.offer
 	ld hl, DayCareIntroText
 	call PrintText
 	call YesNoChoice
@@ -17,6 +36,7 @@ DayCareMText1:
 	and a
 	ld hl, DayCareComeAgainText
 	jp nz, .done
+.deposit
 	ld a, [wPartyCount]
 	dec a
 	ld hl, DayCareOnlyHaveOneMonText
@@ -48,8 +68,11 @@ DayCareMText1:
 	call GetPartyMonName
 	ld hl, DayCareWillLookAfterMonText
 	call PrintText
-	ld a, 1
-	ld [wDayCareInUse], a
+	ld a, [wDayCareInUse]
+	and a
+	call nz, SwapDayCareMons ; the one already here goes second
+	ld hl, wDayCareInUse
+	inc [hl]
 	ld a, PARTY_TO_DAYCARE
 	ld [wMoveMonType], a
 	call MoveMon
@@ -158,8 +181,9 @@ DayCareMText1:
 	jp .leaveMonInDayCare
 
 .enoughMoney
+	ld hl, wDayCareInUse
+	dec [hl]
 	xor a
-	ld [wDayCareInUse], a
 	ld hl, wDayCareNumLevelsGrown
 	ld [hli], a
 	inc hl
@@ -249,6 +273,9 @@ DayCareMText1:
 	dec a
 	ld hl, wPartyMonNicks
 	call GetPartyMonName
+	ld a, [wDayCareInUse]
+	and a
+	call nz, SwapDayCareMons ; the one still here goes first
 	ld hl, DayCareGotMonBackText
 	jr .done
 
@@ -262,6 +289,73 @@ DayCareMText1:
 	call PrintText
 	jp TextScriptEnd
 
+
+; swaps the two day-care mons in save RAM: the day care works on the first
+SwapDayCareMons:
+	call OpenBox
+	ld hl, sDayCareMonName
+	ld de, sDayCareMon2Name
+	ld c, DAY_CARE_DATA_LENGTH
+.loop
+	ld a, [de]
+	ld b, [hl]
+	ld [hli], a
+	ld a, b
+	ld [de], a
+	inc de
+	dec c
+	jr nz, .loop
+	jp CloseBox
+
+; a menu of the two day-care mons and CANCEL -> a = the one chosen (0 or 1),
+; carry if cancelled
+DayCareChooseMon:
+	call SaveScreenTilesToBuffer1
+	coord hl, 7, 4
+	lb bc, 5, 11
+	call TextBoxBorder
+	call OpenBox
+	coord hl, 9, 5
+	ld de, sDayCareMonName
+	call PlaceString
+	coord hl, 9, 7
+	ld de, sDayCareMon2Name
+	call PlaceString
+	call CloseBox
+	coord hl, 9, 9
+	ld de, DayCareCancelText
+	call PlaceString
+	ld hl, wTopMenuItemY
+	ld a, 5
+	ld [hli], a ; wTopMenuItemY
+	ld a, 8
+	ld [hli], a ; wTopMenuItemX
+	xor a
+	ld [hli], a ; wCurrentMenuItem
+	inc hl
+	ld a, 2
+	ld [hli], a ; wMaxMenuItem
+	ld a, A_BUTTON | B_BUTTON
+	ld [hli], a ; wMenuWatchedKeys
+	xor a
+	ld [hl], a ; wLastMenuItem
+	call HandleMenuInput
+	push af
+	call LoadScreenTilesFromBuffer1
+	pop af
+	bit BIT_B_BUTTON, a
+	jr nz, .cancel
+	ld a, [wCurrentMenuItem]
+	cp 2
+	jr z, .cancel
+	and a
+	ret
+.cancel
+	scf
+	ret
+
+DayCareCancelText:
+	db "CANCEL@"
 
 DaycareEvolution:
 ;sets z flag if no evolution happened
@@ -354,6 +448,14 @@ DaycareMoveLearning:
 	
 DayCareIntroText:
 	TX_FAR _DayCareIntroText
+	db "@"
+
+DayCareRaiseAnotherText:
+	TX_FAR _DayCareRaiseAnotherText
+	db "@"
+
+DayCareWhichBackText:
+	TX_FAR _DayCareWhichBackText
 	db "@"
 
 DayCareWhichMonText:

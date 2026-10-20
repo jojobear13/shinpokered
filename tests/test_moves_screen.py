@@ -12,7 +12,7 @@ import re
 import unittest
 
 from harness import REPO_ROOT, shared_game
-from test_held_items import ITEMS
+from test_held_items import ITEMS, _hram
 from test_learnsets import learnsets
 
 FIELD_SLOT = 4
@@ -207,8 +207,20 @@ class MovesScreenTest(unittest.TestCase):
     def test_new_game_owns_no_machines(self):
         g = self.game
         self.own(range(55))
+        g.poke(_hram("hJoyHeld"), 0)
         g.call("InitPlayerData", max_frames=2000)
         self.assertEqual(g.peek("wTMsOwned", 7), [0] * 7)
+
+    def test_new_game_plus_keeps_them(self):
+        g = self.game
+        self.own([0, 9, 50, 54])
+        owned = g.peek("wTMsOwned", 7)
+        g.poke("wNumBagItems", 1, ITEMS["POTION"], 3, 0xFF)
+        g.call("DoNewGamePlus", max_frames=2000)
+        g.poke(_hram("hJoyHeld"), 0x04)  # SELECT, as NEW GAME+ needs
+        g.call("InitPlayerData", max_frames=2000)
+        self.assertEqual(g.peek("wTMsOwned", 7), owned)
+        self.assertEqual(g.peek("wNumBagItems"), 0)  # the bag is still emptied
 
 
 if __name__ == "__main__":

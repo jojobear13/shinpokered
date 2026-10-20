@@ -1609,8 +1609,9 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   HMs) instead of adding it to the bag: `AddItemToInventory_` handles it
   and always succeeds. Marts sell an owned TM no more and an unowned one one
   at a time; the prize corner won't trade for one already owned. NEW GAME
-  and NEW GAME+ clear the flags. The TM item-use code is left in place but
-  can no longer be reached. Pewter's TM34 speech says TMs never run out.
+  clears the flags; NEW GAME+ keeps them (`DoNewGamePlus` and
+  `InitPlayerData` skip `wTMsOwned`..`wTMsOwnedEnd`). Pewter's TM34 speech
+  says TMs never run out.
 - **The MOVES screen** (party menu → MOVES, `engine/menu/moves_screen.asm`):
   the mon's four moves with their PP and its field move slot (Shin's
   temporary field move: usable outside battle only), and below them the
@@ -1623,8 +1624,7 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   PP, and PP Ups go with the old move, as in Gen 9. The party submenu is
   STATS, MOVES, SWITCH, CANCEL, so it shows at most four field moves
   (`NUM_FIELD_MOVES`): a mon with four field moves no longer lists its
-  field-slot move or TAKE there. Shin's move deleter and relearner NPCs in
-  Saffron are still there, though the MOVES screen does both for free.
+  field-slot move or TAKE there.
   `tests/test_moves_screen.py` checks the lists against a model built from
   the data files, for six mons and every slot, and learning, replacing,
   removing and the field slot; it also found that the learnset parser in
@@ -1635,3 +1635,24 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   meant row TOP, one column to the left). No existing call used an
   expression the change affects, so the ROM is otherwise unchanged; the bag screen had
   hit it.
+- **Removed, now that the MOVES screen does their jobs**: Shin's move
+  deleter and relearner NPCs in Saffron (the `_MOVENPCS` build flag, their
+  scripts, texts and `PrepareRelearnableMoveList`; Fuchsia gym's move list
+  keeps the `MOVESLISTMENU` handling it shares), and the code that taught a
+  TM from the bag (`ItemUseTMHM` and its texts, `TMToMove`, the party
+  menu's ABLE/NOT ABLE mode, `TMHM_PARTY_MENU`'s prompt, and the "can't
+  toss, sell or deposit an HM" checks). `LearnToFieldSlot` stays: a
+  level-up outside battle can still offer a field move for the field slot.
+- **The day care takes two.** A second slot in save RAM
+  (`sDayCareMon2Name`, `sDayCareMon2OT`, `sDayCareMon2`, the same layout as
+  the first, right after it; the bank 1 snapshot doubles to match), and
+  `wDayCareInUse` is now how many are in (0-2). The day-care code still
+  works on the first slot: `SwapDayCareMons` swaps the two when it needs the
+  other, so a lone mon is always in the first. Talking to the man: with
+  none in, as before; with one, "Would you like me to raise another
+  #MON too?" (NO goes on to taking that one back, as before); with two, a
+  menu of their names and CANCEL picks which one comes back. Both gain
+  experience on the same steps. `tests/test_pc_boxes.py`: the swap, both
+  gaining exp, the menu, saving and loading both, and the whole
+  conversation (two in, the first one back) through the man's own script.
+  Breeding and eggs come next, on top of this.

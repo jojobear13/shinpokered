@@ -16,6 +16,12 @@ sLiveDataStart::
 sDayCareMonName:: ds NAME_LENGTH ; b858
 sDayCareMonOT::   ds NAME_LENGTH ; b863
 sDayCareMon:: box_struct sDayCareMon ; b86e
+; the second day-care mon, in the same layout: the day care works on the
+; first, swapping the two (SwapDayCareMons) to work on this one
+sDayCareMon2Name:: ds NAME_LENGTH
+sDayCareMon2OT::   ds NAME_LENGTH
+sDayCareMon2:: box_struct sDayCareMon2
+ASSERT sDayCareMon2Name - sDayCareMonName == DAY_CARE_DATA_LENGTH
 
 sBoxDataStart:: ; b88f
 sNumInBox::  ds 1
@@ -43,7 +49,7 @@ sMainDataCheckSum:: ds 1 ; b08a, covers sPlayerName up to here
 ; The live day care and current box (sLiveDataStart, bank 0) as of the last
 ; save, in the same layout, with their own checksum. Loading copies this back.
 sLiveDataSnapshot:: ; b08b
-sDayCareData:: ds DAY_CARE_DATA_LENGTH
+sDayCareData:: ds DAY_CARE_DATA_LENGTH * DAY_CARE_SLOTS
 sCurBoxData::  ds sBoxDataEnd - sBoxDataStart ; b0c2
 sLiveDataSnapshotEnd::
 sLiveDataSnapshotCheckSum:: ds 1 ; b524

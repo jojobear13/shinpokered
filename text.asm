@@ -229,11 +229,6 @@ SECTION "Text 3", ROMX, BANK[TEXT_3]
 INCLUDE "text/maps/rock_tunnel_b2f_2.asm"
 INCLUDE "text/maps/seafoam_islands_b4f.asm"
 
-IF DEF(_MOVENPCS)
-;joenote - adding Mateo's move relearner/deleter files
-INCLUDE "text/move_deleter.asm"
-INCLUDE "text/move_relearner.asm"
-ENDC
 
 _AIBattleWithdrawText::
 	TX_RAM wTrainerName
@@ -1619,11 +1614,6 @@ _PartyMenuBattleText::
 	line "#MON?"
 	done
 
-_PartyMenuUseTMText::
-	text "Use machine on"	;joenote - HMs use this, so made it generic
-	line "which #MON?"
-	done
-
 _PartyMenuSwapMonText::
 	text "Move #MON"
 	line "where?"
@@ -2974,40 +2964,6 @@ _PPIncreasedText::
 
 _PPRestoredText::
 	text "PP was restored."
-	prompt
-
-_BootedUpTMText::
-	text "Booted up a TM!"
-	prompt
-
-_BootedUpHMText::
-	text "Booted up an HM!"
-	prompt
-
-_TeachMachineMoveText::
-	text "It contained"
-	line "@"
-	TX_RAM wcf4b
-	text "!"
-
-	para "Teach @"
-	TX_RAM wcf4b
-	text ""
-	line "to a #MON?"
-	done
-
-_MonCannotLearnMachineMoveText::
-	TX_RAM wcd6d
-	text " is not"
-	line "compatible with"
-	cont "@"
-	TX_RAM wcf4b
-	text "."
-
-	para "It can't learn"
-	line "@"
-	TX_RAM wcf4b
-	text "."
 	prompt
 
 _ItemUseNotTimeText::

@@ -33,6 +33,11 @@ InitPlayerData2:
 	ld hl, sNumInBox
 	call InitializeEmptyList
 	call CloseBox
+
+	ld hl, wTMsOwned ; NEW GAME+ keeps them
+	ld bc, wTMsOwnedEnd - wTMsOwned
+	xor a
+	call FillMemory
 .newgameplus
 	
 	ld a, $ff
@@ -44,10 +49,6 @@ InitPlayerData2:
 	ld hl, wNumBagItems
 	call InitializeEmptyList
 
-	ld hl, wTMsOwned
-	ld bc, (NUM_MACHINES + 7) / 8
-	xor a
-	call FillMemory
 
 	ld hl, wNumBoxItems
 	call InitializeEmptyList
