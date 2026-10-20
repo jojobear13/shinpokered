@@ -167,7 +167,7 @@ const_value = 1
 
 NUM_ATTACKS EQU const_value + -1
 
-	const STRUGGLE
+	const STRUGGLE     ; a5
 
 	; Moves do double duty as animation identifiers.
 

@@ -332,7 +332,7 @@ class HPTest(unittest.TestCase):
     def test_recoil(self):
         g = self.game
         for move, ability, expected in (("DOUBLE_EDGE", "ROCK_HEAD", 200), ("DOUBLE_EDGE", "MAGIC_GUARD", 200),
-                                        ("DOUBLE_EDGE", "NO_ABILITY", 200 - 25), ("STRUGGLE", "ROCK_HEAD", 200 - 50),
+                                        ("DOUBLE_EDGE", "NO_ABILITY", 200 - 33), ("STRUGGLE", "ROCK_HEAD", 200 - 50),
                                         ("STRUGGLE", "MAGIC_GUARD", 200)):
             for turn in (0, 1):
                 with self.subTest(move=move, ability=ability, turn=turn):

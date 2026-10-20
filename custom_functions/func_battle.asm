@@ -786,67 +786,7 @@ GetBadgeCap:
 	ld d, b
 	pop bc
 	ret
-	
-	
-PsywaveEnhanced:
-	;E = user's level
-	;D = [0, user's level]
-	push de
-	ld e, d
-	
-	ld hl, $0000
-	ld d, 0
-	add hl, de
-	srl e
-	add hl, de
-	ld a, h
-	or l
-	jr nz, .next
-	inc l
-.next
-	ld d, h
-	ld e, l
-	;DE = [1, 1.5*user's level]
-	
-	ld hl, wDamage
-	ld a, [hl]
-	cp d
-	jr c, .update
-	inc hl
-	ld a, [hld]
-	cp e
-	jr nc, .cycle
-.update
-	ld a, d
-	ld [hli], a
-	ld a, e
-	ld [hl], a
-	
-.cycle
-	ld hl, wcf4b
-	ld a, [hli]
-	ld d, a
-	ld a, [hld]
-	ld e, a
-	srl d
-	rr e
-	srl d
-	rr e
-	ld a, d
-	ld [hli], a
-	ld a, e
-	ld [hld], a
-	or d
-	jr nz, .return_reroll
-	
-.return_good
-	xor a
-	jr .return
-.return_reroll
-	scf
-.return
-	pop de
-	ret
+
 
 
 

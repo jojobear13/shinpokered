@@ -4607,38 +4607,11 @@ PrintMoveFailureText:
 	set 7, a	;setting this bit causes counter to miss
 	ld [wUnusedC000], a 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;ld hl, wDamage ; since the move missed, wDamage will always contain 0 at this point.
-	                ; Thus, recoil damage will always be equal to 1
-	                ; even if it was intended to be potential damage/8.
-	ld hl, wUnusedD71F ;joenote - threatened damage now gets put in this address on a miss.
-						;This should fix the issue with the proper recoil damage
-	ld a, [hli]
-	ld b, [hl]
-	srl a
-	rr b
-	srl a
-	rr b
-	srl a
-	rr b
-	ld hl, wDamage+1
-	ld [hl], b
-	dec hl
-	ld [hli], a
-	or b
-	jr nz, .applyRecoil
-	inc a
-	ld [hl], a
-.applyRecoil
 	ld hl, KeptGoingAndCrashedText
 	call PrintText
 	ld b, $4
 	predef PredefShakeScreenHorizontally
-	ld a, [H_WHOSETURN]
-	and a
-	jr nz, .enemyTurn
-	jp ApplyDamageToPlayerPokemon
-.enemyTurn
-	jp ApplyDamageToEnemyPokemon
+	jpab CrashDamage_ ; Gen 9: half its max HP
 
 AttackMissedText:
 	TX_FAR _AttackMissedText
@@ -5588,15 +5561,6 @@ MoveHitTest:
 .move_hit
 	ret
 .moveMissed
-;;;;;;;;;;;;;;;;;;;;
-;joenote - if a move misses, store the damage it threatened into wUnusedD71F.
-;this is so the Jump Kick effect works correctly
-	ld hl, wUnusedD71F
-	ld a, [wDamage]
-	ld [hli], a
-	ld a, [wDamage + 1]
-	ld [hl], a
-;;;;;;;;;;;;;;;;;;;;
 	xor a
 	ld hl, wDamage ; zero the damage
 	ld [hli], a
@@ -7861,17 +7825,22 @@ TwoToFiveAttacksEffect:
 	pop bc
 	ld a, 5 ; Skill Link always hits five times
 	jr c, .saveNumberOfHits
-; for TWO_TO_FIVE_ATTACKS_EFFECT 3/8 chance for 2 and 3 hits, and 1/8 chance for 4 and 5 hits
+; Gen 9: 2 or 3 hits 35% of the time each, 4 or 5 hits 15%
 	call BattleRandom
-	and $3
-	cp $2
+	push bc
+	ld c, 2
+	cp 90
 	jr c, .gotNumHits
-; if the number of hits was greater than 2, re-roll again for a lower chance
-	call BattleRandom
-	and $3
+	inc c
+	cp 180
+	jr c, .gotNumHits
+	inc c
+	cp 218
+	jr c, .gotNumHits
+	inc c
 .gotNumHits
-	inc a
-	inc a
+	ld a, c
+	pop bc
 .saveNumberOfHits
 	ld [de], a
 	ld [bc], a
@@ -8522,40 +8491,32 @@ SpriteScalingAndInterlacing:
 	call InterlaceMergeSpriteBuffers ; combine the two buffers to a single 2bpp sprite
 	ret
 	
+; Gen 9: the user's level (at hl) times 50-150%, at least 1
 PsywaveDamage:
-;adjusted to account for underflow/overflow
-;adjusted for 2 bytes bc
-;loop until a random number in the range [1, bc] is found
-;take heed that the min/max possible bc value for psywave is [$0001, $017E]
-;can use BC and HL freely
-	push de
-	ld a, [hl]	;load level from HL
-	ld e, a
-
-	xor a
-	ld [wDamage], a
-	ld [wDamage+1], a
-	
-	ld a, [H_WHOSETURN]
-	and a
-	ld hl, wEnemyMonHP
-	jr z, .got_turn
-	ld hl, wBattleMonHP
-.got_turn
-	ld a, [hli]
-	ld [wcf4b], a
 	ld a, [hl]
-	ld [wcf4b+1], a
-
-.loop
+	ld [H_MULTIPLICAND + 2], a
+	xor a
+	ld [H_MULTIPLICAND], a
+	ld [H_MULTIPLICAND + 1], a
+.roll
 	call BattleRandom
-	cp e
-	jr z, .next
-	jr nc, .loop
-.next
-	ld d, a
-	callba PsywaveEnhanced
-	jr c, .loop
-
-	pop de
+	and $7f
+	cp 101
+	jr nc, .roll
+	add 50
+	ld [H_MULTIPLIER], a
+	call Multiply
+	ld a, 100
+	ld [H_DIVISOR], a
+	ld b, 4
+	call Divide
+	ld hl, wDamage
+	ld a, [H_QUOTIENT + 2]
+	ld [hli], a
+	ld b, a
+	ld a, [H_QUOTIENT + 3]
+	ld [hl], a
+	or b
+	ret nz
+	inc [hl]
 	ret

@@ -20,6 +20,7 @@ from test_types import TYPES, expected as type_factor
 SEEDS = range(300)
 BRN = 1 << 4
 GETTING_PUMPED = 1 << 2
+LOW_KICK = 0x43
 NAMES = {v: k for k, v in TYPES.items()}
 
 SIDES = {
@@ -39,11 +40,18 @@ def scaled(stat, stage):
     return max(1, min(999, stat * n // d))
 
 
+def rom(game, name, offset):
+    return game.peek((game.bank(name), game.addr(name) + offset))
+
+
 def model(game, side, roll):
     attacker, defender, a_unmod, d_unmod, a_mods, d_mods, status3, move = SIDES[side]
     power = game.peek(move + "Power")
     if power == 0:
         return None
+    if game.peek(move + "Num") == LOW_KICK:  # by the target's weight (test_move_effects checks the table)
+        dex = rom(game, "PokedexOrder", game.peek(defender + "Species") - 1)
+        power = rom(game, "LowKickPowers", dex - 1)
     special = dmg.category(game.peek(move + "Num")) == "SPECIAL"
     crit = game.peek("wCriticalHitOrOHKO") == 1
     a_stage = game.peek(a_mods + ("SpecialAttackMod" if special else "AttackMod"))

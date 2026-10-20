@@ -75,6 +75,28 @@ CritChances: ; out of 256, by stage
 
 INCLUDE "data/move_crit_moves.asm"
 
+; Gen 9's Low Kick: its power is by the target's weight (LowKickPowers)
+LowKickPower:
+	ld a, [hBattleSide]
+	and BATTLE_SIDE_ENEMY
+	ld a, [wEnemyMonSpecies]
+	jr z, .gotTarget
+	ld a, [wBattleMonSpecies]
+.gotTarget
+	ld [wd11e], a
+	predef IndexToPokedex
+	ld a, [wd11e]
+	dec a
+	ld c, a
+	ld b, 0
+	ld hl, LowKickPowers
+	add hl, bc
+	ld a, [hl]
+	ld [wDamageScratch], a
+	ret
+
+INCLUDE "data/low_kick_powers.asm"
+
 ; hBattleSide = the attacking side -> wDamage = the base damage, and
 ; BATTLE_SIDE_SPECIAL set for a special move; z if the move has no power
 BaseDamage:
@@ -94,6 +116,13 @@ BaseDamage:
 	ld [wDamageScratch], a ; power
 	dec hl
 	ld a, [hl]
+	cp LOW_KICK
+	jr nz, .gotPower
+	push hl
+	call LowKickPower
+	pop hl
+	ld a, [hl]
+.gotPower
 	call GetMoveCategory
 	cp SPECIAL
 	jr nz, .gotCategory

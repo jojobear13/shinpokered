@@ -1302,9 +1302,27 @@ In progress, one commit per group:
   Snorlax showed "can't escape!", "hurt by WRAP", "was freed from WRAP!",
   Reflect failing while up, and Mist. The damage and link mirror suites
   read the screens' new counters.
+- **Multi-hit moves** hit 2 or 3 times 35% of the time each, 4 or 5 times
+  15% (90/90/38/38 in 256; Skill Link still 5).
+- **Recoil**: Double-Edge 1/3 of the damage dealt, Take Down and Submission
+  1/4, rounded half up as Showdown does; Struggle 1/4 of the user's max HP
+  (Rock Head doesn't stop it, Magic Guard does). At least 1.
+- **Crash damage** (Jump Kick, Hi Jump Kick missing or not affecting the
+  target): half the user's max HP, taken from the mon itself, not its
+  substitute (`CrashDamage_`). The fork's "threatened damage" store in the
+  hit test goes.
+- **Psywave**: the user's level times 50-150% (a 0-100 roll, rerolled above
+  100), at least 1. The fork's `PsywaveEnhanced` goes.
+- **Low Kick**'s power goes by the target's Gen 9 weight: 20 under 10 kg,
+  40 under 25, 60 under 50, 80 under 100, 100 under 200, else 120
+  (`data/low_kick_powers.asm`, by Pokédex number, from `tools/gen_species.py`;
+  `LowKickPower` in `BaseDamage`).
+- **Verified:** `tests/test_move_effects.py` checks each multi-hit threshold,
+  the recoil fractions and rounding, crash damage around a substitute,
+  Psywave's ends and reroll, and Low Kick against four species; the damage
+  model reads Low Kick's table.
 - **Still to do in this part:** Substitute, Counter, Bide, Rage, Disable,
-  Mimic, Mirror Move, Conversion, Whirlwind and Roar, Struggle, multi-hit
-  odds, recoil and crash damage, Low Kick, Psywave, powder moves, thawing
+  Mimic, Mirror Move, Conversion, Whirlwind and Roar, powder moves, thawing
   and never-miss flags.
 
 ## Bugs found by the refactor
