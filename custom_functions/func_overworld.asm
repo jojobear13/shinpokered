@@ -67,11 +67,12 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	
 	ld a, [wOptions]
 	and %11000000
-	set 0, a
+	or TEXT_DELAY_MEDIUM
 	ld [wOptions], a
 
 	ld a, [wUnusedD721]
 	and %00000111
+	or BATTLE_NOSWITCH
 	ld [wUnusedD721], a
 	
 	ResetEvent EVENT_8D7
@@ -94,6 +95,8 @@ ResetAllOptions: ;joenote - reset all the special options (like for patching-up)
 	ResetEvent EVENT_8C5
 	ResetEvent EVENT_8C8
 	ResetEvent EVENT_8C9
+	ResetEvent EVENT_WIN_HEAL
+	ResetEvent EVENT_BLACKOUT_RETURN
 
 	ResetEvent EVENT_9FE
 	ResetEvent EVENT_9FF

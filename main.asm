@@ -1922,7 +1922,6 @@ INCLUDE "engine/learn_move.asm"	;joenote - moved in order to have more space
 INCLUDE "engine/overworld/elevator.asm"	;joenote - moving this to make space
 
 INCLUDE "custom_functions/func_gamma.asm"
-INCLUDE "custom_functions/func_extra_menu.asm"
 
 ; abilities and held items, with the item names and prices (out of bank 9)
 SECTION "Abilities and held items", ROMX, BANK[$34]
@@ -1948,8 +1947,8 @@ INCLUDE "data/ev_yields.asm"
 INCLUDE "data/base_exp.asm"
 
 
-SECTION "Rules Menu", ROMX
-INCLUDE "custom_functions/func_rules_menu.asm"
+SECTION "Options Menu", ROMX
+INCLUDE "engine/menu/options.asm"
 
 ; out of bank 3, which is nearly full
 SECTION "Draw Badges", ROMX

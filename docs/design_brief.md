@@ -384,9 +384,9 @@ G.
 
 **Chosen.** Every Shin rule that an NPC or object used to toggle (wild and
 trainer randomizers, trainer scaling, alternate trainer moves, catch-up EXP,
-the caught icon, the five battle clauses and the Safari event) is a row on
-the RULES page of the extra options menu
-(`custom_functions/func_rules_menu.asm`). The NPCs that Shin added for them
+the caught icon, the battle clauses and the Safari event) is an option on
+the OPTION screen (`engine/menu/options.asm`; see "The OPTION screen"
+below). The NPCs that Shin added for them
 are gone; the Oak's Lab girl and aides, which are in the original game, say
 their original lines again; the Viridian house is back to its original size.
 Each rule is still the same event flag, so the code that follows a rule did
@@ -1570,13 +1570,13 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 
 ## Cleanup after the Gen 9 pass
 
-- **Rules toggles**: the two features the project began with are RULES page
-  rows: HEAL ON WIN (heal the party after a trainer win) and BLACKOUT RTN
-  (offer a return to where you blacked out). Both are on by default: their
-  event flags (`EVENT_NO_WIN_HEAL`, `EVENT_NO_BLACKOUT_RETURN`, the unused
-  $8CA and $8CB) mean "off", and a rule entry can now be marked inverted
-  (a sixth byte, the mask again), so a choice made before NEW GAME carries
-  over as the other rules do. `tests/test_rule_toggles.py`.
+- **Rules toggles**: the two features the project began with are options:
+  HEAL ON WIN (heal the party after a trainer win) and WARP BACK (offer a
+  return to where you blacked out), on the OPTION screen's EXTRAS page. They
+  were on by default at first (inverted flags); since the OPTION screen
+  rework they are off by default like every other extra, with the flags
+  `EVENT_WIN_HEAL` and `EVENT_BLACKOUT_RETURN` (the unused $8CA and $8CB)
+  meaning "on". `tests/test_rule_toggles.py`.
 - **Starter HP**: gift mons (the starters, and every mon `AddPartyMon` makes
   outside battle) came 1-2 HP short: `PackIVs` clobbered `de`, so
   `AddPartyMon` worked out the current HP from the bytes after `wIVScratch`
@@ -1736,7 +1736,7 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   trade's cable circle uses. Every icon now animates by swapping frames
   (the Poké Ball and helix icons used to bob instead). On the Game Boy
   Color, the icons still take the party menu's one sprite palette.
-- **SPRITES: GEN 1 / GEN 2** (extra options, under RULES). GEN 2 shows
+- **SPRITES: GEN 1 / GEN 2** (OPTION screen, DISPLAY page). GEN 2 shows
   Pokémon Crystal's sprites, fronts and backs, everywhere a Pokémon's
   picture is: battle (the send-out animation included), the status screen,
   the Pokédex, evolution, trades, the Hall of Fame, the title screen.
@@ -1774,3 +1774,42 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   - `tests/test_gen2_sprites.py`: every species' header with the option on
     and off (pointers, bank, size against the pic file), the special
     pictures, and NEW GAME+.
+- **The OPTION screen** (`engine/menu/options.asm`) replaces the original
+  three-option screen, the extra options screen SELECT opened, and that
+  screen's RULES page, where options were unexplained and rules hid behind a
+  confusing submenu.
+  - **Layout**: the page's name in a box at the top (rows 0-2), up to seven
+    options in the middle box (rows 3-11, value right-aligned), and a text
+    box at the bottom (rows 12-17) explaining the option under the cursor
+    in two lines of at most 18 letters. UP/DOWN move, A or RIGHT gives the
+    next value and LEFT the previous; on the page's name, LEFT/RIGHT turn
+    the page, and SELECT turns it from anywhere. B or START closes it. The
+    map's sprites are hidden while it is open.
+  - **Pages**: GAME (TEXT SPEED with INST./FAST/MEDIUM/SLOW, BATTLE ANIM,
+    BTL. STYLE, AUDIO, SOUND TEST), DISPLAY (FRAME RATE, SPRITES, MORE
+    COLOR, COLOR FIX, SYMBOLS), CHALLENGE (HARD MODE, AI SWITCHING, LEVEL
+    CAP showing the current cap, SCALING, ALT. MOVES, NUZLOCKE), CLAUSES
+    (ITEM, SLEEP, FREEZE, HYPER BEAM), EXTRAS (HEAL ON WIN, WARP BACK,
+    CATCH-UP EXP, RANDOM WILD with OFF/TIER/FULL, RANDOM TRNR, SAFARI
+    EVENT).
+  - **Data-driven**: each option is a 12-byte row (label, explanation,
+    kind, mask or value count, address or getter, setter, value names). A
+    bit option (`opt_bit`, `opt_event` for event flags) toggles a mask;
+    custom ones call a getter and setter (text speed, audio, the two color
+    options, which refresh the palettes, the level cap and RANDOM WILD's
+    two flags); an action (SOUND TEST) runs on A. The storage of every
+    option is unchanged, so the code that reads them didn't change.
+  - **Defaults**: every option starts as the original game played
+    (`InitOptions`): MEDIUM text, animations on, SHIFT, mono, 30 frames a
+    second (60 was the default on the Game Boy Color), trainers that don't
+    switch with thought (the old default was smart switching), and every
+    extra off. COLOR FIX is off too: the Japanese builds used to start
+    with it on; SELECT at the copyright screen still turns it on, and the
+    save keeps the choice.
+  - **NEW GAME** still carries the options that are event flags over the
+    event-flag wipe (`SaveRuleFlags`/`RestoreRuleFlags`, now from a plain
+    list of flags, `RuleFlags`).
+  - `tests/test_options.py`: the defaults as each option shows them on
+    every page, every explanation fits its box, text speed and RANDOM
+    WILD's values, bit options, the level cap's value, and the rule flags
+    surviving NEW GAME.

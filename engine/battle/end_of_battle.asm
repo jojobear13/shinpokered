@@ -66,8 +66,8 @@ EndOfBattle:
 	ld a, [wBattleResult]
 	and a ; did the player win?
 	jr nz, .noTrainerVictoryHeal
-	CheckEvent EVENT_NO_WIN_HEAL ; the HEAL ON WIN rule
-	jr nz, .noTrainerVictoryHeal
+	CheckEvent EVENT_WIN_HEAL ; the HEAL ON WIN option
+	jr z, .noTrainerVictoryHeal
 	predef HealParty
 .noTrainerVictoryHeal
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

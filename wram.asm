@@ -1030,7 +1030,7 @@ wChargeMoveNum:: ; cd3d
 
 wCoordIndex:: ; cd3d
 
-wOptionsTextSpeedCursorX:: ; cd3d
+wOptionsPage:: ; cd3d
 
 wBoxNumString:: ; cd3d
 
@@ -1093,7 +1093,7 @@ wRivalStarterBallSpriteIndex:: ; cd3e
 
 wDayCareNumLevelsGrown:: ; cd3e
 
-wOptionsBattleAnimCursorX:: ; cd3e
+wOptionsRow:: ; cd3e
 
 wTrainerInfoTextBoxWidth:: ; cd3e
 
@@ -1133,7 +1133,6 @@ wDayCareTotalCost:: ; cd3f
 
 wJigglypuffFacingDirections:: ; cd3f
 
-wOptionsBattleStyleCursorX:: ; cd3f
 
 wTrainerInfoTextBoxNextRowOffset:: ; cd3f
 

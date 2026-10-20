@@ -186,13 +186,14 @@ Attack animations are colored according to type during Gameboy Color play.
 Yellow's audio engine is backported for stereo sound support. 
 Game Boy Printer functionality has been added. 
 
-New options that can be toggled! Hit SELECT on the options screen to see an extra options menu.
-Choose RULES there for the optional game rules that NPCs used to toggle (randomizers, trainer scaling, clauses and more).
-Rules can be set from the title screen's options before starting a new game.
+New options that can be toggled! The OPTION screen has five pages (GAME, DISPLAY, CHALLENGE, CLAUSES and EXTRAS).
+Each option has a two-line explanation at the bottom of the screen. Every option starts as the original game played (MEDIUM text, SHIFT, everything extra off).
+On the page's name, LEFT and RIGHT turn the page; SELECT turns it from anywhere.
+The optional game rules that NPCs used to toggle (randomizers, trainer scaling, clauses and more) are options too, and can be set from the title screen's options before starting a new game.
 - Cycle through audio types.
 - Playing in GBC mode on a backlit LCD screen?
   - Press SELECT at the copyright screen to activate color correction.
-  - Or activate it in the extra menu
+  - Or turn on DISPLAY > COLOR FIX
 - Experimental 60FPS Mode
 - Zero-Delay Text
 - Hard Mode
@@ -206,7 +207,7 @@ Non-link battles will use the Stadium 1 critical hit chance formulas.
 Finally, it makes catching a wild Mewtwo more challenging.
 
 Trainer AI has been improved and greatly expanded.
-Some trainers will even try to switch pokemon intelligently if you haven't disabled it in the extra options menu.
+Some trainers will even try to switch pokemon intelligently if you turn on CHALLENGE > AI SWITCHING.
 
 You get notified when a box is filled (either via catching or depositing a pokemon).
 
@@ -235,29 +236,29 @@ No more grinding wild pokemon. Nearly all trainers can be rematched just by talk
 
 You can choose RUN while holding SELECT in trainer battles to forfeit the match and black yourself out.
 
-There is a built-in nuzlocke mode that can be toggled from the extra options menu.
+There is a built-in nuzlocke mode: CHALLENGE > NUZLOCKE.
 
-RULES > RANDOM WILD toggles wild pokemon randomization (TIER shuffles within tiers, FULL across all of them).
+EXTRAS > RANDOM WILD toggles wild pokemon randomization (TIER shuffles within tiers, FULL across all of them).
 If activated early enough in the game, your starter pokemon choices are randomized as well.
 
 The AREA function of the PokeDex now takes the Super Rod into account.
 It will also notify you if the Pokemon you are referencing is available in the immediate vicinity.
 It even works with the randomizer active.
 
-RULES > TRNR SCALING toggles scaling of trainer rosters to your level (evolving them if applicable).
+CHALLENGE > SCALING toggles scaling of trainer rosters to your level (evolving them if applicable).
 
-As an alternative to trainer scaling, there is now an obedience level-cap that can be toggled in the extra options menu.
-While active, the current maximum obedience level will display in the extra options menu.
+As an alternative to trainer scaling, there is now an obedience level-cap: CHALLENGE > LEVEL CAP.
+While active, the current maximum obedience level shows as its value.
 All pokemon, not just trades, will start to disobey if over the displayed level cap.
 
-RULES > CAUGHT ICON toggles a pokeball-caught symbol in battle.
+DISPLAY > SYMBOLS toggles a pokeball-caught symbol in battle.
 To help with Gen 2 interaction, this also applies a gender symbol to species that can be male or female.
 
-RULES > RANDOM TRNRS toggles randomization of non-special trainers.
+EXTRAS > RANDOM TRNR toggles randomization of non-special trainers.
 
-RULES > CATCH-UP EXP toggles a catch-up EXP boost function for under-leveled pokemon.
+EXTRAS > CATCH-UP EXP toggles a catch-up EXP boost function for under-leveled pokemon.
 
-Item, Sleep, Freeze, Trapping, and Hyper Beam clauses can each be toggled under RULES.
+Item, Sleep, Freeze, and Hyper Beam clauses can each be toggled on the CLAUSES page.
  
 The bag now supports an additional item list for an extra 20 slots of space!
 Press START on the bag menu to hot-swap the item list that populates the active bag.
@@ -362,7 +363,7 @@ Cheats and Secrets!
   - Link trading with an original retail cartridge appears to work properly
   - Link trading between the lite and master branches appears to work properly
   - Link trading via the Gen-2 Time Capsule is possible but with a known issue
-    - You must go to Shin Pokemon's extra menu and change the FPS to 30 
+    - DISPLAY > FRAME RATE must be 30 (the default)
 	- If you do not, the Gen-2 game will receive corrupted pokemon data
   - Link trading using Game Boy Advance emulators (such as mGBA) is known to be problematic
     - The GBA link cable and the GBC link cable are completely different protocols
@@ -405,7 +406,7 @@ v1.25.0
 - Fixed a bug where the no-battle bit in Mt. Moon area 3 won't clear if using dig/teleport/escape rope
 - Fixed a vanilla bug where the side menu on the party select screen does not fully disappear in battle 
 - Fixed a vanilla bug involving minor text box flicker when a pokemon learns a move after evolving
-- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
+- Enhanced GBC color has been added to the options (DISPLAY > MORE COLOR) that colorizes the overworld to a further degree
 - Game now keeps the status of the gamma shader with the save on file
 - Fixed a bug in Rocket Hideout 1 map where a SFX plays every time the map loads
 - Fixed graphical display bug when talking to the 15th sprite on a map
@@ -424,7 +425,7 @@ v1.25.0
 - Made japanese patches more accurate to the original, particularly the timing of the intro
 - Added a different emulator check that tests the timing of memory modification opcodes
 - Fixed a bug where interacting with a hidden item or a bookshelf when a trainer spots the player will freeze the game
-- Press SELECT on the extra options menu to get a sound test menu
+- GAME > SOUND TEST opens a sound test menu
   - Listen to the game's musical tracks
   - They even continue to play once you've backed out of the options menu
 - Added overflow protection to super-effective damage calculation
@@ -449,7 +450,7 @@ v1.25.0
 - Biker teams can now include Beedrill, Magmar, an Electrode, and more Voltorbs
 - Fixed an issue where enemy level-up moves were being skipped
 - Added a feature for Alt Trainer Moves  
-  - Toggle it under RULES > ALT. MOVES.  
+  - Toggle it under CHALLENGE > ALT. MOVES.  
   - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
   - Their moves will be more competitive at higher levels.
 
@@ -666,7 +667,7 @@ v1.25.0
   - Audio engine has been back-ported from Yellow version
     - Fixes some channel conflicts between cries and the low-health alarm
     - Fixes some audio hiccups with Yellow's color palettes on the GBC
-    - Press SELECT on the option menu to go to the extra menu and change the audio mixing option under "AUDIO"
+    - Change the audio mixing option under GAME > AUDIO
   - Fuchsia gym plays the correct sfx when getting the TM from Koga
   - Vermilion gym plays the correct sfx when getting the TM from Surge
   - Restored sfx for getting a badge
@@ -954,7 +955,7 @@ v1.25.0
   
 - Trainer switching (ai routine #4) can now toggled ON and OFF
   - While OFF, trainers will not switch intelligently just like in the original retail games.
-  - Press SELECT on the option menu to go to the extra menu and toggle this option under "AI SWAPS"
+  - Toggle this option under CHALLENGE > AI SWITCHING
   - Note that Jugglers are unaffected because their official gimmick is that they switch randomly.
 
 - Trainer stat DVs are now randomly generated to a degree (only in hard mode) to be above-average
@@ -1123,7 +1124,7 @@ v1.25.0
 
 #Difficulty and scalable trainers
 - There is an option to scale trainer rosters to the level of your strongest roster pkmn
-  - Toggle it under RULES > TRNR SCALING
+  - Toggle it under CHALLENGE > SCALING
   - Enemy pkmn will evolve by level if applicable
     - Pokemon that evolve below level 30 will evolve at 4/3x the original level 
     - Pokemon that evolve >= level 30 will evolve at 8/7x the original level 
@@ -1146,10 +1147,10 @@ v1.25.0
   - Warning: The difficulty will be compounded if both trainer scaling and hard mode are active
   - Oak's pokeballs will be upgraded to great balls if you beat the route 22 rival in hard mode
 - Alt Trainer Moves  
-  - Toggle it under RULES > ALT. MOVES.  
+  - Toggle it under CHALLENGE > ALT. MOVES.  
   - When active, many enemy trainer Pokémon will have slight changes to their move lists such as having more TM moves.  
   - Their moves will be more competitive at higher levels.
-- Added battle clauses, toggled under RULES
+- Added battle clauses, toggled on the CLAUSES page
   - They enforce the item, sleep, and/or freeze clauses
   - The clauses apply to the player and AI equally
   - Sleep and freeze clauses work like they do in Pokemon Stadium
@@ -1167,7 +1168,7 @@ v1.25.0
   - There is a clipboard in the Colosseum that is used to reset and re-select your battle clauses
   - Any active clauses between your opponent and yourself are applied to both players
   - A splash screen before battle will desplay the enforced clauses
-- There is now an obedience level-cap that can be toggled in the extra options menu under "LVL CAP"
+- There is now an obedience level-cap that can be toggled under CHALLENGE > LEVEL CAP
   - While active, the current maximum obedience level will display in the options menu
   - All pokemon, not just trades, will start to disobey if over the displayed level cap
   - The cap will change based on which badge you have
@@ -1177,21 +1178,21 @@ v1.25.0
 
 #Quick Keys / Options / Menu-Related
 - Game Boy Printer functions have been added, and they can be accessed from the normal PC
-- Press SELECT on the option menu to go to the extra options menu where many new options can be toggled!
+- The OPTION screen has pages of new options, each explained at the bottom of the screen!
 - Added built-in gamma shader for backlit LCD screens (press SELECT at the copyright screen)
   - Gamma shader defaults ON if the destination code in the rom header is set to 00 (JP)
   - Pressing SELECT at the copyright info now switches the shader from its default state
-  - It can also be toggled in the extra menu under "Y SHADER" so you don't have to reset the game to change it
+  - It can also be toggled under DISPLAY > COLOR FIX so you don't have to reset the game to change it
   - The default state of the gamma shader can be changed with any gameboy rom header editor
   - Alternately, remove the 'j' in 'cjsv' in the Makefile to compile with a JP destination code
 - Added an option to make the overworld run in 60fps
-  - Press SELECT on the option menu to go to the extra menu, and there you can toggle 30 or 60 under "FPS"
+  - Toggle 30 or 60 under DISPLAY > FRAME RATE
   - This feature is more of a proof-of-concept and is still kinda rusty
   - Takes advantage of double-speed CPU mode when played as a GBC game
-- Text with zero frame delay can be toggled from the extra menu under "INST. TXT"
+- Text with zero frame delay is the INST. value of GAME > TEXT SPEED
   - The regular text speed selecttion will be ignored while ON
   - Turning this OFF will default the text speed to FAST
-- Press SELECT on the extra options menu to get a sound test menu
+- GAME > SOUND TEST opens a sound test menu
   - Listen to the game's musical tracks
   - They even continue to play once you've backed out of the options menu
 - Softlock Warp 
@@ -1266,7 +1267,7 @@ v1.25.0
   - When playing in GBC-mode, move animations are colored based on their type
   - In GBC-mode, when a pokemon is caught, the resting ball now has a defined color
   - Tossing pokeballs have color in GBC mode
-- Enhanced GBC color has been added to the extra options menu that colorizes the overworld to a further degree
+- Enhanced GBC color has been added to the options (DISPLAY > MORE COLOR) that colorizes the overworld to a further degree
 - You can now play as a girl when starting a new game
   - Has front, back, walking, fishing, and cycling sprites
   - Has unique default names when starting a new game
@@ -1281,7 +1282,7 @@ v1.25.0
   - non-sexed species have no symbol
   - The symbol is displayed for a party mon in its status screen
   - The symbol is displayed in the battle hud only for wild enemy mon (the only time it matters)
-- RULES > CAUGHT ICON toggles the caught & gender symbols
+- DISPLAY > SYMBOLS toggles the caught & gender symbols
 - Red & Blue versions use the back sprites from spaceworld 97 so as to be cohesive with the front sprites
 - Added spaceworld-style trainer back sprites for consistency with the spaceworld 'mon back sprites 
 - The silhouette effect at the start of battle now displays when playing on a DMG gameboy
@@ -1289,7 +1290,7 @@ v1.25.0
 
 
 #Pre-E4 NPCs
-- RULES > RANDOM WILD toggles a built-in randomizer for wild pokemon and your starters
+- EXTRAS > RANDOM WILD toggles a built-in randomizer for wild pokemon and your starters
   - Shuffles all pokemon that can be gained through walking, surfing, fishing, or from the game corner
   - If activated early enough, your starter pokemon options are shuffled as well
   - Randomizes using a saved seed value, so the shuffled order is always preserved between play sessions
@@ -1300,7 +1301,7 @@ v1.25.0
   - The game's five legendary pokemon are excluded from randomization
   - The AREA feature of the pokedex automatically adjusts to show the new pokemon locations
   - Choosing FULL instead of TIER combines the tiers into one big list.  
-- RULES > RANDOM TRNRS toggles regular trainer randomization
+- EXTRAS > RANDOM TRNR toggles regular trainer randomization
   - Only affects regular trainers that use one level for all 'mons and have no custom movesets
   - Will replace their roster 'mons with random non-evolved 'mons (legendaries are excluded)
   - The new mons will be swapped with their evolved forms if at a high enough level
@@ -1314,7 +1315,7 @@ v1.25.0
   - Talk to her tutor to relearn moves.
   - I have expanded Mateo's code so that it also detects default level-0 moves from the baseStats header files.
 - Catch-Up EXP Booster
-  - Toggle it under RULES > CATCH-UP EXP.  
+  - Toggle it under EXTRAS > CATCH-UP EXP.  
   - While active, EXP gained is boosted if the active pokemon's level is lower than that of the fainted enemy.  
   - The boost is 1.5x multiplied by an additional 1.5x for every 3 levels of difference.  
   - For example, a level gap of 12 results in an EXP multiplier of (1.5)^4 = 5.0625.  
@@ -1353,7 +1354,7 @@ v1.25.0
   - Sells max revives, moon stones, amber, fossils, exp all, master balls, and rare candy
   - Only opens up after beating elite 4
 - Relocated one of the rocket grunts in celadon city, and he now sells bulk coins in the post-game
-- RULES > SAFARI EVENT toggles a special safari event
+- EXTRAS > SAFARI EVENT toggles a special safari event
   - All pokemon in the safari zone will have above-average DVs
   - Also makes it so there is a rare chance for any pokemon to be encountered in the safari zone (depends on location)
 - The game corner chief will buy pokemon from the player post-e4
@@ -1569,7 +1570,7 @@ v1.25.0
 #Built-In Nuzlocke Mode
 ------------------------
 - Activation/Deactivation
-  - Go to the OPTIONS screen and press SELECT to get to the extra menu.
+  - Go to the OPTION screen's CHALLENGE page.
   - Toggle this mode under "NUZLOCKE".
   
 - This mode now checks if you have had access to pokeballs on the save file.
