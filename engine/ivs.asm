@@ -63,8 +63,9 @@ UnpackIVs::
 	ret
 
 ; wIVScratch -> the four IV bytes at hl, with the flags in a (bits 0 and 1).
-; Keeps hl.
+; Keeps de and hl.
 PackIVs::
+	push de
 	push af
 	push hl
 	xor a
@@ -104,6 +105,7 @@ PackIVs::
 	ld [hld], a
 	dec hl
 	dec hl
+	pop de
 	ret
 
 ; shift the 32 bits at hl left, carry into bit 0. Keeps hl

@@ -8,6 +8,11 @@ MACRO rule
 	dw \1 ; label, or 0 for a flag with no row of its own
 	dwEventFlagAddress \2
 	db 1 << ((\2) % 8)
+IF _NARG > 2 ; inverted: the flag set means the rule is off, so it's on by default
+	db 1 << ((\2) % 8)
+ELSE
+	db 0
+ENDC
 ENDM
 
 ; one entry per row, then the flags that share a row with another
@@ -23,11 +28,13 @@ RuleFlags:
 	rule RulesTextFreeze,     EVENT_8DD ; freeze clause
 	rule RulesTextHyperBeam,  EVENT_8C8 ; hyper beam clause
 	rule RulesTextSafari,     EVENT_90F ; special safari zone event
+	rule RulesTextWinHeal,    EVENT_NO_WIN_HEAL, INVERTED ; heal the party after winning a trainer battle
+	rule RulesTextBlackout,   EVENT_NO_BLACKOUT_RETURN, INVERTED ; offer a return to where you blacked out
 RuleFlagsRowsEnd:
 	rule 0,                   EVENT_8D7 ; full rather than tiered wild randomization
 RuleFlagsEnd:
 
-RULE_ENTRY_LENGTH EQU 5
+RULE_ENTRY_LENGTH EQU 6
 NUM_RULE_ROWS EQU (RuleFlagsRowsEnd - RuleFlags) / RULE_ENTRY_LENGTH
 NUM_RULE_FLAGS EQU (RuleFlagsEnd - RuleFlags) / RULE_ENTRY_LENGTH
 RULES_BACK_ROW EQU NUM_RULE_ROWS + 3
@@ -181,8 +188,11 @@ ShowRules:
 	call RuleEntry
 	call RuleFlagAddress
 	ld b, a
+	inc hl
+	ld c, [hl] ; the inverted mask
 	ld a, [de]
 	and b
+	xor c
 	ld de, RulesTextOff
 	jr z, .place
 	ld de, RulesTextOn
@@ -263,6 +273,10 @@ RulesTextHyperBeam:
 	db " H.BEAM CLAUSE@"
 RulesTextSafari:
 	db " SAFARI EVENT@"
+RulesTextWinHeal:
+	db " HEAL ON WIN@"
+RulesTextBlackout:
+	db " BLACKOUT RTN@"
 RulesTextBack:
 	db " BACK@"
 

@@ -1567,3 +1567,21 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - The list menu tells a party list from a box list by the low byte of the
   list's address alone; `wram.asm` asserts that `wBoxListCopy` differs from
   `wPartyCount` there.
+
+## Cleanup after the Gen 9 pass
+
+- **Rules toggles**: the two features the project began with are RULES page
+  rows: HEAL ON WIN (heal the party after a trainer win) and BLACKOUT RTN
+  (offer a return to where you blacked out). Both are on by default: their
+  event flags (`EVENT_NO_WIN_HEAL`, `EVENT_NO_BLACKOUT_RETURN`, the unused
+  $8CA and $8CB) mean "off", and a rule entry can now be marked inverted
+  (a sixth byte, the mask again), so a choice made before NEW GAME carries
+  over as the other rules do. `tests/test_rule_toggles.py`.
+- **Starter HP**: gift mons (the starters, and every mon `AddPartyMon` makes
+  outside battle) came 1-2 HP short: `PackIVs` clobbered `de`, so
+  `AddPartyMon` worked out the current HP from the bytes after `wIVScratch`
+  instead of the new IVs. `PackIVs` keeps `de` now. `tests/test_gift_mons.py`.
+- **Branding and version**: the title logo loses "SHIN" and 真 (the Japanese
+  logo never had them); the main menu shows v0.5.0, and the link handshake
+  digits are 0.0.5.0, so it won't link with Shin's builds.
+

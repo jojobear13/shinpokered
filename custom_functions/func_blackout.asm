@@ -4,6 +4,8 @@
 SaveBlackoutPosition:
 	xor a
 	ld [wBlackoutReturnFlag], a
+	CheckEvent EVENT_NO_BLACKOUT_RETURN ; the BLACKOUT RTN rule
+	ret nz
 ;don't offer a return for the elite 4 and champion rooms or the safari zone
 	ld a, [wCurMap]
 	cp LORELEIS_ROOM
