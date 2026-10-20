@@ -2838,3 +2838,32 @@ INCLUDE "data/ability_names.asm"
 
 INCLUDE "data/move_flags.asm"
 	ASSERT MoveFlagsEnd - MoveFlags == STRUGGLE
+
+; carry if a mon in the party (not an egg) has Flame Body, which hatches eggs
+; twice as fast (engine/breeding.asm)
+PartyHasFlameBody::
+	ld hl, wPartySpecies
+	ld de, wPartyMon1IVs + IV_FLAGS
+.loop
+	ld a, [hli]
+	cp $ff
+	ret z ; no carry
+	cp EGG
+	jr z, .next
+	push hl
+	ld h, d
+	ld l, e
+	ld c, [hl]
+	pop hl
+	call GetMonAbility
+	cp FLAME_BODY
+	scf
+	ret z
+.next
+	push hl
+	ld hl, wPartyMon2 - wPartyMon1
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	jr .loop

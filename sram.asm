@@ -22,6 +22,12 @@ sDayCareMon2Name:: ds NAME_LENGTH
 sDayCareMon2OT::   ds NAME_LENGTH
 sDayCareMon2:: box_struct sDayCareMon2
 ASSERT sDayCareMon2Name - sDayCareMonName == DAY_CARE_DATA_LENGTH
+; the egg the day care is keeping for the player (wDayCareEggReady), made
+; when it was laid, in the same layout
+sDayCareEggName:: ds NAME_LENGTH
+sDayCareEggOT::   ds NAME_LENGTH
+sDayCareEgg:: box_struct sDayCareEgg
+ASSERT sDayCareEggName - sDayCareMon2Name == DAY_CARE_DATA_LENGTH
 
 sBoxDataStart:: ; b88f
 sNumInBox::  ds 1
@@ -49,7 +55,7 @@ sMainDataCheckSum:: ds 1 ; b08a, covers sPlayerName up to here
 ; The live day care and current box (sLiveDataStart, bank 0) as of the last
 ; save, in the same layout, with their own checksum. Loading copies this back.
 sLiveDataSnapshot:: ; b08b
-sDayCareData:: ds DAY_CARE_DATA_LENGTH * DAY_CARE_SLOTS
+sDayCareData:: ds DAY_CARE_DATA_LENGTH * (DAY_CARE_SLOTS + 1) ; the egg's too
 sCurBoxData::  ds sBoxDataEnd - sBoxDataStart ; b0c2
 sLiveDataSnapshotEnd::
 sLiveDataSnapshotCheckSum:: ds 1 ; b524

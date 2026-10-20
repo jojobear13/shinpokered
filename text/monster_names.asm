@@ -189,3 +189,7 @@ MonsterNames:
 	db "BELLSPROUT"
 	db "WEEPINBELL"
 	db "VICTREEBEL"
+
+; GetMonName's name for an egg (EGG in a species list)
+EggMonName:
+	db "EGG@@@@@@@"

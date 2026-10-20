@@ -68,3 +68,10 @@ NatureNames: ; 8 bytes each, in the order of the nature constants
 	db "QUIRKY@@"
 NatureNamesEnd:
 	ASSERT NatureNamesEnd - NatureNames == NUM_NATURES * 8
+
+; de = a mon's IVs -> wCalcStatNature = its nature, for far callers (callab
+; keeps de)
+GetNatureFromIVsAtDE::
+	ld h, d
+	ld l, e
+	jp GetNatureFromIVs

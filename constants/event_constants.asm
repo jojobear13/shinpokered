@@ -739,8 +739,8 @@ const_value = 0
 	const EVENT_GAVE_FOSSIL_TO_LAB                   ; 2E0, (D7A3, bit 0)
 	const EVENT_LAB_STILL_REVIVING_FOSSIL            ; 2E1, (D7A3, bit 1)
 	const EVENT_LAB_HANDING_OVER_FOSSIL_MON          ; 2E2, (D7A3, bit 2)
-	const EVENT_2E3   ;gave gene sample to lab       ; 2E3, (D7A3, bit 3)	;joenote - for cloning
-	const EVENT_2E4   ;still gestating pokemon       ; 2E4, (D7A3, bit 4)
+	const EVENT_2E3   ; 2E3, (D7A3, bit 3)
+	const EVENT_2E4   ; 2E4, (D7A3, bit 4)
 	const EVENT_2E5                                  ; 2E5, (D7A3, bit 5)
 	const EVENT_2E6                                  ; 2E6, (D7A3, bit 6)
 	const EVENT_2E7                                  ; 2E7, (D7A3, bit 7)

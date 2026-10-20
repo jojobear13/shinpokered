@@ -1961,6 +1961,9 @@ INCLUDE "engine/menu/bag_menu.asm"
 
 SECTION "Moves Screen", ROMX
 INCLUDE "engine/menu/moves_screen.asm"
+
+SECTION "Breeding", ROMX
+INCLUDE "engine/breeding.asm"
 INCLUDE "custom_functions/func_soundtest.asm"
 INCLUDE "custom_functions/func_emuchecks.asm"
 

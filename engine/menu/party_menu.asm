@@ -75,6 +75,12 @@ RedrawPartyMenu_:
 	inc hl
 	inc hl
 .skipUnfilledRightArrow
+	ld a, [wcf91]
+	cp EGG
+	jr nz, .notEgg
+	call SetPartyMenuEggSpeed ; an egg: its name only
+	jr .nextMon
+.notEgg
 	ld a, [wPartyMenuTypeOrMessageID] ; menu type
 	cp EVO_STONE_PARTY_MENU
 	jr z, .evolutionStoneMenu
@@ -100,6 +106,7 @@ RedrawPartyMenu_:
 	ld bc, 10 ; move 10 columns to the right
 	add hl, bc
 	call PrintLevel
+.nextMon
 	pop hl
 	pop de
 	inc de
@@ -288,6 +295,18 @@ RareCandyText:
 	TX_SFX_ITEM_1 ; probably supposed to play SFX_LEVEL_UP but the wrong music bank is loaded
 	TX_BLINK
 	db "@"
+
+; an egg has no HP bar; its icon wiggles slowly (as for red HP)
+SetPartyMenuEggSpeed:
+	ld hl, wPartyMenuHPBarColors
+	ld a, [wWhichPartyMenuHPBar]
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld [hl], 2
+	ld hl, wWhichPartyMenuHPBar
+	inc [hl]
+	ret
 
 SetPartyMenuHPBarColor:
 	ld hl, wPartyMenuHPBarColors

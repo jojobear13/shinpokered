@@ -9,6 +9,10 @@ NameRaterScript_1da15:
 	ret
 
 NameRaterScript_1da20:
+	ld a, [wcf91]
+	cp EGG
+	scf
+	ret z ; an egg isn't named yet
 	ld hl, wPartyMonOT
 	ld bc, NAME_LENGTH
 	ld a, [wWhichPokemon]

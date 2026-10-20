@@ -59,6 +59,8 @@ GetAnimationSpeed:
 	ld a, [hl]
 	cp $4 ; tile ID for SPRITE_BALL_M
 	jr z, .editCoords
+	cp EGG_ICON << 2 ; an egg wiggles too
+	jr z, .editCoords
 	cp $8 ; tile ID for SPRITE_HELIX
 	jr nz, .editTileIDS
 ; SPRITE_BALL_M and SPRITE_HELIX only shake up and down
@@ -91,7 +93,7 @@ PartyMonSpeeds:
 LoadMonPartySpriteGfx:
 ; Load mon party sprite tile patterns into VRAM during V-blank.
 	ld hl, MonPartySpritePointers
-	ld a, $1c
+	ld a, $1d ; the icons' entries in MonPartySpritePointers
 
 LoadAnimSpriteGfx:
 ; Load animated sprite tile patterns into VRAM during V-blank. hl is the address
@@ -130,7 +132,7 @@ LoadMonPartySpriteGfxWithLCDDisabled:
 ; LCD.
 	call DisableLCD
 	ld hl, MonPartySpritePointers
-	ld a, $1c
+	ld a, $1d ; the icons' entries in MonPartySpritePointers
 	ld bc, $0
 .loop
 	push af
@@ -303,6 +305,11 @@ MonPartySpritePointers:
 	db BANK(MonPartySprites)
 	dw vSprites + $780
 
+	dw EggIconSprite ; an egg's (EGG_ICON)
+	db $40 / $10 ; $40 bytes
+	db BANK(EggIconSprite)
+	dw vSprites + EGG_ICON * $40
+
 WriteMonPartySpriteOAMByPartyIndex:
 ; Write OAM blocks for the party mon in [hPartyMonIndex].
 	push hl
@@ -397,6 +404,11 @@ WriteMonPartySpriteOAM:
 	jp CopyData
 
 GetPartyMonSpriteID:
+	cp EGG
+	jr nz, .notEgg
+	ld a, EGG_ICON << 2
+	ret
+.notEgg
 	ld [wd11e], a
 	predef IndexToPokedex
 	ld a, [wd11e]
@@ -421,3 +433,6 @@ INCLUDE "data/mon_party_sprites.asm"
 
 MonPartySprites:
 	INCBIN "gfx/mon_ow_sprites.2bpp"
+
+EggIconSprite: ; its left half: the icons are mirrored (WriteSymmetricMonPartySpriteOAM)
+	INCBIN "gfx/egg_icon.2bpp"

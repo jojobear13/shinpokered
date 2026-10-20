@@ -1656,3 +1656,63 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   gaining exp, the menu, saving and loading both, and the whole
   conversation (two in, the first one back) through the man's own script.
   Breeding and eggs come next, on top of this.
+- **Breeding and eggs, as from Gen 6** (`engine/breeding.asm`). Shin's
+  cloning machine in the Cinnabar lab (the gene-splicing scientist and his
+  three bookshelves, `DevolveMon`) is gone; this replaces it.
+  - **Data**: `tools/gen_breeding.py` writes `data/breeding.asm` from
+    PokeAPI's CSVs, by Pokédex number: each species' two egg groups
+    (`EGG_*`, `constants/breeding_constants.asm`), its egg cycles, the first
+    of its line (what its eggs are) and its egg moves. Egg moves are those of
+    the first of the whole line, so Pikachu's eggs know Pichu's, Snorlax's
+    Munchlax's; they're Scarlet and Violet's, or for a species not in them
+    the latest game's (Sword and Shield first), keeping the moves this game
+    has.
+  - **Laying**: every 256 steps (`wEggStepCounter`, from the step hook in
+    `ApplyOutOfBattlePoisonDamage`) the day care's two mons may make an egg
+    if none is waiting. `DayCareCompatibility`: a Ditto with any mon that
+    isn't a Ditto or of the no-eggs group, or a male and a female sharing an
+    egg group; 70% for the same species with different original trainers
+    (OT IDs), 50% for the same species and trainer or different species and
+    trainers, 20% for different species with the same trainer. The man
+    says which ("The two seem to get along very well." ...) when the player
+    talks to him with two mons in.
+  - **The egg** is made when it's laid, into its own day-care slot in save
+    RAM (`sDayCareEgg`, snapshotted with the rest), so taking a parent back
+    doesn't change it. Its species is the first of the mother's line (the
+    non-Ditto parent's): Nidoran either one at random. Its moves: its level 1
+    moves, then the learnset moves both parents know, then the egg moves
+    either parent knows, each new one pushing out the oldest. Three IVs, at
+    random, come from one parent or the other; the rest are random; its
+    ability slot is the mother's 80% of the time, the other's otherwise. A
+    parent holding an Everstone passes its nature down (one of the two at
+    random if both do): natures come from the IVs, so the last IV not
+    inherited is picked to give it (any nature is possible from one IV's 32
+    values). Gender and shininess come from the IVs, as for any mon. Level
+    1, 0 EVs, the player as its original trainer, "EGG" as its nickname.
+  - **Taking it**: the man offers it before anything else. Yes, with room in
+    the party, gives it; no room keeps it for later; no means he keeps it
+    for good (it's gone, as from Gen 3).
+  - **An egg** is `EGG` ($FD) in a party's or box's species list (as in Gen
+    2); its data is a mon's, with its real species, 0 HP, level 1, and its
+    egg cycles left where a held item goes. With 0 HP it never battles and
+    gains no experience; the Pokémon Center and every other full heal leave
+    it at 0; no item works on it (the item party menus refuse it); it has no
+    field moves, TAKE, MOVES screen, cry, rename or Hall of Fame entry; it
+    can't go in the day care, and the PC and the day care won't take a
+    player's last mon that can battle. STATS shows "EGG" and how close it is
+    to hatching (Gen 2's four lines). The party menu shows its name and a new
+    egg icon that wiggles (`gfx/egg_icon.png`, icon `EGG_ICON`).
+    `GetMonName` names it "EGG"; `LoadMonData` reads an egg's header from
+    its real species, so moving it through the PC works.
+  - **Hatching**: every 256 steps each egg in the party loses a cycle (two
+    with a Flame Body mon in the party, as from Gen 3); at 0 it hatches at
+    once (`TEXT_EGG_HATCHING`): "Oh?", the new mon's picture and cry,
+    "... hatched from the EGG!", a nickname, its level 1 stats and full HP,
+    and its species seen and owned in the Pokédex. Gen 4 on hatch at level 1.
+  - **Bugs found by the tests**: two 8-bit `(dex - 1) * 2` table offsets
+    that wrap past Pokédex number 128 (Ditto read Charmander's egg groups).
+  - `tests/test_breeding.py`: the data, compatibility for 13 pairs, the
+    egg's species, moves (against a model), IVs and ability (with the random
+    numbers queued), Ditto and Nidoran, the Everstone, laying, cycles and
+    Flame Body, giving, hatching, the PC, healing, names, the last-battler
+    rule, and the man's offer.

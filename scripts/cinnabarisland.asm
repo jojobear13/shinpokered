@@ -4,7 +4,6 @@ CinnabarIslandScript:
 	set 5, [hl]
 	ResetEvent EVENT_MANSION_SWITCH_ON
 	ResetEvent EVENT_LAB_STILL_REVIVING_FOSSIL
-	ResetEvent EVENT_2E4	;joenote - for pokemon cloning
 	ld hl, CinnabarIslandScriptPointers
 	ld a, [wCinnabarIslandCurScript]
 	jp CallFunctionInTable

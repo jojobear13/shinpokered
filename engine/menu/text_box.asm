@@ -717,6 +717,14 @@ PokemonMenuEntries:
 
 GetMonFieldMoves:
 	ld a, [wWhichPokemon]
+	ld c, a
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl]
+	cp EGG
+	ret z ; an egg uses none, and holds nothing
+	ld a, [wWhichPokemon]
 	ld hl, wPartyMon1Moves
 	ld bc, wPartyMon2 - wPartyMon1
 	call AddNTimes

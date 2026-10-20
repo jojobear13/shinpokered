@@ -3181,8 +3181,11 @@ wFossilItem:: ; d70f
 wFossilMon:: ; d710
 ; mon that will result from the item
 	ds 1
-wFossilMonIVs::	;d711	;joenote - added to store some values
-	ds NUM_IVS
+wDayCareEggReady:: ; an egg is waiting at the day care (in sDayCareEgg)
+	ds 1
+wEggStepCounter:: ; every 256 steps the day care may lay an egg, and eggs in the party get closer to hatching
+	ds 1
+	ds NUM_IVS - 2
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200
@@ -3642,8 +3645,28 @@ wMovesData:: ; a move's Moves entry
 	ds 6
 wMovesChoices:: ; the count, then (move, where from) pairs: the level, or the TM or HM; move 0 is REMOVE
 	ds 1 + MAX_MOVE_CHOICES * 2
-wMovesLearnset:: ; the mon's evolutions and learnset
+wMovesLearnset:: ; the mon's evolutions and learnset (breeding uses it too)
 	ds MOVES_LEARNSET_LENGTH
+
+; breeding (engine/breeding.asm)
+wBreedParents:: ; the day care's two mons, copied from save RAM
+	ds DAY_CARE_DATA_LENGTH * DAY_CARE_SLOTS
+wBreedInfo:: ; for each parent: BREED_INFO_LENGTH bytes (BREED_INFO_*)
+	ds BREED_INFO_LENGTH * DAY_CARE_SLOTS
+wBreedMother:: ; the parent the egg's species and ability come from (0 or 1)
+	ds 1
+wBreedParentIVs:: ; each parent's six IVs
+	ds NUM_STATS * DAY_CARE_SLOTS
+wBreedInherited:: ; which IVs came from a parent (bit 0 = HP ...)
+	ds 1
+wBreedNature:: ; the nature an Everstone passes down, $FF for none
+	ds 1
+wBreedTemp::
+	ds 2
+wBreedEgg:: ; the egg being made, in the day care's layout
+	ds DAY_CARE_DATA_LENGTH
+wHoFSlot:: ; the Hall of Fame slot being recorded (eggs are skipped)
+	ds 1
 
 ; free up to the stack at $df00
 

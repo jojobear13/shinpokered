@@ -7,6 +7,8 @@ HealParty:
 	ld a, [hli]
 	cp $ff
 	jr z, .done
+	cp EGG
+	jr z, .nextMon ; an egg keeps its 0 HP
 
 	push hl
 	push de
@@ -91,6 +93,7 @@ HealParty:
 	pop de
 	pop hl
 
+.nextMon
 	push hl
 	ld bc, wPartyMon2 - wPartyMon1
 	ld h, d

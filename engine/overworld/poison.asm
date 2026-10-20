@@ -6,6 +6,15 @@ ApplyOutOfBattlePoisonDamage:
 	and a
 	jp z, .noBlackOut
 	call IncrementDayCareMonExp
+	callba DayCareEggStep ; carry if an egg hatches
+	jr nc, .noHatch
+	xor a
+	ld [wJoyIgnore], a
+	call EnableAutoTextBoxDrawing
+	ld a, TEXT_EGG_HATCHING
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+.noHatch
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - every interval of steps, have a chance to respawn both 1 missible and 1 hidden item if E4 have been beaten
 ;	push bc

@@ -7,6 +7,28 @@ DayCareMTextPointers:
 DayCareMText1:
 	TX_ASM
 	call SaveScreenTilesToBuffer2
+	ld a, [wDayCareEggReady]
+	and a
+	jr z, .noEgg
+	ld hl, DayCareEggText ; an egg first
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
+	jr nz, .declineEgg
+	ld a, [wPartyCount]
+	cp PARTY_LENGTH
+	ld hl, DayCareNoRoomForEggText
+	jp nc, .done
+	callab GiveDayCareEgg
+	ld hl, DayCareReceivedEggText
+	jp .done
+.declineEgg
+	xor a
+	ld [wDayCareEggReady], a ; gone
+	ld hl, DayCareKeepEggText
+	jp .done
+.noEgg
 	ld a, [wDayCareInUse]
 	and a
 	jr z, .offer
@@ -20,6 +42,19 @@ DayCareMText1:
 	jp nz, .daycareInUse
 	jr .deposit
 .chooseMon
+	callab DayCareCompatibility
+	ld hl, DayCarePlayWithOthersText
+	and a
+	jr z, .gotCompatibility
+	ld hl, DayCareDontLikeEachOtherText
+	cp BREED_LOW
+	jr z, .gotCompatibility
+	ld hl, DayCareGetAlongText
+	cp BREED_MEDIUM
+	jr z, .gotCompatibility
+	ld hl, DayCareGetAlongVeryWellText
+.gotCompatibility
+	call PrintText
 	ld hl, DayCareWhichBackText
 	call PrintText
 	call DayCareChooseMon
@@ -55,6 +90,13 @@ DayCareMText1:
 	pop af
 	ld hl, DayCareAllRightThenText
 	jp c, .done
+	ld a, [wcf91]
+	cp EGG
+	ld hl, DayCareCantTakeEggText
+	jp z, .done
+	callab PartyHasOtherBattler
+	ld hl, DayCareLastMonText
+	jp nc, .done
 ;joenote - HM moves are not needed to travel between the daycare and the Cerulean Pokemon Center,
 ;			so disallowing HM moves does nothing to prevent a softlock here.
 ;			This can be commented out safely.
@@ -448,6 +490,48 @@ DaycareMoveLearning:
 	
 DayCareIntroText:
 	TX_FAR _DayCareIntroText
+	db "@"
+
+DayCareEggText:
+	TX_FAR _DayCareEggText
+	db "@"
+
+DayCareReceivedEggText:
+	TX_FAR _DayCareReceivedEggText
+	TX_SFX_ITEM_1
+	TX_FAR _DayCareTakeCareOfEggText
+	db "@"
+
+DayCareNoRoomForEggText:
+	TX_FAR _DayCareNoRoomForEggText
+	db "@"
+
+DayCareKeepEggText:
+	TX_FAR _DayCareKeepEggText
+	db "@"
+
+DayCareGetAlongVeryWellText:
+	TX_FAR _DayCareGetAlongVeryWellText
+	db "@"
+
+DayCareGetAlongText:
+	TX_FAR _DayCareGetAlongText
+	db "@"
+
+DayCareDontLikeEachOtherText:
+	TX_FAR _DayCareDontLikeEachOtherText
+	db "@"
+
+DayCarePlayWithOthersText:
+	TX_FAR _DayCarePlayWithOthersText
+	db "@"
+
+DayCareCantTakeEggText:
+	TX_FAR _DayCareCantTakeEggText
+	db "@"
+
+DayCareLastMonText:
+	TX_FAR _DayCareLastMonText
 	db "@"
 
 DayCareRaiseAnotherText:

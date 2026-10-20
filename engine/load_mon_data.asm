@@ -25,8 +25,11 @@ LoadMonData_:
 
 .GetMonHeader
 	ld a, [wcf91]
+	cp EGG
+	jr z, .gotHeader ; after the data, from its real species
 	ld [wd0b5], a ; input for GetMonHeader
 	call GetMonHeader
+.gotHeader
 
 	ld hl, wPartyMons
 	ld bc, wPartyMon2 - wPartyMon1
@@ -56,6 +59,14 @@ LoadMonData_:
 	;jp CopyData
 ;joenote - allow active battle pokemon's realtime stats to be used in place of its unmodified stats
 	call CopyData
+
+	ld a, [wcf91]
+	cp EGG
+	jr nz, .notEgg
+	ld a, [wLoadedMonSpecies] ; an egg's header is its real species'
+	ld [wd0b5], a
+	call GetMonHeader
+.notEgg
 
 	ld a, [wMonDataLocation]
 	and $7f

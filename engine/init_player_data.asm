@@ -49,6 +49,11 @@ InitPlayerData2:
 	ld hl, wNumBagItems
 	call InitializeEmptyList
 
+	xor a
+	ld [wDayCareInUse], a
+	ld [wDayCareEggReady], a
+	ld [wEggStepCounter], a
+
 
 	ld hl, wNumBoxItems
 	call InitializeEmptyList

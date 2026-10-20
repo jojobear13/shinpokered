@@ -102,6 +102,18 @@ StartMenu_Pokemon:
 	call GoBackToPartyMenu
 	jp .checkIfPokemonChosen
 .choseMoves
+	ld a, [wWhichPokemon]
+	ld c, a
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl]
+	cp EGG
+	jr nz, .notEgg
+	ld a, SFX_DENIED ; an egg can't learn moves yet
+	call PlaySound
+	jp StartMenu_Pokemon
+.notEgg
 	callab MovesScreen
 	call ReloadMapData
 	jp StartMenu_Pokemon

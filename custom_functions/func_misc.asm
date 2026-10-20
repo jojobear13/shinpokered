@@ -165,7 +165,7 @@ Mon1BCDScore:
 	cp 1
 	jr nz, .default
 	;calculate a = $FF - the species' catch rate (the struct byte is the held item)
-	ld a, [wPartySpecies]
+	ld a, [wPartyMon1Species] ; (an egg's real species)
 	ld [wd0b5], a
 	call GetMonHeader
 	ld a, [wMonHCatchRate]

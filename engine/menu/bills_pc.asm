@@ -278,9 +278,18 @@ BillsPCDeposit:
 	jp c, BillsPCMenu
 	call DisplayDepositWithdrawMenu
 	jp nc, BillsPCMenu
+	callab PartyHasOtherBattler ; not the last that can battle (eggs can't)
+	jr c, .canDeposit
+	ld hl, CantDepositLastMonText
+	call PrintText
+	jp BillsPCMenu
+.canDeposit
 	ld a, [wcf91]
+	cp EGG
+	jr z, .noCry
 	call GetCryData
 	call PlaySoundWaitForCurrent
+.noCry
 	ld a, PARTY_TO_BOX
 	ld [wMoveMonType], a
 	call MoveMon
@@ -340,8 +349,11 @@ BillsPCWithdraw:
 	call GetPartyMonName
 	call CloseBox
 	ld a, [wcf91]
+	cp EGG
+	jr z, .noCry
 	call GetCryData
 	call PlaySoundWaitForCurrent
+.noCry
 	xor a ; BOX_TO_PARTY
 	ld [wMoveMonType], a
 	call MoveMon

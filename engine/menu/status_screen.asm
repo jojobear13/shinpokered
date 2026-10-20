@@ -77,6 +77,11 @@ DrawHP_:
 ; Predef 0x37
 StatusScreen:
 	call LoadMonData
+	ld a, [wcf91]
+	cp EGG
+	jr nz, .notEgg
+	jpab EggStatusScreen ; its summary instead (StatusScreen2 shows nothing)
+.notEgg
 	ld a, [wMonDataLocation]
 	cp BOX_DATA
 	jr c, .DontRecalculate
@@ -428,6 +433,9 @@ StatsText:
 	next "SPCL.DEF@"
 
 StatusScreen2:
+	ld a, [wcf91]
+	cp EGG
+	ret z
 	ld a, [hTilesetType]
 	push af
 	xor a

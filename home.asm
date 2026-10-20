@@ -349,7 +349,9 @@ LoadFrontSpriteByMonIndex::
 
 
 PlayCry::
-; Play monster a's cry.
+; Play monster a's cry (an egg has none).
+	cp EGG
+	ret z
 	call GetCryData
 	call PlaySound
 	jp WaitForSoundToFinish
@@ -460,6 +462,26 @@ HandlePartyMenuInput::
 	ld a, [wMenuItemToSwap]
 	and a
 	jp nz, .swappingPokemon
+	bit 1, b
+	jr nz, .notItemOnEgg
+	ld a, [wPartyMenuTypeOrMessageID]
+	cp USE_ITEM_PARTY_MENU
+	jr z, .usingItem
+	cp EVO_STONE_PARTY_MENU
+	jr nz, .notItemOnEgg
+.usingItem
+	ld a, [wCurrentMenuItem]
+	ld c, a
+	ld b, 0
+	ld hl, wPartySpecies
+	add hl, bc
+	ld a, [hl]
+	cp EGG
+	jr nz, .notItemOnEgg
+	ld a, SFX_DENIED ; no item works on an egg
+	call PlaySound
+	jp HandlePartyMenuInput
+.notItemOnEgg
 	pop af
 	ld [hTilesetType], a
 	bit 1, b
@@ -492,12 +514,12 @@ HandlePartyMenuInput::
 	ld [wMenuItemToSwap], a
 	ld [wPartyMenuTypeOrMessageID], a
 	call RedrawPartyMenu
-	jr HandlePartyMenuInput
+	jp HandlePartyMenuInput
 .handleSwap
 	ld a, [wCurrentMenuItem]
 	ld [wWhichPokemon], a
 	callba SwitchPartyMon
-	jr HandlePartyMenuInput
+	jp HandlePartyMenuInput
 
 DrawPartyMenu::
 	ld hl, DrawPartyMenu_
@@ -1161,6 +1183,8 @@ DisplayTextID::
 	jp z, DisplayPlayerBlackedOutText
 	cp TEXT_REPEL_WORE_OFF
 	jp z, DisplayRepelWoreOffText
+	cp TEXT_EGG_HATCHING
+	jp z, DisplayEggHatchingText
 	
 	;joenote - close if $FF is the textID or sprite index
 	cp $FF
@@ -1391,6 +1415,10 @@ DisplayPlayerBlackedOutText::
 PlayerBlackedOutText::
 	TX_FAR _PlayerBlackedOutText
 	db "@"
+
+DisplayEggHatchingText::
+	callba HatchEggs
+	jp CloseTextDisplay
 
 DisplayRepelWoreOffText::
 	ld hl, RepelWoreOffText
@@ -2044,11 +2072,15 @@ GetMonName::
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
 	ld a, [wd11e]
+	ld hl, EggMonName
+	cp EGG
+	jr z, .gotName
 	dec a
 	ld hl, MonsterNames
 	ld c, 10
 	ld b, 0
 	call AddNTimes
+.gotName
 	ld de, wcd6d
 	push de
 	ld bc, 10
