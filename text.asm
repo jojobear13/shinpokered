@@ -2305,8 +2305,10 @@ _HitWithRecoilText::
 	prompt
 
 _ConvertedTypeText::
-	text "Converted type to"
-	line "<TARGET>'s!"
+	text "<USER>'s type"
+	line "became @"
+	TX_RAM wcd6d
+	text "!"
 	prompt
 
 _StatusChangesEliminatedText::

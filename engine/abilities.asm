@@ -156,11 +156,18 @@ PowderBlocked:
 ; and de
 MoveHasFlag:
 	ld a, d
+	and a
+	ret z ; no move: carry clear
+	cp STRUGGLE + 1
+	jr nc, .none ; ($ff: none chosen)
 .gotMove
 	call GetMoveFlags
 	and e
 	ret z ; carry clear
 	scf
+	ret
+.none
+	and a
 	ret
 
 ; hl = the user's move (wPlayerMoveNum or wEnemyMoveNum)

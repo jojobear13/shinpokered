@@ -99,3 +99,59 @@ PrintMonType_StatusScreen:
 	jp PrintType
 	
 INCLUDE "text/type_names.asm"
+
+; Gen 6+ Conversion: the user becomes the type of the move in its first slot,
+; unless it already has that type
+ConversionEffect_:
+	ld hl, wBattleMonMoves
+	ld de, wBattleMonType1
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .gotUser
+	ld hl, wEnemyMonMoves
+	ld de, wEnemyMonType1
+.gotUser
+	ld a, [hl]
+	dec a
+	ld hl, Moves + 3 ; the type field
+	ld bc, MoveEnd - Moves
+	call AddNTimes
+	push de
+	ld de, wd11e
+	ld bc, 1
+	ld a, BANK(Moves)
+	call FarCopyData
+	pop de
+	ld a, [wd11e]
+	ld b, a
+	ld a, [de]
+	cp b
+	jr z, .failed
+	inc de
+	ld a, [de]
+	cp b
+	jr z, .failed
+	ld a, b
+	ld [de], a
+	dec de
+	ld [de], a
+	add a
+	ld hl, TypeNames
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wcd6d
+	ld bc, NAME_LENGTH
+	call CopyData
+	callab PlayCurrentMoveAnimation
+	ld hl, ConvertedTypeText
+	jp PrintText
+.failed
+	jpab PrintButItFailedText_
+
+ConvertedTypeText:
+	TX_FAR _ConvertedTypeText
+	db "@"

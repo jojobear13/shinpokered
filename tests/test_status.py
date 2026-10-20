@@ -222,3 +222,34 @@ class SpeedTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DefrostTest(unittest.TestCase):
+    """A frozen mon using a move that thaws its user (Gen 9's defrost flag:
+    Flame Wheel, Flare Blitz...) thaws without the 20% roll. No Gen 1 move
+    has the flag, so the test gives it to Tackle."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.game = shared_game()
+
+    def test_defrost_move_thaws(self):
+        g = self.game
+        for defrost, thawed, used in ((True, True, 0), (False, False, 1)):
+            with self.subTest(defrost=defrost):
+                g.reset()
+                mx.setup(g, random.Random(4))
+                g.clear_random()
+                g.queue_random(255)
+                tackle = 0x21
+                flags = g.peek((g.bank("MoveFlags"), g.addr("MoveFlags") + tackle - 1))
+                if defrost:
+                    g.patch((g.bank("MoveFlags"), g.addr("MoveFlags") + tackle - 1), flags | 1 << 4)
+                for i in (1, 2, 3):
+                    g.poke(f"wPlayerBattleStatus{i}", 0)
+                    g.poke(f"wEnemyBattleStatus{i}", 0)
+                g.poke("wBattleMonStatus", FRZ)
+                g.poke("wPlayerSelectedMove", tackle)
+                g.poke(H_WHOSETURN, 0)
+                g.call("CheckPlayerStatusConditions", max_frames=5000)
+                self.assertEqual((g.peek("wBattleMonStatus") == 0, g.random_used()), (thawed, used))

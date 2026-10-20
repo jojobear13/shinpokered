@@ -1968,6 +1968,8 @@ SwitchEnemyMon:
 	callab EnemyTrapped ; Arena Trap: no switch, so no action
 	ccf
 	ret nc
+; Whirlwind, Roar and Teleport come in here, trapped or not
+WithdrawEnemyMon:
 	callba DoEnemyShinybit ;joenote - reset shiny checker bits
 ; prepare to withdraw the active monster:
 	callab NaturalCureEnemy
@@ -2009,8 +2011,12 @@ SwitchEnemyMon:
 	ld [hl], a
 	
 .skiptransformed
+	ld a, [wForcedSwitchSlot]
+	and a
+	jr nz, .dragged ; the trainer didn't withdraw it
 	ld hl, AIBattleWithdrawText
 	call PrintText
+.dragged
 
 	; This wFirstMonsNotOutYet variable is abused to prevent the player from
 	; switching in a new mon in response to this switch.

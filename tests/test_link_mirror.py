@@ -54,7 +54,11 @@ PAIRS = [
     ("wPlayerReflectTurns", "wEnemyReflectTurns", 1),
     ("wPlayerLightScreenTurns", "wEnemyLightScreenTurns", 1),
     ("wPlayerMistTurns", "wEnemyMistTurns", 1),
-    ("wPartyCount", "wEnemyPartyCount", 1),
+    ("wPartyCount", "wEnemyPartyCount", 1 + 6 + 1),  # and the species, for Roar's switch-ins
+    ("wPartyMonNicks", "wEnemyMonNicks", 11 * 6),
+    ("wForcedSwitchSlot", "wForcedSwitchSlot", 1),
+    ("wPlayerMimicSlot", "wEnemyMimicSlot", 1),
+    ("wPlayerMimicPP", "wEnemyMimicPP", 1),
 ]
 # mirrored, but PP is spent differently by the two sides (the player's when it
 # moves, the enemy's when it's chosen), so it's left out of the comparison

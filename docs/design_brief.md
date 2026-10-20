@@ -1263,7 +1263,7 @@ As in Gen 9 (Showdown's implementation, where Bulbapedia is vague):
 
 ### Part 6: move behaviours
 
-In progress, one commit per group:
+One commit per group:
 
 - **Priority** is Gen 9's brackets, from a table generated from PokeAPI
   (`tools/gen_move_data.py` → `data/move_priorities.asm`): Quick Attack +1,
@@ -1366,8 +1366,30 @@ In progress, one commit per group:
   Substitute thresholds, breaking at 0 and counting its HP, Bide, Rage).
   Writing them found `PowderBlocked` returning carry for every type below
   Grass, and the flag mask lost across `callab`.
-- **Still to do in this part:** Conversion, Whirlwind, Roar and Teleport,
-  and the user thawing with a defrost move.
+- **Conversion** (Gen 6+): the user becomes the type of the move in its
+  first slot ("CLEFAIRY's type became FIRE!"), and fails if it already has
+  that type. It moved to bank 9, by the type names.
+- **Whirlwind and Roar in trainer battles** drag out a random other mon of
+  the target's that can battle (`PickRandomSwitchIn`, rerolling
+  `BattleRandom & 7` until a slot fits, so a link partner's game picks the
+  same one), through trapping, and fail if there's none. The enemy's mon
+  comes in through `EnemySendOut` with `wForcedSwitchSlot` set (no
+  "withdrew" text, no shift prompt); the player's through
+  `SwitchPlayerMon`. The dragged-out side does nothing more that turn.
+- **Teleport in trainer battles** (Gen 8+) switches the user out: the player
+  picks from the party menu (no cancelling), the AI at random. It fails in
+  link battles, where the choice would have to cross the link mid-move.
+- **Wild battles** keep Gen 1's rule for all three (running away or blowing
+  the wild mon away, by a level roll).
+- **Defrost**: a frozen mon using a move with the defrost flag thaws without
+  the 20% roll (no Gen 1 move has it; Flame Wheel and Flare Blitz will).
+- **Verified:** `tests/test_switch_moves.py` (which slots can come in, the
+  random pick's rerolls, Roar on the enemy, Whirlwind on the player, the
+  enemy's Teleport, failing with no other mon, Conversion) and a defrost
+  test in `tests/test_status.py` (Tackle given the flag). The link mirror
+  test now mirrors the party species, nicknames, Mimic slots and the forced
+  switch slot, and caught the enemy's move number surviving a dragged-out
+  switch (the player's is cleared by `SendOutMon`; now both are).
 
 ## Bugs found by the refactor
 

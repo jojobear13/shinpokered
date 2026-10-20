@@ -1644,6 +1644,15 @@ EnemySendOutFirstMon:
 	call SlideTrainerPicOffScreen
 	call PrintEmptyString
 	call SaveScreenTilesToBuffer1
+	ld a, [wForcedSwitchSlot] ; dragged out by Whirlwind or Roar, or Teleport
+	and a
+	jr z, .notForced
+	dec a
+	ld [wWhichPokemon], a
+	xor a
+	ld [wForcedSwitchSlot], a
+	jr .next3
+.notForced
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jr nz, .next
@@ -3962,10 +3971,20 @@ CheckStatusConditions:
 .checkIfFrozen
 	bit FRZ, [hl] ; frozen?
 	jr z, .checkIfTrapped
-; Gen 9: a 20% chance to thaw out, and move
+; Gen 9: a move that thaws its user (Flame Wheel...) does
+	push hl
+	ld hl, StatusCheckSelectedMove
+	call GetSideAddr
+	ld d, [hl]
+	ld e, 1 << MOVE_DEFROST_F
+	callab MoveHasFlag
+	pop hl
+	jr c, .thaw
+; else a 20% chance to thaw out, and move
 	call BattleRandom
 	cp 51
 	jr nc, .stillFrozen
+.thaw
 	res FRZ, [hl]
 	ld hl, ThawedOutText
 	call PrintText
@@ -7664,13 +7683,14 @@ ThrashPetalDanceEffect:
 	add ANIM_B0
 	jp PlayBattleAnimation2
 
+; in wild battles (in trainer battles, SwitchMonsEffect)
 SwitchAndTeleportEffect:
+	ld a, [wIsInBattle]
+	dec a
+	jp nz, SwitchMonsEffect
 	ld a, [H_WHOSETURN]
 	and a
 	jr nz, .handleEnemy
-	ld a, [wIsInBattle]
-	dec a
-	jr nz, .notWildBattle1
 	ld a, [wCurEnemyLVL]
 	ld b, a
 	ld a, [wBattleMonLevel]
@@ -7701,18 +7721,7 @@ SwitchAndTeleportEffect:
 	ld [wEscapedFromBattle], a
 	ld a, [wPlayerMoveNum]
 	jr .playAnimAndPrintText
-.notWildBattle1
-	ld c, 50
-	call DelayFrames
-	ld hl, IsUnaffectedText
-	ld a, [wPlayerMoveNum]
-	cp TELEPORT
-	jp nz, PrintText
-	jp PrintButItFailedText_
 .handleEnemy
-	ld a, [wIsInBattle]
-	dec a
-	jr nz, .notWildBattle2
 	ld a, [wBattleMonLevel]
 	ld b, a
 	ld a, [wCurEnemyLVL]
@@ -7743,14 +7752,6 @@ SwitchAndTeleportEffect:
 	ld [wEscapedFromBattle], a
 	ld a, [wEnemyMoveNum]
 	jr .playAnimAndPrintText
-.notWildBattle2
-	ld c, 50
-	call DelayFrames
-	ld hl, IsUnaffectedText
-	ld a, [wEnemyMoveNum]
-	cp TELEPORT
-	jp nz, PrintText
-	jp ConditionalPrintButItFailed
 .playAnimAndPrintText
 	push af
 	call PlayBattleAnimation
@@ -7778,6 +7779,146 @@ RanAwayScaredText:
 WasBlownAwayText:
 	TX_FAR _WasBlownAwayText
 	db "@"
+
+; Gen 9 in trainer battles: Whirlwind and Roar drag out a random other mon of
+; the target's (through trapping); Teleport switches the user out, the player
+; choosing (not over a link) and the AI at random. Fails without a mon that
+; could come in
+SwitchMonsEffect:
+	ld a, [H_WHOSETURN]
+	and a
+	ld a, [wPlayerMoveNum]
+	jr z, .gotMove
+	ld a, [wEnemyMoveNum]
+.gotMove
+	lb de, 0, 1 ; d: the player chooses, e: the target's side switches
+	cp TELEPORT
+	jr nz, .gotSwitcher
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jp z, PrintButItFailedText_
+	dec e ; the user's side
+	inc d
+.gotSwitcher
+	ld a, [H_WHOSETURN]
+	xor e
+	ld e, a ; 0: the player's mon switches, 1: the enemy's
+	call HasSwitchIn
+	jp z, PrintButItFailedText_
+	ld a, [H_WHOSETURN]
+	push af
+	ld a, e
+	and a
+	jr nz, .enemy
+	dec d
+	jr nz, .random
+	call ChooseTeleportSwitch
+	jr .player
+.random
+	call PickRandomSwitchIn
+.player
+	call ReadPlayerMonCurHPAndStatus
+	call SwitchPlayerMon
+	ld a, $ff ; nothing more this turn
+	ld [wPlayerSelectedMove], a
+	jr .done
+.enemy
+	call PickRandomSwitchIn
+	ld a, [wWhichPokemon]
+	inc a
+	ld [wForcedSwitchSlot], a
+	callab WithdrawEnemyMon
+	xor a ; as SendOutMon does for the player's (and a link partner's game does)
+	ld [wEnemyMoveNum], a
+	ld [wEnemyMoveListIndex], a
+	dec a
+	ld [wEnemySelectedMove], a
+.done
+	pop af
+	ld [H_WHOSETURN], a
+	ret
+
+; e = 0 for the player's party or 1 for the enemy's, b = a slot -> nz if a mon
+; there could come in: in the party, not out already, not fainted
+SlotCanSwitchIn:
+	ld a, e
+	and a
+	ld hl, wPartyCount
+	ld a, [wPlayerMonNumber]
+	jr z, .gotSide
+	ld hl, wEnemyPartyCount
+	ld a, [wEnemyMonPartyPos]
+.gotSide
+	cp b
+	jr z, .no ; already out
+	ld a, b
+	cp [hl]
+	jr nc, .no ; not in the party
+	ld a, e
+	and a
+	ld hl, wPartyMon1HP
+	jr z, .gotMons
+	ld hl, wEnemyMon1HP
+.gotMons
+	ASSERT wEnemyMon2 - wEnemyMon1 == wPartyMon2 - wPartyMon1
+	push bc
+	ld a, b
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	pop bc
+	ld a, [hli]
+	or [hl]
+	ret ; nz if it has HP
+.no
+	xor a
+	ret
+
+; e = side -> nz if it has a mon that could come in
+HasSwitchIn:
+	ld b, PARTY_LENGTH - 1
+.loop
+	call SlotCanSwitchIn
+	ret nz
+	dec b
+	bit 7, b
+	jr z, .loop
+	xor a
+	ret
+
+; e = side (with a mon that could come in) -> wWhichPokemon = one at random
+PickRandomSwitchIn:
+	call BattleRandom
+	and 7
+	ld b, a
+	call SlotCanSwitchIn
+	jr z, PickRandomSwitchIn
+	ld a, b
+	ld [wWhichPokemon], a
+	ret
+
+; the player picks the mon Teleport switches in (no cancelling)
+ChooseTeleportSwitch:
+	call SaveScreenTilesToBuffer1
+	ld a, BATTLE_PARTY_MENU
+	ld [wPartyMenuTypeOrMessageID], a
+	call DisplayPartyMenu
+.check
+	jr nc, .chosen
+.back
+	call GoBackToPartyMenu
+	jr .check
+.chosen
+	ld e, 0
+	ld a, [wWhichPokemon]
+	ld b, a
+	call SlotCanSwitchIn
+	jr z, .back
+	call GBPalWhiteOut
+	call ClearSprites
+	call LoadHudTilePatterns
+	call LoadScreenTilesFromBuffer1
+	call RunDefaultPaletteCommand
+	jp GBPalNormal
 
 TwoToFiveAttacksEffect:
 	ld hl, wPlayerBattleStatus1

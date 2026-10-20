@@ -3610,6 +3610,8 @@ wPlayerMimicPP:: ; Mimic's own PP, for the party mon
 	ds 1
 wEnemyMimicPP::
 	ds 1
+wForcedSwitchSlot:: ; the slot (1-4) the enemy's Roar-dragged mon comes from, 0 for the AI's pick
+	ds 1
 wSideConditionsEnd::
 
 ; free up to the stack at $df00
