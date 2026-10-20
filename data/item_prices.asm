@@ -150,3 +150,4 @@ ItemPrices:;joenote - added prices for amber/fossils/moon stone/pp_up/exp all/ma
 	money 3000  ; METAL_COAT
 	money 3000  ; BLACKGLASSES
 	money 3000  ; FAIRYFEATHER
+	money 0     ; DEXREPEL

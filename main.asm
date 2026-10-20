@@ -1949,6 +1949,9 @@ INCLUDE "data/base_exp.asm"
 SECTION "Options Menu", ROMX
 INCLUDE "engine/menu/options.asm"
 
+SECTION "Held Item Use", ROMX
+INCLUDE "engine/items/held_item_use.asm"
+
 SECTION "Type Chart", ROMX
 INCLUDE "engine/battle/type_chart.asm"
 

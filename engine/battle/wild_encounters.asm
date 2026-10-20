@@ -104,14 +104,9 @@ TryDoWildEncounter:
 ;joenote - generate a random wild pokemon based on a seed value
 	predef ReplaceWildMon
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	ld a, [wRepelRemainingSteps]
-	and a
-	jr z, .willEncounter
-	ld a, [wPartyMon1Level]
-	ld b, a
-	ld a, [wCurEnemyLVL]
-	cp b
-;	jr c, .CantEncounter2 ; repel prevents encounters if the leading party mon's level is higher than the wild mon
+; a REPEL keeps away mons lower level than the first party mon, and the
+; DEXREPEL mons already caught (engine/items/held_item_use.asm)
+	callab WildRepelCheck
 	jr c, .shinycheck_repel
 	jr .willEncounter
 .lastRepelStep

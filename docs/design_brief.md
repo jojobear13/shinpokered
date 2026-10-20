@@ -1853,3 +1853,20 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
     side, status and fixed-damage moves don't count, each matchup's own
     bit, and the marks with OFF, ON and LEARNED. `test_move_menu_marks.py`
     runs with ON.
+- **DEXREPEL** (key item `$97`, after the held items): a new PROF.OAK's
+  aide upstairs in the Route 12 gate (with the TM39 girl; the binoculars
+  are now text 3 and 4) gives it for 80 kinds caught, through the same
+  `OaksAideScript` as the other aides (`EVENT_GOT_DEXREPEL`, $8CE). Used
+  from the bag it turns on or off (`EVENT_DEXREPEL_ON`, $8CD; "not the
+  time" in battle). On, a wild mon whose species is owned doesn't appear.
+  - `TryDoWildEncounter` asks the far routine `WildRepelCheck`, which also
+    does the REPEL's level check that used to be inline (bank 4 had 6 free
+    bytes). As with the REPEL, a shiny still gets through, and fishing and
+    fixed encounters are unaffected.
+  - Using a held item from the bag, and TAKE, moved out of the full bank 3
+    to `engine/items/held_item_use.asm`; `UseItem_` still sends every item
+    from `FIRST_HELD_ITEM` up there, and the DEXREPEL is caught first.
+  - `tests/test_dexrepel.py`: owned species kept away only while on, the
+    REPEL still works, using it toggles (not in battle), and it's a key item
+    in the key pocket.
+

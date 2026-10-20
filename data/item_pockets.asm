@@ -152,8 +152,9 @@ ItemPockets:
 	db POCKET_ITEMS    ; METAL_COAT
 	db POCKET_ITEMS    ; BLACKGLASSES
 	db POCKET_ITEMS    ; FAIRYFEATHER
+	db POCKET_KEY      ; DEXREPEL
 ItemPocketsEnd:
-	ASSERT ItemPocketsEnd - ItemPockets == FAIRYFEATHER
+	ASSERT ItemPocketsEnd - ItemPockets == DEXREPEL
 
 ; the bag's order: the pockets in order, each item in its place
 ItemSortList::
@@ -290,4 +291,5 @@ ItemSortList::
 	db BIKE_VOUCHER
 	db OAKS_PARCEL
 	db POKEDEX
+	db DEXREPEL
 	db $FF ; end

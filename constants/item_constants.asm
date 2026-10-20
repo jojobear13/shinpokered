@@ -157,6 +157,7 @@ FIRST_HELD_ITEM EQU const_value
 	const METAL_COAT    ; $94 the new types' boosting items
 	const BLACKGLASSES  ; $95
 	const FAIRYFEATHER  ; $96
+	const DEXREPEL      ; $97 a key item: keeps away wild mons already caught
 NUM_ITEMS_AND_FLOORS EQU const_value - 1
 
 const_value = $C4

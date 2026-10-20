@@ -30,7 +30,7 @@ def _items():
 
 
 ITEMS = _items()
-HELD = [name for name, value in sorted(ITEMS.items(), key=lambda kv: kv[1]) if ITEMS["BLACK_BELT"] <= value < 0xC4]
+HELD = [name for name, value in sorted(ITEMS.items(), key=lambda kv: kv[1]) if ITEMS["BLACK_BELT"] <= value <= ITEMS["FAIRYFEATHER"]]
 TAKE_ITEM_MENU_ENTRY = 10
 
 
@@ -75,7 +75,7 @@ class ItemDataTest(unittest.TestCase):
     def test_names(self):
         g = self.game
         names = item_names()
-        names = names[names.index("ZINC") + 1:]  # the held items' names follow Zinc's
+        names = names[names.index("ZINC") + 1:names.index("FAIRYFEATHER") + 1]  # the held items' names follow Zinc's
         self.assertEqual(len(names), len(HELD))
         for item, name in zip(HELD, names):
             with self.subTest(item=item):

@@ -151,3 +151,4 @@ ItemNames:
 	db "METAL COAT@"
 	db "BLACKGLASSES@"
 	db "FAIRYFEATHER@"
+	db "DEXREPEL@"
