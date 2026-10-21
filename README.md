@@ -161,16 +161,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Enemy multi-hit moves used the player's level after the first hit.
 - Enemy fully paralyzed or self-hit mid-Fly/Dig stayed invulnerable.
 - Accuracy/evasion stage changes re-applied every badge boost to the player's stats.
-- Confused self-hit could use special stats after a special move (fork's own bug).
-- Gift and starter Pokémon started 1-2 HP short.
 - Transform desynced link battles (only the player's move index was reset).
-- Substitute HP check only read the low byte (256 HP left failed).
-- Party icons not reloaded after swapping mons; overworld sprites drawn over the hatch scene.
-- Level-up text for a mon that didn't take part used another mon's name or a move's name.
-- Catching with EXP on catch: the ball wasn't used up, and the thrown ball was drawn over the level-up boxes.
-- After using an item from the party menu (an evolution stone, or one with no effect), the bag stayed white until the next button press.
-- Shin's Pikachu/Dragonite move secret marked the mon with catch rate 168, now its held item byte; it is an event flag now.
-- Status screen EVs (SELECT) were shifted two columns left, so the nature marks covered their middle digit.
 
 #### Removed from Shin
 - NPC and object rule toggles (rules are now options); Oak's Lab NPCs and Viridian house restored.

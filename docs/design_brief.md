@@ -1899,6 +1899,8 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - **README**: rewritten as a compact list of every change (this fork's, then
   Shin's, with what this fork replaced), credits and screenshots
   (`screenshots/fork/`); Shin's README is kept as `docs/shin_readme.md`.
+  Its bug-fix list names only bugs from vanilla or Shin; bugs this fork
+  introduced and then fixed are recorded here, not there.
 - **Fixes and options (after the README)**:
   - Level-up text: a mon that didn't take part never printed "gained", so
     "grew to level" used whatever name `wcd6d` held (another mon's, or a
