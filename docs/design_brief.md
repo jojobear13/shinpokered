@@ -1942,4 +1942,11 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   were critical about 1 time in 22, near Gen 9's 1 in 24.
   `tests/test_multi_hit_crits.py` keeps it so (a hook on
   `PrintCriticalOHKOText` records each hit's flag and damage).
+- **HP PERCENT animates**: as the enemy's bar moves, each HP step
+  (`UpdateHPBar_PrintHPNumber`, which prints no number for the enemy) far
+  calls `AnimateEnemyHPPercent`, which works out the percentage of the HP
+  the bar shows (`wHPBarOldHP` of `wHPBarMaxHP`) and redraws the two tiles
+  when it changes (`wHPPercentShown`). `UpdateHPBar_AnimateHPBar` puts the
+  tiles back after each `DrawHPBar`, which used to draw "HP:" over them for
+  the length of the animation. `HP_PERCENT_TILE` moved to the constants.
 

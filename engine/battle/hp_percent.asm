@@ -2,9 +2,7 @@
 ; as on Showdown (the number alone), in place of the "HP:" label. It is drawn in a small
 ; 3x5 font into two tiles ($D0 and $D1, blank in the English font: kana
 ; slots) that take the place of the label's two tiles; the second keeps the
-; bar's left end.
-
-HP_PERCENT_TILE EQU $D0
+; bar's left end. While the bar animates, the number counts along with it.
 
 ; after DrawEnemyHUDAndHPBar draws the bar at (2, 2)
 DrawEnemyHPPercent:
@@ -13,6 +11,7 @@ DrawEnemyHPPercent:
 	ret z
 	push de ; the bar's pixels, for its color
 	call EnemyHPPercent
+	ld [wHPPercentShown], a
 	call DrawHPPercentTiles
 	coord hl, 2, 2
 	ld a, HP_PERCENT_TILE
@@ -22,6 +21,28 @@ DrawEnemyHPPercent:
 	pop de
 	ret
 
+; as the enemy's HP bar animates (UpdateHPBar_PrintHPNumber, each HP point):
+; the number follows the HP the bar shows (wHPBarOldHP of wHPBarMaxHP, both
+; little-endian), redrawn whenever it changes
+AnimateEnemyHPPercent:
+	ld a, [wDisplayOptions]
+	bit BIT_HP_PERCENT, a
+	ret z
+	ld hl, wHPBarOldHP
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	ld hl, wHPBarMaxHP
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call HPPercent
+	ld hl, wHPPercentShown
+	cp [hl]
+	ret z
+	ld [hl], a
+	jp DrawHPPercentTiles
+
 ; a = the enemy's HP as a percentage of its max HP: rounded down, but at least
 ; 1 while it has any
 EnemyHPPercent:
@@ -29,12 +50,16 @@ EnemyHPPercent:
 	ld a, [hli]
 	ld b, a
 	ld c, [hl]
-	or c
-	ret z
 	ld hl, wEnemyMonMaxHP
 	ld a, [hli]
 	ld d, a
 	ld e, [hl]
+	; fall through
+; a = HP bc as a percentage of max HP de
+HPPercent:
+	ld a, b
+	or c
+	ret z
 .scale ; max HP to one byte for Divide, HP alike
 	ld a, d
 	and a

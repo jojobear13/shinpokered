@@ -114,7 +114,7 @@ Every option starts as the original game played; everything extra is off by defa
 - OPTION screen: five pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS) with two-line explanations.
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
-- HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:".
+- HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:"; it counts up or down with the bar.
 - CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
 - EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR, SAFARI EVENT, PC IN MENU.
