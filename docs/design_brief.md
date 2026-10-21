@@ -2019,3 +2019,15 @@ and the playtest) is in `docs/verification_plan.md`, with its status table.
   (bank 4 has no room for the bag to do it). Test:
   `test_held_items.test_give_puts_the_field_back`; TAKE from the party menu
   was checked in the emulator and was fine.
+
+- **Phase 3 fixes** (soak tests, `docs/verification_plan.md`):
+  - X Accuracy and one-hit KO moves (Shin's bug): `OneHitKOEffect_` lets
+    an X Accuracy user hit though slower, but the player's turn jumped past
+    that check. The same mon's move then went two ways on the two games of
+    a link battle, one drawing a random number the other didn't, and every
+    turn after differed. Both sides now check. Test:
+    `test_move_effects.OneHitKOTest`.
+  - Mystery Berry in link battles: each game spends only its own player's
+    PP, so the other never saw the move run out and kept the berry. The
+    berry is off in link battles. Test:
+    `test_held_item_battle.test_mystery_berry_not_in_link_battles`.

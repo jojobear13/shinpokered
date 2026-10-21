@@ -12,7 +12,7 @@ OneHitKOEffect_:
 	ld bc, wPlayerBattleStatus2
 	ld a, [H_WHOSETURN]
 	and a
-	jr z, .compareSpeed
+	jr z, .ohko_xacc ; X Accuracy works for the player's too (it skipped the check)
 	ld hl, wEnemyMonSpeed + 1
 	ld de, wBattleMonSpeed + 1
 	ld bc, wEnemyBattleStatus2

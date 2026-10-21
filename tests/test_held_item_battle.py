@@ -341,6 +341,21 @@ class AfterMoveItemTest(unittest.TestCase):
                 if turn == 0:
                     self.assertEqual(g.peek("wPartyMon1PP", 4), [9, 9, 0xC5, 9])
 
+    def test_mystery_berry_not_in_link_battles(self):
+        # each game spends only its own player's PP, so the other would never
+        # see the move run out: the berry stays out of link battles
+        g = self.game
+        self.setup(0, "NO_ABILITY", "NO_ABILITY")
+        mon = SIDES[0][1]
+        g.poke(mon + "CatchRate", ITEMS["MYSTERYBERRY"])
+        g.poke(mon + "PP", 9, 9, 0xC0, 9)
+        g.poke("wLinkState", 4)  # LINK_STATE_BATTLING
+        g.poke(SIDES[0][0] + "BattleStatus3", 0)
+        self.after()
+        g.poke("wLinkState", 0)
+        self.assertEqual(g.peek(mon + "PP", 4), [9, 9, 0xC0, 9])
+        self.assertEqual(g.peek(mon + "CatchRate"), ITEMS["MYSTERYBERRY"])
+
 
 class BerryTest(unittest.TestCase):
     @classmethod

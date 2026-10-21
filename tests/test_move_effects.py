@@ -108,3 +108,32 @@ class MoveEffectsTest(unittest.TestCase):
                 g.poke("wEnemyMonSpecies", SPECIES[species])
                 g.call("LowKickPower", max_frames=1000)
                 self.assertEqual(g.peek("wDamageScratch"), power)
+
+
+class OneHitKOTest(unittest.TestCase):
+    """A one-hit KO move fails for a slower user, unless it's using X
+    Accuracy: for either side (the player's skipped the X Accuracy check,
+    which also put link battles out of step)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.game = shared_game()
+
+    def ohko(self, turn, x_accuracy):
+        g = self.game
+        g.reset()
+        g.poke(H_WHOSETURN, turn)
+        user, target = ("wBattleMon", "wEnemyMon") if turn == 0 else ("wEnemyMon", "wBattleMon")
+        g.poke16(user + "Speed", 50)
+        g.poke16(target + "Speed", 100)
+        g.poke("wPlayerBattleStatus2", 1 if x_accuracy and turn == 0 else 0)  # USING_X_ACCURACY
+        g.poke("wEnemyBattleStatus2", 1 if x_accuracy and turn == 1 else 0)
+        g.poke("wMoveMissed", 0)
+        g.call("OneHitKOEffect_", max_frames=50)
+        return not g.peek("wMoveMissed")
+
+    def test_x_accuracy_lets_a_slower_user_hit(self):
+        for turn in (0, 1):
+            with self.subTest(turn=turn):
+                self.assertFalse(self.ohko(turn, False))
+                self.assertTrue(self.ohko(turn, True))

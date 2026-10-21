@@ -28,7 +28,9 @@ def _consts(filename):
 
 
 ALL_SPECIES = _consts("pokemon_constants.asm")
-SPECIES = {k: v for k, v in ALL_SPECIES.items() if not k.startswith("MISSINGNO")}
+# the real species: not MISSINGNO, nor the pictures-only FOSSIL_* and MON_GHOST
+SPECIES = {k: v for k, v in ALL_SPECIES.items()
+           if not k.startswith(("MISSINGNO", "FOSSIL_")) and k != "MON_GHOST"}
 MOVES = _consts("move_constants.asm")
 NUM_ATTACKS = MOVES["STRUGGLE"]
 

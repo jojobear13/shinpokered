@@ -533,8 +533,13 @@ KingsRock:
 	ret z
 	jp StenchFlinch
 
-; MysteryBerry: a move left with no PP gets 5 back
+; MysteryBerry: a move left with no PP gets 5 back. Not in a link battle:
+; there each game spends only its own player's PP, so the other game would
+; never see the move run out, and the two would disagree on the berry
 MysteryBerry:
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	ret z
 	call UserItem
 	cp MYSTERYBERRY
 	ret nz
