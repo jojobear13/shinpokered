@@ -51,12 +51,19 @@ class Regions:
         # locations and events: the regions they're reached from
         self.locs = S.locations(g)
         for l in self.locs:
-            l['regions'] = sorted({comp[n] for n in S.near(l['map'], l['square']) if n in comp})
-        self.events = {a: sorted({comp[n] for n in S.near(*sq) if n in comp})
-                       for a, sq in S.event_squares(g).items()}
+            l['regions'] = self.facing(l['map'], l['square'])
+        self.events = {a: self.facing(*sq) for a, sq in S.event_squares(g).items()}
         self.start = comp[(g.rom.map_ids[L.START[0]], L.START[1])]
         lobby = g.rom.map_ids[L.GOAL[0]]
         self.goal = sorted({c for (mid, p), c in comp.items() if mid == lobby})
+
+    def facing(self, mid, sq):
+        """Regions of the squares a person or item at sq is reached from."""
+        grid = self.g.w.grids[mid]
+        regs = {self.comp[(mid, q)] for q in grid.facing_from(sq)}
+        if not regs:    # a square one stands on (an event's spot)
+            regs = {self.comp[(mid, sq)]}
+        return sorted(regs)
 
     def sweep(self, pairing, placement, start_have=()):
         """pairing: entrance -> entrance for the shuffled ones.
@@ -345,11 +352,10 @@ def softlocks(C, pairing, placement):
         bad = seen - back
         # only the bad regions that reach no other bad region outside their
         # own component need checking: every bad region drains into one
-        for v in sinks(adj, bad, have):
+        for v in sinks(adj, bad, have, radj):
             h2, s2 = sweep_from(C, adj, v, have, taken, placement)
             if not C.beaten(h2, s2):
                 out.append((rnd, v))
-        SINKS.append(len(sinks(adj, bad, have)))
         new = {a for a, regs in C.events.items() if a not in have and any(r in seen for r in regs)}
         for l in C.locs:
             if l['key'] not in taken and set(l['req']) <= have and any(r in seen for r in l['nodes']):
@@ -363,29 +369,28 @@ def softlocks(C, pairing, placement):
         rnd += 1
 
 
-SINKS = []
 
-
-def sinks(adj, bad, have):
-    """One region from each sink component of the bad regions."""
+def sinks(adj, bad, have, radj=None):
+    """One region from each sink component of the bad regions: v is in one
+    when everything it reaches (within bad) reaches it back. Each test also
+    settles v's whole component."""
+    if radj is None:
+        radj = defaultdict(list)
+        for a, lst in adj.items():
+            for b, r in lst:
+                radj[b].append((a, r))
     out = []
     done = set()
     for v in sorted(bad):
         if v in done:
             continue
-        # forward closure within bad
-        clo = {v}
-        st = [v]
-        while st:
-            x = st.pop()
-            for u, r in adj[x]:
-                if u in bad and u not in clo and r <= have:
-                    clo.add(u)
-                    st.append(u)
-        # v is in a sink component iff everything it reaches reaches back to v
-        if all(v in reach_within(adj, u, bad, have) for u in clo):
+        fwd = reach_within(adj, v, bad, have)
+        back = reach_within(radj, v, bad, have)
+        if fwd <= back:
             out.append(v)
-            done |= clo
+            done |= fwd
+        else:
+            done |= fwd & back
     return out
 
 

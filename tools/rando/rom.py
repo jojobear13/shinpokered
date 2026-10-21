@@ -42,7 +42,9 @@ class Rom:
             self.map_names[int(m.group(4), 16)] = m.group(1)
         self.map_ids = {v: k for k, v in self.map_names.items()}
         self.items = consts('constants/item_constants.asm')
-        self.item_names = {v: k for k, v in self.items.items()}
+        self.item_names = {}
+        for k, v in self.items.items():          # the first name wins (pockets reuse 0-6)
+            self.item_names.setdefault(v, k)
         self.sprites = consts('constants/sprite_constants.asm')
         self.sprite_names = {v: k for k, v in self.sprites.items()}
 
@@ -63,13 +65,14 @@ class Rom:
         gbank = self.b(bank, a)
         blocks, gfx, coll = self.w(bank, a + 1), self.w(bank, a + 3), self.w(bank, a + 5)
         grass = self.b(bank, a + 10)
+        counters = {c for c in self.b(bank, a + 7, 3) if c != 0xFF}
         passable = set()
         cbank = self.at('Underground_Coll')[0]  # all collision lists share a bank
         i = coll
         while self.b(cbank, i) != 0xFF:
             passable.add(self.b(cbank, i))
             i += 1
-        return dict(bank=gbank, blocks=blocks, passable=passable, grass=grass)
+        return dict(bank=gbank, blocks=blocks, passable=passable, grass=grass, counters=counters)
 
     def blockset(self, ts, nblocks=256):
         return [list(self.b(ts['bank'], ts['blocks'] + k * 16, 16)) for k in range(nblocks)
@@ -121,7 +124,7 @@ class Rom:
                 o += 1
             sprites.append(s)
         return dict(id=mid, name=self.map_names.get(mid, '?%02X' % mid), bank=bank, tileset=tileset,
-                    height=height, width=width, blocks=list(self.b(bank, blocks, height * width)),
+                    height=height, width=width, blocks=[self.b(bank, blocks + i) for i in range(height * width)],
                     connections=conns, warps=warps, signs=signs, sprites=sprites)
 
     def shown(self):

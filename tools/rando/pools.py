@@ -30,4 +30,4 @@ def pools(g):
             II += [e, p]
         else:
             raise ValueError('outside to outside: %s %s' % (na, nb))
-    return O, I, II
+    return sorted(O), sorted(I), sorted(II)

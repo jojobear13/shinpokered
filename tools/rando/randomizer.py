@@ -7,8 +7,9 @@ generator, every list in a fixed order, and the same calls in the same order."""
 import logic as L
 from regions import softlocks
 
-ALL_ATOMS = None
-GROW_BELOW = 6
+# areas as they are before any event: what the door shuffle looks at to
+# tell an entrance that opens more doors from a dead end
+KINDS_HAVE = frozenset(L.derived(set(L.KEY_ITEMS) | {'POKEDEX'}))
 
 
 class Rng:
@@ -52,21 +53,18 @@ class Randomizer:
         self.everything = frozenset(L.derived(everything))
         self.adj_fixed = C.adjacency({})
         self.prog_locs = [l for l in C.locs if l['prog']]
-        self.kinds = self.area_kinds()
         self.leaving = {}
         for e, regs in C.leave.items():
             for r in regs:
                 self.leaving.setdefault(r, []).append(e)
+        self.kinds = self.area_kinds()
 
     # ---- doors
-    def area_kinds(self, have=None):
-        """For each shuffled entrance: the other shuffled entrances arriving
-        through it reaches, with every item and without other shuffled warps."""
+    def area_kinds(self):
+        """For each shuffled entrance: the other shuffled entrances that
+        arriving through it reaches (with the key items and no events), without
+        the shuffled warps. A fixed table, in the ROM."""
         C = self.C
-        leaving = {}
-        for e, regs in C.leave.items():
-            for r in regs:
-                leaving.setdefault(r, []).append(e)
         out = {}
         for f in C.leave:
             seen = {C.arrive[f]}
@@ -74,10 +72,10 @@ class Randomizer:
             while st:
                 v = st.pop()
                 for u, r in self.adj_fixed[v]:
-                    if u not in seen and r <= (have or self.everything):
+                    if u not in seen and r <= KINDS_HAVE:
                         seen.add(u)
                         st.append(u)
-            out[f] = sorted({x for v in seen for x in leaving.get(v, ()) if x != f})
+            out[f] = sorted({x for v in seen for x in self.leaving.get(v, ()) if x != f})
         return out
 
     def reach_state(self):
@@ -136,12 +134,8 @@ class Randomizer:
         pairing = {}
         st = self.reach_state()
         self.extend(st, pairing, [C.start])
-        kinds_have = None
         while True:
             reach = st['reach']
-            if kinds_have != st['have']:
-                kinds_have = set(st['have'])
-                self.kinds = self.area_kinds(frozenset(kinds_have))
             is_open = {e for e in order if e not in pairing and any(r in reach for r in C.leave[e])}
             unreached = [f for f in order if f not in pairing and f not in is_open
                          and any(p in is_open for p in pool_of[f])]
@@ -201,16 +195,6 @@ class Randomizer:
                 pairing[b] = a
         return pairing
 
-    def grows(self, st, pairing, p, e):
-        """Would arriving through p reach an entrance still to pair (other than p)?"""
-        trial = dict(pairing)
-        trial[e] = p
-        trial[p] = e
-        st2 = dict(reach=set(st['reach']), have=set(st['have']), blocked=list(st['blocked']))
-        self.extend(st2, trial, [self.C.arrive[p]])
-        return any(x not in trial and any(r in st2['reach'] and r not in st['reach'] for r in self.C.leave[x])
-                   for x in self.C.leave)
-
     # ---- items
     def place_items(self, rng, pairing):
         """Assumed fill for the items the logic needs; the other key items
@@ -256,3 +240,52 @@ class Randomizer:
             if self.C.beaten(have, seen) and not softlocks(self.C, pairing, placement):
                 return dict(pairing=pairing, placement=placement, tries=tries)
         return None
+
+
+# ---- marts: each shuffled mart's list is made when it opens, from the
+# world seed and its number (nothing stored)
+STATIC_MARTS = {0, 3, 12, 16}     # Viridian (Oak's Parcel), the bike shop, Shin's special mart, the drinks
+ALWAYS_SOLD = ['POKE_BALL', 'POTION', 'ESCAPE_ROPE']
+
+
+def mart_lists(rom):
+    """The marts' vanilla lists, from the ROM: [[item id, ...], ...]."""
+    bank, a = rom.at('MartInventories')
+    out = []
+    i = 0
+    while True:
+        p = rom.w(bank, a + 2 * i)
+        if not (0x4000 <= p < 0x8000) or i > 40:
+            break
+        n = rom.b(bank, p)
+        lst = [rom.b(bank, p + 1 + k) for k in range(n)]
+        if rom.b(bank, p + 1 + n) != 0xFF:
+            break
+        out.append(lst)
+        i += 1
+    return out
+
+
+def mart_pool(rom, lists):
+    always = [rom.items[x] for x in ALWAYS_SOLD]
+    pool = []
+    for i, lst in enumerate(lists):
+        if i in STATIC_MARTS:
+            continue
+        for it in lst:
+            if it not in pool and it not in always:
+                pool.append(it)
+    return always, pool
+
+
+def mart(rom, lists, world_seed, i):
+    """The list mart i sells in a randomized world."""
+    if i in STATIC_MARTS:
+        return list(lists[i])
+    always, pool = mart_pool(rom, lists)
+    rng = Rng(world_seed ^ (((i + 1) * 0x9E3779B9) & 0xFFFFFFFF))
+    cands = list(pool)
+    out = list(always)
+    for _ in range(len(lists[i]) - len(always)):
+        out.append(cands.pop(rng.rand(len(cands))))
+    return out

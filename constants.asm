@@ -33,3 +33,8 @@ INCLUDE "constants/tilesets.asm"
 INCLUDE "constants/starter_mons.asm"
 INCLUDE "constants/event_constants.asm"
 INCLUDE "constants/text_constants.asm"
+IF DEF(_REDGREENJP)
+INCLUDE "data/rando/jp_consts.asm"
+ELSE
+INCLUDE "data/rando/intl_consts.asm"
+ENDC

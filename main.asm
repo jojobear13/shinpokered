@@ -2043,3 +2043,31 @@ DiplomaPikachuGraphicsEnd:
 ; data/gen2_pics.asm then gives each species' pics a section of its own
 SECTION "Gen 2 Sprites", ROMX
 INCLUDE "engine/gen2_pics.asm"
+
+
+SECTION "Rando Generator", ROMX, BANK[$36]
+INCLUDE "engine/rando/constants.asm"
+DEF RP EQUS "Rando"
+INCLUDE "engine/rando/generator.asm"
+IF DEF(_REDGREENJP)
+INCLUDE "data/rando/jp_gen.asm"
+INCLUDE "data/rando/jp_kinds.asm"
+ELSE
+INCLUDE "data/rando/intl_gen.asm"
+INCLUDE "data/rando/intl_kinds.asm"
+ENDC
+PURGE RP
+
+SECTION "Rando Softlocks", ROMX, BANK[$37]
+DEF RP EQUS "RandoB"
+DEF RANDO_HAS_REV EQU 1
+INCLUDE "engine/rando/core.asm"
+INCLUDE "engine/rando/softlocks.asm"
+IF DEF(_REDGREENJP)
+INCLUDE "data/rando/jp_gen.asm"
+INCLUDE "data/rando/jp_rev.asm"
+ELSE
+INCLUDE "data/rando/intl_gen.asm"
+INCLUDE "data/rando/intl_rev.asm"
+ENDC
+PURGE RP

@@ -22,6 +22,7 @@ class MapGrid:
         ts = rom.tileset(m['tileset'])
         self.tileset = m['tileset']
         self.passable = ts['passable']
+        self.counters = ts['counters']
         bs = rom.blockset(ts)
         W = m['width']
 
@@ -46,6 +47,22 @@ class MapGrid:
             elif s['movement'] == STAY:
                 self.blocked[(s['x'], s['y'])] = None
         self.extra = extra or {}
+
+    def facing_from(self, sq):
+        """Squares one can stand on and face sq from (across a counter too)."""
+        out = []
+        for dx, dy in DIRS.values():
+            q = (sq[0] + dx, sq[1] + dy)
+            if not self.inside(q):
+                continue
+            t = self.tile[q]
+            if t in self.passable or self.is_water(t):
+                out.append(q)
+            elif t in self.counters:
+                q2 = (sq[0] + 2 * dx, sq[1] + 2 * dy)
+                if self.inside(q2) and (self.tile[q2] in self.passable):
+                    out.append(q2)
+        return out
 
     def inside(self, p):
         return 0 <= p[0] < self.w and 0 <= p[1] < self.h
