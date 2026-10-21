@@ -3,11 +3,24 @@
 ; here too.
 
 ; a held item, used from the bag, is given to a party mon; one it was holding
-; goes back in the bag
+; goes back in the bag. The bag calls this as it does any other item, so
+; this puts the field back as the bag's party menu items have it done for
+; them (StartMenu_Item's .useItem_partyMenu): sprites updating again, and
+; the map's sprite tiles over the party menu's icons
 ItemUseHeldItem_:
 	ld a, [wcf91]
 	cp DEXREPEL
 	jp z, ItemUseDexRepel
+	ld a, [wUpdateSpritesEnabled]
+	push af
+	call GiveHeldItem
+	call GBPalWhiteOutWithDelay3
+	call RestoreScreenTilesAndReloadTilePatterns
+	pop af
+	ld [wUpdateSpritesEnabled], a
+	ret
+
+GiveHeldItem:
 	ld a, [wWhichPokemon] ; the item's place in the bag
 	push af
 	ld a, [wcf91]

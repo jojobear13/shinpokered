@@ -162,6 +162,18 @@ class HoldingTest(unittest.TestCase):
         self.assertEqual(g.peek("wPartyMon2CatchRate"), ITEMS["LEFTOVERS"])
         self.assertEqual(self.bag_contents(), {ITEMS["POTION"]: 3})
 
+    def test_give_puts_the_field_back(self):
+        # the party menu stops sprite updates and covers the map's sprite
+        # tiles with icons; giving must turn updates back on (it didn't: the
+        # player vanished and couldn't move after leaving the menu)
+        g = self.game
+        self.party()
+        self.bag(("LEFTOVERS", 1))
+        g.poke("wUpdateSpritesEnabled", 1)
+        self.give(0, 0)
+        self.assertEqual(g.peek("wPartyMon1CatchRate"), ITEMS["LEFTOVERS"])
+        self.assertEqual(g.peek("wUpdateSpritesEnabled"), 1)
+
     def test_give_swaps(self):
         g = self.game
         self.party(items=(ITEMS["CHARCOAL"], 0))

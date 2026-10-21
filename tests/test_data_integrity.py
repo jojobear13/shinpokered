@@ -297,3 +297,26 @@ class SaveLayoutTest(unittest.TestCase):
         last = max(addr for name, (bank, addr) in g.symbols.items()
                    if 0xC000 <= addr < 0xE000 and name != "wStack" and "." not in name)
         self.assertLess(last, 0xDF00, hex(last))
+
+
+class FishingDataTest(unittest.TestCase):
+    """Each Super Rod fishing group's count matches its list (data/super_rod.asm).
+    FishingGroup2 is Shin's secret: Dittos of level 120-240 in Cerulean Cave's
+    deepest floor."""
+
+    def test_super_rod_groups(self):
+        text = open(os.path.join(REPO_ROOT, "data", "super_rod.asm")).read()
+        groups = re.findall(r"^(FishingGroup\d+):\n((?:\s*db [^\n]*\n)+)", text, re.M)
+        self.assertGreater(len(groups), 5)
+        for label, body in groups:
+            rows = re.findall(r"db ([^\n;]*)", body)
+            with self.subTest(group=label):
+                count = int(rows[0].strip(), 0)
+                pairs = [r for r in rows[1:]]
+                self.assertEqual(count, len(pairs))
+                for pair in pairs:
+                    level, species = [x.strip() for x in pair.split(",")]
+                    self.assertTrue(1 <= int(level) <= (240 if label == "FishingGroup2" else 100))
+                    self.assertIn(species, SPECIES)
+        used = set(re.findall(r"dw (FishingGroup\d+)", text))
+        self.assertTrue(used <= {label for label, _ in groups}, used - {label for label, _ in groups})

@@ -2009,3 +2009,13 @@ and the playtest) is in `docs/verification_plan.md`, with its status table.
   intended); 16 battle messages rewritten to fit the box after an enemy's
   name; `wLastRepelUsed` moved into the saved block (the unused
   `wUnusedD726`).
+- **Fixed: giving a held item locked the field** (reported in the playtest).
+  `ItemUseHeldItem_` showed the party menu with sprite updates off and
+  returned to the bag without turning them back on or reloading the map's
+  sprite tiles (the party menu's icons overwrite them), because the bag only
+  does that for the items in `UsableItems_PartyMenu`. After leaving the menu
+  the player had vanished and couldn't move, or the game crashed. The give
+  now restores both itself, as the bag's party-menu items have it done
+  (bank 4 has no room for the bag to do it). Test:
+  `test_held_items.test_give_puts_the_field_back`; TAKE from the party menu
+  was checked in the emulator and was fine.
