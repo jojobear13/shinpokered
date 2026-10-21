@@ -100,7 +100,7 @@ You play; I keep the pipeline ready to take whatever you find:
 | 1 Static checks | small | done (below) |
 | 2 Sweeps | medium | done (below) |
 | 3 Soak tests | medium | done (below) |
-| 4 Story checkpoints | large | not started |
+| 4 Story checkpoints | large | done (below) |
 | 5 Builds, modes, saves | medium | not started |
 | 6 Playtest support | ongoing | ready |
 
@@ -190,3 +190,31 @@ Emulator sweeps (PyBoy, the Red build, from a new game with a test party):
   made with the game's own random numbers: every one the right species,
   level 1, no HP, its egg cycles, real moves with full PP, none twice, all
   ones it may have, and a valid ability slot.
+
+## Phase 4 results
+
+Scripted checkpoints (`tools/emu/`, rerunnable): each sets the flags, badges,
+bag and party a player would have, enters the map, walks up to the person (or
+onto the trigger) and presses A as a player would, plays the battle through,
+and checks the outcome. All 26 pass.
+
+- **Gym leaders** (all 8): the battle, the leader's flag, the badge, the TM
+  owned (the fork's TM flags, given through `GiveItem`), and the whole text
+  through "<PLAYER> received TMxx".
+- **Story events**: Mr. Fuji rescued and the Poké Flute; Giovanni in the
+  Rocket Hideout and the Silph Scope; the ghost Marowak; Giovanni at Silph Co.
+  (its trigger tiles) and the president's Master Ball; the Lapras gift; the
+  Fighting Dojo gift; the warden's Strength (HM04) for the Gold Teeth; the
+  Surf house (HM03); a fossil given, the island visited and Omanyte handed
+  over; Snorlax (Shin plays the flute when you talk to it); Mewtwo; the four
+  Elite Four rooms; the Champion, Oak, the Hall of Fame and its count.
+- **Saves**: saved from the start menu, reset, CONTINUE: the party, bag,
+  events, TMs, type chart, options, Pokédex, money and position all come back
+  (only Shin's "a save exists" flag changes, as saving sets it). NEW GAME+
+  (SELECT held on NEW GAME with the Elite Four beaten) keeps the TMs, type
+  chart, Pokédex and options, clears the party, badges and story flags, and
+  starts in Red's room.
+
+No game bug turned up in this phase; everything that failed on the way was
+the scripts (a gym trainer spotting the player first, a locked Silph gate,
+the walking fossil scientist, a misread flag list).
