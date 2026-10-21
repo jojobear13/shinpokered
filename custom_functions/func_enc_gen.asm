@@ -1,3 +1,15 @@
+;the Mew-to-Ditto swap alone, without marking Mew as met, so a repel judges
+;the mon that would really appear (WildRepelCheck)
+ReplaceDisallowedWildMew:
+	ld a, [wcf91]
+	cp MEW
+	ret nz
+	CheckEvent EVENT_90B
+	jr z, DisallowWildMew.replace_mew
+	CheckEvent EVENT_8C0
+	ret z
+	jr DisallowWildMew.replace_mew
+
 ;replace random mew encounters with ditto if dex diploma not attained
 DisallowWildMew:
 	ld a, [wcf91]	;get the current pokemon in question

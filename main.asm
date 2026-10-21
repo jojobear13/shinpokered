@@ -1627,12 +1627,15 @@ Plateau_Block:     INCBIN "gfx/blocksets/plateau.bst"
 SECTION "bank1A",ROMX,BANK[$1A]
 
 
-Version_GFX:
-IF (DEF(_RED) || DEF(_GREEN))
-	INCBIN "gfx/red/redgreenversion.1bpp" ; 10 tiles
+Version_GFX: ; 14 tiles each (tools/gen_title_text.py)
+IF DEF(_RED)
+	INCBIN "gfx/title_red.1bpp" ; "Red 30th Anniversary"
 ENDC
 IF DEF(_BLUE)
-	INCBIN "gfx/blue/blueversion.1bpp" ; 8 tiles
+	INCBIN "gfx/title_blue.1bpp" ; "Blue 30th Anniversary"
+ENDC
+IF DEF(_GREEN)
+	INCBIN "gfx/title_green.1bpp" ; "Green 30th Anniversary"
 ENDC
 Version_GFXEnd:
 

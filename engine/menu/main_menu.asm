@@ -494,14 +494,14 @@ HandshakeList:
 ;This serves as a version control passcode.
 ;Each digit of the passcode is one nybble.
 ;FF is used as an end-of-list marker.
-	db $0 ; 0.5.0: no linking with Shin's builds
+	db $0 ; 0.9.0: no linking with Shin's builds or earlier PK30 ones
 	db $0
-	db $5
+	db $9
 	db $0
 	db $a
 	db $ff
 VersionText:
-	db "v0.5.0@"
+	db "v0.9.0@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText

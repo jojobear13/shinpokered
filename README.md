@@ -1,6 +1,6 @@
-# Pokémon Red and Blue: a Gen 9 rules fork of Shin Pokémon
+# Pokémon Red 30th Anniversary (PK30)
 
-Version 0.5.0. A Game Boy hack of Pokémon Red and Blue built on [Shin Pokémon](https://github.com/jojobear13/shinpokered) (jojobear13), which is built on [pret's pokered disassembly](https://github.com/pret/pokered). It keeps the Game Boy look and feel and brings in Gen 9 battle rules, abilities, held items, breeding and later-generation conveniences.
+A Gen 9 rules fork of Shin Pokémon. Version 0.9.0. A Game Boy hack of Pokémon Red and Blue built on [Shin Pokémon](https://github.com/jojobear13/shinpokered) (jojobear13), which is built on [pret's pokered disassembly](https://github.com/pret/pokered). It keeps the Game Boy look and feel and brings in Gen 9 battle rules, abilities, held items, breeding and later-generation conveniences.
 
 - **Made with AI.** This fork's code, data and documentation were written with an AI coding assistant (Claude, by Anthropic), directed and reviewed by the project owner.
 - **Emulators and hardware.** The ROM works on [BGB](https://bgb.bircd.org/), a highly accurate emulator, so it should also run on real Game Boy / Game Boy Color hardware. Less accurate emulators may show Shin's "Emulator ERROR" warning on the title menu.
@@ -12,7 +12,7 @@ Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blu
 ## Screenshots
 
 <table>
-<tr><td align="center"><img src="screenshots/fork/title.png" width="240"><br><sub>Title (no "SHIN" logo)</sub></td><td align="center"><img src="screenshots/fork/options_game.png" width="240"><br><sub>OPTION: GAME</sub></td><td align="center"><img src="screenshots/fork/options_display.png" width="240"><br><sub>OPTION: DISPLAY</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/title.png" width="240"><br><sub>Title screen</sub></td><td align="center"><img src="screenshots/fork/options_game.png" width="240"><br><sub>OPTION: GAME</sub></td><td align="center"><img src="screenshots/fork/options_display.png" width="240"><br><sub>OPTION: DISPLAY</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/options_challenge.png" width="240"><br><sub>OPTION: CHALLENGE</sub></td><td align="center"><img src="screenshots/fork/options_clauses.png" width="240"><br><sub>OPTION: CLAUSES</sub></td><td align="center"><img src="screenshots/fork/options_extras.png" width="240"><br><sub>OPTION: EXTRAS</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/move_menu_marks.png" width="240"><br><sub>Category and effectiveness marks</sub></td><td align="center"><img src="screenshots/fork/move_menu_dark.png" width="240"><br><sub>Dark type</sub></td><td align="center"><img src="screenshots/fork/ability_intimidate.png" width="240"><br><sub>Abilities</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/type_hint_learned_unknown.png" width="240"><br><sub>TYPE HINT: LEARNED, unseen</sub></td><td align="center"><img src="screenshots/fork/type_hint_learned_known.png" width="240"><br><sub>TYPE HINT: LEARNED, seen</sub></td><td align="center"><img src="screenshots/fork/status.png" width="240"><br><sub>Status: nature, held item</sub></td></tr>
@@ -21,11 +21,9 @@ Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blu
 <tr><td align="center"><img src="screenshots/fork/moves_screen_choices.png" width="240"><br><sub>MOVES: learnset and TMs</sub></td><td align="center"><img src="screenshots/fork/moves_screen_choices2.png" width="240"><br><sub>MOVES: move details</sub></td><td align="center"><img src="screenshots/fork/bag_items.png" width="240"><br><sub>Bag: ITEMS</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/bag_medicine.png" width="240"><br><sub>Bag: MEDICINE</sub></td><td align="center"><img src="screenshots/fork/bag_balls.png" width="240"><br><sub>Bag: POKé BALLS</sub></td><td align="center"><img src="screenshots/fork/party_icons.png" width="240"><br><sub>Party icons</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/party_egg.png" width="240"><br><sub>Egg in the party</sub></td><td align="center"><img src="screenshots/fork/egg_hatch.png" width="240"><br><sub>Egg hatching</sub></td><td align="center"><img src="screenshots/fork/gen1_sprites_battle.png" width="240"><br><sub>SPRITES: GEN 1</sub></td></tr>
-<tr><td align="center"><img src="screenshots/fork/gen2_sprites_battle.png" width="240"><br><sub>SPRITES: GEN 2</sub></td><td align="center"><img src="screenshots/fork/start_menu_pc.png" width="240"><br><sub>PC IN MENU</sub></td><td align="center"><img src="screenshots/fork/start_menu_pc_open.png" width="240"><br><sub>PC from the start menu</sub></td></tr>
-<tr><td align="center"><img src="screenshots/fork/dexrepel_aide.png" width="240"><br><sub>DEXREPEL aide (Route 12 gate)</sub></td><td align="center"><img src="screenshots/fork/dexrepel_aide_given.png" width="240"><br><sub>DEXREPEL explained</sub></td><td align="center"><img src="screenshots/fork/dexrepel_bag.png" width="240"><br><sub>DEXREPEL in KEY ITEMS</sub></td></tr>
-<tr><td align="center"><img src="screenshots/fork/dexrepel_on.png" width="240"><br><sub>DEXREPEL on</sub></td><td align="center"><img src="screenshots/fork/repel_prompt.png" width="240"><br><sub>Use another repel?</sub></td><td align="center"><img src="screenshots/fork/repel_prompt_used.png" width="240"><br><sub>Repel reused</sub></td></tr>
-<tr><td align="center"><img src="screenshots/fork/catch_exp.png" width="240"><br><sub>EXP on catch</sub></td><td align="center"><img src="screenshots/fork/catch_exp_levelup.png" width="240"><br><sub>Level-up from a catch</sub></td><td align="center"><img src="screenshots/fork/warp_back_prompt.png" width="240"><br><sub>WARP BACK after a blackout</sub></td></tr>
-<tr><td align="center"><img src="screenshots/fork/hp_percent.png" width="240"><br><sub>HP PERCENT</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/gen2_sprites_battle.png" width="240"><br><sub>SPRITES: GEN 2</sub></td><td align="center"><img src="screenshots/fork/start_menu_pc.png" width="240"><br><sub>PC IN MENU</sub></td><td align="center"><img src="screenshots/fork/dexrepel_aide_given.png" width="240"><br><sub>DEXREPEL explained (1/2)</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/dexrepel_aide_given2.png" width="240"><br><sub>DEXREPEL explained (2/2)</sub></td><td align="center"><img src="screenshots/fork/repel_prompt.png" width="240"><br><sub>Use another repel?</sub></td><td align="center"><img src="screenshots/fork/catch_exp_levelup.png" width="240"><br><sub>EXP on catch</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/warp_back_prompt.png" width="240"><br><sub>WARP BACK after a blackout</sub></td><td align="center"><img src="screenshots/fork/hp_percent.png" width="240"><br><sub>HP PERCENT</sub></td></tr>
 </table>
 
 ## Changes from Shin Pokémon (this fork)
@@ -122,7 +120,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Rule options can be set from the title screen before NEW GAME.
 - TYPE HINT: OFF (default), ON, or LEARNED (only matchups seen in battle; "?" otherwise).
 - PC IN MENU: start menu PC item opens the full PC (hidden in link rooms).
-- Title logo drops "SHIN"; main menu shows version 0.5.0.
+- Title screen: "Red 30th Anniversary" (Blue and Green in those builds) under the logo, in the original "Red Version" lettering; main menu shows version 0.9.0.
 
 #### Breeding and day care
 - Day care holds two Pokémon; both gain experience.
@@ -178,7 +176,7 @@ Every option starts as the original game played; everything extra is off by defa
 
 #### Save/compatibility
 - Pokémon data layout changed (IVs, EVs, held item); Shin saves are not compatible.
-- Link handshake version 0.0.5.0: won't link with Shin builds.
+- Link handshake version 0.0.9.0: won't link with Shin builds.
 
 #### Known issues
 - Weather and infatuation are not implemented, so abilities needing them are left out (see Pokémon data).
@@ -433,7 +431,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Nuzlocke death mark in catch rate ($05; Gen 2 Poké Ball) → an IV flag bit.
 - Catch-rate byte → held item.
 - Gameshark addresses → may not match: the box and day care moved to save RAM.
-- "SHIN" title logo and Shin link compatibility → v0.5.0 branding; won't link with Shin builds.
+- Shin's title and link compatibility → PK30 title and v0.9.0 branding; won't link with Shin builds.
 
 ## Credits
 

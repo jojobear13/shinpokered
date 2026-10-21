@@ -1592,9 +1592,11 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   outside battle) came 1-2 HP short: `PackIVs` clobbered `de`, so
   `AddPartyMon` worked out the current HP from the bytes after `wIVScratch`
   instead of the new IVs. `PackIVs` keeps `de` now. `tests/test_gift_mons.py`.
-- **Branding and version**: the title logo loses "SHIN" and 真 (the Japanese
-  logo never had them); the main menu shows v0.5.0, and the link handshake
-  digits are 0.0.5.0, so it won't link with Shin's builds.
+- **Branding and version**: the title logo loses "SHIN" and 真 (the
+  Japanese-style logo of the JP and Green builds kept them until the PK30
+  title screen); the main menu shows v0.9.0 (v0.5.0 before), and the link
+  handshake digits are 0.0.9.0, so it won't link with Shin's builds or
+  earlier ones of this fork.
 
 - **The bag screen**: Shin's SELECT-swapped second bag is gone (its WRAM
   backup is freed). The bag holds 36 kinds (`BAG_ITEM_CAPACITY`) and opens
@@ -1880,6 +1882,15 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   - `tests/test_dexrepel.py`: owned species kept away only while on, the
     REPEL still works, using it toggles (not in battle), and it's a key item
     in the key pocket.
+  - Fixed after a playtest: a wild Mew without the diploma, or once Mew has
+    been met, becomes a Ditto (Shin's `DisallowWildMew`), but only after the
+    repel check, so an owned Ditto could still appear from Cerulean Cave
+    B1's Mew slot. `WildRepelCheck` first makes the swap alone
+    (`ReplaceDisallowedWildMew`); marking Mew as met still waits until the
+    mon really appears.
+  - Playtest (emulator, Viridian Forest, 500 steps each): off, every species
+    appeared; on with Weedle and Kakuna owned, only Metapod; on with all five
+    owned, no battles; on with a REPEL too, both kept theirs away.
 - **EXP on catch** (Gen 6+): after "<mon> was caught!", `CaughtMonExperience`
   runs `GainExperience` as a defeat would: experience (with the Exp. Share
   rules and level-ups, move learning included) and the caught mon's EV
@@ -1969,3 +1980,19 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   `HandlePoisonBurnLeechSeed`'s faint path now draw only the HUD of the side
   whose turn it is (`DrawTurnSideHUD`).
 
+
+## PK30: the name and title screen
+
+The hack is named **Pokémon Red 30th Anniversary**, PK30 for short.
+
+- **Title screen**: "Red Version" under the logo becomes "Red 30th
+  Anniversary" ("Blue" and "Green" in those builds), in the version's color,
+  sliding in from the right as before. It is drawn in the original title
+  text's style (2px strokes, capitals 5 rows, lowercase 4) by
+  `tools/gen_title_text.py`, which writes `gfx/title_{red,blue,green}.png`
+  (14 tiles at `$60`, a free stretch of the title's VRAM) and centres each
+  under the logo (column 3). The old `redgreenversion` and `blueversion`
+  graphics are no longer used. The Japanese-style logo (`pokemon_logo_jp.png`)
+  also loses Shin's "SHIN" and 真. Checked in the emulator in the Red, Blue,
+  Green and Red-JP builds.
+- The ROM header title is still "POKEMON RED" etc.
