@@ -331,6 +331,37 @@ class SaveTest(BoxTestCase):
                 self.game.memory[bank, addr + offset] ^= 0x01
                 self.assertEqual(self.load(), 1, "a changed box byte should fail the checksum")
 
+    def test_all_twelve_boxes_full_survive_save_and_load(self):
+        g = self.game
+        rng, party, _ = self.fresh(0, 6, 0)
+        g.poke("wCurrentBoxNum", 0)
+        boxes = []
+        for number in range(bx.NUM_BOXES):
+            if number:
+                ChangeBoxTest.change_box(self, number)
+            full = [bx.random_mon(rng, SPECIES, party=False) for _ in range(bx.MONS_PER_BOX)]
+            bx.write_current_box(g, full)
+            boxes.append(full)
+        self.save()
+        bx.write_current_box(g, [])
+        bx.write_party(g, party[:1])
+        self.assertEqual(self.load(), 2, "checksum should be good")
+        self.assertEqual(bx.read_party(g), party)
+        self.assertEqual(bx.read_current_box(g), boxes[-1])
+        for number in range(bx.NUM_BOXES - 1):
+            self.assertEqual(bx.read_saved_box(g, number), boxes[number], f"box {number + 1}")
+
+    def test_corrupt_main_data_is_refused(self):
+        """What an old or damaged save meets: no CONTINUE (status 1)."""
+        for seed in SEEDS[:4]:
+            with self.subTest(seed=seed):
+                rng, party, box = self.fresh(seed, 2, 3)
+                self.save()
+                bank, start = self.game.symbols["sPlayerName"]
+                _, end = self.game.symbols["sMainDataCheckSum"]
+                self.game.memory[bank, start + rng.randrange(end - start)] ^= 0x10
+                self.assertEqual(self.load(), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,7 @@
 """Story checkpoints: set up the flags, party and bag a player would have,
 enter the map, trigger the event, play it through, and check the outcome."""
-import sys, io, re, json
+import sys, io, re, json, os, glob
+ROOT='/tmp/pk30emu/'.rstrip('/'); REPO='/home/user/shinpokered'
 from lib import *
 from dxlib import screen, box
 sys.path.insert(0,'/home/user/shinpokered/tests')
@@ -27,7 +28,7 @@ for f in glob.glob(R+'/data/mapHeaders/*.asm'):
         o=re.findall(r'dw (\w+Object)', t)
         if o: hdrobj[h]=o[-1]
 def warps(mid):
-    t=open(objfile[hdrobj[hdr[mid]]]).read()
+    t=preprocess(open(objfile[hdrobj[hdr[mid]]]).read())
     return [(int(x),int(y)) for x,y in re.findall(r'^\s*warp (\d+), (\d+)', t, re.M)]
 
 g=G(); m=g.m
@@ -137,9 +138,33 @@ def run(talk=None, yes=True, frames=60000, log=None):
         if idle%10==5: g.pb.button('b',3)
     return dict(result='timeout', lines=lines, battles=battles)
 
+def build_defs():
+    """The -D flags of the build the workspace ROM came from (by matching it
+    against the repo's built ROMs and reading the Makefile)."""
+    rom=open(ROOT+'/rom.gbc','rb').read()
+    for f in glob.glob(REPO+'/*.gbc'):
+        if open(f,'rb').read()==rom:
+            name=os.path.basename(f)[:-4]
+            mk=re.search(r'^\$\(%s_obj\):\s*RGBASMFLAGS \+=(.*)$' % name, open(REPO+'/Makefile').read(), re.M)
+            return set(re.findall(r'-D (\w+)', mk.group(1))) if mk else set()
+    return set()
+DEFS=build_defs()
+
+def preprocess(t):
+    """Keep the IF DEF(x)/ELSE/ENDC branches this build assembles."""
+    out=[]; stack=[]
+    for line in t.split('\n'):
+        c=line.split(';')[0].strip()
+        mo=re.match(r'IF\s+(!?)DEF\((\w+)\)', c)
+        if mo: stack.append((mo.group(2) in DEFS) != bool(mo.group(1))); continue
+        if c=='ELSE' and stack: stack[-1]=not stack[-1]; continue
+        if c=='ENDC' and stack: stack.pop(); continue
+        if all(stack): out.append(line)
+    return '\n'.join(out)
+
 def objects(mapname):
     mid=MAPS[mapname][0]
-    t=open(objfile[hdrobj[hdr[mid]]]).read()
+    t=preprocess(open(objfile[hdrobj[hdr[mid]]]).read())
     return [(int(x),int(y)) for x,y in re.findall(r'^\s*object \w+, (\d+), (\d+),', t, re.M)]
 
 def approach(mapname, n, sides=None):
@@ -152,6 +177,7 @@ def approach(mapname, n, sides=None):
         snap.seek(0); g.pb.load_state(snap)
         if not enter(mapname, pos=pos): continue
         if (m[A('wXCoord')],m[A('wYCoord')])!=pos: continue
+        m[A('wGrassRate')]=0  # no wild battle on the way (a cave's whole floor)
         g.press(face,20); g.press('a',10)
         for k in range(30):
             g.tick(4)

@@ -835,7 +835,7 @@ OptHelpMoreColor:
 	db   "More color in the"
 	next "overworld. (GBC)@"
 OptHelpColorFix:
-	db   "Darker colors for"
+	db   "Softer colors for"
 	next "backlit screens.@"
 OptHelpSymbols:
 	db   "Caught and gender"

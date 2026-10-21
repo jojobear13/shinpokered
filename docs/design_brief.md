@@ -2031,3 +2031,14 @@ and the playtest) is in `docs/verification_plan.md`, with its status table.
     PP, so the other never saw the move run out and kept the berry. The
     berry is off in link battles. Test:
     `test_held_item_battle.test_mystery_berry_not_in_link_battles`.
+
+- **Phase 5** (builds, display modes, saves, SameBoy; details in
+  `docs/verification_plan.md`): every build ran the phase 2-4 scripts
+  without a game bug. One text fix: the COLOR FIX help said "Darker colors";
+  Shin's gamma shader lightens and softens the picture (measured on every
+  scene), so it now says "Softer colors for backlit screens." The emulator
+  scripts now read map objects through the build's `IF DEF` branches (the
+  Japanese Red and Green keep the original Japanese layouts, so their
+  Mewtwo stands elsewhere). New tests: all 12 boxes full through a save
+  and load, and a damaged save refused
+  (`test_pc_boxes.SaveTest`).

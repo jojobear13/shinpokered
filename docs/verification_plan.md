@@ -101,7 +101,7 @@ You play; I keep the pipeline ready to take whatever you find:
 | 2 Sweeps | medium | done (below) |
 | 3 Soak tests | medium | done (below) |
 | 4 Story checkpoints | large | done (below) |
-| 5 Builds, modes, saves | medium | not started |
+| 5 Builds, modes, saves | medium | done (below) |
 | 6 Playtest support | ongoing | ready |
 
 Phases 1-3 need no input from you and find the most per hour, so they go
@@ -218,3 +218,33 @@ and checks the outcome. All 26 pass.
 No game bug turned up in this phase; everything that failed on the way was
 the scripts (a gym trainer spotting the player first, a locked Silph gate,
 the walking fossil scientist, a misread flag list).
+
+## Phase 5 results
+
+- **Every build**: all 8 pass the unit tests. Blue, Green, Red-JP, Blue-JP
+  and Red on an original Game Boy (DMG mode in PyBoy) each ran the whole of
+  phases 2 and 4: all 226 maps load and run (the same six spawn artifacts
+  as Red), all 8 gym leaders, all 17 story checkpoints, save and CONTINUE,
+  NEW GAME+, and all 137 items from the bag with no crash. The `_origback`
+  builds (back sprites only) ran 40 random battles each. One script fix: the
+  Japanese Red and Green keep the original Japanese layout of Cerulean
+  Cave's last floor, where Mewtwo stands at (5,10), not (27,13); the scripts
+  now read each map's objects through the build's `IF DEF` branches.
+- **SameBoy** (`tools/emu/sameboy_check.py`, an accurate emulator
+  independent of PyBoy, driven through `tools/emu/sbdrive.c`): a save made
+  in PyBoy is continued in SameBoy as a Game Boy Color, an original Game
+  Boy and a Super Game Boy; each plays a wild battle, gives a held item
+  ("is now holding LEFTOVERS."), walks, and saves, and that save continues
+  back in PyBoy with everything in place. All three pass. The screenshots
+  show the right palettes on each, and Red's Super Game Boy border.
+- **Display options** (`tools/emu/colors.py`): COLOR FIX and MORE COLOR in
+  all four combinations, on towns, a route, Viridian Forest, a battle and
+  the start menu: all draw correctly. COLOR FIX is kept through a save. Its
+  help text said "Darker colors"; the shader makes every scene lighter
+  and softer, so it now says "Softer colors for backlit screens."
+- **Saves**: all 12 boxes full (20 each) survive a save and load; a damaged
+  save (any changed byte in the main data) is refused with no CONTINUE;
+  a save made in NEW GAME+ continues
+  as NEW GAME+ with its kept TMs.
+
+No game bug turned up in this phase beyond the help text.

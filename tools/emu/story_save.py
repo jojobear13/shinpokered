@@ -14,22 +14,24 @@ m[A('wDisplayOptions')]=0x0D; m[A('wLastRepelUsed')]=IT['SUPER_REPEL']
 for i in range(19): m[A('wPokedexOwned')+i]=0xFF; m[A('wPokedexSeen')+i]=0xFF
 enter('VIRIDIAN_CITY', pos=(23,26)); run()
 before=snap(KEEP)
-# save from the start menu
-g.press('start',40)
-for k in range(8):
-    if '▶SAVE' in screen(g): break
-    g.press('down',12)
-g.press('a',60)
-lines=[]
-for k in range(60):
-    b=boxed()
-    if b and (not lines or lines[-1]!=b): lines.append(b)
-    scr=screen(g)
-    if 'YES' in scr: g.press('a',30)
-    else: g.press('a',20)
-    if 'saved the game' in ' '.join(lines): break
-print('save text:', lines[-2:])
-for k in range(4): g.press('b',20)
+def save_game():
+    """Save from the start menu; returns the last lines of text."""
+    g.press('start',40)
+    for k in range(8):
+        if '▶SAVE' in screen(g): break
+        g.press('down',12)
+    g.press('a',60)
+    lines=[]
+    for k in range(60):
+        b=boxed()
+        if b and (not lines or lines[-1]!=b): lines.append(b)
+        scr=screen(g)
+        if 'YES' in scr: g.press('a',30)
+        else: g.press('a',20)
+        if 'saved the game' in ' '.join(lines): break
+    for k in range(4): g.press('b',20)
+    return lines[-2:]
+print('save text:', save_game())
 # soft reset, CONTINUE
 def to_main_menu():
     g.pb.register_file.PC=0x0100; g.pb.register_file.SP=0xDFFF
@@ -40,8 +42,10 @@ def to_main_menu():
     return False
 to_main_menu()
 print('menu:', [l for l in screen(g).split('\n') if 'CONTINUE' in l or 'NEW' in l][:3])
-g.press('a',60); g.press('a',120)
-for k in range(10): g.tick(30)
+def continue_game():
+    g.press('a',60); g.press('a',120)
+    for k in range(10): g.tick(30)
+continue_game()
 after=snap(KEEP)
 diff=[n for n in before if before[n]!=after[n]]
 ev_diff=[]
@@ -73,3 +77,10 @@ cleared=dict(party=ng['wPartyCount'][0]==0, badges=ng['wObtainedBadges'][0]==0, 
              in_reds_room=ng['wCurMap'][0]==MAPS['REDS_HOUSE_2F'][0])
 print('NEW GAME+', 'PASS' if all(kept.values()) and all(cleared.values()) else 'FAIL', kept, cleared)
 print('  ', [l for l in lines if 'ID' in l or 'jingle' in l][:3])
+# a save made early in NEW GAME+ continues as NEW GAME+
+run()
+mid=snap(KEEP)
+save_game(); to_main_menu(); continue_game()
+back=snap(KEEP)
+diff=[n for n in mid if mid[n]!=back[n] and n!='wEventFlags']
+print('NEW GAME+ SAVE', 'PASS' if not diff and back['wTMsOwned']==before['wTMsOwned'] else 'FAIL', diff)

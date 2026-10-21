@@ -62,7 +62,7 @@ if want('snorlax'):
     check('snorlax', battles=r['battles']==1, beat=event('EVENT_BEAT_ROUTE12_SNORLAX'))
 if want('mewtwo'):
     setup(badges=0xFF, events=['EVENT_BEAT_CHAMPION_RIVAL'])
-    approach('UNKNOWN_DUNGEON_3', 1, sides=[((27,14),'up'),((26,13),'right'),((28,13),'left')]); r=run()
+    approach('UNKNOWN_DUNGEON_3', 1); r=run()
     check('mewtwo', battles=r['battles']==1, beat=event('EVENT_BEAT_MEWTWO'))
 if want('e4'):
     for room,ev in (('LORELEIS_ROOM','EVENT_BEAT_LORELEIS_ROOM_TRAINER_0'),('BRUNOS_ROOM','EVENT_BEAT_BRUNOS_ROOM_TRAINER_0'),
