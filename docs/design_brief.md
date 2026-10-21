@@ -1594,8 +1594,9 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   instead of the new IVs. `PackIVs` keeps `de` now. `tests/test_gift_mons.py`.
 - **Branding and version**: the title logo loses "SHIN" and 真 (the
   Japanese-style logo of the JP and Green builds kept them until the PK30
-  title screen); the main menu shows v0.5.0, and the link handshake
-  digits are 0.0.5.0, so it won't link with Shin's builds.
+  title screen); the main menu shows v0.9.0 (v0.5.0 before), and the link
+  handshake digits are 0.0.9.0, so it won't link with Shin's builds or
+  earlier ones of this fork.
 
 - **The bag screen**: Shin's SELECT-swapped second bag is gone (its WRAM
   backup is freed). The bag holds 36 kinds (`BAG_ITEM_CAPACITY`) and opens
