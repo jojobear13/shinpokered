@@ -1540,6 +1540,17 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   the physical stats, and the number is put back. Test:
   `tests/test_confusion_self_hit.py`.
 
+- **Fixed: a white screen after using an item from the party menu.** The
+  party menu whites the screen out as it closes (an evolution stone that
+  evolved a mon, or one with no effect, such as a Moon Stone on a Kadabra
+  under level 35). The full-screen bag then drew under that white palette,
+  and nothing restored it until the player pressed a button: in the
+  emulator it stayed white for 900 frames with no input. The bag now loads
+  the map's palette after drawing whenever it finds the screen whited out,
+  so the white lasts as long as the party menu's own tile reload (44 frames
+  in the Kadabra case). A bag opened any other way keeps its palette, so
+  ROCK TUNNEL's darkness is untouched. Tests: `tests/test_bag.py`.
+
 ## Known facts that are easy to get wrong
 
 - 16-bit values are big-endian in battle and party structures, but the HP bar

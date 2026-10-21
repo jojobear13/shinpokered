@@ -41,6 +41,9 @@ BagMenuMain:
 	ld a, 1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call Delay3
+	ld a, [rBGP]
+	and a ; whited out? (back from using an item on the party menu)
+	call z, LoadGBPal ; then show the bag now, not on the next input
 .input
 	call JoypadLowSensitivity
 	ld a, [hJoy5]
