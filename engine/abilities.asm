@@ -2681,20 +2681,23 @@ AbilityActivatedUserText:
 	prompt
 
 AbilityCantUseMoveText:
-	text "<USER> can't use"
-	line "@"
+	text "<USER>"
+	line "can't use"
+	cont "@"
 	TX_RAM wcf4b
 	text "!"
 	prompt
 
 SuckedUpOozeTargetText:
-	text "<TARGET> sucked"
-	line "up the ooze!"
+	text "<TARGET>"
+	line "sucked up the"
+	cont "ooze!"
 	prompt
 
 SuckedUpOozeUserText:
-	text "<USER> sucked"
-	line "up the ooze!"
+	text "<USER>"
+	line "sucked up the"
+	cont "ooze!"
 	prompt
 
 FellAsleepAbilityText:
@@ -2702,14 +2705,14 @@ FellAsleepAbilityText:
 	db "@"
 
 ExertingPressureText:
-	text "<USER> is"
-	line "exerting its"
+	text "<USER>"
+	line "is exerting its"
 	cont "PRESSURE!"
 	prompt
 
 BreaksTheMoldText:
-	text "<USER> breaks"
-	line "the mold!"
+	text "<USER>"
+	line "breaks the mold!"
 	prompt
 
 NeutralizingGasText:
@@ -2723,8 +2726,9 @@ TargetAttackFellText:
 	prompt
 
 TargetAttackNotLoweredText:
-	text "<TARGET>'s ATTACK"
-	line "wasn't lowered!"
+	text "<TARGET>'s"
+	line "ATTACK wasn't"
+	cont "lowered!"
 	prompt
 
 UserAttackRoseText:
@@ -2738,8 +2742,9 @@ UserSpecialAttackRoseText:
 	prompt
 
 TracedText:
-	text "<USER> traced"
-	line "<TARGET>'s"
+	text "<USER>"
+	line "traced"
+	cont "<TARGET>'s"
 	cont "@"
 	TX_RAM wcd6d
 	text "!"
@@ -2758,8 +2763,8 @@ AbilityCuredUserText:
 	prompt
 
 MaxedAttackText:
-	text "<TARGET> maxed"
-	line "its ATTACK!"
+	text "<TARGET>"
+	line "maxed its ATTACK!"
 	prompt
 
 UserMoveDisabledText:
@@ -2793,9 +2798,9 @@ SynchronizeParalyzedText:
 	db "@"
 
 HungOnText:
-	text "<TARGET> hung on"
-	line "using its"
-	cont "@"
+	text "<TARGET>"
+	line "hung on using"
+	cont "its @"
 	TX_RAM wcd6d
 	text "!"
 	prompt
@@ -2827,8 +2832,9 @@ AbilitySpecialAttackRoseText:
 	prompt
 
 AbilityFirePowerRoseText:
-	text "<TARGET>'s FIRE"
-	line "moves powered up!"
+	text "<TARGET>'s"
+	line "FIRE moves"
+	cont "powered up!"
 	prompt
 
 INCLUDE "data/mon_abilities.asm"

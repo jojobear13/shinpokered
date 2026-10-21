@@ -7129,13 +7129,13 @@ RecalculateUserStats:
 	jp PrintText
 
 AllStatsRoseText:
-	text "<USER>'s stats"
-	line "rose!"
+	text "<USER>'s"
+	line "stats rose!"
 	prompt
 
 DefensesFellText:
-	text "<USER>'s defenses"
-	line "fell!"
+	text "<USER>'s"
+	line "defenses fell!"
 	prompt
 
 ; Gen 5+ Growth: attack and special attack up one stage each

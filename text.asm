@@ -1298,8 +1298,9 @@ _ThrashingAboutText::
 	done
 
 _HurtByBindingText::
-	text "<USER>'s hurt"
-	line "by @"
+	text "<USER>'s"
+	line "hurt by"
+	cont "@"
 	TX_RAM wcd6d
 	text "!"
 	prompt
@@ -2294,8 +2295,9 @@ _HitWithRecoilText::
 	prompt
 
 _ConvertedTypeText::
-	text "<USER>'s type"
-	line "became @"
+	text "<USER>'s"
+	line "type became"
+	cont "@"
 	TX_RAM wcd6d
 	text "!"
 	prompt

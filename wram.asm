@@ -3255,8 +3255,11 @@ wUnusedD721:: ; d721	;joenote - use to set various wram flags
 ;;;;;;;;;;;;;;joenote - use these unused locations for debugging and parsing DV scores or holding temp values
 wUnusedD722:: 
 	ds 4
-wUnusedD726::
-	ds 2
+wLastRepelUsed:: ; the kind of repel last used, offered again when it wears off (0: none);
+	; saved, so a repel still running in a loaded game is offered again too
+	ds 1
+wUnusedD727::
+	ds 1
 ;;;;;;;;;;;;;;
 wd728:: ; d728
 ; bit 0: using Strength outside of battle
@@ -3677,8 +3680,6 @@ wHoFSlot:: ; the Hall of Fame slot being recorded (eggs are skipped)
 	ds 1
 wPartyIconSpecies:: ; the species whose icon each party slot's sprite tiles hold
 	ds PARTY_LENGTH
-wLastRepelUsed:: ; the kind of repel last used, offered again when it wears off (0: none)
-	ds 1
 wHPPercentTiles:: ; the HP PERCENT option's two tiles (engine/battle/hp_percent.asm)
 	ds 2 * 16
 wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)

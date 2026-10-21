@@ -97,7 +97,7 @@ You play; I keep the pipeline ready to take whatever you find:
 
 | Phase | Effort | Status |
 |---|---|---|
-| 1 Static checks | small | not started |
+| 1 Static checks | small | done (below) |
 | 2 Sweeps | medium | not started |
 | 3 Soak tests | medium | not started |
 | 4 Story checkpoints | large | not started |
@@ -106,3 +106,30 @@ You play; I keep the pipeline ready to take whatever you find:
 
 Phases 1-3 need no input from you and find the most per hour, so they go
 first. Phase 4 is the slowest to build but gives a rerunnable playthrough.
+
+## Phase 1 results
+
+- **Builds**: all 8 build with no warnings (the Makefile's deprecated
+  `rgbgfx -h` is now `-Z`).
+- **Space**: `tools/space_report.py` prints each bank's free bytes from the
+  link maps. About 236 KB of ROM is free (10 empty banks and slack), 476
+  bytes of WRAM, and the last WRAM variable ends at `$dd25`, 730 bytes clear
+  of the stack. Many of Shin's banks are within a few bytes of full, which
+  only matters for code added to them.
+- **Data**: `tests/test_data_integrity.py` reads every trainer party with
+  the game's own `ReadTrainer` (as written, with the alternative movesets,
+  scaled to a level 50 and a level 100 team, and randomized), every wild
+  table, mart, in-game trade and evolution from the built ROM. It found one
+  bug, fixed: a special trainer move the mon already knew gave it that move
+  twice (Bruno's first Onix, with DIG twice, from this fork's learnsets;
+  Sabrina and Koga with Shin's level scaling on).
+- **Text**: `tools/text_lint.py` (and `tests/test_text_fit.py`) follows the
+  text commands with the game's charmap and finds lines wider than the
+  18-column box in the worst case. It found 16 of this fork's battle
+  messages that ran past the box when the line began with an enemy's name
+  ("Enemy " and up to 10 letters): all rewritten.
+- **Flags and saves**: this fork's event flags ($8CC-$8D1) were unused in
+  Shin. Everything it keeps between sessions is in the saved, checksummed
+  block, now including the last repel used (it was outside, so a game
+  loaded mid-repel couldn't offer another when it wore off); tested in
+  `SaveLayoutTest`.

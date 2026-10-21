@@ -170,12 +170,12 @@ pokebluejp_origback_opt = -cjsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLU
 	$(RGBFIX) $($*_opt) $@
 
 
-gfx/blue/intro_purin_1.2bpp: rgbgfx += -h
-gfx/blue/intro_purin_2.2bpp: rgbgfx += -h
-gfx/blue/intro_purin_3.2bpp: rgbgfx += -h
-gfx/red/intro_nido_1.2bpp: rgbgfx += -h
-gfx/red/intro_nido_2.2bpp: rgbgfx += -h
-gfx/red/intro_nido_3.2bpp: rgbgfx += -h
+gfx/blue/intro_purin_1.2bpp: rgbgfx += -Z
+gfx/blue/intro_purin_2.2bpp: rgbgfx += -Z
+gfx/blue/intro_purin_3.2bpp: rgbgfx += -Z
+gfx/red/intro_nido_1.2bpp: rgbgfx += -Z
+gfx/red/intro_nido_2.2bpp: rgbgfx += -Z
+gfx/red/intro_nido_3.2bpp: rgbgfx += -Z
 
 gfx/game_boy.2bpp: tools/gfx += --remove-duplicates
 gfx/theend.2bpp: tools/gfx += --interleave --png=$<

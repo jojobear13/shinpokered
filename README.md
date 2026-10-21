@@ -161,6 +161,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Enemy fully paralyzed or self-hit mid-Fly/Dig stayed invulnerable.
 - Accuracy/evasion stage changes re-applied every badge boost to the player's stats.
 - Transform desynced link battles (only the player's move index was reset).
+- Gym leaders' and the Elite Four's special moves could give a mon the same move twice with trainer level scaling on.
 
 #### Removed from Shin
 - NPC and object rule toggles (rules are now options); Oak's Lab NPCs and Viridian house restored.

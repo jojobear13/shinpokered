@@ -80,8 +80,9 @@ BoundTurnEnd:
 	ret
 
 FreedText:
-	text "<USER> was"
-	line "freed from @"
+	text "<USER>"
+	line "was freed from"
+	cont "@"
 	TX_RAM wcd6d
 	text "!"
 	prompt

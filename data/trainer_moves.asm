@@ -181,6 +181,7 @@ SpecialTrainerMoves:
 	;onix - rock slide, screech, slam, dig
 	db 1,1,ROCK_SLIDE
 	db 1,2,SCREECH
+	db 1,3,SLAM ; its Gen 9 learnset puts DIG here by 53
 	db 1,4,DIG
 	;hitmonchan - ice punch, thunder punch, mega punch, submission
 	db 2,4,SUBMISSION

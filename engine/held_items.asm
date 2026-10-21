@@ -823,8 +823,9 @@ BerryPPRestoredText:
 	prompt
 
 LifeOrbText:
-	text "<USER> lost some"
-	line "of its HP!"
+	text "<USER>"
+	line "lost some of"
+	cont "its HP!"
 	prompt
 
 ChoiceLockedText:

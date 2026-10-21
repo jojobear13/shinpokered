@@ -2002,3 +2002,10 @@ The hack is named **Pokémon Red 30th Anniversary**, PK30 for short.
 Merged to `master` as v0.9.0. The plan for checking the whole game before
 1.0 (static checks, sweeps, soak tests, story checkpoints, builds and saves,
 and the playtest) is in `docs/verification_plan.md`, with its status table.
+
+- **Phase 1 fixes** (details in `docs/verification_plan.md`): special
+  trainer moves no longer duplicate a known move (`ReadTrainer` swaps the
+  two slots; Bruno's first Onix gets SLAM back in slot 3, as Shin's comment
+  intended); 16 battle messages rewritten to fit the box after an enemy's
+  name; `wLastRepelUsed` moved into the saved block (the unused
+  `wUnusedD726`).

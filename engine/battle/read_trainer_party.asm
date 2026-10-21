@@ -235,7 +235,39 @@ ReadTrainer:
 	add hl,bc
 	ld a, [de]
 	inc de
-	ld [hl], a
+; a move the mon already knows in another slot (from its learnset at this
+; level, which scaling or the learnsets may give it) swaps slots with the one
+; it replaces, so no move is there twice
+	push de
+	ld d, a ; the special move
+	ld e, [hl] ; the move in its slot
+	push hl
+	ld a, l
+	sub c
+	ld l, a
+	jr nc, .gotFirstMove
+	dec h
+.gotFirstMove
+	ld b, NUM_MOVES
+.findKnownMove
+	ld a, [hl]
+	cp d
+	jr nz, .notKnown
+	ld a, e
+	and a
+	jr z, .alreadyKnown ; its slot is empty: leave the move where it is
+	ld [hl], e
+.notKnown
+	inc hl
+	dec b
+	jr nz, .findKnownMove
+	pop hl
+	ld [hl], d
+	pop de
+	jr .writeAdditionalMoveDataLoop
+.alreadyKnown
+	pop hl
+	pop de
 	jr .writeAdditionalMoveDataLoop
 .asm_39c46
 	ld a, [hli]
