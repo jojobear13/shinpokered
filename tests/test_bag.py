@@ -13,6 +13,8 @@ import unittest
 from harness import REPO_ROOT, shared_game
 from test_held_items import ITEMS
 
+RBGP = 0xFF47
+
 POCKETS = ["POCKET_ITEMS", "POCKET_MEDICINE", "POCKET_BALLS", "POCKET_BATTLE",
            "POCKET_BERRIES", "POCKET_KEY"]
 
@@ -147,6 +149,27 @@ class BagTest(unittest.TestCase):
         g.poke("wBagScroll", 0)
         out = g.call("BagMenu", max_frames=600)
         self.assertTrue(out["carry"])
+
+    def open_bag_with_palette(self, bgp):
+        g = self.game
+        g.auto_buttons()
+        self.fill_bag([(ITEMS["POTION"], 1)])
+        g.poke("wBagPocket", POCKETS.index("POCKET_MEDICINE"))
+        g.poke("wBagCursor", 1)  # CANCEL
+        g.poke("wBagScroll", 0)
+        g.poke("wMapPalOffset", 0)
+        g.poke(RBGP, bgp)
+        g.call("BagMenu", max_frames=600)
+        return g.peek(RBGP)
+
+    def test_whited_out_bag_is_shown(self):
+        # back from using an item on the party menu, which whites the screen
+        # out: the bag restores the palette when it's drawn, not on the
+        # player's next input
+        self.assertEqual(self.open_bag_with_palette(0), 0b11100100)
+
+    def test_bag_keeps_its_palette(self):
+        self.assertEqual(self.open_bag_with_palette(0b11111001), 0b11111001)
 
 
 if __name__ == "__main__":

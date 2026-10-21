@@ -114,7 +114,7 @@ Every option starts as the original game played; everything extra is off by defa
 - OPTION screen: five pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS) with two-line explanations.
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
-- HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:".
+- HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:"; it counts up or down with the bar.
 - CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
 - EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR, SAFARI EVENT, PC IN MENU.
@@ -161,15 +161,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Enemy multi-hit moves used the player's level after the first hit.
 - Enemy fully paralyzed or self-hit mid-Fly/Dig stayed invulnerable.
 - Accuracy/evasion stage changes re-applied every badge boost to the player's stats.
-- Confused self-hit could use special stats after a special move (fork's own bug).
-- Gift and starter Pokémon started 1-2 HP short.
 - Transform desynced link battles (only the player's move index was reset).
-- Substitute HP check only read the low byte (256 HP left failed).
-- Party icons not reloaded after swapping mons; overworld sprites drawn over the hatch scene.
-- Level-up text for a mon that didn't take part used another mon's name or a move's name.
-- Catching with EXP on catch: the ball wasn't used up, and the thrown ball was drawn over the level-up boxes.
-- Shin's Pikachu/Dragonite move secret marked the mon with catch rate 168, now its held item byte; it is an event flag now.
-- Status screen EVs (SELECT) were shifted two columns left, so the nature marks covered their middle digit.
 
 #### Removed from Shin
 - NPC and object rule toggles (rules are now options); Oak's Lab NPCs and Viridian house restored.

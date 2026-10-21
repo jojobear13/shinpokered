@@ -148,6 +148,9 @@ UpdateHPBar_AnimateHPBar:
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call DrawHPBar
+	ld a, [wHPBarType]
+	and a
+	call z, .percentLabel ; the enemy's: keep the HP PERCENT number's tiles
 	ld a, 1
 	ld [H_AUTOBGTRANSFERENABLED], a	
 
@@ -168,6 +171,17 @@ UpdateHPBar_AnimateHPBar:
 .barFilledUp
 	pop af
 	pop hl
+	ret
+
+; with HP PERCENT on, the number's two tiles in place of "HP:" (hl: the bar)
+.percentLabel
+	ld a, [wDisplayOptions]
+	bit BIT_HP_PERCENT, a
+	ret z
+	ld [hl], HP_PERCENT_TILE
+	inc hl
+	ld [hl], HP_PERCENT_TILE + 1
+	dec hl
 	ret
 
 ; compares old HP and new HP and sets c and z flags accordingly
@@ -214,7 +228,13 @@ UpdateHPBar_PrintHPNumber:
 	push de
 	ld a, [wHPBarType]
 	and a
-	jr z, .done ; don't print number in enemy HUD
+	jr nz, .playerHUD
+; no number in the enemy's HUD, but with HP PERCENT on its percentage follows
+	push hl
+	callab AnimateEnemyHPPercent
+	pop hl
+	jr .done
+.playerHUD
 ; convert from little-endian to big-endian for PrintNumber
 	ld a, [wHPBarOldHP]
 	ld [wHPBarTempHP + 1], a

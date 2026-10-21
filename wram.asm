@@ -3683,6 +3683,8 @@ wHPPercentTiles:: ; the HP PERCENT option's two tiles (engine/battle/hp_percent.
 	ds 2 * 16
 wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)
 	ds 3
+wHPPercentShown:: ; the percentage its tiles show now
+	ds 1
 
 ; free up to the stack at $df00
 

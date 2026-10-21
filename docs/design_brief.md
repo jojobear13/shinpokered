@@ -1540,6 +1540,17 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   the physical stats, and the number is put back. Test:
   `tests/test_confusion_self_hit.py`.
 
+- **Fixed: a white screen after using an item from the party menu.** The
+  party menu whites the screen out as it closes (an evolution stone that
+  evolved a mon, or one with no effect, such as a Moon Stone on a Kadabra
+  under level 35). The full-screen bag then drew under that white palette,
+  and nothing restored it until the player pressed a button: in the
+  emulator it stayed white for 900 frames with no input. The bag now loads
+  the map's palette after drawing whenever it finds the screen whited out,
+  so the white lasts as long as the party menu's own tile reload (44 frames
+  in the Kadabra case). A bag opened any other way keeps its palette, so
+  ROCK TUNNEL's darkness is untouched. Tests: `tests/test_bag.py`.
+
 ## Known facts that are easy to get wrong
 
 - 16-bit values are big-endian in battle and party structures, but the HP bar
@@ -1888,6 +1899,8 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
 - **README**: rewritten as a compact list of every change (this fork's, then
   Shin's, with what this fork replaced), credits and screenshots
   (`screenshots/fork/`); Shin's README is kept as `docs/shin_readme.md`.
+  Its bug-fix list names only bugs from vanilla or Shin; bugs this fork
+  introduced and then fixed are recorded here, not there.
 - **Fixes and options (after the README)**:
   - Level-up text: a mon that didn't take part never printed "gained", so
     "grew to level" used whatever name `wcd6d` held (another mon's, or a
@@ -1942,4 +1955,17 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   were critical about 1 time in 22, near Gen 9's 1 in 24.
   `tests/test_multi_hit_crits.py` keeps it so (a hook on
   `PrintCriticalOHKOText` records each hit's flag and damage).
+- **HP PERCENT animates**: as the enemy's bar moves, each HP step
+  (`UpdateHPBar_PrintHPNumber`, which prints no number for the enemy) far
+  calls `AnimateEnemyHPPercent`, which works out the percentage of the HP
+  the bar shows (`wHPBarOldHP` of `wHPBarMaxHP`) and redraws the two tiles
+  when it changes (`wHPPercentShown`). `UpdateHPBar_AnimateHPBar` puts the
+  tiles back after each `DrawHPBar`, which used to draw "HP:" over them for
+  the length of the animation. `HP_PERCENT_TILE` moved to the constants.
+- **Bug (from the Gen 9 fainting change)**: after an enemy fainted, the
+  survivor's end-of-round effects redrew both HUDs, so the fainted enemy's
+  name, status and empty bar came back under the trainer's party balls
+  ("Will <PLAYER> change POKéMON?" in SHIFT). `ResidualIfAlive` and
+  `HandlePoisonBurnLeechSeed`'s faint path now draw only the HUD of the side
+  whose turn it is (`DrawTurnSideHUD`).
 
