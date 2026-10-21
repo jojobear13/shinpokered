@@ -702,7 +702,14 @@ ResidualIfAlive:
 	or [hl]
 	ret z
 	call HandlePoisonBurnLeechSeed
-	jp DrawHUDsAndHPBars
+	; fall through
+; the HUD of the side whose turn it is: the other may have fainted, its HUD
+; gone (the trainer's party balls may be about to show there)
+DrawTurnSideHUD:
+	ld a, [H_WHOSETURN]
+	and a
+	jp z, DrawPlayerHUDAndHPBar
+	jp DrawEnemyHUDAndHPBar
 
 ; a faint handler, once the fainted mon is gone and before anyone comes in:
 ; if a move made it faint, side a (the survivor) still has its end-of-round
@@ -854,7 +861,7 @@ HandlePoisonBurnLeechSeed:
 	ld a, [hli]
 	or [hl]
 	ret nz          ; test if fainted
-	call DrawHUDsAndHPBars
+	call DrawTurnSideHUD
 	ld c, 20
 	call DelayFrames
 	xor a

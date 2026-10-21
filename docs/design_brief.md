@@ -1949,4 +1949,10 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   when it changes (`wHPPercentShown`). `UpdateHPBar_AnimateHPBar` puts the
   tiles back after each `DrawHPBar`, which used to draw "HP:" over them for
   the length of the animation. `HP_PERCENT_TILE` moved to the constants.
+- **Bug (from the Gen 9 fainting change)**: after an enemy fainted, the
+  survivor's end-of-round effects redrew both HUDs, so the fainted enemy's
+  name, status and empty bar came back under the trainer's party balls
+  ("Will <PLAYER> change POKéMON?" in SHIFT). `ResidualIfAlive` and
+  `HandlePoisonBurnLeechSeed`'s faint path now draw only the HUD of the side
+  whose turn it is (`DrawTurnSideHUD`).
 
