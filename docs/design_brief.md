@@ -1996,3 +1996,9 @@ The hack is named **Pokémon Red 30th Anniversary**, PK30 for short.
   also loses Shin's "SHIN" and 真. Checked in the emulator in the Red, Blue,
   Green and Red-JP builds.
 - The ROM header title is still "POKEMON RED" etc.
+
+## Verification for 1.0
+
+Merged to `master` as v0.9.0. The plan for checking the whole game before
+1.0 (static checks, sweeps, soak tests, story checkpoints, builds and saves,
+and the playtest) is in `docs/verification_plan.md`, with its status table.
