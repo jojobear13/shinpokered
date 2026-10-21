@@ -1592,8 +1592,9 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   outside battle) came 1-2 HP short: `PackIVs` clobbered `de`, so
   `AddPartyMon` worked out the current HP from the bytes after `wIVScratch`
   instead of the new IVs. `PackIVs` keeps `de` now. `tests/test_gift_mons.py`.
-- **Branding and version**: the title logo loses "SHIN" and 真 (the Japanese
-  logo never had them); the main menu shows v0.5.0, and the link handshake
+- **Branding and version**: the title logo loses "SHIN" and 真 (the
+  Japanese-style logo of the JP and Green builds kept them until the PK30
+  title screen); the main menu shows v0.5.0, and the link handshake
   digits are 0.0.5.0, so it won't link with Shin's builds.
 
 - **The bag screen**: Shin's SELECT-swapped second bag is gone (its WRAM
@@ -1978,3 +1979,19 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   `HandlePoisonBurnLeechSeed`'s faint path now draw only the HUD of the side
   whose turn it is (`DrawTurnSideHUD`).
 
+
+## PK30: the name and title screen
+
+The hack is named **Pokémon Red 30th Anniversary**, PK30 for short.
+
+- **Title screen**: "Red Version" under the logo becomes "Red 30th
+  Anniversary" ("Blue" and "Green" in those builds), in the version's color,
+  sliding in from the right as before. It is drawn in the original title
+  text's style (2px strokes, capitals 5 rows, lowercase 4) by
+  `tools/gen_title_text.py`, which writes `gfx/title_{red,blue,green}.png`
+  (14 tiles at `$60`, a free stretch of the title's VRAM) and centres each
+  under the logo (column 3). The old `redgreenversion` and `blueversion`
+  graphics are no longer used. The Japanese-style logo (`pokemon_logo_jp.png`)
+  also loses Shin's "SHIN" and 真. Checked in the emulator in the Red, Blue,
+  Green and Red-JP builds.
+- The ROM header title is still "POKEMON RED" etc.

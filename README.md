@@ -1,6 +1,6 @@
-# Pokémon Red and Blue: a Gen 9 rules fork of Shin Pokémon
+# Pokémon Red 30th Anniversary (PK30)
 
-Version 0.5.0. A Game Boy hack of Pokémon Red and Blue built on [Shin Pokémon](https://github.com/jojobear13/shinpokered) (jojobear13), which is built on [pret's pokered disassembly](https://github.com/pret/pokered). It keeps the Game Boy look and feel and brings in Gen 9 battle rules, abilities, held items, breeding and later-generation conveniences.
+A Gen 9 rules fork of Shin Pokémon. Version 0.5.0. A Game Boy hack of Pokémon Red and Blue built on [Shin Pokémon](https://github.com/jojobear13/shinpokered) (jojobear13), which is built on [pret's pokered disassembly](https://github.com/pret/pokered). It keeps the Game Boy look and feel and brings in Gen 9 battle rules, abilities, held items, breeding and later-generation conveniences.
 
 - **Made with AI.** This fork's code, data and documentation were written with an AI coding assistant (Claude, by Anthropic), directed and reviewed by the project owner.
 - **Emulators and hardware.** The ROM works on [BGB](https://bgb.bircd.org/), a highly accurate emulator, so it should also run on real Game Boy / Game Boy Color hardware. Less accurate emulators may show Shin's "Emulator ERROR" warning on the title menu.
@@ -12,7 +12,7 @@ Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blu
 ## Screenshots
 
 <table>
-<tr><td align="center"><img src="screenshots/fork/title.png" width="240"><br><sub>Title (no "SHIN" logo)</sub></td><td align="center"><img src="screenshots/fork/options_game.png" width="240"><br><sub>OPTION: GAME</sub></td><td align="center"><img src="screenshots/fork/options_display.png" width="240"><br><sub>OPTION: DISPLAY</sub></td></tr>
+<tr><td align="center"><img src="screenshots/fork/title.png" width="240"><br><sub>Title: Red 30th Anniversary</sub></td><td align="center"><img src="screenshots/fork/options_game.png" width="240"><br><sub>OPTION: GAME</sub></td><td align="center"><img src="screenshots/fork/options_display.png" width="240"><br><sub>OPTION: DISPLAY</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/options_challenge.png" width="240"><br><sub>OPTION: CHALLENGE</sub></td><td align="center"><img src="screenshots/fork/options_clauses.png" width="240"><br><sub>OPTION: CLAUSES</sub></td><td align="center"><img src="screenshots/fork/options_extras.png" width="240"><br><sub>OPTION: EXTRAS</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/move_menu_marks.png" width="240"><br><sub>Category and effectiveness marks</sub></td><td align="center"><img src="screenshots/fork/move_menu_dark.png" width="240"><br><sub>Dark type</sub></td><td align="center"><img src="screenshots/fork/ability_intimidate.png" width="240"><br><sub>Abilities</sub></td></tr>
 <tr><td align="center"><img src="screenshots/fork/type_hint_learned_unknown.png" width="240"><br><sub>TYPE HINT: LEARNED, unseen</sub></td><td align="center"><img src="screenshots/fork/type_hint_learned_known.png" width="240"><br><sub>TYPE HINT: LEARNED, seen</sub></td><td align="center"><img src="screenshots/fork/status.png" width="240"><br><sub>Status: nature, held item</sub></td></tr>
@@ -122,7 +122,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Rule options can be set from the title screen before NEW GAME.
 - TYPE HINT: OFF (default), ON, or LEARNED (only matchups seen in battle; "?" otherwise).
 - PC IN MENU: start menu PC item opens the full PC (hidden in link rooms).
-- Title logo drops "SHIN"; main menu shows version 0.5.0.
+- Title screen: "Red 30th Anniversary" (Blue and Green in those builds) under the logo, in the original "Red Version" lettering; the logo drops "SHIN" (and the Japanese-style logo "SHIN" and 真); main menu shows version 0.5.0.
 
 #### Breeding and day care
 - Day care holds two Pokémon; both gain experience.
@@ -433,7 +433,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Nuzlocke death mark in catch rate ($05; Gen 2 Poké Ball) → an IV flag bit.
 - Catch-rate byte → held item.
 - Gameshark addresses → may not match: the box and day care moved to save RAM.
-- "SHIN" title logo and Shin link compatibility → v0.5.0 branding; won't link with Shin builds.
+- "SHIN" title logo and Shin link compatibility → PK30 title and v0.5.0 branding; won't link with Shin builds.
 
 ## Credits
 

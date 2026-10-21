@@ -62,7 +62,7 @@ ENDC
 	ld a, BANK(PokemonLogoGraphics)
 	call FarCopyData2          ; second chunk
 	ld hl, Version_GFX
-	ld de, vChars2 + $600 - (Version_GFXEnd - Version_GFX - $50)
+	ld de, vChars2 + $600
 	ld bc, Version_GFXEnd - Version_GFX
 	ld a, BANK(Version_GFX)
 	call FarCopyDataDouble
@@ -530,26 +530,16 @@ ENDC
 
 INCLUDE "data/title_mons.asm"
 
-; prints version text (red, blue)
+; prints the subtitle under the logo ("Red 30th Anniversary"), in the
+; version's color; tools/gen_title_text.py centres it and gives its column
 PrintGameVersionOnTitleScreen:
-IF DEF(_GREEN)
-	coord hl, 6, 8
-ELSE
-	coord hl, 7, 8
-ENDC
+	coord hl, 3, 8
 	ld de, VersionOnTitleScreenText
 	jp PlaceString
 
 ; these point to special tiles specifically loaded for that purpose and are not usual text
 VersionOnTitleScreenText:
-IF DEF(_RED)
-	db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
-ENDC
-IF DEF(_BLUE)
-	db $61,$62,$63,$64,$65,$66,$67,$68,"@" ; "Blue Version"
-ENDC
-IF DEF(_GREEN)
-	db $62,$63,$64,$7F,$65,$66,$67,$68,$69,"@" ; "Green Version"
-ENDC
+	db $60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$6A,$6B,$6C,$6D,"@"
+
 NintenText: db "NINTEN@"
 SonyText:   db "SONY@"
