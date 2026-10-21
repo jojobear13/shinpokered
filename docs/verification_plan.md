@@ -99,7 +99,7 @@ You play; I keep the pipeline ready to take whatever you find:
 |---|---|---|
 | 1 Static checks | small | done (below) |
 | 2 Sweeps | medium | done (below) |
-| 3 Soak tests | medium | not started |
+| 3 Soak tests | medium | done (below) |
 | 4 Story checkpoints | large | not started |
 | 5 Builds, modes, saves | medium | not started |
 | 6 Playtest support | ongoing | ready |
@@ -160,3 +160,33 @@ Emulator sweeps (PyBoy, the Red build, from a new game with a test party):
     checker missed lines continuing after an inserted name; it now follows
     them, and found one more edge: "<PLAYER> got ¥" with a 7-letter name
     and 6 digits of prize money).
+
+## Phase 3 results
+
+- **Battle soak** (PyBoy, the Red build): 750 whole battles, 13,420 turns,
+  with random player parties made by the game's own `AddPartyMon` (random
+  species and levels, moves from their learnsets, held items, ability
+  slots), against random trainer parties or wild mons, each with random
+  options (EXP. SHARE, HP PERCENT, TYPE HINT, every clause, hard mode,
+  SET/SHIFT, animations, Shin's trainer options). Checked every turn: HP
+  within max on both sides and in the party, stat stages 1-13, real moves;
+  throughout: no jump to the crash vector, no code run from RAM, and the
+  deepest stack use (100 bytes, to `$df9b`; WRAM ends at `$dd25`). 741
+  battles ended; 9 ran past the time limit and were checked by eye (stalls:
+  Minimize and Acid Armor, a disobedient high-level mon). No crash.
+  - One finding, harmless and Shin's: a trainer mon's party copy keeps the
+    max HP worked out without its EVs while the battle copy has them, so
+    the party copy's HP can read a few points over its max after it has
+    been out. The battle copy is recalculated whenever it comes in, so
+    nothing shows.
+  - A crash found early was the test's: it had picked one of the
+    pictures-only species (FOSSIL_KABUTOPS), which no party can hold.
+- **Link soak** (`tests/soak_link.py`): the mirror test on 11,000 more seeds
+  with random abilities, moves and held items. Two real desyncs, fixed:
+  X Accuracy with a one-hit KO move (Shin's), and the Mystery Berry. The
+  last 4,000 seeds all agree.
+- **Breeding soak** (`tests/soak_breeding.py`): 2,042 eggs from random
+  breedable pairs (genders, moves, IVs, abilities, Everstones, trainer IDs),
+  made with the game's own random numbers: every one the right species,
+  level 1, no HP, its egg cycles, real moves with full PP, none twice, all
+  ones it may have, and a valid ability slot.
