@@ -15,7 +15,11 @@ import glob, re, sys
 WIDTH = 18
 # expansions wider than one tile, and control codes with no tile
 EXPAND = {"#": 4, "<PLAYER>": 7, "<RIVAL>": 7, "<USER>": 16, "<TARGET>": 16, "<pkmn>": 2}
-NAME = 12
+NAME = 12  # a move or item name; inserts known to be shorter:
+SHORT = {"wGymLeaderName": 8, "wBoxNumString": 2}
+# lines whose insert is shorter than a name: (start of the line, width)
+SHORT_LINES = {"Scored @": 4,      # a coin count
+               "It was @": 10}     # the revived fossil mon's name
 CHARMAP = sorted({m.group(1) for m in re.finditer(r'charmap "((?:[^"\\]|\\.)+)", \$([0-9A-Fa-f]+)', open("charmap.asm").read())},
                  key=len, reverse=True)
 ZERO = {k for k, v in re.findall(r'charmap "((?:[^"\\]|\\.)+)", \$([0-9A-Fa-f]+)', open("charmap.asm").read())
@@ -48,17 +52,19 @@ def lint(path):
             close()
             w, lit = width(m.group(2))
             cur = [w, lit, n, m.group(2)]
-            if "@" in m.group(2):
-                close(); cur = None
             continue
         m = re.match(r"\s*(TX_RAM|TX_NUM|TX_BCD)\b\s*([^;]*)", line)
         if m and cur is not None:
             args = [a.strip() for a in m.group(2).split(",")]
-            add = NAME
+            add = SHORT.get(args[0], SHORT_LINES.get(cur[3].split("<")[0], NAME))
             if m.group(1) == "TX_NUM" and len(args) >= 3:
-                add = int(args[2], 0)
+                add = int(args[2].replace("$", "0x"), 0)
             elif m.group(1) == "TX_BCD" and len(args) >= 2:
-                add = 7
+                flags = args[1].replace("$", "0x")
+                try:
+                    add = (eval(flags, {"LEADING_ZEROES": 0x80, "LEFT_ALIGN": 0x40, "MONEY_SIGN": 0x20}) & 0x1F) * 2
+                except Exception:
+                    add = 6
             cur[0] += add
             cur[3] += f"<{args[0]}>"
             continue

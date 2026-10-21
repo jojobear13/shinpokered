@@ -127,7 +127,8 @@ NowHoldingItemText:
 	text "@"
 	TX_RAM wcd6d
 	text " is now"
-	line "holding @"
+	line "holding"
+	cont "@"
 	TX_RAM wcf4b
 	text "."
 	prompt

@@ -98,7 +98,7 @@ You play; I keep the pipeline ready to take whatever you find:
 | Phase | Effort | Status |
 |---|---|---|
 | 1 Static checks | small | done (below) |
-| 2 Sweeps | medium | not started |
+| 2 Sweeps | medium | done (below) |
 | 3 Soak tests | medium | not started |
 | 4 Story checkpoints | large | not started |
 | 5 Builds, modes, saves | medium | not started |
@@ -133,3 +133,30 @@ first. Phase 4 is the slowest to build but gives a rerunnable playthrough.
   block, now including the last repel used (it was outside, so a game
   loaded mid-repel couldn't offer another when it wore off); tested in
   `SaveLayoutTest`.
+
+## Phase 2 results
+
+Emulator sweeps (PyBoy, the Red build, from a new game with a test party):
+
+- **Maps**: all 226 maps entered through a steered fly warp (any map, a
+  door or the middle as the spawn): every one loads, runs the overworld
+  loop and draws correctly (a contact sheet of all of them was checked by
+  eye). Six couldn't be walked out of from the spawn chosen (the sea on
+  Routes 19 and 21, the Cerulean Cave door, boulders on Seafoam B4F, a
+  hemmed-in Saffron door, the Hall of Fame cutscene): all spawn artifacts.
+- **People and signs**: all 1,146 texts opened through `DisplayTextID` and
+  pressed through: 801 end and return to the field, 339 start their trainer
+  battle, 6 run long or wait on an entry cutscene (Lance, the Hall of Fame)
+  that ignores the joypad, all checked. The 4,240 lines of dialogue shown
+  have no unknown tile.
+- **Trainers**: all 362 parties battled to the end with each enemy mon
+  acting: only real moves, no unknown tile in any battle text, no crash.
+- **Items**: all 137 items used from the bag in the field and in a wild
+  battle. Two bugs, fixed:
+  - Giving a held item left sprite updates off and the map's sprite tiles
+    overwritten (reported in the playtest too): the player vanished and
+    couldn't move, or the game crashed.
+  - "PIKACHU is now holding FOCUS BAND." ran past the box (the text
+    checker missed lines continuing after an inserted name; it now follows
+    them, and found one more edge: "<PLAYER> got ¥" with a 7-letter name
+    and 6 digits of prize money).
