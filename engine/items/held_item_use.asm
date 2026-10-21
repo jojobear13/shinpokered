@@ -164,6 +164,7 @@ DexRepelOffText:
 ; wCurEnemyLVL) away: the DEXREPEL, if it's owned, or a REPEL, if it's lower
 ; level than the first party mon (wild_encounters.asm)
 WildRepelCheck:
+	callba ReplaceDisallowedWildMew ; a Mew that would be a Ditto is judged as one
 	CheckEvent EVENT_DEXREPEL_ON
 	jr z, .repel
 	ld a, [wd11e]

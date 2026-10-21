@@ -14,6 +14,8 @@ with open(os.path.join(REPO_ROOT, "constants", "item_constants.asm")) as f:
 DEXREPEL = ITEMS["DEXREPEL"]
 DEXREPEL_ON = 0x8CD
 PIDGEY, RATTATA = 0x24, 0xA5  # Pokédex 16 and 19
+MEW, DITTO = 0x15, 0x4C  # Pokédex 151 and 132
+MEW_MET, DIPLOMA = 0x8C0, 0x90B
 
 
 class DexRepelTest(unittest.TestCase):
@@ -44,6 +46,14 @@ class DexRepelTest(unittest.TestCase):
         g.poke("wPartyMon1Level", lead_level)
         return bool(g.call("WildRepelCheck", max_frames=100)["f"] & 0x10)
 
+    def set_event(self, event, on):
+        g = self.game
+        address = f"wEventFlags+{event // 8}"
+        g.poke(address, g.peek(address) & ~(1 << event % 8) | on << event % 8)
+
+    def event(self, event):
+        return bool(self.game.peek(f"wEventFlags+{event // 8}") >> event % 8 & 1)
+
     def own(self, dex):
         g = self.game
         g.poke(f"wPokedexOwned+{(dex - 1) // 8}", g.peek(f"wPokedexOwned+{(dex - 1) // 8}") | 1 << (dex - 1) % 8)
@@ -57,6 +67,28 @@ class DexRepelTest(unittest.TestCase):
         self.own(16)
         self.assertTrue(self.repelled(PIDGEY))
         self.assertFalse(self.repelled(RATTATA))
+
+    def wild_mew(self, diploma, met):
+        self.set_on(True)
+        self.own(132)
+        self.set_event(DIPLOMA, diploma)
+        self.set_event(MEW_MET, met)
+        self.game.poke("wcf91", MEW)
+        return self.repelled(MEW)
+
+    def test_mew_turned_ditto_is_judged_as_ditto(self):
+        # without the diploma, or once Mew has been met, a wild Mew is a
+        # Ditto: an owned Ditto stays away like any other
+        self.assertTrue(self.wild_mew(diploma=False, met=False))
+        self.assertTrue(self.wild_mew(diploma=True, met=True))
+        self.assertEqual(self.game.peek("wEnemyMonSpecies2"), DITTO)
+
+    def test_allowed_mew_is_not_marked_met(self):
+        # an allowed, unowned Mew still appears, and only meeting it (after
+        # the repels, in DisallowWildMew) marks it met
+        self.assertFalse(self.wild_mew(diploma=True, met=False))
+        self.assertEqual(self.game.peek("wEnemyMonSpecies2"), MEW)
+        self.assertFalse(self.event(MEW_MET))
 
     def test_repel_still_works(self):
         g = self.game

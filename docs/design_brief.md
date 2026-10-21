@@ -1880,6 +1880,15 @@ exist upstream are written up for Shin Pokémon in `docs/upstream_bug_reports.md
   - `tests/test_dexrepel.py`: owned species kept away only while on, the
     REPEL still works, using it toggles (not in battle), and it's a key item
     in the key pocket.
+  - Fixed after a playtest: a wild Mew without the diploma, or once Mew has
+    been met, becomes a Ditto (Shin's `DisallowWildMew`), but only after the
+    repel check, so an owned Ditto could still appear from Cerulean Cave
+    B1's Mew slot. `WildRepelCheck` first makes the swap alone
+    (`ReplaceDisallowedWildMew`); marking Mew as met still waits until the
+    mon really appears.
+  - Playtest (emulator, Viridian Forest, 500 steps each): off, every species
+    appeared; on with Weedle and Kakuna owned, only Metapod; on with all five
+    owned, no battles; on with a REPEL too, both kept theirs away.
 - **EXP on catch** (Gen 6+): after "<mon> was caught!", `CaughtMonExperience`
   runs `GainExperience` as a defeat would: experience (with the Exp. Share
   rules and level-ups, move learning included) and the caught mon's EV
