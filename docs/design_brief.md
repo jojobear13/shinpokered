@@ -2271,22 +2271,21 @@ Bugs reported in play, and what came of each.
 - **Badge boosts are back** (see Gen 9 rules pass, part 4), with CHALLENGE >
   BADGE BOOST to turn them off.
 
-### Item descriptions in the bag (investigated, not built)
+### Item descriptions in the bag
 
-- **Layout.** The bag uses the whole screen: pocket header on rows 0-2,
-  six entries of two rows from row 4. A Gold/Silver-style description box
-  fits on rows 12-17 (two lines of 18 letters) if the list shows four
-  entries instead of six (`BAG_ROWS` 6 to 4); the cursor and scroll code
-  already work from `BAG_ROWS`.
-- **Text.** 129 bag items need a line pair (the 137 real items less the 8
-  badges; TMs and HMs aren't bag items). About 32 bytes each, 4.2 KB, plus
-  a 302-byte pointer table by item number.
-- **Space.** The ROM has 8 empty banks and about 87 KB free in the rest, so
-  the text and the drawing code go in a bank of their own. The bag's own
-  bank has 3-5 bytes free, so the one far call from `BagDrawScreen` needs a
-  few bytes moved out (for instance `PocketNames`).
-- **Work.** Writing 129 descriptions that match this game's rules (Gen 9
-  held items, the berries, the DEXREPEL), the box and its redraw on each
-  cursor move (the screen is redrawn whole already), and a test that every
-  bag item has text that fits. The same text could serve the marts' BUY
-  list.
+- **Layout.** The bag uses the whole screen: the pocket header on rows 0-2,
+  four entries of two rows from row 4 (`BAG_ROWS`, six before), and a box on
+  rows 13-17 with two lines on the entry under the cursor, as in Gold and
+  Silver ("Close the bag." on CANCEL). The screen is redrawn whole on each
+  cursor move already, so the box follows the cursor for free.
+- **Code and space.** The bag's bank had 3-5 bytes free, so the header (the
+  pocket's name, `PocketNames`) and the description box moved to their own
+  floating section, `engine/menu/item_descriptions.asm`, which
+  `BagDrawScreen` reaches with one `callba BagDrawFrame`; that freed more
+  than the call costs.
+- **Text.** `data/item_descriptions.asm`: a pointer per item number (0 for
+  the badges, the floors and the coin, which never are in the bag) and two
+  lines of at most 18 tiles each, 128 items, written to this game's rules
+  (Gen 9 held items, the vitamins' EVs, the Mist Stone and M.GENE, the
+  DEXREPEL). Test: `tests/test_item_descriptions.py` (every bag item has
+  two lines that fit). The marts' BUY list could use the same text.

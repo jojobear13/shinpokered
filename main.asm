@@ -1975,6 +1975,9 @@ INCLUDE "custom_functions/func_linkbattlecomms.asm"
 INCLUDE "custom_functions/func_bag.asm"
 INCLUDE "engine/menu/bag_menu.asm"
 
+SECTION "Item Descriptions", ROMX
+INCLUDE "engine/menu/item_descriptions.asm"
+
 SECTION "Moves Screen", ROMX
 INCLUDE "engine/menu/moves_screen.asm"
 

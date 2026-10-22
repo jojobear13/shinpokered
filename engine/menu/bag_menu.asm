@@ -4,7 +4,8 @@
 ; item, wWhichPokemon = its index in the bag, wMaxItemQuantity = how many,
 ; and its name in wcd6d and wcf4b.
 
-BAG_ROWS EQU 6 ; entries on the screen, two lines each
+BAG_ROWS EQU 4 ; entries on the screen, two lines each (the description
+               ; box is under them: engine/menu/item_descriptions.asm)
 BAG_TOP EQU 4 ; the first entry's row
 
 BagMenu::
@@ -210,30 +211,10 @@ ItemPocket::
 	ret
 
 BagDrawScreen:
-	coord hl, 0, 0
-	lb bc, 1, 18
-	call TextBoxBorder
+	callba BagDrawFrame ; the pocket's name, and the description box
 	coord hl, 0, BAG_TOP - 1
 	lb bc, BAG_ROWS * 2, 18
 	call TextBoxBorder
-	coord hl, 1, 1
-	lb bc, 1, 18
-	call ClearScreenArea
-	coord hl, 1, 1
-	ld [hl], "◀"
-	coord hl, 18, 1
-	ld [hl], "▶"
-	ld a, [wBagPocket]
-	add a
-	ld c, a
-	ld b, 0
-	ld hl, PocketNames
-	add hl, bc
-	ld a, [hli]
-	ld d, [hl]
-	ld e, a
-	coord hl, 4, 1
-	call PlaceString
 	coord hl, 1, BAG_TOP
 	lb bc, BAG_ROWS * 2, 18
 	call ClearScreenArea
@@ -326,18 +307,3 @@ BagCursorAddress:
 
 BagCancelText:
 	db "CANCEL@"
-
-PocketNames:
-	dw .items, .medicine, .balls, .battle, .berries, .key
-.items
-	db "ITEMS@"
-.medicine
-	db "MEDICINE@"
-.balls
-	db "# BALLS@"
-.battle
-	db "BATTLE ITEMS@"
-.berries
-	db "BERRIES@"
-.key
-	db "KEY ITEMS@"
