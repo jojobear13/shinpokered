@@ -96,6 +96,8 @@ def setup(game, rng):
         if name in game.symbols:  # no abilities: those have their own tests
             game.poke(name, 0)
     game.poke("wObtainedBadges", 0xFF)  # otherwise mons over level 10 disobey
+    flags = game.addr("wEventFlags") + 0x8D2 // 8  # EVENT_NO_BADGE_BOOSTS: stats as set
+    game.poke(flags, game.peek(flags) | 1 << 0x8D2 % 8)
     game.poke("wPlayerMonNumber", rng.randint(0, PARTY_LENGTH - 1))
     game.poke("wPartyCount", PARTY_LENGTH)
     game.poke("wEnemyPartyCount", PARTY_LENGTH)

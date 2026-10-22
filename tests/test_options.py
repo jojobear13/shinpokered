@@ -13,7 +13,7 @@ OPT_LENGTH = 12
 DEFAULTS = [
     ["MEDIUM", "ON", "SHIFT", "MONO", "OFF", None],  # GAME
     ["30", "GEN 1", "OFF", "OFF", "OFF", "OFF", "OFF"],  # DISPLAY
-    ["OFF"] * 6,  # CHALLENGE
+    ["OFF"] * 6 + ["ON"],  # CHALLENGE (BADGE BOOST, Gen 1's, is on)
     ["OFF"] * 4,  # CLAUSES
     ["OFF"] * 5,  # EXTRAS
     ["OFF"] * 5,  # RANDOMIZER
@@ -132,6 +132,16 @@ class OptionsTest(unittest.TestCase):
         self.change(switching, 0)
         self.assertEqual(g.peek("wUnusedD721"), 0)
         self.assertEqual(self.value(switching), "ON")
+
+    def test_badge_boost_off(self):
+        g = self.game
+        boost = self.options(2)[6]
+        events = g.addr("wEventFlags")
+        self.change(boost, 1)
+        self.assertEqual(self.value(boost), "OFF")
+        self.assertEqual(g.peek(events + 0x8D2 // 8) >> (0x8D2 % 8) & 1, 1)  # EVENT_NO_BADGE_BOOSTS
+        self.change(boost, 0)
+        self.assertEqual(self.value(boost), "ON")
 
     def test_level_cap_shows_the_cap(self):
         g = self.game

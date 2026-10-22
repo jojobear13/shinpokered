@@ -18,6 +18,7 @@ HazeEffect_:
 	push af
 	callab ApplyBurnAndParalysisPenaltiesToPlayer
 	callab ApplyBurnAndParalysisPenaltiesToEnemy
+	callab ApplyAllBadgeStatBoosts ; every stat of the player's again
 	pop af
 	ld [H_WHOSETURN], a
 	ld hl, PlayCurrentMoveAnimation

@@ -181,26 +181,25 @@ class StatStageMoveTest(unittest.TestCase):
 
 
 class BadgeBoostTest(unittest.TestCase):
-    """Gen 9 has no badge boosts: ApplyBadgeStatBoosts leaves every stat alone."""
+    """The Volcano Badge boosts both specials (test_badge_boosts.py has the rest)."""
 
     @classmethod
     def setUpClass(cls):
         cls.game = shared_game()
 
-    def test_no_boosts(self):
+    def test_volcano_badge_boosts_both_specials(self):
         g = self.game
-        for changed_stage in (0, MOD_SPECIAL_DEFENSE + 1):
-            g.reset()
-            g.poke("wLinkState", 0)
-            g.poke("wOptions", 0)
-            g.poke("wObtainedBadges", 0xFF)
-            g.poke("wUnusedD71B", changed_stage)
-            values = {"Attack": 100, "Defense": 120, "Speed": 140, "SpecialAttack": 160, "SpecialDefense": 180}
-            for name, value in values.items():
-                g.poke16("wBattleMon" + name, value)
-            g.call("ApplyBadgeStatBoosts")
-            self.assertEqual({name: g.peek16("wBattleMon" + name) for name in values}, values)
-            self.assertEqual(g.peek("wUnusedD71B"), 0)
+        g.reset()
+        g.poke("wLinkState", 0)
+        flags = g.addr("wEventFlags") + 0x8D2 // 8  # EVENT_NO_BADGE_BOOSTS off
+        g.poke(flags, g.peek(flags) & ~(1 << 0x8D2 % 8))
+        g.poke("wObtainedBadges", 1 << 6)  # BIT_VOLCANOBADGE
+        values = {"Attack": 160, "Defense": 160, "Speed": 160, "SpecialAttack": 160, "SpecialDefense": 160}
+        for name, value in values.items():
+            g.poke16("wBattleMon" + name, value)
+        g.call("ApplyAllBadgeStatBoosts")
+        self.assertEqual({name: g.peek16("wBattleMon" + name) for name in values},
+                         dict(values, SpecialAttack=180, SpecialDefense=180))
 
 
 class WildIVsTest(unittest.TestCase):

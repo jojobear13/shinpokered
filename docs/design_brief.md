@@ -1068,7 +1068,8 @@ types and stats, moves), through generator scripts in `tools/`.
    replace the three DV bytes and ten stat-experience bytes, so each mon's
    data gets 3 bytes smaller.
 4. The damage formula, critical hits (stages, x1.5, which stages and
-   screens they ignore), stat and accuracy stages; badge boosts go.
+   screens they ignore), stat and accuracy stages; badge boosts went here
+   and came back later as an option (see below).
 5. Status conditions.
 6. Move behaviours (priority, secondary-effect chances, trapping, screens,
    Haze, Substitute, Counter, recoil and crash, switching moves...).
@@ -1207,8 +1208,18 @@ a new bank, `$35` ("Battle 2"), replacing the old code as it goes.
   are gone, in every mode.
 - **Stages** are Gen 9's ratios for the stored stats too, and accuracy is one
   net stage, accuracy minus evasion, from 3/9 to 9/3.
-- **Burn** halves damage, not the Attack stat, so curing it changes no stat;
-  **badge boosts** are gone (Gen 9 has none).
+- **Burn** halves damage, not the Attack stat, so curing it changes no stat.
+  **Badge boosts** went with this part (Gen 9 has none) and were later
+  brought back, on by default, with the CHALLENGE option BADGE BOOST to turn
+  them off: `ApplyBadgeStatBoosts` multiplies a stat by 1.125 only right
+  after it is worked out again from its stage, so boosts never stack. Every
+  stat gets it after a switch-in, a level-up in battle, Haze or a move that
+  changes several of the user's stats (`ApplyAllBadgeStatBoosts`, which
+  also ignores a stale `wUnusedD71B` left by the enemy's own stat change);
+  after one stat's change, only that one. Not in link battles, and Shin's
+  hard-mode rule (none in trainer battles) stays gone: the option replaces
+  it. Critical hits use the unmodified stats, so they ignore the boosts, as
+  in Gen 1. Tests: `tests/test_badge_boosts.py`.
 - **The confused self-hit** is Gen 9's: 40 power, the mon's own Attack
   against its own Defense with their stages, x85-100%, never critical, and
   no longer touched by the foe's Reflect.

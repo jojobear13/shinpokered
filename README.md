@@ -37,7 +37,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Gen 5+ damage formula with 16-bit stats; modifiers applied in Gen 9 order; 999 cap kept.
 - Critical hits: Gen 9 stages (1/24, 1/8, 1/2, always), x1.5, ignore bad stages and screens.
 - Stat stages use Gen 9 ratios; accuracy is one net stage (accuracy minus evasion).
-- Badge stat boosts removed; Stadium-style and speed-based crit rates removed.
+- Stadium-style and speed-based crit rates removed.
 - Burn halves physical damage instead of Attack; Explosion no longer halves Defense.
 - Confused self-hit: 40 power, own Attack vs own Defense, never critical, ignores Reflect.
 - Sleep 1-3 turns; freeze 20% thaw per turn; paralysis halves Speed, 25% full para.
@@ -114,7 +114,8 @@ Every option starts as the original game played; everything extra is off by defa
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
 - HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:"; it counts up or down with the bar.
-- CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
+- CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE, BADGE BOOST.
+- BADGE BOOST: Gen 1's badge boosts (each badge raises its stat of your Pokémon by 1/8; the Volcano Badge raises both specials), on by default. They never stack: a stat gets its boost only when it is worked out again. Turn them off here; link battles never have them.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
 - EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, SAFARI EVENT, PC IN MENU.
 - RANDOMIZER: DOORS, KEY ITEMS, ITEMS, MARTS, TRADES; RANDOM POKéMON: STARTERS, WILD, TRAINERS, SPECIAL MON, TM MOVES, TM COMPAT., LEARNSETS (see Randomizer).
@@ -191,7 +192,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Saffron move deleter and relearner NPCs; teaching TMs from the bag (replaced by MOVES screen).
 - SELECT-swapped second bag.
 - Mid-game wild randomizer reseed; Safari event no longer locked until after the Elite Four.
-- Trapping clause, enhanced Psywave, badge boosts, Gen 1 crit modes.
+- Trapping clause, enhanced Psywave, Gen 1 crit modes.
 
 #### Internal
 - Player/enemy battle routine pairs merged; PC box and day care moved to save RAM.
@@ -424,7 +425,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Physical/special by type → split by move.
 - Gen 1 type chart → Gen 6+ chart with Steel, Dark and Fairy; Gen 9 base stats, catch rates and move data.
 - Gen 1 damage, crits, stat stages and burn/paralysis penalties → Gen 9's.
-- Shin's crit tweaks, Stadium crits in hard mode and badge boosts (incl. hard-mode trainer-battle rule) → removed.
+- Shin's crit tweaks and Stadium crits in hard mode → removed; badge boosts kept, with a CHALLENGE option to turn them off in place of the hard-mode trainer-battle rule.
 - Shin's sleep counter, Rest and Haze → Gen 9 status rules and Haze.
 - Shin's Rage (2-3 turns), Psywave re-rolls, Bide, Disable, Mimic, Mirror Move, Counter, Substitute and crash-damage rules → Gen 9/Gen 7 behaviour.
 - Shin's Reflect/Light Screen cap → 5-turn side conditions.

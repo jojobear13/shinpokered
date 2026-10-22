@@ -2140,7 +2140,7 @@ LoadBattleMonFromParty:
 	call ApplyBurnAndParalysisPenaltiesToPlayer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - apply badge stat boosts
-	call ApplyBadgeStatBoosts
+	call ApplyAllBadgeStatBoosts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ld a, $7 ; default stat modifier
 	ld b, NUM_STAT_MODS
@@ -6307,11 +6307,91 @@ HalveSpeedDueToParalysis:
 HalveAttackDueToBurn:
 	ret
 
-; Gen 9 has no badge boosts. Only clears the stat change wUnusedD71B noted
+; Gen 1's badge boosts: each badge the player has multiplies its stat of the
+; player's mon by 1.125 (not in link battles, nor with the CHALLENGE option
+; BADGE BOOST off). Only a stat just recalculated from its stage gets its
+; boost, so they never stack (Gen 1 boosted every stat again on each stat
+; change): all of them after a switch-in, level-up, Haze or a move changing
+; several stats, and after a single stat's change only that one
+; (wUnusedD71B holds its MOD_* index + 1).
+ApplyAllBadgeStatBoosts:
+	xor a
+	ld [wUnusedD71B], a
 ApplyBadgeStatBoosts:
+	ld a, [wLinkState]
+	cp LINK_STATE_BATTLING
+	jr z, .return
+	CheckEvent EVENT_NO_BADGE_BOOSTS
+	jr nz, .return
+	ld a, [wObtainedBadges]
+	ld b, a
+	ld hl, wBattleMonAttack
+	ld de, BadgeStatBoosts
+.loop
+	ld a, [de]
+	inc de
+	and a
+	jr z, .return
+	ld c, a ; MOD_* + 1 of the stat at hl
+	ld a, [wUnusedD71B]
+	and a
+	jr z, .checkBadge ; boost every stat
+	cp c
+	jr nz, .next ; (accuracy and evasion have no stat: nothing)
+.checkBadge
+	ld a, [de]
+	and b
+	jr z, .next
+	push de
+	call .applyBoostToStat
+	pop de
+.next
+	inc de
+	inc hl
+	inc hl
+	jr .loop
+.return
 	xor a
 	ld [wUnusedD71B], a
 	ret
+; stat at hl * 1.125, at most 999
+.applyBoostToStat
+	ld a, [hli]
+	ld d, a
+	ld e, [hl]
+	srl d
+	rr e
+	srl d
+	rr e
+	srl d
+	rr e
+	ld a, [hl]
+	add e
+	ld [hld], a
+	ld a, [hl]
+	adc d
+	ld [hli], a
+	ld a, [hld]
+	sub 999 % $100
+	ld a, [hl]
+	sbc 999 / $100
+	ret c
+	ld a, 999 / $100
+	ld [hli], a
+	ld a, 999 % $100
+	ld [hld], a
+	ret
+
+; for each stat from attack on, in wBattleMon order: its MOD_* index + 1 and the
+; badge that boosts it. The Volcano Badge boosts both specials, as the Glacier
+; Badge does in Gen 2.
+BadgeStatBoosts:
+	db MOD_ATTACK + 1,          1 << BIT_BOULDERBADGE
+	db MOD_DEFENSE + 1,         1 << BIT_THUNDERBADGE
+	db MOD_SPEED + 1,           1 << BIT_SOULBADGE
+	db MOD_SPECIAL_ATTACK + 1,  1 << BIT_VOLCANOBADGE
+	db MOD_SPECIAL_DEFENSE + 1, 1 << BIT_VOLCANOBADGE
+	db 0
 
 
 ;joenote - This will refresh the party menu without printing anything in the text box or initiating anything
@@ -7132,6 +7212,9 @@ RecalculateUserStats:
 	ld [wCalculateWhoseStats], a
 	callab CalculateModifiedStats
 	ld a, [H_WHOSETURN]
+	and a
+	call z, ApplyAllBadgeStatBoosts ; the player's: every stat again
+	ld a, [H_WHOSETURN]
 	push af
 	xor 1 ; HalveSpeedDueToParalysis halves the other side's
 	ld [H_WHOSETURN], a
@@ -7488,9 +7571,7 @@ UpdateStatDone:
 .applyBadgeBoostsAndStatusPenalties
 	ld a, [H_WHOSETURN]
 	and a
-	call z, ApplyBadgeStatBoosts ; whenever the player uses a stat-up move, badge boosts get reapplied again to every stat,
-	                             ; even to those not affected by the stat-up move (will be boosted further)
-								 ;joenote - this has been fixed
+	call z, ApplyBadgeStatBoosts ; the raised stat's badge boost (Gen 1 boosted every stat again, stacking)
 	ld hl, MonsStatsRoseText
 	call PrintText
 
@@ -7724,9 +7805,7 @@ UpdateLoweredStatDone:
 .ApplyBadgeBoostsAndStatusPenalties
 	ld a, [H_WHOSETURN]
 	and a
-	call nz, ApplyBadgeStatBoosts ; whenever the player gets hit with a stat-down move, badge boosts get reapplied again to every stat,
-	                              ; even to those not affected by the stat-down move (will be boosted further)
-								  ;joenote - this is now fixed
+	call nz, ApplyBadgeStatBoosts ; the lowered stat's badge boost (Gen 1 boosted every stat again, stacking)
 	ld hl, MonsStatsFellText
 	call PrintText
 	

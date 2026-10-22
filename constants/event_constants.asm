@@ -2258,7 +2258,7 @@ const_value = 0
 	const EVENT_SURFING_PIKACHU ;Pikachu won the S.S. Anne tournament ; 8CF, (D860, bit 7)
 	const EVENT_FLYING_DRAGONITE ;Dragonite led against Lance ; 8D0, (D861, bit 0)
 	const EVENT_EXP_SHARE_ON  ;option: the whole team gains EXP ; 8D1, (D861, bit 1)
-	const EVENT_8D2                                  ; 8D2, (D861, bit 2)
+	const EVENT_NO_BADGE_BOOSTS ;option: BADGE BOOST off ; 8D2, (D861, bit 2)
 	const EVENT_8D3                                  ; 8D3, (D861, bit 3)
 	const EVENT_8D4                                  ; 8D4, (D861, bit 4)
 	const EVENT_8D5                                  ; 8D5, (D861, bit 5)

@@ -77,13 +77,14 @@ OptionsPageDisplay:
 	opt_bit    OptTextHPPercent, OptHelpHPPercent, wDisplayOptions, 1 << BIT_HP_PERCENT, OptValuesOffOn
 
 OptionsPageChallenge:
-	db "CHALLENGE@", 6
+	db "CHALLENGE@", 7
 	opt_bit    OptTextHardMode, OptHelpHardMode, wOptions, BATTLE_HARD_MODE, OptValuesOffOn
 	opt_bit    OptTextAISwitching, OptHelpAISwitching, wUnusedD721, BATTLE_NOSWITCH, OptValuesOnOff ; the flag means off
 	opt_custom OptTextLevelCap, OptHelpLevelCap, 2, GetLevelCapOption, SetLevelCapOption, OptValuesLevelCap
 	opt_event  OptTextScaling, OptHelpScaling, EVENT_90C, OptValuesOffOn
 	opt_event  OptTextAltMoves, OptHelpAltMoves, EVENT_8C9, OptValuesOffOn
 	opt_bit    OptTextNuzlocke, OptHelpNuzlocke, wUnusedD721, 1 << 6, OptValuesOffOn
+	opt_event  OptTextBadgeBoost, OptHelpBadgeBoost, EVENT_NO_BADGE_BOOSTS, OptValuesOnOff ; the flag means off
 
 OptionsPageClauses:
 	db "CLAUSES@", 4
@@ -993,6 +994,7 @@ OptTextSymbols:        db "SYMBOLS@"
 OptTextTypeHint:       db "TYPE HINT@"
 OptTextHPPercent:      db "HP PERCENT@"
 OptTextExpShare:       db "EXP. SHARE@"
+OptTextBadgeBoost:     db "BADGE BOOST@"
 OptTextHardMode:       db "HARD MODE@"
 OptTextAISwitching:    db "AI SWITCHING@"
 OptTextLevelCap:       db "LEVEL CAP@"
@@ -1082,6 +1084,9 @@ OptHelpAltMoves:
 OptHelpNuzlocke:
 	db   "#MON that faint"
 	next "die. 1 catch/area.@"
+OptHelpBadgeBoost:
+	db   "Badges raise your"
+	next "#MON's stats.@"
 OptHelpItemClause:
 	db   "No one uses items"
 	next "in trainer fights.@"
