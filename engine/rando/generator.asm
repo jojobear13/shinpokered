@@ -115,6 +115,13 @@ RandoHashResult::
 	ld bc, 4
 	jp CopyData
 
+; sRandoRng, just set from a key (RandoKey), stirred
+RandoRngStir::
+	call RandoSRAM
+	call RandoRngNext
+	call RandoRngNext
+	jp RandoRngNext
+
 ; de = n -> de = a random number below n, from sRandoRng (RandoMart)
 RandoRandDE::
 	call RandoSRAM

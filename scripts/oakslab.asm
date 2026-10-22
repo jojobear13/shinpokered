@@ -328,6 +328,9 @@ OaksLabScript9:
 	call Delay3
 	ld a, [wRivalStarterTemp]
 	ld [wRivalStarter], a
+	ld e, a
+	callba RandoStarterMonFar ; the one STARTERS put in that ball
+	ld a, e
 	ld [wcf91], a
 	ld [wd11e], a
 	call GetMonName
@@ -883,7 +886,9 @@ OaksLabScript_1d133:
 	ld [wcf91], a
 	
 	;joenote - randomize the starter
-	predef ReplaceWildMon
+	push bc
+	callba RandoStarterChoice ; STARTERS', or Shin's random wild #MON
+	pop bc
 	ld a, [wcf91]
 	
 	ld [wd11e], a
@@ -922,6 +927,15 @@ OaksLabScript_1d157:
 	call ReloadMapData
 	ld c, 10
 	call DelayFrames
+	; randomized starters: just the name
+	ld a, [wcf91]
+	ld [wd11e], a
+	call GetMonName
+	callba RandoStartersChanged
+	ld a, e
+	and a
+	ld hl, OaksLabAnyStarterText
+	jr nz, OaksLabMonChoiceMenu
 	ld a, [wSpriteIndex]
 	cp $2
 	jr z, OaksLabLookAtCharmander
@@ -949,6 +963,13 @@ OaksLabLookAtBulbasaur:
 OaksLabBulbasaurText:
 	TX_FAR _OaksLabBulbasaurText
 	db "@"
+
+OaksLabAnyStarterText:
+	text "So! You want"
+	line "@"
+	TX_RAM wcd6d
+	text "?"
+	done
 
 OaksLabMonChoiceMenu:
 	call PrintText

@@ -91,7 +91,7 @@ ReadTrainer:
 	ld a, ENEMY_PARTY_DATA
 	ld [wMonDataLocation], a
 	push hl
-	callba RandoScaleDown ; the randomizer: not far above the party
+	callba RandoTrainerMon ; the randomizer's #MON, not far above the party
 	call AddPartyMon
 	pop hl
 	jr .LoopTrainerData
@@ -116,7 +116,7 @@ ReadTrainer:
 	ld a, ENEMY_PARTY_DATA
 	ld [wMonDataLocation], a
 	push hl
-	callba RandoScaleDown ; the randomizer: not far above the party
+	callba RandoTrainerMon ; the randomizer's #MON, not far above the party
 	call AddPartyMon
 	pop hl
 	jr .SpecialTrainer
@@ -316,4 +316,5 @@ ReadTrainer:
 	dec b
 	jr nz, .LastLoop ; repeat wCurEnemyLVL times
 	callab TrainerHeldItems
+	callab RandoTrainerHeld ; TRAINERS ALL: the bosses' others hold something
 	jpab AmuletCoinMoney

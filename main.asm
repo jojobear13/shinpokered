@@ -2074,6 +2074,7 @@ PURGE RP
 
 SECTION "Rando Runtime", ROMX, BANK[$38]
 INCLUDE "engine/rando/runtime.asm"
+INCLUDE "engine/rando/mons.asm"
 IF DEF(_REDGREENJP)
 INCLUDE "data/rando/jp_run.asm"
 ELSE

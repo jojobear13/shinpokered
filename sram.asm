@@ -143,6 +143,8 @@ sRandoBk:: ds (RANDO_NODES + 7) / 8
 sRandoTaken:: ds (RANDO_LOCS + 7) / 8
 sRandoSlTaken:: ds (RANDO_LOCS + 7) / 8
 sRandoKeys:: ds RANDO_NUM_PROG
+; in the game: what RandoPickSpecies may pick (RANDO_WANT_*)
+sRandoWant:: ds 6 ; RANDO_WANT_SIZE
 ; the door shuffle's, then the item placement's
 UNION
 sRandoState:: ds RANDO_SLOTS ; STATE_PAIRED, STATE_OPEN

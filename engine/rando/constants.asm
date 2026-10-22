@@ -29,3 +29,28 @@ DEF CLASS_KNOWN_F EQU 4        ; the two above are still right (RandoStale)
 
 ASSERT RANDO_NUM_ATOMS <= 32   ; sRandoHave and friends are 4 bytes
 ASSERT RANDO_NODES < 2048 && RANDO_SLOTS < 2048 ; RandoBit
+
+; sRandoWant, what RandoPickSpecies may pick
+DEF RANDO_WANT_MASK EQU 0      ; RandoMonInfo's flags & this
+DEF RANDO_WANT_FLAGS EQU 1     ; must be this
+DEF RANDO_WANT_TYPE EQU 2      ; a type it has ($ff: any)
+DEF RANDO_WANT_LOW EQU 3       ; base stat total / 4 from
+DEF RANDO_WANT_HIGH EQU 4      ; to
+DEF RANDO_WANT_NOT EQU 5       ; never this one
+DEF RANDO_WANT_SIZE EQU 6
+; RandoMonInfo: type, type, base stat total / 4, flags
+DEF MONINFO_REAL EQU 1
+DEF MONINFO_BASIC EQU 2
+DEF MONINFO_LEGENDARY EQU 4
+DEF MONINFO_WATER EQU 8
+DEF MONINFO_EVOLVES EQU 16
+DEF MONINFO_LINE EQU 32        ; the first of a three-stage line
+; RandoKey's kinds: one per thing randomized, so they never share numbers
+DEF RKEY_STARTERS EQU 1
+DEF RKEY_TRAINER EQU 2
+DEF RKEY_WILD EQU 3
+DEF RKEY_SPECIAL EQU 4
+DEF RKEY_TRADE EQU 5
+DEF RKEY_TM EQU 6
+DEF RKEY_LEARN EQU 7
+DEF RKEY_HELD EQU 8
