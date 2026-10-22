@@ -17,6 +17,7 @@ and assume the repo is at `/home/user/shinpokered`.
     python3 colors.py                      # COLOR FIX and MORE COLOR combinations
     python3 sameboy_check.py [cgb dmg sgb] # the same save played in SameBoy
     python3 rando_walk.py [SEED]           # doors of a randomized world, walked through
+    python3 rando_mons.py [SEED]           # RANDOM #MON: gifts, Snorlax, Mewtwo, the Elite Four
 
 Results and screenshots go to `/tmp/pk30emu/out`. `lib.py` and `dxlib.py`
 are the shared helpers (party set-up, screen text from the charmap); `story.py`

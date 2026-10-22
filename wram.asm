@@ -3695,6 +3695,11 @@ wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)
 wHPPercentShown:: ; the percentage its tiles show now
 	ds 1
 
+wRandoLearnsetSpecies:: ; LEARNSETS: the #MON whose learnset is in wRandoLearnset
+	ds 1
+wRandoLearnset:: ; its evolutions and learnset, with LEARNSETS' moves (RandoLearnset)
+	ds RANDO_LEARNSET_SIZE
+
 ; free up to the stack at $df00
 
 

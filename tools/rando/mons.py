@@ -63,6 +63,10 @@ class Mons:
     def type_set(self, sp):
         return set(self.types[sp])
 
+    def num_moves(self):
+        moves = consts('constants/move_constants.asm')
+        return moves['STRUGGLE'] - 1    # NUM_ATTACKS: the moves before STRUGGLE
+
     # ---- the type chart
     def read_types(self):
         bank, a = self.rom.at('TypeEffects')

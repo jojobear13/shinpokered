@@ -653,6 +653,7 @@ GetMonHeader::
 	ld bc, MonBaseStatsEnd - MonBaseStats
 	call CopyData
 	callab Gen2PicHeader ; Crystal's pics instead, with the option on
+	callba RandoHeaderMoves ; LEARNSETS' first moves
 	jr .done
 .specialID
 	;joenote - dynamically get pic size of special ID

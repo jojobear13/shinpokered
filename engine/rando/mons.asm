@@ -460,8 +460,9 @@ RandoStartersChanged::
 ; far in wEnemyPartyCount). With TRAINERS ALL every trainer's #MON is
 ; another of similar strength, of the trainer's type theme if it had one
 ; (the gym leaders and the ELITE FOUR always do), drawn from the seed, the
-; trainer and the place in the party; the rival keeps the starter line
-; (STARTERS' if those are shuffled). Then levels scale down.
+; trainer and the place in the party, then evolved as far as its level
+; allows; the rival keeps the starter line (STARTERS' if those are
+; shuffled). Then levels scale down.
 RandoTrainerMon::
 	call RandoRivalClass
 	jr nz, .notRival
@@ -493,6 +494,8 @@ RandoTrainerMon::
 	ld [wcf91], a
 .close
 	call RandoCloseSRAM
+	; evolved as far as its level allows, as Shin's random trainers' are
+	callba EnemyMonEvolve
 .scale
 	jp RandoScaleDown
 
@@ -1047,3 +1050,417 @@ RandoTrade::
 	pop hl
 	ld [hl], a
 	jp RandoCloseSRAM
+
+; ---- moves: TM MOVES, TM COMPAT. and LEARNSETS
+
+; a = move -> a = its RandoMoveInfo (bit 7: does damage; the type below)
+RandoMoveInfoOf:
+	dec a
+	ld e, a
+	ld d, 0
+	ld hl, RandoMoveInfo
+	add hl, de
+	ld a, [hl]
+	ret
+
+; a = move -> carry if it is one the HMs teach (never a TM's, by TM MOVES)
+RandoHMMove:
+	ld hl, RandoVanillaTMs + NUM_TMS
+	ld c, NUM_HMS
+.loop
+	cp [hl]
+	scf
+	ret z
+	inc hl
+	dec c
+	jr nz, .loop
+	and a
+	ret
+
+; a = a machine (0-, the TMs then the HMs) -> a = the move it teaches. With
+; TM MOVES the TMs teach a shuffle of every move but the HMs': the p-th of
+; those is p + 1, plus one for each HM move at or below it (the HMs' moves
+; are in order).
+RandoTMMove:
+	cp NUM_TMS
+	jr nc, .vanilla
+	ld b, a
+	ld a, [wRandoFlags3]
+	bit RANDO3_TM_MOVES_F, a
+	ld a, b
+	jr z, .vanilla
+	ld c, NUM_ATTACKS - NUM_HMS
+	ld b, RKEY_TM
+	call RandoPermute
+	inc a
+	ld hl, RandoVanillaTMs + NUM_TMS
+	ld c, NUM_HMS
+.skipHMs
+	cp [hl]
+	jr c, .done
+	inc a
+	inc hl
+	dec c
+	jr nz, .skipHMs
+.done
+	ret
+.vanilla
+	ld e, a
+	ld d, 0
+	ld hl, RandoVanillaTMs
+	add hl, de
+	ld a, [hl]
+	ret
+
+; a = move -> a = the machine that teaches it ($ff: none)
+RandoMoveMachine:
+	ld b, a
+	ld a, [wRandoFlags3]
+	bit RANDO3_TM_MOVES_F, a
+	jr z, .vanilla
+	ld a, b
+	call RandoHMMove
+	jr c, .vanilla               ; the HMs stay
+	; its place among the moves that aren't the HMs'
+	ld a, b
+	dec a
+	ld hl, RandoVanillaTMs + NUM_TMS
+	ld c, NUM_HMS
+.below
+	ld d, a
+	ld a, [hli]
+	cp b
+	ld a, d
+	jr nc, .placed
+	dec a
+	dec c
+	jr nz, .below
+.placed
+	ld d, a                      ; the place
+	ld e, 0
+.machine
+	ld a, e
+	push de
+	ld c, NUM_ATTACKS - NUM_HMS
+	ld b, RKEY_TM
+	call RandoPermute
+	pop de
+	cp d
+	ld a, e
+	ret z
+	inc e
+	ld a, e
+	cp NUM_TMS
+	jr c, .machine
+	ld a, $ff
+	ret
+.vanilla
+	ld hl, RandoVanillaTMs
+	ld e, 0
+.find
+	ld a, [hli]
+	cp b
+	ld a, e
+	ret z
+	inc e
+	ld a, e
+	cp NUM_TMS + NUM_HMS
+	jr c, .find
+	ld a, $ff
+	ret
+
+; e = a machine -> e = its move (from other banks)
+RandoTMMoveFar::
+	ld a, e
+	call RandoTMMove
+	ld e, a
+	ret
+
+; CanLearnTM: e = the move, wcf91 the #MON, wMonHLearnset its machine bits
+; -> e = 1 if it can learn it, 0 if not; $ff if neither TM MOVES nor TM
+; COMPAT. changes anything (the game's own check)
+RandoCanLearnTM::
+	ld a, [wRandoFlags3]
+	and (1 << RANDO3_TM_MOVES_F) | RANDO3_TM_COMPAT
+	jr nz, .changed
+	ld e, $ff
+	ret
+.changed
+	ld a, e
+	push de
+	call RandoMoveMachine
+	pop de
+	ld d, a                      ; the machine
+	cp $ff
+	jr nz, .gotMachine
+	ld e, 0
+	ret
+.gotMachine
+	ld a, [wRandoFlags3]
+	and RANDO3_TM_COMPAT
+	jr z, .ownBits
+	cp 3 << RANDO3_TM_COMPAT_F
+	jr z, .yes                   ; FULL: every #MON, every machine
+	ld a, d
+	cp NUM_TMS
+	jr nc, .ownBits              ; the HMs as they were: the logic needs them
+	; TYPE: its own types always, NORMAL moves half the time, others a
+	; fifth; RANDOM: half the time. One answer per #MON per machine per seed.
+	push de
+	ld a, [wcf91]
+	ld c, a
+	ld b, RKEY_TM
+	ld e, 0
+	call RandoKey
+	ld a, 100
+	call RandoRandA
+	push af
+	call RandoCloseSRAM
+	pop af
+	pop de
+	ld b, a                      ; 0-99
+	ld a, [wRandoFlags3]
+	and RANDO3_TM_COMPAT
+	cp 2 << RANDO3_TM_COMPAT_F
+	ld c, 50
+	jr z, .chance
+	push bc
+	ld a, e
+	call RandoMoveInfoOf
+	pop bc
+	and $7f
+	ld c, a                      ; the move's type
+	ld a, [wcf91]
+	push bc
+	call RandoMonInfoOf
+	pop bc
+	ld a, [hli]
+	cp c
+	jr z, .yes
+	ld a, [hl]
+	cp c
+	jr z, .yes
+	ld a, c
+	and a                        ; NORMAL
+	ld c, 50
+	jr z, .chance
+	ld c, 20
+.chance
+	ld a, b
+	cp c
+	jr c, .yes
+	ld e, 0
+	ret
+.yes
+	ld e, 1
+	ret
+.ownBits
+	ld a, d
+	ld e, a
+	srl e
+	srl e
+	srl e
+	ld d, 0
+	ld hl, wMonHLearnset
+	add hl, de
+	and 7
+	ld b, a
+	ld a, [hl]
+	inc b
+.shift
+	dec b
+	jr z, .bit
+	rrca
+	jr .shift
+.bit
+	and 1
+	ld e, a
+	ret
+
+; LEARNSETS: e = the #MON, d = a move it learns -> d = the one it learns
+; instead: one that does damage for one that does, else one that doesn't;
+; with TYPE, of one of its types half the time; with METRONOME, METRONOME.
+; One answer per #MON per move per seed, drawn by trying random moves
+; (cheap: each try is a byte). Save RAM is closed after.
+RandoLearnMove:
+	ld a, d
+	and a
+	ret z
+	ld a, [wRandoFlags3]
+	and RANDO3_LEARN
+	ret z
+	cp 3 << RANDO3_LEARN_F
+	jr nz, .random
+	ld d, METRONOME
+	ret
+.random
+	push de
+	ld c, e
+	ld b, RKEY_LEARN
+	call RandoKey                ; d, e: the move and the #MON
+	pop de
+	; sRandoWant, for moves: + 0 damage or not (bit 7), + 1 a type ($ff any),
+	; + 2 the one replaced, + 3 the one being tried
+	ld a, d
+	ld [sRandoWant + 2], a
+	push de
+	call RandoMoveInfoOf
+	pop de
+	and $80
+	ld [sRandoWant], a
+	ld a, $ff
+	ld [sRandoWant + 1], a
+	ld a, [wRandoFlags3]
+	and RANDO3_LEARN
+	cp 1 << RANDO3_LEARN_F
+	jr nz, .try
+	call RandoRngByte
+	rrca
+	jr nc, .try                  ; half the time any type
+	rrca
+	push af
+	ld a, e
+	call RandoMonInfoOf          ; its first type, or its second
+	pop af
+	jr nc, .gotType
+	inc hl
+.gotType
+	ld a, [hl]
+	ld [sRandoWant + 1], a
+.try
+	ld b, 0                      ; tries: after 256 of one type, any type
+.again
+	push bc
+	call RandoRngByte
+	pop bc
+	and a
+	jr z, .miss
+	cp NUM_ATTACKS + 1
+	jr nc, .miss
+	ld [sRandoWant + 3], a       ; the try
+	push bc
+	call .wanted
+	pop bc
+	jr nz, .found
+.miss
+	dec b
+	jr nz, .again
+	ld a, $ff
+	ld [sRandoWant + 1], a
+	jr .again
+.found
+	ld a, [sRandoWant + 3]
+	ld d, a
+	jp RandoCloseSRAM
+
+; a = move -> nz if wanted (c = the move)
+.wanted
+	ld c, a
+	ld a, [sRandoWant + 2]
+	cp c
+	jr z, .no
+	ld a, c
+	push bc
+	call RandoHMMove
+	pop bc
+	jr c, .no
+	ld a, c
+	push bc
+	call RandoMoveInfoOf
+	pop bc
+	ld b, a
+	and $80
+	ld hl, sRandoWant
+	cp [hl]
+	jr nz, .no
+	inc hl
+	ld a, [hl]
+	cp $ff
+	jr z, .yes
+	ld a, b
+	and $7f
+	cp [hl]
+	jr nz, .no
+.yes
+	or 1
+	ret
+.no
+	xor a
+	ret
+
+; -> a = a random byte from sRandoRng (save RAM open; de kept)
+RandoRngByte:
+	push de
+	callba RandoRngByteFar
+	ld a, e
+	pop de
+	ret
+
+; rando_learnset (macros): wRandoLearnset holds a pointer to a #MON's evolutions
+; and learnset (EvosMovesPointerTable's bank), wRandoLearnsetSpecies the
+; #MON: copy them there with LEARNSETS' moves
+RandoBuildLearnset::
+	ld hl, wRandoLearnset
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wRandoLearnset
+	ld bc, RANDO_LEARNSET_SIZE
+	ld a, BANK(EvosMovesPointerTable)
+	call FarCopyData
+	ld hl, wRandoLearnset
+.evolutions
+	ld a, [hli]
+	and a
+	jr z, .moves
+	cp EV_ITEM
+	jr nz, .threeBytes
+	inc hl
+.threeBytes
+	inc hl
+	inc hl
+	jr .evolutions
+.moves
+	ld a, [hli]                  ; the level
+	and a
+	ret z
+	push hl
+	ld d, [hl]
+	ld a, [wRandoLearnsetSpecies]
+	ld e, a
+	call RandoLearnMove
+	pop hl
+	ld [hl], d
+	inc hl
+	jr .moves
+
+; GetMonHeader: the four moves it starts with (wMonHMoves), with LEARNSETS
+; (METRONOME: just the one)
+RandoHeaderMoves::
+	ld a, [wRandoFlags3]
+	and RANDO3_LEARN
+	ret z
+	ld hl, wMonHMoves
+	ld b, NUM_MOVES
+.loop
+	push bc
+	push hl
+	ld d, [hl]
+	ld a, [wd0b5]
+	ld e, a
+	call RandoLearnMove
+	pop hl
+	pop bc
+	ld a, b
+	cp NUM_MOVES
+	jr z, .put
+	ld a, d
+	cp METRONOME
+	jr nz, .put
+	ld d, 0                      ; METRONOME once
+.put
+	ld [hl], d
+	inc hl
+	dec b
+	jr nz, .loop
+	ret

@@ -23,6 +23,9 @@ own world (the Japanese Red and Green keep the original layouts).
   world is attached, key items by assumed fill, ground items into the rest,
   then a check that the game can be finished and that no place a player can
   walk into leaves it unfinishable.
+- `mons.py`: species (types, base stat totals, evolutions, the three-stage
+  lines and the type triangles among them), trainers' teams and type themes,
+  for the RANDOM #MON options.
 - `gen_data.py`: writes `data/rando/{intl,jp}_*.asm`, the tables the game's
   generator (`engine/rando/`) and its runtime lookups use. Run it after a
   change to the maps or the logic, then build again:

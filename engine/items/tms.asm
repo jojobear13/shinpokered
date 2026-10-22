@@ -6,7 +6,18 @@ CanLearnTM:
 	ld hl, wMonHLearnset
 
 	call SpecialMachineMove ;joenote - handle a pokemon that can learn machines not normally allowed (like surfing pikachu)
-	
+
+	; TM MOVES and TM COMPAT.
+	ld a, [wMoveNum]
+	ld e, a
+	callba RandoCanLearnTM
+	ld a, e
+	cp $ff
+	jr z, .asTheyWere
+	ld c, a
+	ret
+.asTheyWere
+	ld hl, wMonHLearnset
 	ld a, [wMoveNum]
 	call MachineMoveInC
 	ld b, FLAG_TEST

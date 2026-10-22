@@ -115,6 +115,14 @@ RandoHashResult::
 	ld bc, 4
 	jp CopyData
 
+; -> e = the next random byte (sRandoRng's top byte after a step)
+RandoRngByteFar::
+	call RandoSRAM
+	call RandoRngNext
+	ld a, [sRandoRng + 3]
+	ld e, a
+	ret
+
 ; sRandoRng, just set from a key (RandoKey), stirred
 RandoRngStir::
 	call RandoSRAM

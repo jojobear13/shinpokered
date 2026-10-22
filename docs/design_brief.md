@@ -2141,3 +2141,75 @@ than patching ROMs on a computer.
   lock). In the emulator: NEW GAME with a typed seed builds the same world
   as the reference (DMG and GBC timings above), and `tools/emu/rando_walk.py`
   walks through the doors of four towns and back.
+
+### The Pokémon options (RANDOM #MON page)
+
+Ideas from UPR FVX's options that fit Gen 1 and this fork (its code isn't
+used). Unlike the world, nothing here is built ahead or stored: every answer
+is drawn when the game needs it from the seed and what it is for
+(`RandoKey`: a kind, then up to three bytes such as the trainer, its number
+and the place in the party), so the same seed always gives the same
+Pokémon, and the save holds only the choices (`wRandoFlags2`, `wRandoFlags3`,
+in the old "unused space" of the progress flags; carried over NEW GAME and
+NEW GAME+; hashed into the seed with the rest). Code in
+`engine/rando/mons.asm` (bank $38); the tables it reads (each species'
+types, base stat total / 4 and kind; the three-stage lines and the
+"triangles" among them; each trainer's type theme; the wild encounter
+groups; each move's type and whether it does damage; the TMs' moves) are
+written by `gen_data.py` from the ROM through `tools/rando/mons.py`.
+
+- **Picking.** `RandoSimilar` draws among the species `sRandoWant` allows
+  (flags, a type, a range of base stat totals): within an eighth of the
+  original's total, else a quarter, else any; legendaries only for
+  legendaries. `RandoPermute` is a keyed shuffle of 0-n cheap enough to run
+  per species (four rounds of odd-multiply-add and xorshift on a byte,
+  repeated until below n): Shin's TIER and FULL wild swaps use it with the
+  whole seed (their own had a one-byte seed: 255 games), WILD AREA uses it
+  for its decks, TM MOVES for the TMs. Moves are drawn by trying random
+  bytes until one fits (`RandoLearnMove`), as counting them is too slow.
+- **Starters**: a vanilla starter's line maps to the same stage of the
+  line in its slot (`RandoStarterMon`), so OAK's balls, the rival's ball and
+  all the rival's teams follow. TYPES picks one of the precomputed ordered
+  triangles (27 among Gen 1's sixteen three-stage lines: a beats b beats c
+  beats a, by the first types, each one-way). OAK says "So! You want X?"
+  when the starters aren't the originals (Shin's random starters too).
+- **Trainers ALL** (`RandoTrainerMon`, before each `AddPartyMon`): themes are
+  the type a vanilla team shares (the first one's first, unless NORMAL),
+  fixed for the gym leaders and the Elite Four; then Shin's
+  `EnemyMonEvolve` and the scale-down. Gen 1 has one Ghost line and one
+  Dragon line, so Agatha and Lance field five of the same. With ALL Shin's
+  own regular-trainer randomizer is off (the two are one option's values).
+- **Wild AREA**: an encounter slot's number (`RandoWildGroups`: the map's
+  group, times ten, plus the slot) picks from the deck of basic Pokémon but
+  the legendaries; every run of the deck's size numbers is a whole shuffle,
+  so with 550 land slots each of the ~70 basics is somewhere. Surfing and
+  fishing draw from the Water-type basics. `RandoAreaLocations` answers the
+  Pokédex's AREA by working out each slot's place against the species'
+  basic's place in the deck (no species lookups: fast enough).
+- **SPECIAL MON**: one per Pokémon per map per seed, at each site that names
+  a one-off Pokémon (`rando_special`), and at `InitBattleEnemyParameters`
+  for the ones standing on the map (legendaries, the Power Plant's). The
+  dojo names its gift; the Lapras, Eevee and Magikarp people's own lines
+  and the legendaries' cries still are the originals'.
+- **TRADES**: both sides of each trade, similar strength.
+- **TMs**: TM MOVES shuffles every move but the HMs' into the 50 TMs (the
+  p-th such move is p + 1 plus one per HM move at or below it, so the
+  inverse is quick). TM COMPAT. answers per Pokémon per machine; the HMs keep
+  their own compatibility (the world's logic needs Cut and the rest) unless
+  FULL.
+- **Learnsets**: each (Pokémon, move) maps to one move, damaging for
+  damaging. The readers that matter take it: level-up learning and
+  `WriteMonMoves` (wild and trainer movesets) through `rando_learnset`, a
+  copy in `wRandoLearnset`; the MOVES screen; and the starting moves, made in
+  place in `GetMonHeader`. Breeding's inherited moves and the trainers'
+  set special moves are as they were.
+- **Costs**: TRAINERS ALL adds about 20 frames to a battle's start (Lorelei:
+  12 to 33 frames to read her team). A trainer test driver that waits for
+  the battle with a short idle limit needs more patience
+  (`tools/emu/rando_mons.py`).
+- **Tests**: `tests/test_rando_mons.py` (starters, trainers, wild, special,
+  trades, TMs, learnsets: the rules each promises, determinism, off is
+  off); `tests/test_options.py` (the page, the lock, the fields). In the
+  emulator, `tools/emu/rando_mons.py` with every option on: the Lapras and
+  dojo gifts, Snorlax, Mewtwo (a legendary), and the Elite Four (each keeps
+  its type) all played through.

@@ -74,14 +74,14 @@ class RandoMonsTest(unittest.TestCase):
     # ---- trainers
     ALL = 1 << 4
 
-    def trainer_mon(self, cls, no, species, slot=0, seed=7, flags2=ALL):
+    def trainer_mon(self, cls, no, species, slot=0, seed=7, flags2=ALL, level=5):
         self.setup(seed, flags2=flags2)
         g = self.game
         g.poke("wTrainerClass", self.mons.trainer_classes[cls])
         g.poke("wTrainerNo", no)
         g.poke("wEnemyPartyCount", slot)
         g.poke("wcf91", self.sp[species])
-        g.poke("wCurEnemyLVL", 20)
+        g.poke("wCurEnemyLVL", level)
         g.poke("wPartyCount", 0)
         g.call("RandoTrainerMon", max_frames=600)
         return g.peek("wcf91")
@@ -107,6 +107,12 @@ class RandoMonsTest(unittest.TestCase):
             got = self.trainer_mon("YOUNGSTER", 1, "RATTATA", 0, seed)
             far += abs(m.bst[got] - m.bst[self.sp["RATTATA"]]) > m.bst[self.sp["RATTATA"]] // 4 + 4
         self.assertLessEqual(far, 2)
+
+    def test_picks_evolve_with_their_level(self):
+        m = self.mons
+        for seed in range(1, 8):
+            got = self.trainer_mon("LANCE", 1, "DRAGONAIR", 1, seed, level=56)
+            self.assertEqual(m.name[got], "DRAGONITE")
 
     def test_trainers_follow_the_seed(self):
         a = [self.trainer_mon("LASS", 2, "PIDGEY", k, 9) for k in range(3)]
@@ -299,6 +305,91 @@ class RandoMonsTest(unittest.TestCase):
             self.assertNotIn(give, m.legendary)
             self.assertLessEqual(abs(m.bst[get] - m.bst[self.sp["MR_MIME"]]), m.bst[self.sp["MR_MIME"]] // 4 + 4)
         self.assertEqual(self.trade(4, "ABRA", "MR_MIME", 5), self.trade(4, "ABRA", "MR_MIME", 5))
+
+
+    # ---- moves
+    def move_info(self):
+        g = self.game
+        moves = R.consts("constants/move_constants.asm")
+        info = g.peek((g.bank("RandoMoveInfo"), g.addr("RandoMoveInfo")), moves["STRUGGLE"] - 1)
+        return moves, info
+
+    def tm_moves(self, seed, flags3):
+        self.setup(seed, flags3=flags3)
+        return [self.game.call("RandoTMMoveFar", de=k)["de"] & 0xFF for k in range(55)]
+
+    def test_tm_moves(self):
+        moves, _ = self.move_info()
+        vanilla = self.tm_moves(1, 0)
+        hms = [moves[n] for n in ("CUT", "FLY", "SURF", "STRENGTH", "FLASH")]
+        self.assertEqual(vanilla[50:], hms)
+        got = self.tm_moves(1, 1)
+        self.assertEqual(got[50:], hms)
+        self.assertEqual(len(set(got[:50])), 50)
+        self.assertFalse(set(got[:50]) & set(hms))
+        self.assertTrue(all(1 <= m < moves["STRUGGLE"] for m in got))
+        self.assertNotEqual(got[:50], vanilla[:50])
+        self.assertEqual(got, self.tm_moves(1, 1))
+        self.assertNotEqual(got, self.tm_moves(2, 1))
+
+    def can_learn(self, species, move, seed=3, flags3=0):
+        g = self.game
+        self.setup(seed, flags3=flags3)
+        g.poke("wcf91", self.sp[species])
+        g.poke("wMoveNum", move)
+        return g.call("CanLearnTM", max_frames=600)["bc"] & 0xFF
+
+    def test_tm_compatibility(self):
+        moves, info = self.move_info()
+        tms = self.tm_moves(3, 1)
+        # TM MOVES alone: each TM keeps who could learn it
+        vanilla = self.tm_moves(3, 0)
+        for k in (0, 5, 23):
+            for sp in ("BULBASAUR", "PIKACHU", "MEW"):
+                self.assertEqual(bool(self.can_learn(sp, tms[k], flags3=1)),
+                                 bool(self.can_learn(sp, vanilla[k])), (sp, k))
+        # FULL: everyone learns every machine
+        for k in (0, 10, 49, 52):
+            self.assertTrue(self.can_learn("MAGIKARP", tms[k], flags3=1 | 3 << 1))
+        # TYPE: always moves of its own types; the HMs as they were
+        m = self.mons
+        for k in range(50):
+            if info[tms[k] - 1] & 0x7F in m.types[self.sp["SQUIRTLE"]]:
+                self.assertTrue(self.can_learn("SQUIRTLE", tms[k], flags3=1 | 1 << 1))
+        self.assertEqual(bool(self.can_learn("MAGIKARP", moves["SURF"], flags3=1 | 1 << 1)),
+                         bool(self.can_learn("MAGIKARP", moves["SURF"])))
+        # RANDOM: some can, some can't
+        got = {self.can_learn("RATTATA", tms[k], flags3=1 | 2 << 1) for k in range(50)}
+        self.assertEqual(got, {0, 1})
+
+    def learn(self, species, move, seed=4, mode=2):
+        self.setup(seed, flags3=mode << 3)
+        return self.game.call("RandoLearnMove", de=move << 8 | self.sp[species], max_frames=600)["de"] >> 8
+
+    def test_learnsets(self):
+        moves, info = self.move_info()
+        self.assertEqual(self.learn("PIDGEY", moves["GUST"], mode=0), moves["GUST"])
+        self.assertEqual(self.learn("PIDGEY", moves["GUST"], mode=3), moves["METRONOME"])
+        for move in ("GUST", "SAND_ATTACK", "QUICK_ATTACK", "WHIRLWIND"):
+            for mode in (1, 2):
+                got = self.learn("PIDGEY", moves[move], mode=mode)
+                self.assertEqual(info[got - 1] & 0x80, info[moves[move] - 1] & 0x80, move)
+                self.assertEqual(got, self.learn("PIDGEY", moves[move], mode=mode))
+        # TYPE: its own types more often than RANDOM
+        m = self.mons
+        own = lambda mode: sum(info[self.learn("SQUIRTLE", moves["TACKLE"], seed, mode) - 1] & 0x7F
+                               in m.types[self.sp["SQUIRTLE"]] for seed in range(40))
+        self.assertGreater(own(1), own(2) + 8)
+
+    def test_starting_moves(self):
+        g = self.game
+        moves, _ = self.move_info()
+        for mode, check in ((3, lambda got: got == [moves["METRONOME"], 0, 0, 0]),
+                            (0, lambda got: got[:2] == [moves["TACKLE"], moves["GROWL"]])):
+            self.setup(6, flags3=mode << 3)
+            g.poke("wd0b5", self.sp["BULBASAUR"])
+            g.call("GetMonHeader", max_frames=600)
+            self.assertTrue(check(g.peek("wMonHMoves", 4)), (mode, g.peek("wMonHMoves", 4)))
 
 
 if __name__ == "__main__":

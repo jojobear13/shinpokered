@@ -243,6 +243,8 @@ MovesBuildChoices:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
+	ld a, [wMovesSpecies]
+	rando_learnset ; LEARNSETS (then it's a copy in WRAM)
 	ld de, wMovesLearnset
 	ld bc, MOVES_LEARNSET_LENGTH
 	ld a, BANK(EvosMovesPointerTable)
@@ -279,14 +281,10 @@ MovesBuildChoices:
 	and a
 	jr z, .nextMachine
 	ld a, [wMovesMachine]
-	ld c, a
-	ld b, 0
-	ld hl, TechnicalMachines
-	add hl, bc
-	ld de, wMoveNum
-	ld bc, 1
-	ld a, BANK(TechnicalMachines)
-	call FarCopyData
+	ld e, a
+	callba RandoTMMoveFar ; TM MOVES
+	ld a, e
+	ld [wMoveNum], a
 	ld a, [wMovesSpecies]
 	ld [wcf91], a
 	predef CanLearnTM

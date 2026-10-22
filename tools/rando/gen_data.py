@@ -282,6 +282,31 @@ class Tables:
             k += 1
         w('RandoWildGroups::')
         db(groups)
+        # moves: per move, bit 7 if it does damage, the low bits its type;
+        # the TMs' and HMs' moves as they were
+        mbank, mtab = rom.at('Moves')
+        msize = rom.at('MoveEnd')[1] - mtab
+        nmoves = M.num_moves()
+        w('RandoMoveInfo::')
+        db([(0x80 if rom.b(mbank, mtab + k * msize + 2) else 0) | rom.b(mbank, mtab + k * msize + 3)
+            for k in range(nmoves)])
+        tbank, ttab = rom.at('TechnicalMachines')
+        w('RandoVanillaTMs::')
+        db([rom.b(tbank, ttab + k) for k in range(55)])
+        hms = [rom.b(tbank, ttab + 50 + k) for k in range(5)]
+        assert hms == sorted(hms), 'RandoTMMove needs the HM moves in order'
+        ebank, etab = rom.at('EvosMovesPointerTable')
+        longest = 0
+        for sp in M.all:
+            a = rom.w(ebank, etab + 2 * (sp - 1))
+            start = a
+            while rom.b(ebank, a):
+                a += 4 if rom.b(ebank, a) == 2 else 3
+            a += 1
+            while rom.b(ebank, a):
+                a += 2
+            longest = max(longest, a + 1 - start)
+        files['consts'].append('DEF RANDO_LEARNSET_SIZE EQU %d' % max(longest, 64))  # the MOVES screen copies 64
         files['consts'].append('DEF RANDO_WILD_MAPS EQU %d' % k)
         files['consts'].append('DEF RANDO_LINES EQU %d' % len(lines3))
         # runtime: warps

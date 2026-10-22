@@ -436,6 +436,8 @@ LearnMoveFromLevelUp:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
+	ld a, [wcf91]
+	rando_learnset ; LEARNSETS
 .skipEvolutionDataLoop ; loop to skip past the evolution data, which comes before the move data
 	ld a, [hli]
 	and a ; have we reached the end of the evolution data?
@@ -515,6 +517,8 @@ WriteMonMoves:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
+	ld a, [wcf91]
+	rando_learnset ; LEARNSETS
 .skipEvoEntriesLoop
 	ld a, [hli]
 	and a
