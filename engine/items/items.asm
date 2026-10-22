@@ -731,6 +731,10 @@ CaughtMonExperience:
 	cp BATTLE_TYPE_SAFARI
 	ret z
 	call ClearSprites ; the thrown ball, which would sit over the stat boxes
+	coord hl, 12, 0 ; and the caught mon's pic, which the stat boxes would
+	lb bc, 7, 7     ; put back when they close
+	call ClearScreenArea
+	call SaveScreenTilesToBuffer1
 	ld a, [wcf91]
 	push af
 	ld a, [wd11e]
