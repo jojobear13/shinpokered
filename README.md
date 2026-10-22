@@ -6,9 +6,9 @@ A Gen 9 rules fork of Shin Pokémon. Version 0.9.0. A Game Boy hack of Pokémon 
 - **Emulators and hardware.** The ROM works on [BGB](https://bgb.bircd.org/), a highly accurate emulator, so it should also run on real Game Boy / Game Boy Color hardware. Less accurate emulators may show Shin's "Emulator ERROR" warning on the title menu.
 - **Compatibility.** Not compatible with genuine Pokémon cartridges (link trades and battles, Time Capsule), Pokémon Stadium 1 or 2, or Shin Pokémon or vanilla save files. It links only with itself.
 
-Install: Download the BPS patch in Releases and apply it to a legitimate Pokemon Red ROM file.
+Install: Download the BPS patch in Releases and apply it to a legitimate Pokemon ROM file.
 
-Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Design record: [docs/design_brief.md](docs/design_brief.md). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md).
+Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md).
 
 ## Screenshots
 
