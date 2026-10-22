@@ -367,6 +367,7 @@ DayCareChooseMon:
 	coord hl, 9, 9
 	ld de, DayCareCancelText
 	call PlaceString
+	call UpdateSprites ; hide the sprites under the box
 	ld hl, wTopMenuItemY
 	ld a, 5
 	ld [hli], a ; wTopMenuItemY
@@ -384,6 +385,7 @@ DayCareChooseMon:
 	call HandleMenuInput
 	push af
 	call LoadScreenTilesFromBuffer1
+	call UpdateSprites
 	pop af
 	bit BIT_B_BUTTON, a
 	jr nz, .cancel
