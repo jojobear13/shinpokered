@@ -96,12 +96,18 @@ class EverstoneTest(unittest.TestCase):
         g.poke("wLinkState", 0)
         g.poke("wForceEvolution", 0)
         g.poke("wWhichPokemon", 0)
+        # the evolution scene can't run in the harness (no V-blank): stop
+        # where it would start
+        started = []
+        bank, addr = g.symbols["EvolveMon"]
+        g.pyboy.hook_register(bank, addr, lambda _: started.append(True), None)
         try:
-            g.call("TryEvolvingMon", max_frames=20000)
-            started = False
+            g.call("TryEvolvingMon", max_frames=60)
         except Exception:
-            started = True  # the evolution scene (which the harness can't run to the end)
-        return started, g.peek("wPartyMon1Species")
+            pass
+        finally:
+            g.pyboy.hook_deregister(bank, addr)
+        return bool(started), g.peek("wPartyMon1Species")
 
     def test_everstone(self):
         self.assertEqual(self.evolve("EVERSTONE"), (False, SPECIES["CHARMANDER"]))
