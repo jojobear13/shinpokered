@@ -2288,4 +2288,14 @@ Bugs reported in play, and what came of each.
   lines of at most 18 tiles each, 128 items, written to this game's rules
   (Gen 9 held items, the vitamins' EVs, the Mist Stone and M.GENE, the
   DEXREPEL). Test: `tests/test_item_descriptions.py` (every bag item has
-  two lines that fit). The marts' BUY list could use the same text.
+  two lines that fit).
+- **Shops.** The BUY list shows the same two lines on the entry under its
+  cursor, in the text box under the list ("Take your time." went), "Done
+  shopping." on CANCEL, and for a TM or HM "Teaches the move" and its move
+  (through `RandoTMMoveFar`, so TM MOVES shows the shuffled one). The list
+  menu moves its cursor inside `HandleMenuInput` (bank 0), so that loop
+  calls `MenuItemDescription` after placing the cursor: 12 bytes of bank 0
+  that do nothing unless `wMartDescriptions` is set, which the mart sets
+  only around the BUY list's `DisplayListMenuID` (the quantity and yes/no
+  menus that follow use `HandleMenuInput` too, so the list type wouldn't
+  do). `MartDrawDescription` is in the descriptions' section.

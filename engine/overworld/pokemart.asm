@@ -145,7 +145,11 @@ DisplayPokemartDialogue_:
 	ld [wPrintItemPrices], a
 	inc a ; a = 2 (PRICEDITEMLISTMENU)
 	ld [wListMenuID], a
+	ld hl, wMartDescriptions
+	ld [hl], a ; the item under the cursor is described
 	call DisplayListMenuID
+	ld hl, wMartDescriptions
+	ld [hl], 0 ; (keeps the carry)
 	jr c, .returnToMainPokemartMenu ; if the player closed the menu
 	ld a, 99
 	ld [wMaxItemQuantity], a

@@ -3694,6 +3694,8 @@ wHPPercentDigits:: ; its hundreds, tens and ones (10: blank)
 	ds 3
 wHPPercentShown:: ; the percentage its tiles show now
 	ds 1
+wMartDescriptions:: ; nonzero while the shop's buy list is up: the item under
+	ds 1                ; the cursor is described (MenuItemDescription)
 
 wRandoLearnsetSpecies:: ; LEARNSETS: the #MON whose learnset is in wRandoLearnset
 	ds 1

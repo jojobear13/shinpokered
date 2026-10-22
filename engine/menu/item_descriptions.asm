@@ -43,15 +43,7 @@ BagDrawFrame::
 	add hl, bc
 	add hl, bc
 	ld a, [hl] ; the item
-	dec a
-	ld c, a
-	ld hl, ItemDescriptions
-	add hl, bc
-	add hl, bc
-	ld a, [hli]
-	ld d, [hl]
-	ld e, a
-	or d
+	call ItemDescription
 	ret z ; none
 .gotText
 	coord hl, 1, 14
@@ -59,6 +51,72 @@ BagDrawFrame::
 
 CancelDescription:
 	db   "Close the bag.@"
+
+; a = an item (not a TM or HM) -> de = its two lines, z if it has none
+ItemDescription:
+	dec a
+	ld c, a
+	ld b, 0
+	ld hl, ItemDescriptions
+	add hl, bc
+	add hl, bc
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	or d
+	ret
+
+; The shop's buy list (from MenuItemDescription, as its cursor moves): two
+; lines on the entry under the cursor in the text box under the list, where
+; "Take your time." was. A TM or HM names its move.
+MartDrawDescription::
+	coord hl, 1, 13
+	lb bc, 4, 18
+	call ClearScreenArea
+	ld a, [wListScrollOffset]
+	ld c, a
+	ld a, [wCurrentMenuItem]
+	add c
+	ld c, a ; the entry
+	ld a, [wListCount]
+	cp c
+	ld de, MartCancelDescription
+	jr z, .gotText ; CANCEL
+	jr c, .gotText
+	ld b, 0
+	ld hl, wItemList + 1
+	add hl, bc
+	ld a, [hl]
+	cp HM_01
+	jr nc, .machine
+	call ItemDescription
+	ret z
+.gotText
+	coord hl, 1, 14
+	jp PlaceString
+.machine
+	call MachineIndex
+	ld e, a
+	callba RandoTMMoveFar ; its move (TM MOVES)
+	ld a, e
+	ld [wd11e], a
+	call GetMoveName
+	ld de, MachineDescription
+	coord hl, 1, 14
+	call PlaceString
+	ld de, wcd6d
+	coord hl, 1, 16
+	call PlaceString
+	ld h, b
+	ld l, c
+	ld [hl], "."
+	ret
+
+MartCancelDescription:
+	db   "Done shopping.@"
+
+MachineDescription:
+	db   "Teaches the move@"
 
 PocketNames:
 	dw .items, .medicine, .balls, .battle, .berries, .key

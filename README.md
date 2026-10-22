@@ -111,6 +111,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Bag opens full screen with auto-sorted pockets: ITEMS, MEDICINE, BALLS, BATTLE ITEMS, BERRIES, KEY ITEMS.
 - Bag holds 36 kinds; LEFT/RIGHT change pocket.
 - Bag shows two lines on the item under the cursor (Gold/Silver-style), with four entries on the screen.
+- Shops' buy lists show the same two lines on the item under the cursor (a TM names its move).
 - OPTION screen: seven pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS, RANDOMIZER, RANDOM POKéMON) with two-line explanations.
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.

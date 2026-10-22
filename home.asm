@@ -4056,6 +4056,15 @@ WriteOAMBlock::
 	ld [hli], a
 	ret
 
+; the shop's buy list: two lines on the item under the cursor, as the bag
+; shows (engine/menu/item_descriptions.asm). HandleMenuInput keeps no
+; register across it
+MenuItemDescription:
+	ld a, [wMartDescriptions]
+	and a
+	ret z
+	jpba MartDrawDescription
+
 HandleMenuInput::
 	xor a
 	ld [wPartyMenuAnimMonEnabled], a
@@ -4074,6 +4083,7 @@ HandleMenuInput_::
 	xor a
 	ld [wAnimCounter], a ; counter for pokemon shaking animation
 	call PlaceMenuCursor
+	call MenuItemDescription ; the shop's buy list
 	call Delay3
 .loop2
 	push hl
