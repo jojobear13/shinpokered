@@ -15,10 +15,10 @@ The main purpose of the accompanying source code repository is to study, comment
 It is important to record, for posterity's sake, the methods used for restoring the game to an error-free state.
 Finally, the source code documents many differences and changes between the various Japanese and English releases.
 
-![Box Art](/boxart/animfadeboxsmall.gif?raw=true)
+![Box Art](https://github.com/jojobear13/shinpokered/blob/master/boxart/animfadeboxsmall.gif?raw=true)
 
 *********************************************************************************************************************************
-**Read the ["Guide to New Player Functions"](/patches_and_info/Guide_to_New_Player_Functions.md) for instructions on all the new stuff the player can do.**
+**Read the ["Guide to New Player Functions"](https://github.com/jojobear13/shinpokered/blob/master/patches_and_info/Guide_to_New_Player_Functions.md) for instructions on all the new stuff the player can do.**
 No, really, there's a TON of new options and features. You are bound to miss many of them if you do not read this guide.
 *********************************************************************************************************************************
 
@@ -391,8 +391,8 @@ Cheats and Secrets!
 #Changelog From the Last Full Release
 -----------
 **Note: Changelogs may contain spoilers**  
-[View the Consolidated Changelog Document from 1.23 to 1.24.0](/patches_and_info/changelog_from_v1.23.md)  
-[View the Consolidated Changelog Document from 1.24.0 to 1.25.0](/patches_and_info/changelog_from_v1.24.md)  
+[View the Consolidated Changelog Document from 1.23 to 1.24.0](https://github.com/jojobear13/shinpokered/blob/master/patches_and_info/changelog_from_v1.23.md)  
+[View the Consolidated Changelog Document from 1.24.0 to 1.25.0](https://github.com/jojobear13/shinpokered/blob/master/patches_and_info/changelog_from_v1.24.md)  
 
 Dev updates - These are very small "stealth patches" that address bugs so minor or narrow that they do not call for a new revision.
 - 3/18/2026 - Made minor adjustments to the way AI uses items in battle and made the AI slightly more aggressive

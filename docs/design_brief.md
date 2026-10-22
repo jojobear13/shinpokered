@@ -1483,7 +1483,7 @@ One commit per group:
   (run again, it changes nothing; `tests/test_learnsets.py` checks that
   when the spreadsheet is present). A move goes to the proposed level and
   out of wherever the species had it; "Remove" takes Horn Drill and
-  Guillotine away. `docs/learnset_changes.md` lists every change.
+  Guillotine away. `docs/moveset_changes.md` lists every change.
   `docs/moveset_changes.md` (from `tools/moveset_changes.py`) lists every
   moveset change against Red and Blue (pret/pokered), each marked as Shin's
   or this fork's: level-up and starting moves, TM/HM compatibility, the TM
@@ -2299,3 +2299,17 @@ Bugs reported in play, and what came of each.
   only around the BUY list's `DisplayListMenuID` (the quantity and yes/no
   menus that follow use `HandleMenuInput` too, so the list type wouldn't
   do). `MartDrawDescription` is in the descriptions' section.
+
+## Repository cleanup
+
+Removed as unused by the build, tests and docs: Shin's release files
+(`patches_and_info/`: v1.25 patches, symbol files, changelogs, the trainer
+guide; `boxart/`; `how to guides/`; the `randoshinred` script, which edits
+Shin's ROM layout), the Travis config, the dead `extras` submodule, Shin's
+issue templates, `roms.md5` and `make compare` (Shin's checksums), the
+`rgbds-0.6.0` placeholder, `hram_pokered_addresses.txt`; never-included
+assets (the 151 `pic/favfront` sprites, unused alternate backs, Yellow
+trainer pics, slot machine graphics and songs, 39 per-map block files the
+maps don't use); `docs/learnset_changes.md` (`docs/moveset_changes.md`
+covers it). `docs/shin_readme.md` links Shin's repository for what it
+pointed at here. All builds were made from clean after.

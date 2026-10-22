@@ -25,8 +25,6 @@ pokebluejp_origback_obj := $(rom_obj:.o=_bluejp_origback.o)
 
 ### Build tools
 
-MD5 := md5sum -c
-
 RGBDS ?=
 RGBASM  ?= $(RGBDS)rgbasm
 RGBFIX  ?= $(RGBDS)rgbfix
@@ -40,7 +38,7 @@ RGBLINK ?= $(RGBDS)rgblink
 .SECONDEXPANSION:
 .PRECIOUS:
 .SECONDARY:
-.PHONY: all red blue green red_origback blue_origback bluejp redjp bluejp_origback clean tidy compare tools test
+.PHONY: all red blue green red_origback blue_origback bluejp redjp bluejp_origback clean tidy tools test
 
 all: $(roms)
 red: pokered.gbc
@@ -53,9 +51,6 @@ redjp: pokeredjp.gbc
 bluejp_origback: pokebluejp_origback.gbc
 
 # For contributors to make sure a change didn't affect the contents of the rom.
-compare: $(roms)
-	@$(MD5) roms.md5
-
 # Emulator tests (needs Python 3 and PyBoy; see tests/README.md)
 test: pokered.gbc
 	python3 -m unittest discover -s tests -t tests

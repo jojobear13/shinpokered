@@ -13,10 +13,6 @@ Run setup and leave the default settings. At the "**Select Packages**" step, cho
 - `make`
 - `git`
 - `gcc-core`
-- `vim`
-- `vim-common`
-
-**Note:** The vim and vim-common packages are necessary for the randoshinred bash script (if you want to randomize a compiled rom).
 
 Double click on the text that says "**Skip**" next to each package to select the most recent version to install.
 
