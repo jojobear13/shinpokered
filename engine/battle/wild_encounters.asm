@@ -41,7 +41,7 @@ TryDoWildEncounter:
 ; ...as long as it's not Viridian Forest or Safari Zone.
 	ld a, [wCurMap]
 	cp REDS_HOUSE_1F ; is this an indoor map?
-	jr c, .CantEncounter2
+	jp c, .CantEncounter2
 	ld a, [wCurMapTileset]
 	cp FOREST ; Viridian Forest/Safari Zone
 	jr z, .CantEncounter2
@@ -103,6 +103,7 @@ TryDoWildEncounter:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 ;joenote - generate a random wild pokemon based on a seed value
 	predef ReplaceWildMon
+	callba RandoScaleDownWild ; the randomizer: not above the party
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; a REPEL keeps away mons lower level than the first party mon, and the
 ; DEXREPEL mons already caught (engine/items/held_item_use.asm)

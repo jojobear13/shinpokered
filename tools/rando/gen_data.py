@@ -212,6 +212,11 @@ class Tables:
         files['consts'].append('DEF RANDO_MARTS EQU %d' % len(lists))
         files['consts'].append('DEF RANDO_MART_ALWAYS EQU %d' % len(always))
         files['consts'].append('DEF RANDO_MART_POOL EQU %d' % len(pool))
+        # scaling down (RandoScale): each species' pre-evolution and the
+        # level it evolves at (DEVOLVE_LEVEL for a stone or a trade)
+        w('RandoDevolve::')
+        prevo = devolutions(rom)
+        db([v for sp in range(1, 191) for v in prevo.get(sp, (0, 0))])
         # runtime: warps
         w('RandoSlotWarp::')
         sw = []
@@ -250,6 +255,37 @@ class Tables:
         for f, lines in files.items():
             with open('%s_%s.asm' % (base, f), 'w') as out:
                 out.write('\n'.join(lines) + '\n')
+
+
+DEVOLVE_LEVEL = 30
+
+
+def devolutions(rom):
+    """species -> (its pre-evolution, the level it evolves at), from
+    EvosMovesPointerTable (internal species numbers)."""
+    bank, table = rom.at('EvosMovesPointerTable')
+    out = {}
+    for i in range(190):
+        a = rom.w(bank, table + 2 * i)
+        while True:
+            kind = rom.b(bank, a)
+            if kind == 0:
+                break
+            if kind == 1:      # EV_LEVEL, level, species
+                level, to = rom.b(bank, a + 1), rom.b(bank, a + 2)
+                a += 3
+            elif kind == 2:    # EV_ITEM, item, min level, species
+                level, to = DEVOLVE_LEVEL, rom.b(bank, a + 3)
+                a += 4
+            elif kind == 3:    # EV_TRADE, min level, species
+                level, to = DEVOLVE_LEVEL, rom.b(bank, a + 2)
+                a += 3
+            else:
+                raise ValueError('evolution kind %d' % kind)
+            # (Shin gives some trade evolutions a stone too: the same one twice)
+            assert out.get(to, (i + 1,))[0] == i + 1, to
+            out[to] = (i + 1, min(level, out.get(to, (0, 255))[1]))
+    return out
 
 
 def hidden_coords(rom):

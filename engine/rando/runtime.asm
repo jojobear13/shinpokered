@@ -520,3 +520,77 @@ RandoCenterTowns:
 	db SAFFRON_POKECENTER, SAFFRON_CITY
 	db INDIGO_PLATEAU_LOBBY, INDIGO_PLATEAU
 	db -1
+
+; ---- levels scaled down: in a world whose order is shuffled (doors or key
+; items) a player can arrive anywhere early. A #MON above the party's
+; highest level (+2 for a trainer's, +3 for a boss's) comes down to it, and
+; if it couldn't have evolved yet at that level, it is what it evolved from.
+; Only ever down; Shin's SCALING (up) is its own option.
+
+; before AddPartyMon for a trainer's #MON (wcf91, wCurEnemyLVL)
+RandoScaleDown::
+	ld c, 2
+	ld a, [wGymLeaderNo]
+	and a
+	jr z, RandoScale
+	inc c
+	jr RandoScale
+
+; a wild #MON (wcf91 and wEnemyMonSpecies2, wCurEnemyLVL)
+RandoScaleDownWild::
+	ld c, 0
+	call RandoScale
+	ld a, [wcf91]
+	ld [wEnemyMonSpecies2], a
+	ret
+
+; c = how far above the party's highest level it may be
+RandoScale:
+	ld a, [wRandoFlags]
+	and (1 << RANDO_DOORS_F) | (1 << RANDO_KEYS_F)
+	ret z
+	ld a, [wPartyCount]
+	and a
+	ret z
+	ld b, a
+	ld hl, wPartyMon1Level
+	ld de, wPartyMon2 - wPartyMon1
+	xor a
+.highest
+	cp [hl]
+	jr nc, .lower
+	ld a, [hl]
+.lower
+	add hl, de
+	dec b
+	jr nz, .highest
+	add c
+	ld b, a                      ; the cap
+	ld a, [wCurEnemyLVL]
+	cp b
+	ret c
+	ret z
+	ld a, b
+	ld [wCurEnemyLVL], a
+.devolve
+	ld a, [wcf91]
+	and a
+	ret z
+	cp 191
+	ret nc
+	dec a
+	ld e, a
+	ld d, 0
+	ld hl, RandoDevolve
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	and a
+	ret z                        ; nothing before it
+	ld d, a
+	ld a, [wCurEnemyLVL]
+	cp [hl]
+	ret nc                       ; old enough to have evolved
+	ld a, d
+	ld [wcf91], a
+	jr .devolve

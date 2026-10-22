@@ -200,6 +200,38 @@ class GeneratorTestCase(unittest.TestCase):
         teams = {tuple(self.trainer_team(0x1234, rng, flags=0)[0]) for rng in [(1, 2, 3, 4), (9, 8, 7, 6), (5, 5, 5, 5)]}
         self.assertGreater(len(teams), 1)
 
+    # ---- levels scaled down
+    GOLEM, GRAVELER, GEODUDE, ALAKAZAM, KADABRA = 0x31, 0x27, 0xA9, 0x95, 0x26
+
+    def scale(self, routine, species, level, party=(10,), flags=DOORS | KEYS, boss=0):
+        g = self.game
+        g.reset()
+        g.poke("wRandoFlags", flags)
+        g.poke("wPartyCount", len(party))
+        size = g.addr("wPartyMon2") - g.addr("wPartyMon1")
+        for i, lv in enumerate(party):
+            g.poke(g.addr("wPartyMon1Level") + i * size, lv)
+        g.poke("wGymLeaderNo", boss)
+        g.poke("wcf91", species)
+        g.poke("wCurEnemyLVL", level)
+        g.call(routine)
+        return g.peek("wcf91"), g.peek("wCurEnemyLVL")
+
+    def test_scale_down(self):
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50), (self.GEODUDE, 12))
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, boss=1), (self.GEODUDE, 13))
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, party=(5, 27, 9)), (self.GRAVELER, 29))
+        self.assertEqual(self.scale("RandoScaleDown", self.ALAKAZAM, 40, party=(20,)), (self.KADABRA, 22))
+        self.assertEqual(self.scale("RandoScaleDownWild", self.GOLEM, 40, party=(26,)), (self.GRAVELER, 26))
+        self.assertEqual(self.game.peek("wEnemyMonSpecies2"), self.GRAVELER)
+
+    def test_scale_only_down(self):
+        # below the cap: as it was, evolved or not
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 11), (self.GOLEM, 11))
+        # only in worlds whose order is shuffled
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, flags=ITEMS), (self.GOLEM, 50))
+        self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, flags=KEYS), (self.GEODUDE, 12))
+
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)
         for s, p in enumerate(partners):
