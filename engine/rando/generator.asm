@@ -13,8 +13,9 @@
 ; RandoB (the softlock check), each with its own copy of the searches
 ; (core.asm) and of the tables they read.
 
-; Build the world for the seed in sRandoTag. Carry set if it couldn't
-; (it always can: 255 tries, and the reference needs one to ten).
+; Build the world for the seed in sRandoTag (four bytes of seed, then
+; wRandoFlags: what to shuffle). Carry set if it couldn't (it always can: 255
+; tries, and the reference needs one to ten).
 RandoGenerate::
 	call RandoSRAM
 	xor a
@@ -44,8 +45,18 @@ RandoGenerate::
 	ld a, RANDO_TRIES
 	ld [sRandoTries], a
 .try
+	ld a, [sRandoTag + 4]
+	bit RANDO_DOORS_F, a
+	jr z, .vanillaDoors
 	call RandoShuffleDoors
 	jr c, .next
+	jr .doors
+.vanillaDoors
+	ld hl, RandoVanilla
+	ld de, sRandoPartner
+	ld bc, 2 * RANDO_SLOTS
+	call CopyData
+.doors
 	; with every key item, the events (badges, Mr. Fuji, ...) must be reachable too
 	call RandoClearPlace
 	call RandoKeyItemsHave

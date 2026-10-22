@@ -185,6 +185,9 @@ class Tables:
             for t in lst:
                 back[t].append(s)
         csr('KindsBack', back)
+        # the doors as they were, for worlds that keep them
+        w('RandoVanilla:')
+        dw([self.slot_of[g.vanilla[e]] for e in self.slots])
         # marts (built when one opens, from the seed): for each, 0 if it keeps
         # its list, else how many it sells; what every one sells; the pool
         lists = RZ.mart_lists(rom)

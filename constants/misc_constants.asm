@@ -287,3 +287,11 @@ DEF HP_PERCENT_TILE		EQU $D0			; its two tiles, $D0 and $D1
 DEF NUM_CHART_TYPES		EQU 19
 DEF GEN2_PIC_HEADER_LENGTH	EQU 6			; Gen2PicHeaders' entries
 
+
+; wRandoFlags: what the randomizer shuffles (engine/rando/)
+RANDO_DOORS_F  EQU 0 ; the doors (and so the key items too)
+RANDO_KEYS_F   EQU 1 ; where the key items are
+RANDO_ITEMS_F  EQU 2 ; the other items on the ground and given
+RANDO_MARTS_F  EQU 3 ; what the marts sell
+RANDO_SEEDED_F EQU 7 ; a seed was given: wild and trainer #MON follow it
+RANDO_WORLD    EQU (1 << RANDO_DOORS_F) | (1 << RANDO_KEYS_F) | (1 << RANDO_ITEMS_F)

@@ -18,6 +18,15 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "tools", "rando"))
 import gen_data  # noqa: E402
 
 SEEDS = [1, 2, 3, 0xDEADBEEF, 0x12345678]
+DOORS, KEYS, ITEMS = 1, 2, 4  # wRandoFlags
+# what to shuffle -> the seeds to try it with
+MODES = {
+    DOORS | KEYS | ITEMS: SEEDS,
+    DOORS | KEYS: SEEDS[:2],
+    KEYS | ITEMS: SEEDS[:2],
+    KEYS: SEEDS[:2],
+    ITEMS: SEEDS[:2],
+}
 LAYOUTS = [("pokered", "intl"), ("pokeredjp", "jp")]
 
 
@@ -35,10 +44,10 @@ class GeneratorTestCase(unittest.TestCase):
         cls.tables = gen_data.Tables(cls.label)
         cls.game = Game(rom_path(cls.label))
 
-    def generate(self, seed):
+    def generate(self, seed, mode=DOORS | KEYS | ITEMS):
         g = self.game
         g.reset()
-        g.poke("sRandoTag", *seed.to_bytes(4, "little"), 0)
+        g.poke("sRandoTag", *seed.to_bytes(4, "little"), mode)
         regs = g.call("RandoGenerate", max_frames=100000)
         n = len(self.tables.slots)
         raw = g.peek("sRandoPartner", 2 * n)
@@ -48,18 +57,25 @@ class GeneratorTestCase(unittest.TestCase):
         return regs, partners, place, tries
 
     def test_matches_reference(self):
+        for mode, seeds in MODES.items():
+            for seed in seeds:
+                with self.subTest(mode=mode, seed=hex(seed)):
+                    self.check(mode, seed)
+
+    def check(self, mode, seed):
         T = self.tables
-        for seed in SEEDS:
-            with self.subTest(seed=hex(seed)):
-                regs, partners, place, tries = self.generate(seed)
-                self.assertFalse(regs.get("carry"))
-                self.assertEqual(self.game.peek("sRandoValid"), 1)
-                py = T.Rz.generate(seed, max_tries=255)
-                self.assertEqual(tries, py["tries"])
-                self.assertEqual(partners, [T.slot_of[py["pairing"][e]] for e in T.slots])
-                self.assertEqual(
-                    place, [T.rom.items[py["placement"][l["key"]]] for l in T.C.locs]
-                )
+        regs, partners, place, tries = self.generate(seed, mode)
+        self.assertFalse(regs.get("carry"))
+        self.assertEqual(self.game.peek("sRandoValid"), 1)
+        py = T.Rz.generate(
+            seed, max_tries=255, doors=bool(mode & DOORS), keys=bool(mode & KEYS),
+            items=bool(mode & ITEMS),
+        )
+        self.assertEqual(tries, py["tries"])
+        self.assertEqual(partners, [T.slot_of[py["pairing"][e]] for e in T.slots])
+        self.assertEqual(
+            place, [T.rom.items[py["placement"][l["key"]]] for l in T.C.locs]
+        )
 
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)

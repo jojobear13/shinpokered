@@ -5,6 +5,12 @@
 
 RandoPlaceItems:
 	call RandoClearPlace
+	ld a, [sRandoTag + 4]
+	bit RANDO_KEYS_F, a
+	jr nz, .keys
+	call RandoKeysWhereTheyWere
+	jp .ground
+.keys
 	ld hl, RandoProgItems
 	ld de, sRandoKeys
 	ld bc, RANDO_NUM_PROG
@@ -90,12 +96,7 @@ RandoPlaceItems:
 	; every location's vanilla item, less one of each key item, shuffled
 	ld de, 0
 .vanilla
-	push de
-	call RandoLocInfoOf
-	inc hl
-	inc hl
-	ld a, [hl]
-	pop de
+	call RandoVanillaItem
 	ld hl, sRandoRest
 	add hl, de
 	ld [hl], a
@@ -115,10 +116,17 @@ RandoPlaceItems:
 	pop hl
 	jr .remove
 .shuffle
+	ld a, [sRandoTag + 4]
+	bit RANDO_ITEMS_F, a
+	jr nz, .doShuffle
+	call RandoKeepGround
+	jr .fillFree
+.doShuffle
 	ld hl, sRandoRest
 	ld a, [sRandoRestN]
 	ld b, a
 	call RandoShuffleBytes
+.fillFree
 	; into the free locations, in order
 	ld hl, sRandoRest
 	ld de, 0
@@ -182,7 +190,66 @@ RandoShuffleBytes:
 	pop bc
 	jr .loop
 
-; remove the first a in sRandoRest (sRandoRestN long)
+; location de's vanilla item -> a (de kept)
+RandoVanillaItem:
+	push de
+	call RandoLocInfoOf
+	inc hl
+	inc hl
+	ld a, [hl]
+	pop de
+	ret
+
+; every key item where it was: the first location that held it
+RandoKeysWhereTheyWere:
+	ld hl, RandoKeyItems
+.item
+	ld a, [hli]
+	cp $ff
+	ret z
+	push hl
+	ld c, a
+	ld de, 0
+.find
+	call RandoVanillaItem
+	cp c
+	jr z, .found
+	inc de
+	jr .find
+.found
+	ld hl, sRandoPlace
+	add hl, de
+	ld [hl], c
+	pop hl
+	jr .item
+
+; each free location keeps its vanilla item while sRandoRest has one
+RandoKeepGround:
+	ld de, 0
+.loop
+	ld hl, sRandoPlace
+	add hl, de
+	ld a, [hl]
+	and a
+	jr nz, .next
+	call RandoVanillaItem
+	push de
+	push af
+	call RandoRemoveRest
+	pop bc                      ; b = the item
+	pop de
+	jr nc, .next
+	ld hl, sRandoPlace
+	add hl, de
+	ld [hl], b
+.next
+	inc de
+	ld a, e
+	cp RANDO_LOCS
+	jr nz, .loop
+	ret
+
+; remove the first a in sRandoRest (sRandoRestN long); carry if there was one
 RandoRemoveRest:
 	ld hl, sRandoRest
 	ld c, a
@@ -194,6 +261,7 @@ RandoRemoveRest:
 	jr z, .found
 	dec b
 	jr nz, .find
+	and a
 	ret
 .found
 	dec b
@@ -207,6 +275,7 @@ RandoRemoveRest:
 .last
 	ld hl, sRandoRestN
 	dec [hl]
+	scf
 	ret
 
 ; bc = the locations that may hold a key item, are free and (if

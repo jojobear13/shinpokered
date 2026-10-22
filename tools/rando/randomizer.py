@@ -196,44 +196,63 @@ class Randomizer:
         return pairing
 
     # ---- items
-    def place_items(self, rng, pairing):
-        """Assumed fill for the items the logic needs; the other key items
-        anywhere a key item may go; the ground items into the rest."""
+    def place_items(self, rng, pairing, keys=True, items=True):
+        """Assumed fill for the items the logic needs, and the other key items
+        anywhere a key item may go (or every key item where it was); then the
+        rest, shuffled into the free locations (or each where it was, where it
+        still can be, the ones the key items displaced into the places they
+        left, in order)."""
         C = self.C
-        keys = list(L.PROGRESSION)
-        rng.shuffle(keys)
         placement = {}
-        for i, item in enumerate(keys):
-            have, seen, order = C.sweep(pairing, placement, start_have=keys[i + 1:])
-            got = set(order)
-            cands = [l for l in self.prog_locs if l['key'] not in placement and l['key'] in got]
-            if not cands:
-                return None
-            placement[cands[rng.rand(len(cands))]['key']] = item
-        others = [k for k in L.KEY_ITEMS if k not in L.PROGRESSION]
-        for item in others:
-            cands = [l for l in self.prog_locs if l['key'] not in placement]
-            placement[cands[rng.rand(len(cands))]['key']] = item
+        if keys:
+            order = list(L.PROGRESSION)
+            rng.shuffle(order)
+            for i, item in enumerate(order):
+                have, seen, got = C.sweep(pairing, placement, start_have=order[i + 1:])
+                got = set(got)
+                cands = [l for l in self.prog_locs if l['key'] not in placement and l['key'] in got]
+                if not cands:
+                    return None
+                placement[cands[rng.rand(len(cands))]['key']] = item
+            others = [k for k in L.KEY_ITEMS if k not in L.PROGRESSION]
+            for item in others:
+                cands = [l for l in self.prog_locs if l['key'] not in placement]
+                placement[cands[rng.rand(len(cands))]['key']] = item
+        else:
+            for k in L.KEY_ITEMS:
+                placement[[l for l in C.locs if l['item'] == k][0]['key']] = k
         rest = [l['item'] for l in C.locs]
         for k in L.KEY_ITEMS:
             rest.remove(k)
-        rng.shuffle(rest)
+        if items:
+            rng.shuffle(rest)
+        else:
+            for l in C.locs:
+                if l['key'] not in placement and l['item'] in rest:
+                    rest.remove(l['item'])
+                    placement[l['key']] = l['item']
         free = [l['key'] for l in C.locs if l['key'] not in placement]
         assert len(free) == len(rest)
         placement.update(zip(free, rest))
         return placement
 
-    def generate(self, seed, max_tries=50):
+    def generate(self, seed, max_tries=50, doors=True, keys=True, items=True):
+        """A world for the seed: the doors shuffled (or as they were) and the
+        items placed; tried again until it can be finished without getting
+        stuck. Shuffled doors need shuffled key items (the key items where
+        they were would too often be behind what they open)."""
+        assert keys or not doors
         rng = Rng(seed)
+        vanilla = {e: self.C.R.g.vanilla[e] for e in self.C.leave}
         for tries in range(1, max_tries + 1):
-            pairing = self.shuffle_doors(rng)
+            pairing = self.shuffle_doors(rng) if doors else vanilla
             if pairing is None:
                 continue
             # with every key item, the events (badges, Fuji, ...) must all be reachable too
             have, seen, _ = self.C.sweep(pairing, {}, start_have=L.KEY_ITEMS)
             if not self.C.beaten(have, seen):
                 continue
-            placement = self.place_items(rng, pairing)
+            placement = self.place_items(rng, pairing, keys, items)
             if placement is None:
                 continue
             have, seen, _ = self.C.sweep(pairing, placement)
