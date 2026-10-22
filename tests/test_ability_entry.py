@@ -10,6 +10,8 @@ copying the ability.
 import random
 import unittest
 
+from test_options import decode
+
 from harness import shared_game
 from suites import move_execution as mx
 from suites.apply_attack import H_WHOSETURN
@@ -150,6 +152,14 @@ class EntryTest(unittest.TestCase):
                 self.run_entry()
                 self.assertEqual(self.mods(0), [7] * 7)
                 self.assertEqual(self.mods(1), [7] * 7)
+
+    def test_forewarn_names_the_move(self):
+        g = self.game
+        self.setup("FOREWARN", "NO_ABILITY")
+        g.poke("wEnemyMonMoves", MOVES["TACKLE"], MOVES["FISSURE"], 0, 0)
+        self.run_entry()
+        name = [g.peek(f"wcd6d+{i}") for i in range(13)]
+        self.assertEqual(decode(name[:name.index(0x50)]), "FISSURE")
 
     def test_forewarn_power(self):
         g = self.game

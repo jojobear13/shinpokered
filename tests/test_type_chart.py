@@ -2,7 +2,8 @@
 the DISPLAY option TYPE HINT: OFF, ON, or LEARNED. A matchup is an attacking
 type against a defending type, one way; an attacking move with ordinary
 damage records its type against each of its target's types, whichever side
-used it. Status moves and fixed-damage moves record nothing."""
+used it. Status moves record nothing; fixed-damage moves (power 1, like
+Dragon Rage) record their matchups too."""
 
 import unittest
 
@@ -60,11 +61,13 @@ class TypeChartTest(unittest.TestCase):
         self.assertTrue(self.seen(WATER, FIRE))
         self.assertFalse(self.seen(FIRE, WATER))
 
-    def test_status_and_fixed_damage_dont_count(self):
+    def test_status_moves_dont_count(self):
         self.attack(0, 0, FIRE, (GRASS, GRASS))  # a status move
-        self.attack(0, 1, FIGHTING, (GRASS, GRASS))  # Seismic Toss
         self.assertFalse(self.seen(FIRE, GRASS))
-        self.assertFalse(self.seen(FIGHTING, GRASS))
+
+    def test_fixed_damage_counts(self):
+        self.attack(0, 1, FIGHTING, (GRASS, GRASS))  # Seismic Toss
+        self.assertTrue(self.seen(FIGHTING, GRASS))
 
     def test_every_matchup_has_its_own_bit(self):
         g = self.game

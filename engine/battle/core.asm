@@ -3813,9 +3813,10 @@ MirrorMoveCheck:
 .moveDidNotMiss
 	call ApplyAttackToEnemyPokemon
 	ld a, [wPlayerMovePower]
-	cp 2
-	jr c, .zeropower_or_staticmove
-	call PrintCriticalOHKOText
+	and a
+	jr z, .zeropower_or_staticmove
+	dec a
+	call nz, PrintCriticalOHKOText ; not for fixed damage
 	callab RecordAndDisplayEffectiveness
 .zeropower_or_staticmove
 	ld a, 1
@@ -5808,9 +5809,10 @@ EnemyCheckIfMirrorMoveEffect:
 .moveDidNotMiss
 	call ApplyAttackToPlayerPokemon
 	ld a, [wEnemyMovePower]
-	cp 2
-	jr c, .zeropower_or_staticmove
-	call PrintCriticalOHKOText
+	and a
+	jr z, .zeropower_or_staticmove
+	dec a
+	call nz, PrintCriticalOHKOText ; not for fixed damage
 	callab RecordAndDisplayEffectiveness
 .zeropower_or_staticmove
 	ld a, 1

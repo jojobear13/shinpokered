@@ -2,8 +2,8 @@
 ; marks (the DISPLAY option TYPE HINT: OFF, ON, or LEARNED, which marks only
 ; matchups the player has seen).
 ;
-; A matchup is seen when an attacking move (not a status move, nor one whose
-; damage is fixed) hits, or fails to affect, a mon: its type against each of
+; A matchup is seen when an attacking move (not a status move; fixed-damage
+; ones count) hits, or fails to affect, a mon: its type against each of
 ; the target's types, so a hit on a dual-type mon counts as both matchups.
 ; Either side's moves count, and each direction is its own matchup.
 ; wTypeChartSeen keeps them, a flag each.
@@ -128,10 +128,19 @@ StatusMoveText:
 ; text
 RecordAndDisplayEffectiveness:
 	call RecordTypeMatchup
+	ld a, [H_WHOSETURN]
+	and a
+	ld a, [wPlayerMovePower]
+	jr z, .gotPower
+	ld a, [wEnemyMovePower]
+.gotPower
+	dec a
+	ret z ; fixed damage: no "super effective" text
 	jpab DisplayEffectiveness
 
 ; the matchups of the move being used against its target's types, if it's
-; an attacking move with ordinary damage (power 2 or more). Keeps de.
+; an attacking move (power 1, fixed damage, counts too: its type still
+; decides whether it hits). Keeps de.
 RecordTypeMatchup:
 	push de
 	ld a, [H_WHOSETURN]
@@ -148,8 +157,8 @@ RecordTypeMatchup:
 .gotMove
 	ld d, a
 	ld a, b
-	cp 2
-	jr c, .done
+	and a
+	jr z, .done
 	ld a, [hli]
 	ld e, a
 	push hl

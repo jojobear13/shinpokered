@@ -2471,10 +2471,13 @@ Forewarn:
 	ld a, e
 	and a
 	ret z ; only status moves, or none
+	push de
+	ld d, FOREWARN
+	call PrintUserAbilityActivated ; (puts the ability's name in wcd6d)
+	pop de
+	ld a, e
 	ld [wd11e], a
 	call GetMoveName
-	ld d, FOREWARN
-	call PrintUserAbilityActivated
 	ld hl, ForewarnText
 	jp PrintText
 
