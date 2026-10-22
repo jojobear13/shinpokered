@@ -9,6 +9,8 @@ SetDefaultNames:
 	push af
 	ld a, [wDisplayOptions] ; and the sprites option
 	push af
+	ld a, [wRandoFlags] ; and what the randomizer shuffles
+	push af
 	callba SaveRuleFlags ; and the rules, which are event flags
 	ld hl, wPlayerName
 	ld bc, wMainDataEnd - wPlayerName ; the box is in save RAM now
@@ -19,6 +21,8 @@ SetDefaultNames:
 	xor a
 	call FillMemory
 	callba RestoreRuleFlags
+	pop af
+	ld [wRandoFlags], a
 	pop af
 	ld [wDisplayOptions], a
 	pop af
@@ -367,6 +371,8 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	ld l, a
 	push hl
 	ld a, [wDisplayOptions] ; and the sprites option
+	push af
+	ld a, [wRandoFlags] ; and what the randomizer shuffles
 	push af
 
 	ld hl, wPlayerName

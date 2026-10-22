@@ -763,7 +763,7 @@ StartMenu_Option:
 	ld [H_AUTOBGTRANSFERENABLED], a
 	call ClearScreen
 	call UpdateSprites
-	callab DisplayOptionMenu
+	callab DisplayOptionMenuInGame
 	call LoadScreenTilesFromBuffer2 ; restore saved screen
 	call LoadTextBoxTilePatterns
 	call UpdateSprites

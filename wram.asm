@@ -3315,6 +3315,7 @@ wd72e:: ; d72e
 ; bit 7: set if scripted NPC movement has been initialised
 	ds 1
 
+wOptionsInGame:: ; the OPTION screen was opened from the start menu
 	ds 1
 
 wd730:: ; d730
@@ -3462,7 +3463,10 @@ wRandomizerSeed:: 	;da3B
 ;joenote - generate a random seed for fisher-yates randomizer functions
 	ds 1
 
-	ds 5
+wRandoSeed:: ; the randomizer's seed: a hash of what the player typed and wRandoFlags
+	ds 4
+wRandoFlags:: ; what the randomizer shuffles (RANDO_*_F)
+	ds 1
 
 wPlayTimeHours:: ; da41
 	ds 1

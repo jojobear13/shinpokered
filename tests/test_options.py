@@ -15,8 +15,11 @@ DEFAULTS = [
     ["30", "GEN 1", "OFF", "OFF", "OFF", "OFF", "OFF"],  # DISPLAY
     ["OFF"] * 6,  # CHALLENGE
     ["OFF"] * 4,  # CLAUSES
-    ["OFF"] * 7,  # EXTRAS
+    ["OFF"] * 5,  # EXTRAS
+    ["OFF"] * 6,  # RANDOMIZER
 ]
+RANDOMIZER = 5
+DOORS, KEYS, ITEMS, MARTS = 1, 2, 4, 8  # wRandoFlags
 
 
 def decode(data):
@@ -44,6 +47,8 @@ class OptionsTest(unittest.TestCase):
         for i in range(0x100 // 8, 0xA00 // 8):  # every event flag but the story's first
             g.poke(f"wEventFlags+{i}", 0)
         g.poke("wDisplayOptions", 0)
+        g.poke("wRandoFlags", 0)
+        g.poke("wOptionsInGame", 0)
         g.call("InitOptions")
 
     def string(self, address, limit=40):
@@ -106,7 +111,7 @@ class OptionsTest(unittest.TestCase):
 
     def test_random_wild(self):
         g = self.game
-        wild = self.options(4)[3]
+        wild = self.options(RANDOMIZER)[4]
         events = g.addr("wEventFlags")
         for value, name, flags in [(1, "TIER", (0, 1)), (2, "FULL", (1, 1)), (0, "OFF", (0, 0))]:
             self.change(wild, value)
@@ -131,6 +136,29 @@ class OptionsTest(unittest.TestCase):
         cap = self.options(2)[2]
         self.change(cap, 1)
         self.assertRegex(self.value(cap), r"^:L\d+$")
+
+    def test_randomizer_choices(self):
+        g = self.game
+        doors, keys, items, marts = self.options(RANDOMIZER)[:4]
+        self.change(items, 1)
+        self.change(marts, 1)
+        self.assertEqual(g.peek("wRandoFlags"), ITEMS | MARTS)
+        # shuffled doors need shuffled key items, both ways
+        self.change(doors, 1)
+        self.assertEqual(g.peek("wRandoFlags"), DOORS | KEYS | ITEMS | MARTS)
+        self.change(keys, 0)
+        self.assertEqual(g.peek("wRandoFlags"), ITEMS | MARTS)
+        self.change(keys, 1)
+        self.assertEqual(g.peek("wRandoFlags"), KEYS | ITEMS | MARTS)
+        self.assertEqual([self.value(e) for e in (doors, keys, items, marts)], ["OFF", "ON", "ON", "ON"])
+
+    def test_randomizer_locked_in_game(self):
+        g = self.game
+        g.skip_sound_waits()
+        g.poke("wOptionsInGame", 1)
+        for entry in self.options(RANDOMIZER)[:4]:
+            self.change(entry, 1)
+        self.assertEqual(g.peek("wRandoFlags"), 0)
 
     def test_rules_survive_new_game(self):
         g = self.game

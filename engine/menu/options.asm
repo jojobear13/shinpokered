@@ -52,6 +52,7 @@ OptionPages:
 	dw OptionsPageChallenge
 	dw OptionsPageClauses
 	dw OptionsPageExtras
+	dw OptionsPageRandomizer
 NUM_OPTION_PAGES EQU (@ - OptionPages) / 2
 
 ; each page: its name, its number of options, then the options (at most 7)
@@ -91,16 +92,37 @@ OptionsPageClauses:
 	opt_event  OptTextBeamClause, OptHelpBeamClause, EVENT_8C8, OptValuesOffOn
 
 OptionsPageExtras:
-	db "EXTRAS@", 7
+	db "EXTRAS@", 5
 	opt_event  OptTextWinHeal, OptHelpWinHeal, EVENT_WIN_HEAL, OptValuesOffOn
 	opt_event  OptTextWarpBack, OptHelpWarpBack, EVENT_BLACKOUT_RETURN, OptValuesOffOn
 	opt_event  OptTextCatchUpExp, OptHelpCatchUpExp, EVENT_8D9, OptValuesOffOn
-	opt_custom OptTextRandomWild, OptHelpRandomWild, 3, GetRandomWildOption, SetRandomWildOption, OptValuesRandomWild
-	opt_event  OptTextRandomTrainers, OptHelpRandomTrainers, EVENT_8D8, OptValuesOffOn
 	opt_event  OptTextSafari, OptHelpSafari, EVENT_90F, OptValuesOffOn
 	opt_event  OptTextMenuPC, OptHelpMenuPC, EVENT_PC_IN_MENU, OptValuesOffOn
 
+; the world's shuffles are chosen before NEW GAME (engine/rando/): from the
+; start menu they only show
+OptionsPageRandomizer:
+	db "RANDOMIZER@", 6
+	opt_custom OptTextRandoDoors, OptHelpRandoDoors, 2, GetRandoDoorsOption, SetRandoDoorsOption, OptValuesOffOn
+	opt_custom OptTextRandoKeys, OptHelpRandoKeys, 2, GetRandoKeysOption, SetRandoKeysOption, OptValuesOffOn
+	opt_custom OptTextRandoItems, OptHelpRandoItems, 2, GetRandoItemsOption, SetRandoItemsOption, OptValuesOffOn
+	opt_custom OptTextRandoMarts, OptHelpRandoMarts, 2, GetRandoMartsOption, SetRandoMartsOption, OptValuesOffOn
+	opt_custom OptTextRandomWild, OptHelpRandomWild, 3, GetRandomWildOption, SetRandomWildOption, OptValuesRandomWild
+	opt_event  OptTextRandomTrainers, OptHelpRandomTrainers, EVENT_8D8, OptValuesOffOn
+
+; from the title screen's menu (DisplayOptionMenuInGame from the start menu)
 DisplayOptionMenu:
+	xor a
+	jr DisplayOptions
+DisplayOptionMenuInGame:
+	ld a, 1
+DisplayOptions:
+	ld [wOptionsInGame], a
+	call .options
+	xor a
+	ld [wOptionsInGame], a
+	ret
+.options
 	call GBPalNormal ; ROCK TUNNEL's darkness doesn't reach the menu
 	ld a, [wUpdateSpritesEnabled] ; nor do the map's sprites
 	push af
@@ -665,6 +687,77 @@ SetRandomWildOption:
 	SetEvent EVENT_8D7
 	ret
 
+; the randomizer's choices (wRandoFlags); shuffled doors need shuffled key
+; items, so each turns the other on or off with it
+GetRandoDoorsOption:
+	ld c, 1 << RANDO_DOORS_F
+	jr GetRandoOption
+GetRandoKeysOption:
+	ld c, 1 << RANDO_KEYS_F
+	jr GetRandoOption
+GetRandoItemsOption:
+	ld c, 1 << RANDO_ITEMS_F
+	jr GetRandoOption
+GetRandoMartsOption:
+	ld c, 1 << RANDO_MARTS_F
+GetRandoOption:
+	ld a, [wRandoFlags]
+	and c
+	ret z
+	ld a, 1
+	ret
+
+SetRandoDoorsOption:
+	ld c, 1 << RANDO_DOORS_F
+	call SetRandoOption
+	ret c
+	ret z
+	ld c, 1 << RANDO_KEYS_F
+	jr SetRandoBit
+SetRandoKeysOption:
+	ld c, 1 << RANDO_KEYS_F
+	call SetRandoOption
+	ret c
+	ret nz
+	ld a, [wRandoFlags]
+	res RANDO_DOORS_F, a
+	ld [wRandoFlags], a
+	ret
+SetRandoItemsOption:
+	ld c, 1 << RANDO_ITEMS_F
+	jr SetRandoOption
+SetRandoMartsOption:
+	ld c, 1 << RANDO_MARTS_F
+; a = 1: set the bit c, 0: clear it (nz if set); from the start menu,
+; nothing (carry)
+SetRandoOption:
+	ld b, a
+	ld a, [wOptionsInGame]
+	and a
+	jr nz, .locked
+	ld a, b
+	and a
+	jr nz, SetRandoBit
+	ld a, c
+	cpl
+	ld c, a
+	ld a, [wRandoFlags]
+	and c
+	ld [wRandoFlags], a
+	xor a ; z, no carry
+	ret
+.locked
+	ld a, SFX_DENIED
+	call PlaySound
+	scf
+	ret
+SetRandoBit:
+	ld a, [wRandoFlags]
+	or c
+	ld [wRandoFlags], a
+	or 1 ; nz, no carry
+	ret
+
 ; Starting a new game clears every event flag, so these two carry the rules
 ; that are event flags across it in wBuffer: a player can set them from the
 ; title screen's options before choosing NEW GAME.
@@ -804,6 +897,10 @@ OptTextCatchUpExp:     db "CATCH-UP EXP@"
 OptTextRandomWild:     db "RANDOM WILD@"
 OptTextRandomTrainers: db "RANDOM TRNR@"
 OptTextSafari:         db "SAFARI EVENT@"
+OptTextRandoDoors:     db "DOORS@"
+OptTextRandoKeys:      db "KEY ITEMS@"
+OptTextRandoItems:     db "ITEMS@"
+OptTextRandoMarts:     db "MARTS@"
 OptTextMenuPC:         db "PC IN MENU@"
 
 ; the explanations: two lines of at most 18 letters
@@ -894,6 +991,18 @@ OptHelpRandomWild:
 OptHelpRandomTrainers:
 	db   "Randomize regular"
 	next "trainers' teams.@"
+OptHelpRandoDoors:
+	db   "NEW GAME: shuffle"
+	next "doors and keys.@"
+OptHelpRandoKeys:
+	db   "NEW GAME: shuffle"
+	next "key items and HMs.@"
+OptHelpRandoItems:
+	db   "NEW GAME: shuffle"
+	next "other found items.@"
+OptHelpRandoMarts:
+	db   "NEW GAME: shuffle"
+	next "what marts sell.@"
 OptHelpSafari:
 	db   "SAFARI ZONE: more"
 	next "kinds, better IVs.@"
