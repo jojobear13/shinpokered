@@ -177,7 +177,14 @@ class Tables:
         w('{RP}KeyItems:')
         db([rom.items[x] for x in L.KEY_ITEMS] + [0xFF])
         cur[0] = 'kinds'
-        csr('Kinds', [[self.slot_of[x] for x in self.Rz.kinds[e]] for e in self.slots])
+        kinds = [[self.slot_of[x] for x in self.Rz.kinds[e]] for e in self.slots]
+        csr('Kinds', kinds)
+        # and the other way: for each slot, the slots whose areas it's in
+        back = [[] for _ in self.slots]
+        for s, lst in enumerate(kinds):
+            for t in lst:
+                back[t].append(s)
+        csr('KindsBack', back)
         # marts (built when one opens, from the seed): for each, 0 if it keeps
         # its list, else how many it sells; what every one sells; the pool
         lists = RZ.mart_lists(rom)
@@ -230,7 +237,8 @@ class Tables:
             files['consts'].append('DEF RANDO_LOC_%s EQU %d' % (name, k))
         files['consts'].append('DEF RANDO_MART_POOL EQU %d' % len(pool))
         for f, lines in files.items():
-            open('%s_%s.asm' % (base, f), 'w').write('\n'.join(lines) + '\n')
+            with open('%s_%s.asm' % (base, f), 'w') as out:
+                out.write('\n'.join(lines) + '\n')
 
 
 def hidden_coords(rom):

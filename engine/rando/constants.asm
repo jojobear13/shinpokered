@@ -20,3 +20,12 @@ DEF MODE_EVENTS_F EQU 0        ; a search takes the events it reaches
 DEF MODE_LOCS_F EQU 1          ; and the locations
 DEF MODE_EVENTS EQU 1 << MODE_EVENTS_F
 DEF MODE_LOCS EQU 1 << MODE_LOCS_F
+
+; sRandoClass, a byte per slot while the doors are shuffled
+DEF CLASS_CAND EQU 1 << 7      ; one to reach, with an open door it may pair with
+DEF CLASS_MORE EQU 1 << 6      ; its area has more slots to reach
+DEF CLASS_NOT_STAIRS EQU 1 << 5 ; and one of them isn't stairs
+DEF CLASS_KNOWN_F EQU 4        ; the two above are still right (RandoStale)
+
+ASSERT RANDO_NUM_ATOMS <= 32   ; sRandoHave and friends are 4 bytes
+ASSERT RANDO_NODES < 2048 && RANDO_SLOTS < 2048 ; RandoBit

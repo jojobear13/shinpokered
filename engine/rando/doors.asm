@@ -94,6 +94,9 @@ RandoDoorsStart:
 	ld hl, sRandoWitness
 	ld bc, RANDO_SLOTS
 	call RandoClearBC
+	ld hl, sRandoClass
+	ld bc, RANDO_SLOTS
+	call RandoClearBC
 	ld hl, sRandoOpenN
 	ld bc, 3
 	call RandoClearBC
@@ -145,7 +148,12 @@ RandoPaired:
 	ld a, [hl]
 	ld [hl], STATE_PAIRED
 	cp STATE_OPEN
-	jr nz, .done
+	jr z, .open
+	push de
+	call RandoStale
+	pop de
+	jr .done
+.open
 	call RandoKindOf
 	ld c, a
 	ld b, 0
@@ -162,6 +170,51 @@ RandoNeedOf:
 	cp KIND_STAIRS
 	ret z
 	xor 1
+	ret
+
+; slot de isn't one to reach any more: the areas it's in may have no more
+; to reach (keeps de)
+RandoStale:
+	ld hl, sRandoClass
+	add hl, de
+	ld [hl], 0
+	push de
+	ld hl, RandoKindsBackIndex
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld e, a
+	ld a, [hl]
+	ld d, a
+	ld hl, RandoKindsBack
+	add hl, bc
+	ld a, e                     ; how many: (end - start) / 2
+	sub c
+	ld e, a
+	ld a, d
+	sbc b
+	srl a
+	rr e
+	jr z, .done
+.loop
+	push hl
+	ld a, [hli]
+	ld c, a
+	ld b, [hl]
+	ld hl, sRandoClass
+	add hl, bc
+	res CLASS_KNOWN_F, [hl]
+	pop hl
+	inc hl
+	inc hl
+	dec e
+	jr nz, .loop
+.done
+	pop de
 	ret
 
 ; nz if slot de is open
@@ -195,23 +248,36 @@ RandoIsFresh:
 ;    spare: better reached through that door
 ;  4 the rest
 ; z if there are no candidates.
-DEF CLASS_CAND EQU 1 << 7
-DEF CLASS_MORE EQU 1 << 6
-DEF CLASS_NOT_STAIRS EQU 1 << 5
 RandoClassify:
 	ld hl, sRandoDemand
 	ld bc, sRandoCountsEnd - sRandoDemand
 	call RandoClearBC
+	ld hl, sRandoState
 	ld de, 0
 .loop
-	ld hl, sRandoState
-	add hl, de
-	ld a, [hl]
-	ld bc, sRandoClass - sRandoState
-	add hl, bc
-	ld [hl], 0
+	ld a, [hli]
 	and a
-	jp nz, .next                ; not one to reach
+	jr z, .fresh
+.next
+	inc de
+	ld a, e
+	cp LOW(RANDO_SLOTS)
+	jr nz, .loop
+	ld a, d
+	cp HIGH(RANDO_SLOTS)
+	jr nz, .loop
+	jp .counted
+.fresh
+	push hl
+	call .slot
+	pop hl
+	jr .next
+
+; slot de, one still to reach
+.slot
+	ld hl, sRandoClass
+	add hl, de
+	res 7, [hl]
 	ld hl, RandoSlotKind
 	add hl, de
 	ld a, [hl]
@@ -225,7 +291,7 @@ RandoClassify:
 	add hl, bc
 	ld a, [hl]
 	and a
-	jp z, .next                 ; none of those open
+	ret z                       ; none of those open
 	ld [sRandoTmp], a           ; open doors of the kind it needs
 	ld a, c
 	ld [sRandoTmp + 1], a       ; that kind
@@ -234,11 +300,18 @@ RandoClassify:
 	inc [hl]
 	ld hl, sRandoCands
 	call RandoInc16
-	call RandoMore
-	or CLASS_CAND
 	ld hl, sRandoClass
 	add hl, de
+	bit CLASS_KNOWN_F, [hl]
+	jr nz, .known
+	push hl
+	call RandoMore
+	pop hl
+	or 1 << CLASS_KNOWN_F
 	ld [hl], a
+.known
+	set 7, [hl]
+	ld a, [hl]
 	bit 6, a
 	jr z, .deadEnd
 	; opens more
@@ -250,12 +323,10 @@ RandoClassify:
 	cp KIND_STAIRS
 	jr nz, .grower
 	ld hl, sRandoStairsAnch
-	call RandoInc16
-	jr .next
+	jp RandoInc16
 .grower
 	ld hl, sRandoGrowers
-	call RandoInc16
-	jr .next
+	jp RandoInc16
 .deadEnd
 	ld hl, RandoSlotKind
 	add hl, de
@@ -269,8 +340,7 @@ RandoClassify:
 	cp 2
 	jr c, .cond
 	ld hl, sRandoLeaves
-	call RandoInc16
-	jr .next
+	jp RandoInc16
 .cond
 	; a leaf only if it's the only one needing its kind (known at the end)
 	ld a, [sRandoTmp + 1]
@@ -279,15 +349,9 @@ RandoClassify:
 	ld b, 0
 	ld hl, sRandoLeafCond
 	add hl, bc
-	call RandoInc16
-.next
-	inc de
-	ld a, e
-	cp LOW(RANDO_SLOTS)
-	jp nz, .loop
-	ld a, d
-	cp HIGH(RANDO_SLOTS)
-	jp nz, .loop
+	jp RandoInc16
+
+.counted
 	; stairs to spare? more open stairs than dead-end stairs to reach
 	ld a, [sRandoDeadStairs + 1]
 	and a
@@ -431,25 +495,26 @@ RandoMore:
 	cp $f
 	ret z
 	ld c, a
-.try
-	ld a, [sRandoKindsN]
-	cp c
-	jr z, .none
-	push bc
 	ld a, [sRandoPtr]
 	ld l, a
 	ld a, [sRandoPtr + 1]
 	ld h, a
-	ld b, 0
-	add hl, bc
-	add hl, bc
+	ld e, c
+	ld d, 0
+	add hl, de
+	add hl, de
+.try
+	ld a, [sRandoKindsN]
+	cp c
+	jr z, .none
 	ld a, [hli]
 	ld e, a
-	ld d, [hl]
+	ld a, [hli]
+	ld d, a
+	push hl
 	ld hl, sRandoState
 	add hl, de
 	ld a, [hl]
-	pop bc
 	and a
 	jr nz, .no                  ; not one to reach
 	ld a, b
@@ -461,9 +526,11 @@ RandoMore:
 	cp KIND_STAIRS
 	jr nz, .fit
 .no
+	pop hl
 	inc c
 	jr .try
 .fit
+	pop hl
 	ld a, c
 	ret
 .none
@@ -475,8 +542,11 @@ RandoClassOf:
 	ld hl, sRandoClass
 	add hl, de
 	ld a, [hl]
-	and a
-	ret z
+	bit 7, a
+	jr nz, .cand
+	xor a
+	ret
+.cand
 	bit 6, a
 	jr z, .deadEnd
 	bit 5, a
@@ -550,8 +620,7 @@ RandoPickF:
 .scan
 	ld hl, sRandoClass
 	add hl, de
-	ld a, [hl]
-	and a
+	bit 7, [hl]
 	jr z, .nextScan
 	push bc
 	call RandoClassOf

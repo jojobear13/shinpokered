@@ -11,27 +11,33 @@
 
 ; ---- bit sets
 
-; hl = set, de = index -> hl = its byte, c = its mask
+; hl = set, de = index (below 2048) -> hl = its byte, c = its mask (de kept)
 {RP}Bit:
-	push de
+	ld a, d
+	swap a
+	rlca
+	ld b, a                     ; d << 5
+	ld a, e
+	rrca
+	rrca
+	rrca
+	and %11111
+	or b                        ; de >> 3
+	add l
+	ld l, a
+	jr nc, .noCarry
+	inc h
+.noCarry
 	ld a, e
 	and 7
+	add LOW({RP}BitMasks)
 	ld c, a
-	srl d
-	rr e
-	srl d
-	rr e
-	srl d
-	rr e
-	add hl, de
-	push hl
-	ld hl, {RP}BitMasks
-	ld e, c
-	ld d, 0
-	add hl, de
-	ld c, [hl]
-	pop hl
-	pop de
+	ld b, HIGH({RP}BitMasks)
+	jr nc, .mask
+	inc b
+.mask
+	ld a, [bc]
+	ld c, a
 	ret
 
 {RP}BitMasks:
@@ -69,14 +75,31 @@
 	xor a
 	jp FillMemory
 
-; nz if atom a is held
+; nz if atom a is held (bc, de kept)
 {RP}Has:
-	push de
-	ld e, a
-	ld d, 0
-	ld hl, sRandoHave
-	call {RP}Test
-	pop de
+	push bc
+	ld c, a
+	rrca
+	rrca
+	rrca
+	and %11
+	add LOW(sRandoHave)
+	ld l, a
+	ld h, HIGH(sRandoHave)
+	jr nc, .noCarry
+	inc h
+.noCarry
+	ld a, c
+	and 7
+	add LOW({RP}BitMasks)
+	ld c, a
+	ld b, HIGH({RP}BitMasks)
+	jr nc, .mask
+	inc b
+.mask
+	ld a, [bc]
+	and [hl]
+	pop bc
 	ret
 
 ; ---- the stack (wOverworldMap: no map is loaded while the generator runs)
@@ -198,6 +221,9 @@
 	and a
 	ret nz
 	ld [hl], STATE_OPEN
+IF !DEF(RANDO_HAS_REV)
+	call RandoStale
+ENDC
 	call {RP}KindOf
 	ld c, a
 	ld b, 0
@@ -223,9 +249,13 @@
 	ld l, a
 	ld a, [sRandoVisited + 1]
 	ld h, a
-	call {RP}Test
+	call {RP}Bit
+	ld a, [hl]
+	and c
 	ret nz
-	call {RP}Set
+	ld a, [hl]
+	or c
+	ld [hl], a
 	jp {RP}Push
 
 ; nz if node de has been reached
