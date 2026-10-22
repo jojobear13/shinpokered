@@ -141,7 +141,26 @@ _ReplaceMon:
 .next
 
 	;C now holds the number of mons in the list
-	
+
+	; the randomizer: with a seed, the whole seed picks (RandoWildPermute)
+	push de
+	ld a, [wUnusedD722 + 1]
+	ld d, a
+	ld e, c
+	callba RandoWildPermute
+	ld a, e
+	pop de
+	cp $ff
+	jr z, .shinShuffle
+	ld l, a
+	ld h, 0
+	add hl, de
+	ld a, [hl]
+	ld [wcf91], a
+	ld [wEnemyMonSpecies2], a
+	ret
+.shinShuffle
+
 	;enable the sram and control sram bank 0
 	ld a, SRAM_ENABLE
 	ld [MBC1SRamEnable], a

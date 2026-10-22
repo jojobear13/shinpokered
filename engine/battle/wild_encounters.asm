@@ -44,7 +44,7 @@ TryDoWildEncounter:
 	jp c, .CantEncounter2
 	ld a, [wCurMapTileset]
 	cp FOREST ; Viridian Forest/Safari Zone
-	jr z, .CantEncounter2
+	jp z, .CantEncounter2
 	ld a, [wGrassRate]
 .CanEncounter
 ; compare encounter chance with a random number to determine if there will be an encounter
@@ -94,6 +94,8 @@ TryDoWildEncounter:
 	ld a, [hl]
 	ld [wcf91], a
 	ld [wEnemyMonSpecies2], a
+	ld e, c
+	callba RandoWildArea ; WILD AREA: the slot's own #MON
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;joenote - expand the safari zone random encounters
 	callba GetRandMonSafari

@@ -2250,6 +2250,7 @@ RodResponse:
 ;joenote - generate a random wild pokemon based on a seed value
 	ld [wcf91], a
 	predef ReplaceWildMon
+	callba RandoFishArea ; WILD AREA: from the water deck
 	ld a, [wcf91]
 	ld [wCurOpponent], a
 
@@ -3201,6 +3202,10 @@ ItemUseReloadOverworldData:
 FindWildLocationsOfMon:
 	ld a, 0
 	ld [wActionResultOrTookBattleTurn], a	;joenote - used to differentiate between land, water, and super rod finding
+	callba RandoAreaLocations ; WILD AREA: its own list
+	ld a, e
+	and a
+	ret nz
 
 	ld a, [wd11e]
 	push af

@@ -19,6 +19,40 @@ GetEnemyHeldItem:
 	ret
 .wild
 	push de
+	; ITEMS: another species' pair, one per species per seed
+	ld a, [wEnemyMonSpecies]
+	ld e, a
+	callba RandoWildHeldPick
+	ld a, e
+	cp $ff
+	jr z, .own
+	ld b, a
+	ld c, 0
+	ld hl, WildHeldItems
+.count
+	ld a, [hli]
+	inc hl
+	inc hl
+	inc a
+	jr z, .counted
+	inc c
+	jr .count
+.counted
+	ld a, b
+.mod
+	sub c
+	jr nc, .mod
+	add c                        ; the pair's number
+	ld b, a
+	add a
+	add b
+	inc a
+	ld c, a
+	ld b, 0
+	ld hl, WildHeldItems
+	add hl, bc
+	jr .found
+.own
 	ld a, [wEnemyMonSpecies]
 	ld b, a
 	ld hl, WildHeldItems

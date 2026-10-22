@@ -606,3 +606,364 @@ RandoBossItems:
 	db SCOPE_LENS, BRIGHTPOWDER, FOCUS_BAND, CHOICE_BAND, CHOICE_SPECS, CHOICE_SCARF
 	db LIFE_ORB
 RandoBossItemsEnd:
+
+; ---- wild #MON
+
+; Shin's RANDOM WILD (TIER, FULL): d = the #MON's place in its list, e = the
+; list's length -> e = the place of the one it becomes, from the whole seed
+; (Shin's own shuffle has a one-byte seed); $ff for Shin's (no seed: RANDOM
+; WILD turned on in an older game)
+RandoWildPermute::
+	ld hl, wRandoSeed
+	ld a, [hli]
+	or [hl]
+	inc hl
+	or [hl]
+	inc hl
+	or [hl]
+	jr nz, .seeded
+	ld e, $ff
+	ret
+.seeded
+	ld a, d
+	ld c, e
+	ld b, e                      ; each list its own shuffle
+	call RandoPermute
+	ld e, a
+	ret
+
+; sRandoWant: the basic #MON but the legendaries; with c = 1 only the water
+; ones (save RAM open; c kept)
+RandoWantBasics:
+	push bc
+	call RandoWantAny
+	pop bc
+	ld a, MONINFO_REAL | MONINFO_LEGENDARY | MONINFO_BASIC
+	ld [sRandoWant + RANDO_WANT_MASK], a
+	ld a, MONINFO_REAL | MONINFO_BASIC
+	ld [sRandoWant + RANDO_WANT_FLAGS], a
+	bit 0, c
+	ret z
+	ld a, MONINFO_REAL | MONINFO_LEGENDARY | MONINFO_BASIC | MONINFO_WATER
+	ld [sRandoWant + RANDO_WANT_MASK], a
+	ld a, MONINFO_REAL | MONINFO_BASIC | MONINFO_WATER
+	ld [sRandoWant + RANDO_WANT_FLAGS], a
+	ret
+
+; c = 0 land, 1 water -> d = the size of that deck (save RAM open; c kept)
+RandoDeckSize:
+	call RandoWantBasics
+	push bc
+	call RandoCountWanted
+	pop bc
+	ld d, a
+	ret
+
+; WILD AREA: hl = an encounter's number among the land (c = 0) or water
+; (c = 1) ones, d = the deck's size -> a = its place in the deck. Each run
+; of the deck's size numbers is a shuffle of the whole deck, so every basic
+; #MON is somewhere. (bc, de, hl kept.)
+RandoAreaPlace:
+	push bc
+	push de
+	push hl
+	ld b, RKEY_WILD
+	ld e, d
+	ld d, 0
+.cycle
+	ld a, l
+	sub e
+	ld l, a
+	ld a, h
+	sbc d
+	jr c, .got
+	ld h, a
+	inc b
+	inc b
+	jr .cycle
+.got
+	ld a, l
+	add e                        ; the place in this run
+	push af
+	ld a, b
+	add c                        ; land and water differ
+	ld b, a
+	pop af
+	ld c, e
+	call RandoPermute
+	pop hl
+	pop de
+	pop bc
+	ret
+
+; a = a map, c = 0 land, 1 water -> a = its encounter group (0: none); bc,
+; de kept
+RandoWildGroup:
+	push de
+	ld l, a
+	ld h, 0
+	add hl, hl
+	ld e, c
+	ld d, 0
+	add hl, de
+	ld de, RandoWildGroups
+	add hl, de
+	ld a, [hl]
+	pop de
+	ret
+
+; a = the group (1-), e = the slot -> hl = the encounter's number
+RandoAreaNumber:
+	dec a
+	ld l, a
+	ld h, 0
+	ld a, e
+	ld d, h
+	ld e, l
+	add hl, hl
+	add hl, hl
+	add hl, de
+	add hl, hl                   ; * 10
+	ld e, a
+	ld d, 0
+	add hl, de
+	ret
+
+; wild_encounters: e = the slot * 2 (wcf91, wCurEnemyLVL). With WILD AREA,
+; the #MON there is the deck's, then evolved as far as its level allows.
+RandoWildArea::
+	ld a, [wRandoFlags2]
+	bit RANDO2_WILD_AREA_F, a
+	ret z
+	srl e
+	ld c, 0
+	aCoord ENCOUNTER_TILE_COORD_X, ENCOUNTER_TILE_COORD_Y
+	cp $14                       ; a water tile (as wild_encounters)
+	jr nz, .gotKind
+	inc c
+.gotKind
+	ld a, [wCurMap]
+	call RandoWildGroup
+	and a
+	ret z
+	call RandoAreaNumber
+	call RandoAreaMon
+	jp RandoAreaEvolve
+
+; hl = the encounter's number, c = 0 land, 1 water -> wcf91 = the deck's
+RandoAreaMon:
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, 1
+	ld [MBC1SRamBank], a
+	push hl
+	call RandoDeckSize
+	pop hl
+	call RandoAreaPlace
+	call RandoNthWanted          ; (sRandoWant still the deck)
+	ld [wcf91], a
+	jp RandoCloseSRAM
+
+; wcf91 evolved as Shin's trainers' are for wCurEnemyLVL; into
+; wEnemyMonSpecies2 too
+RandoAreaEvolve:
+	callba EnemyMonEvolve
+	ld a, [wcf91]
+	ld [wEnemyMonSpecies2], a
+	ret
+
+; fishing (wcf91, wCurEnemyLVL): with WILD AREA, from the water deck, by the
+; map and what the rod would have caught
+RandoFishArea::
+	ld a, [wRandoFlags2]
+	bit RANDO2_WILD_AREA_F, a
+	ret z
+	ld a, [wCurMap]
+	ld l, a
+	ld h, 0
+	ld a, [wcf91]
+	ld e, a
+	ld d, h
+	add hl, de
+	ld c, 1
+	call RandoAreaMon
+	jp RandoAreaEvolve
+
+; FindWildLocationsOfMon, with WILD AREA: wBuffer = the maps where wd11e's
+; line can be met, $ff after; the flags for wCurMap as CheckMapForMon sets
+; them (bit 1 land, bit 3 water). e = 1 if done (WILD AREA on), else 0.
+; Scratch in save RAM: sRandoArea = the map, + 1 the line's basic, + 2-5
+; its place in each deck ($ff: not in it) and the deck's size.
+RandoAreaLocations::
+	ld e, 0
+	ld a, [wRandoFlags2]
+	bit RANDO2_WILD_AREA_F, a
+	ret z
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, 1
+	ld [MBC1SRamBank], a
+	ld a, [wd11e]
+.basic
+	ld [sRandoArea + 1], a
+	dec a
+	ld l, a
+	ld h, 0
+	add hl, hl
+	ld de, RandoDevolve
+	add hl, de
+	ld a, [hl]
+	and a
+	jr nz, .basic
+	ld c, 0
+	call .rank
+	ld c, 1
+	call .rank
+	ld de, wBuffer
+	xor a
+.map
+	ld [sRandoArea], a
+	ld c, 0
+	call .kind
+	ld c, 1
+	call .kind
+	ld a, [sRandoArea]
+	inc a
+	cp RANDO_WILD_MAPS
+	jr c, .map
+	ld a, $ff
+	ld [de], a
+	call RandoCloseSRAM
+	ld e, 1
+	ret
+
+; c = the deck -> its size and the basic's place in it, at sRandoArea + 2 + c * 2
+.rank
+	call RandoDeckSize
+	push de
+	ld a, [sRandoArea + 1]
+	push bc
+	call RandoWantedRank
+	pop bc
+	pop de
+	ld b, a
+	ld a, c
+	add a
+	ld l, a
+	ld h, 0
+	push de
+	ld de, sRandoArea + 2
+	add hl, de
+	pop de
+	ld a, b
+	ld [hli], a
+	ld [hl], d
+	ret
+
+; c = 0 land, 1 water: is the basic in this map's group? (de: where wBuffer
+; is up to)
+.kind
+	ld a, [sRandoArea]
+	call RandoWildGroup
+	and a
+	ret z
+	push de
+	ld e, 0
+	call RandoAreaNumber         ; hl = the group's first number
+	push hl
+	ld a, c
+	add a
+	ld l, a
+	ld h, 0
+	ld de, sRandoArea + 2
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	ld a, [de]
+	ld b, a                      ; the place
+	inc de
+	ld a, [de]
+	ld d, a                      ; the deck's size
+	ld a, b
+	cp $ff
+	jr z, .none
+	ld e, 10
+.slot
+	call RandoAreaPlace
+	cp b
+	jr z, .found
+	inc hl
+	dec e
+	jr nz, .slot
+.none
+	pop de
+	ret
+.found
+	pop de
+	ld a, [sRandoArea]
+	ld [de], a
+	inc de
+	ld b, a
+	ld a, [wCurMap]
+	cp b
+	ret nz
+	ld a, [wActionResultOrTookBattleTurn]
+	set 1, a
+	bit 0, c
+	jr z, .flag
+	res 1, a
+	set 3, a
+.flag
+	ld [wActionResultOrTookBattleTurn], a
+	ret
+
+; a = species -> a = its place among those sRandoWant wants ($ff: not one)
+RandoWantedRank:
+	push af
+	call RandoWanted
+	pop bc
+	jr z, .no
+	ld c, 0
+	ld a, 1
+.loop
+	cp b
+	jr z, .done
+	push af
+	push bc
+	call RandoWanted
+	pop bc
+	jr z, .next
+	inc c
+.next
+	pop af
+	inc a
+	jr .loop
+.done
+	ld a, c
+	ret
+.no
+	ld a, $ff
+	ret
+
+; GetEnemyHeldItem: e = the wild #MON -> e = a random number for which of
+; WildHeldItems' pairs it holds from (ITEMS: one pair per species per
+; seed), or $ff for its own
+RandoWildHeldPick::
+	ld a, [wRandoFlags]
+	bit RANDO_ITEMS_F, a
+	jr nz, .items
+	ld e, $ff
+	ret
+.items
+	ld c, e
+	ld b, RKEY_HELD
+	ld de, $100
+	call RandoKey
+	ld a, $ff
+	call RandoRandA
+	push af
+	call RandoCloseSRAM
+	pop af
+	ld e, a
+	ret

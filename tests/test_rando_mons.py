@@ -135,5 +135,117 @@ class RandoMonsTest(unittest.TestCase):
         self.assertEqual(g.peek(g.addr("wEnemyMon1CatchRate") + size), 0x72)
 
 
+    # ---- wild
+    AREA = 1 << 5
+
+    def set_event(self, event, on=True):
+        g = self.game
+        a = g.addr("wEventFlags") + event // 8
+        g.poke(a, g.peek(a) & ~(1 << event % 8) | on << event % 8)
+
+    def rom_list(self, label):
+        g = self.game
+        bank, a = g.bank(label), g.addr(label)
+        out = []
+        while g.peek((bank, a)) != 0xFF:
+            out.append(g.peek((bank, a)))
+            a += 1
+        return out
+
+    def full_random(self, seed, species):
+        self.setup(seed)
+        self.set_event(0x8DE)
+        self.set_event(0x8D7)
+        self.set_event(0x8DA, False)
+        g = self.game
+        g.poke("wRandomizerSeed", 77)
+        g.poke("wcf91", species)
+        g.call("_ReplaceMon", max_frames=600)
+        return g.peek("wcf91")
+
+    def test_full_random_uses_the_whole_seed(self):
+        lst = self.rom_list("MonListTrueRandom")
+        maps = []
+        for seed in (0x01020304, 0x01020305):
+            got = [self.full_random(seed, sp) for sp in lst[:40]]
+            self.assertEqual(len(set(got)), len(got))   # a shuffle
+            self.assertTrue(set(got) <= set(lst))
+            maps.append(got)
+        self.assertNotEqual(maps[0], maps[1])           # a different seed, another shuffle
+
+    def area_mon(self, number, water=0, seed=11):
+        self.setup(seed, flags2=self.AREA)
+        g = self.game
+        g.call("RandoAreaMon", hl=number, bc=water, max_frames=600)
+        return g.peek("wcf91")
+
+    def test_area_has_every_basic(self):
+        m = self.mons
+        land = {sp for sp in m.all if m.basic(sp) and sp not in m.legendary}
+        got = {self.area_mon(n) for n in range(len(land))}
+        self.assertEqual(got, land)
+        water = {sp for sp in land if M.TYPES["WATER"] in m.types[sp]}
+        self.assertEqual({self.area_mon(n, 1) for n in range(len(water))}, water)
+
+    def test_area_by_the_slot(self):
+        g = self.game
+        self.setup(11, flags2=self.AREA)
+        route1 = 0x0C
+        g.poke("wCurMap", route1)
+        g.poke("wTileMap+%d" % (9 * 20 + 8), 0x00)       # not water
+        g.poke("wCurEnemyLVL", 3)
+        got = []
+        for slot in range(10):
+            g.poke("wcf91", self.sp["PIDGEY"])
+            g.call("RandoWildArea", de=slot * 2, max_frames=600)
+            got.append(g.peek("wcf91"))
+            self.assertEqual(g.peek("wEnemyMonSpecies2"), got[-1])
+        groups = g.peek((g.bank("RandoWildGroups"), g.addr("RandoWildGroups") + 2 * route1))
+        want = [self.area_mon((groups - 1) * 10 + k) for k in range(10)]
+        self.assertEqual(got, want)
+
+    def test_area_off(self):
+        g = self.game
+        self.setup(11)
+        g.poke("wCurMap", 0x0C)
+        g.poke("wcf91", self.sp["PIDGEY"])
+        g.call("RandoWildArea", de=0, max_frames=600)
+        self.assertEqual(g.peek("wcf91"), self.sp["PIDGEY"])
+
+    def test_area_pokedex(self):
+        g = self.game
+        m = self.mons
+        bank, table = g.bank("RandoWildGroups"), g.addr("RandoWildGroups")
+        groups = g.peek((bank, table), 2 * 248)
+        where = {}
+        for mid in range(248):
+            gr = groups[2 * mid]
+            if gr:
+                for k in range(10):
+                    where.setdefault(self.area_mon((gr - 1) * 10 + k), set()).add(mid)
+        for sp in list(where)[:4] + [self.sp["MEWTWO"]]:
+            self.setup(11, flags2=self.AREA)
+            g.poke("wd11e", sp)
+            g.poke("wCurMap", 0)
+            regs = g.call("RandoAreaLocations", max_frames=3000)
+            self.assertEqual(regs["de"] & 0xFF, 1)
+            found = []
+            for b in g.peek("wBuffer", 30):
+                if b == 0xFF:
+                    break
+                found.append(b)
+            self.assertEqual(set(found), where.get(sp, set()), m.name[sp])
+
+    def test_wild_held_items(self):
+        g = self.game
+        self.setup(5)
+        self.assertEqual(g.call("RandoWildHeldPick", de=self.sp["PIDGEY"])["de"] & 0xFF, 0xFF)
+        self.setup(5, flags=1 << 2)  # ITEMS
+        a = g.call("RandoWildHeldPick", de=self.sp["PIDGEY"])["de"] & 0xFF
+        self.assertEqual(a, g.call("RandoWildHeldPick", de=self.sp["PIDGEY"])["de"] & 0xFF)
+        picks = {g.call("RandoWildHeldPick", de=sp)["de"] & 0xFF for sp in self.mons.all[:30]}
+        self.assertGreater(len(picks), 10)
+
+
 if __name__ == "__main__":
     unittest.main()
