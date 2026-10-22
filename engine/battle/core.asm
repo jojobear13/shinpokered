@@ -608,6 +608,10 @@ MainInBattleLoop:
 	ld a, b
 	and a
 	jp z, HandlePlayerMonFainted
+	ld hl, wEnemyMonHP
+	ld a, [hli]
+	or [hl]
+	jp z, HandleEnemyMonFainted ; fainted by its own move (Explosion, recoil): out before the player moves
 .AIActionUsedEnemyFirst
 	call DrawHUDsAndHPBars
 	call ExecutePlayerMoveThenAbilities
@@ -637,6 +641,13 @@ MainInBattleLoop:
 	ld a, b
 	and a
 	jp z, HandleEnemyMonFainted
+	ld hl, wBattleMonHP
+	ld a, [hli]
+	or [hl]
+	jr nz, .playerStillUp
+	call CheckandResetEnemyActedBit
+	jp HandlePlayerMonFainted ; fainted by its own move: out before the enemy moves
+.playerStillUp
 	call DrawHUDsAndHPBars
 ;#3 - handle enemy using move
 	ld a, $1
