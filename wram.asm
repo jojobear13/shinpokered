@@ -3128,8 +3128,12 @@ wSeafoamIslands5CurScript:: ; d668
 	ds 1
 wRoute18GateCurScript:: ; d669
 	ds 1
+wRandoFlags2:: ; the randomizer's #MON choices (RANDO2_*): saved
+	ds 1
+wRandoFlags3:: ; and its moves' (RANDO3_*)
+	ds 1
 ;usused space
-	ds 30
+	ds 28
 wTempFieldMoveSlots::	;joenote - for field move slot
 	ds 6
 wGameProgressFlagsEnd::

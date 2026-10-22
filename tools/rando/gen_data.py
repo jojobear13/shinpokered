@@ -40,6 +40,7 @@ from graph import Graph
 import logic as L
 from regions import Regions, Compact
 import randomizer as RZ
+import mons
 from rom import REPO
 
 WARP = 31
@@ -217,6 +218,72 @@ class Tables:
         w('RandoDevolve::')
         prevo = devolutions(rom)
         db([v for sp in range(1, 191) for v in prevo.get(sp, (0, 0))])
+        # the #MON choices (mons.py)
+        M = mons.Mons(rom)
+        w('RandoMonInfo::')      # per species: type, type, base stat total / 4, flags
+        lines3 = M.lines3()
+        line_basics = {l[0] for l in lines3}
+        water = mons.TYPES['WATER']
+        info = []
+        for sp in range(1, 191):
+            if sp not in M.dex:
+                info += [0, 0, 0, 0]
+                continue
+            fl = 1
+            fl |= 2 if M.basic(sp) else 0
+            fl |= 4 if sp in M.legendary else 0
+            fl |= 8 if water in M.types[sp] else 0
+            fl |= 16 if M.evolves[sp] else 0
+            fl |= 32 if sp in line_basics else 0
+            info += [M.types[sp][0], M.types[sp][1], M.bst[sp] // 4, fl]
+        db(info)
+        w('RandoLines::')        # the three-stage lines: count, then basic, middle, final
+        db([len(lines3)] + [x for l in lines3 for x in l])
+        tri = M.triangles(lines3)
+        w('RandoTriangles::')    # line numbers whose basics beat each other in turn
+        db([len(tri)] + [x for t in tri for x in t])
+        # each trainer's type theme ($ff none): the bosses' are fixed
+        teams = M.trainers()
+        boss = {M.trainer_classes[c]: mons.TYPES[t] for c, t in mons.BOSS_THEMES.items()}
+        rivals = {M.trainer_classes[c] for c in mons.RIVALS}
+        themes = []
+        for c in range(1, len(M.trainer_classes) + 1):
+            row = []
+            for team in teams[c]:
+                t = boss.get(c, None if c in rivals else M.theme(team))
+                row.append(0xFF if t is None else t)
+            themes.append(row)
+        off, idx = 0, []
+        for row in themes:
+            idx.append(off)
+            off += len(row)
+        w('RandoThemeIndex::')
+        dw(idx)
+        w('RandoThemes::')
+        db([t for row in themes for t in row])
+        # wild encounter groups: per map, its grass and water slot groups + 1
+        wbank, wtab = rom.at('WildDataPointers')
+        groups = []
+        ng = nw = 0
+        k = 0
+        while rom.w(wbank, wtab + 2 * k) != 0xFFFF:
+            a = rom.w(wbank, wtab + 2 * k)
+            g_ = w_ = 0
+            if rom.b(wbank, a):
+                ng += 1
+                g_ = ng
+                a += 21
+            else:
+                a += 1
+            if rom.b(wbank, a):
+                nw += 1
+                w_ = nw
+            groups += [g_, w_]
+            k += 1
+        w('RandoWildGroups::')
+        db(groups)
+        files['consts'].append('DEF RANDO_WILD_MAPS EQU %d' % k)
+        files['consts'].append('DEF RANDO_LINES EQU %d' % len(lines3))
         # runtime: warps
         w('RandoSlotWarp::')
         sw = []
@@ -298,8 +365,13 @@ def hidden_coords(rom):
 
 
 if __name__ == '__main__':
-    os.makedirs(os.path.join(REPO, 'data/rando'), exist_ok=True)
-    for f in os.listdir(os.path.join(REPO, 'data/rando')):
-        os.remove(os.path.join(REPO, 'data/rando', f))
-    Tables('pokered').write(os.path.join(REPO, 'data/rando/intl'), 'pokered')
-    Tables('pokeredjp').write(os.path.join(REPO, 'data/rando/jp'), 'pokeredjp')
+    import tempfile, shutil
+    out = os.path.join(REPO, 'data/rando')
+    with tempfile.TemporaryDirectory() as tmp:     # all or nothing
+        Tables('pokered').write(os.path.join(tmp, 'intl'), 'pokered')
+        Tables('pokeredjp').write(os.path.join(tmp, 'jp'), 'pokeredjp')
+        os.makedirs(out, exist_ok=True)
+        for f in os.listdir(out):
+            os.remove(os.path.join(out, f))
+        for f in os.listdir(tmp):
+            shutil.copy(os.path.join(tmp, f), out)

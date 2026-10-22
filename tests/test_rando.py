@@ -80,10 +80,11 @@ class GeneratorTestCase(unittest.TestCase):
 
     def test_seed_hash(self):
         g = self.game
-        for text, settings in [("PIKACHU", 7), ("pikachu", 7), ("PIKACHU", 3), ("Race 2026", 0x5F)]:
+        for text, settings in [("PIKACHU", [7, 0, 0]), ("pikachu", [7, 1, 0]), ("PIKACHU", [3, 0, 9]),
+                               ("Race 2026", [0x5F, 0x3F, 0x1F])]:
             g.reset()
             g.call("RandoHashStart")
-            for b in randomizer.seed_codes(text) + [settings]:
+            for b in randomizer.seed_codes(text) + settings:
                 g.call("RandoHashByte", de=b)
             g.call("RandoHashResult")
             got = int.from_bytes(bytes(g.peek("wRandoSeed", 4)), "little")

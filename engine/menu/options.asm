@@ -53,6 +53,7 @@ OptionPages:
 	dw OptionsPageClauses
 	dw OptionsPageExtras
 	dw OptionsPageRandomizer
+	dw OptionsPageRandomMons
 NUM_OPTION_PAGES EQU (@ - OptionPages) / 2
 
 ; each page: its name, its number of options, then the options (at most 7)
@@ -102,13 +103,22 @@ OptionsPageExtras:
 ; the world's shuffles are chosen before NEW GAME (engine/rando/): from the
 ; start menu they only show
 OptionsPageRandomizer:
-	db "RANDOMIZER@", 6
+	db "RANDOMIZER@", 5
 	opt_custom OptTextRandoDoors, OptHelpRandoDoors, 2, GetRandoDoorsOption, SetRandoDoorsOption, OptValuesOffOn
 	opt_custom OptTextRandoKeys, OptHelpRandoKeys, 2, GetRandoKeysOption, SetRandoKeysOption, OptValuesOffOn
 	opt_custom OptTextRandoItems, OptHelpRandoItems, 2, GetRandoItemsOption, SetRandoItemsOption, OptValuesOffOn
 	opt_custom OptTextRandoMarts, OptHelpRandoMarts, 2, GetRandoMartsOption, SetRandoMartsOption, OptValuesOffOn
-	opt_custom OptTextRandomWild, OptHelpRandomWild, 3, GetRandomWildOption, SetRandomWildOption, OptValuesRandomWild
-	opt_event  OptTextRandomTrainers, OptHelpRandomTrainers, EVENT_8D8, OptValuesOffOn
+	opt_custom OptTextRandoTrades, OptHelpRandoTrades, 2, GetRandoTradesOption, SetRandoTradesOption, OptValuesOffOn
+
+OptionsPageRandomMons:
+	db "RANDOM #MON@", 7
+	opt_custom OptTextRandoStarters, OptHelpRandoStarters, 3, GetRandoStartersOption, SetRandoStartersOption, OptValuesStarters
+	opt_custom OptTextRandomWild, OptHelpRandomWild, 4, GetRandomWildOption, SetRandomWildOption, OptValuesRandomWild
+	opt_custom OptTextRandomTrainers, OptHelpRandomTrainers, 3, GetRandomTrainersOption, SetRandomTrainersOption, OptValuesRandomTrainers
+	opt_custom OptTextRandoSpecial, OptHelpRandoSpecial, 2, GetRandoSpecialOption, SetRandoSpecialOption, OptValuesOffOn
+	opt_custom OptTextRandoTMMoves, OptHelpRandoTMMoves, 2, GetRandoTMMovesOption, SetRandoTMMovesOption, OptValuesOffOn
+	opt_custom OptTextRandoTMCompat, OptHelpRandoTMCompat, 4, GetRandoTMCompatOption, SetRandoTMCompatOption, OptValuesTMCompat
+	opt_custom OptTextRandoLearnsets, OptHelpRandoLearnsets, 4, GetRandoLearnsetsOption, SetRandoLearnsetsOption, OptValuesLearnsets
 
 ; from the title screen's menu (DisplayOptionMenuInGame from the start menu)
 DisplayOptionMenu:
@@ -665,8 +675,13 @@ SetLevelCapOption:
 	ld [hl], a
 	ret
 
-; OFF, TIER (each #MON swapped for one of its tier) or FULL
+; OFF, TIER (each #MON swapped for one of its tier), FULL, or AREA (each
+; encounter slot its own, every kind somewhere)
 GetRandomWildOption:
+	ld a, [wRandoFlags2]
+	bit RANDO2_WILD_AREA_F, a
+	ld a, 3
+	ret nz
 	CheckEvent EVENT_8DE
 	ld a, 0
 	ret z
@@ -677,14 +692,104 @@ GetRandomWildOption:
 	ret
 
 SetRandomWildOption:
+	call RandoOptionLocked
+	ret c
+	push af
+	ld hl, wRandoFlags2
+	res RANDO2_WILD_AREA_F, [hl]
 	ResetEvent EVENT_8DE
 	ResetEvent EVENT_8D7
+	pop af
 	and a
 	ret z
+	cp 3
+	jr z, .area
 	SetEvent EVENT_8DE
 	dec a
 	ret z
 	SetEvent EVENT_8D7
+	ret
+.area
+	ld hl, wRandoFlags2
+	set RANDO2_WILD_AREA_F, [hl]
+	ret
+
+; OFF, ON (Shin's: regular trainers) or ALL (every trainer, themes kept)
+GetRandomTrainersOption:
+	ld a, [wRandoFlags2]
+	bit RANDO2_TRAINERS_F, a
+	ld a, 2
+	ret nz
+	CheckEvent EVENT_8D8
+	ld a, 0
+	ret z
+	inc a
+	ret
+
+SetRandomTrainersOption:
+	call RandoOptionLocked
+	ret c
+	push af
+	ld hl, wRandoFlags2
+	res RANDO2_TRAINERS_F, [hl]
+	ResetEvent EVENT_8D8
+	pop af
+	and a
+	ret z
+	dec a
+	jr nz, .all
+	SetEvent EVENT_8D8
+	ret
+.all
+	ld hl, wRandoFlags2
+	set RANDO2_TRAINERS_F, [hl]
+	ret
+
+; the #MON and move choices: fields of wRandoFlags2 and 3
+MACRO rando_field ; name, flags byte, first bit, mask
+Get\1Option:
+	ld a, [\2]
+	and \4
+	REPT \3
+	srl a
+	ENDR
+	ret
+Set\1Option:
+	call RandoOptionLocked
+	ret c
+	REPT \3
+	add a
+	ENDR
+	ld b, a
+	ld a, [\2]
+	and ~(\4)
+	or b
+	ld [\2], a
+	ret
+ENDM
+
+	rando_field RandoStarters, wRandoFlags2, RANDO2_STARTERS_F, RANDO2_STARTERS
+	rando_field RandoSpecial, wRandoFlags2, RANDO2_SPECIAL_F, 1 << RANDO2_SPECIAL_F
+	rando_field RandoTrades, wRandoFlags2, RANDO2_TRADES_F, 1 << RANDO2_TRADES_F
+	rando_field RandoTMMoves, wRandoFlags3, RANDO3_TM_MOVES_F, 1 << RANDO3_TM_MOVES_F
+	rando_field RandoTMCompat, wRandoFlags3, RANDO3_TM_COMPAT_F, RANDO3_TM_COMPAT
+	rando_field RandoLearnsets, wRandoFlags3, RANDO3_LEARN_F, RANDO3_LEARN
+
+; carry (and a buzz) from the start menu: these are chosen before NEW GAME
+; (a kept)
+RandoOptionLocked:
+	push af
+	ld a, [wOptionsInGame]
+	and a
+	jr nz, .locked
+	pop af
+	and a
+	ret
+.locked
+	ld a, SFX_DENIED
+	call PlaySound
+	pop af
+	scf
 	ret
 
 ; the randomizer's choices (wRandoFlags); shuffled doors need shuffled key
@@ -731,11 +836,9 @@ SetRandoMartsOption:
 ; a = 1: set the bit c, 0: clear it (nz if set); from the start menu,
 ; nothing (carry)
 SetRandoOption:
+	call RandoOptionLocked
+	ret c
 	ld b, a
-	ld a, [wOptionsInGame]
-	and a
-	jr nz, .locked
-	ld a, b
 	and a
 	jr nz, SetRandoBit
 	ld a, c
@@ -745,11 +848,6 @@ SetRandoOption:
 	and c
 	ld [wRandoFlags], a
 	xor a ; z, no carry
-	ret
-.locked
-	ld a, SFX_DENIED
-	call PlaySound
-	scf
 	ret
 SetRandoBit:
 	ld a, [wRandoFlags]
@@ -846,7 +944,15 @@ OptValuesLevelCap:
 OptValuesTypeHint:
 	dw OptTextOff, OptTextOn, OptTextLearned
 OptValuesRandomWild:
-	dw OptTextOff, OptTextTier, OptTextFull
+	dw OptTextOff, OptTextTier, OptTextFull, OptTextArea
+OptValuesRandomTrainers:
+	dw OptTextOff, OptTextOn, OptTextAll
+OptValuesStarters:
+	dw OptTextOff, OptTextRandom, OptTextTypes
+OptValuesTMCompat:
+	dw OptTextOff, OptTextType, OptTextRandom, OptTextFull
+OptValuesLearnsets:
+	dw OptTextOff, OptTextType, OptTextRandom, OptTextMetronome
 
 OptTextOff:        db "OFF@"
 OptTextOn:         db "ON@"
@@ -866,6 +972,12 @@ OptTextGen1:       db "GEN 1@"
 OptTextGen2:       db "GEN 2@"
 OptTextTier:       db "TIER@"
 OptTextFull:       db "FULL@"
+OptTextArea:       db "AREA@"
+OptTextAll:        db "ALL@"
+OptTextRandom:     db "RANDOM@"
+OptTextTypes:      db "TYPES@"
+OptTextType:       db "TYPE@"
+OptTextMetronome:  db "METRONOME@"
 OptTextLearned:    db "LEARNED@"
 
 OptTextTextSpeed:      db "TEXT SPEED@"
@@ -894,13 +1006,19 @@ OptTextBeamClause:     db "HYPER BEAM@"
 OptTextWinHeal:        db "HEAL ON WIN@"
 OptTextWarpBack:       db "WARP BACK@"
 OptTextCatchUpExp:     db "CATCH-UP EXP@"
-OptTextRandomWild:     db "RANDOM WILD@"
-OptTextRandomTrainers: db "RANDOM TRNR@"
+OptTextRandomWild:     db "WILD@"
+OptTextRandomTrainers: db "TRAINERS@"
 OptTextSafari:         db "SAFARI EVENT@"
 OptTextRandoDoors:     db "DOORS@"
 OptTextRandoKeys:      db "KEY ITEMS@"
 OptTextRandoItems:     db "ITEMS@"
 OptTextRandoMarts:     db "MARTS@"
+OptTextRandoTrades:    db "TRADES@"
+OptTextRandoStarters:  db "STARTERS@"
+OptTextRandoSpecial:   db "SPECIAL MON@"
+OptTextRandoTMMoves:   db "TM MOVES@"
+OptTextRandoTMCompat:  db "TM COMPAT.@"
+OptTextRandoLearnsets: db "LEARNSETS@"
 OptTextMenuPC:         db "PC IN MENU@"
 
 ; the explanations: two lines of at most 18 letters
@@ -986,11 +1104,29 @@ OptHelpCatchUpExp:
 	db   "More EXP when the"
 	next "foe outlevels you.@"
 OptHelpRandomWild:
-	db   "Swap wild species,"
-	next "TIER keeps power.@"
+	db   "TIER keeps power;"
+	next "AREA: by the spot.@"
 OptHelpRandomTrainers:
-	db   "Randomize regular"
-	next "trainers' teams.@"
+	db   "ON: regular ones;"
+	next "ALL keeps themes.@"
+OptHelpRandoTrades:
+	db   "NEW GAME: shuffle"
+	next "in-game trades.@"
+OptHelpRandoStarters:
+	db   "TYPES: each beats"
+	next "the next in turn.@"
+OptHelpRandoSpecial:
+	db   "Gifts, legends,"
+	next "SNORLAX, prizes.@"
+OptHelpRandoTMMoves:
+	db   "What each TM"
+	next "teaches (not HMs).@"
+OptHelpRandoTMCompat:
+	db   "Who can learn TMs;"
+	next "TYPE: mostly own.@"
+OptHelpRandoLearnsets:
+	db   "Level-up moves;"
+	next "TYPE: mostly own.@"
 OptHelpRandoDoors:
 	db   "NEW GAME: shuffle"
 	next "doors and keys.@"

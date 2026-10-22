@@ -9,7 +9,12 @@ RandoNewGame::
 	res RANDO_SEEDED_F, a
 	ld [wRandoFlags], a
 	call RandoSettings
-	and a
+	ld b, a
+	ld a, [wRandoFlags2]
+	or b
+	ld b, a
+	ld a, [wRandoFlags3]
+	or b
 	ret z
 	callba DisplaySeedNamingScreen
 	ld a, [wBuffer]
@@ -29,6 +34,12 @@ RandoNewGame::
 	jr .char
 .typed
 	call RandoSettings
+	ld e, a
+	callba RandoHashByte
+	ld a, [wRandoFlags2]
+	ld e, a
+	callba RandoHashByte
+	ld a, [wRandoFlags3]
 	ld e, a
 	callba RandoHashByte
 	callba RandoHashResult       ; into wRandoSeed
@@ -57,7 +68,7 @@ RandoNewGame::
 	jp RandoBuildWorld
 
 ; a = what is randomized: wRandoFlags' choices, then RANDOM WILD (two bits)
-; and RANDOM TRNR; 0 if nothing
+; and RANDOM TRNR; 0 if nothing (wRandoFlags2 and 3 hold the rest)
 RandoSettings:
 	ld a, [wRandoFlags]
 	and $0f

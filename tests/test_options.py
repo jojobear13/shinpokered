@@ -16,9 +16,11 @@ DEFAULTS = [
     ["OFF"] * 6,  # CHALLENGE
     ["OFF"] * 4,  # CLAUSES
     ["OFF"] * 5,  # EXTRAS
-    ["OFF"] * 6,  # RANDOMIZER
+    ["OFF"] * 5,  # RANDOMIZER
+    ["OFF"] * 7,  # RANDOM #MON
 ]
 RANDOMIZER = 5
+RANDOM_MONS = 6
 DOORS, KEYS, ITEMS, MARTS = 1, 2, 4, 8  # wRandoFlags
 
 
@@ -111,9 +113,9 @@ class OptionsTest(unittest.TestCase):
 
     def test_random_wild(self):
         g = self.game
-        wild = self.options(RANDOMIZER)[4]
+        wild = self.options(RANDOM_MONS)[1]
         events = g.addr("wEventFlags")
-        for value, name, flags in [(1, "TIER", (0, 1)), (2, "FULL", (1, 1)), (0, "OFF", (0, 0))]:
+        for value, name, flags in [(1, "TIER", (0, 1)), (2, "FULL", (1, 1)), (3, "AREA", (0, 0)), (0, "OFF", (0, 0))]:
             self.change(wild, value)
             full = g.peek(events + 0x8D7 // 8) >> (0x8D7 % 8) & 1  # EVENT_8D7
             randomized = g.peek(events + 0x8DE // 8) >> (0x8DE % 8) & 1  # EVENT_8DE
@@ -156,9 +158,25 @@ class OptionsTest(unittest.TestCase):
         g = self.game
         g.skip_sound_waits()
         g.poke("wOptionsInGame", 1)
-        for entry in self.options(RANDOMIZER)[:4]:
+        for entry in self.options(RANDOMIZER) + self.options(RANDOM_MONS):
             self.change(entry, 1)
-        self.assertEqual(g.peek("wRandoFlags"), 0)
+        self.assertEqual([g.peek(f) for f in ("wRandoFlags", "wRandoFlags2", "wRandoFlags3")], [0, 0, 0])
+
+    def test_random_mon_fields(self):
+        g = self.game
+        starters, wild, trainers, special, tm_moves, compat, learn = self.options(RANDOM_MONS)
+        for entry, value, name in [(starters, 2, "TYPES"), (trainers, 2, "ALL"), (special, 1, "ON"),
+                                   (tm_moves, 1, "ON"), (compat, 3, "FULL"), (learn, 3, "METRONOME"),
+                                   (wild, 3, "AREA")]:
+            self.change(entry, value)
+            self.assertEqual(self.value(entry), name)
+        self.assertEqual(g.peek("wRandoFlags2"), 2 | 1 << 2 | 1 << 4 | 1 << 5)
+        self.assertEqual(g.peek("wRandoFlags3"), 1 | 3 << 1 | 3 << 3)
+        self.change(trainers, 1)
+        self.assertEqual(self.value(trainers), "ON")
+        self.assertEqual(g.peek("wRandoFlags2") & 1 << 4, 0)
+        events = g.addr("wEventFlags")
+        self.assertTrue(g.peek(events + 0x8D8 // 8) & 1 << (0x8D8 % 8))
 
     def test_rules_survive_new_game(self):
         g = self.game

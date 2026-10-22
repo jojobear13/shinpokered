@@ -36,15 +36,6 @@ class Rng:
             lst[i], lst[j] = lst[j], lst[i]
 
 
-def seed_hash(codes, settings):
-    """FNV-1a over the seed's characters (game charmap codes) and the settings byte."""
-    h = 0x811C9DC5
-    for c in list(codes) + [settings]:
-        h ^= c
-        h = (h * 0x01000193) & 0xFFFFFFFF
-    return h
-
-
 class Randomizer:
     def __init__(self, C):
         self.C = C
@@ -281,11 +272,14 @@ def seed_codes(text):
 
 def seed_hash(codes, settings):
     """wRandoSeed: FNV-1a's start, each byte (the seed's, then the settings:
-    wRandoFlags' low nibble, RANDOM WILD's two bits, RANDOM TRNR) xored in
-    and stirred with a step of Rng."""
+    wRandoFlags' low nibble with RANDOM WILD's two bits and RANDOM TRNR above,
+    then wRandoFlags2 and wRandoFlags3) xored in and stirred with a step of
+    Rng. settings: that first byte, or all three."""
+    if isinstance(settings, int):
+        settings = [settings, 0, 0]
     r = Rng(0)
     r.x = 0x811C9DC5
-    for b in list(codes) + [settings]:
+    for b in list(codes) + list(settings):
         r.x ^= b
         r.next()
     return r.x
