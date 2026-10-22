@@ -1,6 +1,7 @@
 IndigoPlateauLobbyScript:
 	call Serial_TryEstablishingExternallyClockedConnection
 	call EnableAutoTextBoxDrawing
+	callba RandoLobbyGate
 	ld hl, wCurrentMapScriptFlags
 	bit 6, [hl]
 	res 6, [hl]

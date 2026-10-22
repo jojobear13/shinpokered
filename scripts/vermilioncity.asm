@@ -64,6 +64,9 @@ VermilionCityScript0:
 	call DisplayTextID
 	CheckEvent EVENT_908 ;joenote - override the blocking guy if you beat the elite 4
 	jr nz, .ssane_returns3	;joenote - jump...
+	ld a, [wRandoFlags]
+	bit RANDO_DOORS_F, a ; the randomizer: the dock may be a way through
+	jr nz, .ssane_returns3
 	CheckEvent EVENT_SS_ANNE_LEFT
 	jr nz, .asm_19810
 .ssane_returns3	;joenote - ...to here

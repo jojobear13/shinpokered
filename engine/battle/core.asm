@@ -6453,7 +6453,7 @@ InitBattleCommon:
 	jp c, InitWildBattle
 	ld [wTrainerClass], a
 	call GetTrainerInformation
-	callab ReadTrainer
+	callab RandoReadTrainer ; (the seed's teams, with a seed)
 	call DoBattleTransitionAndInitBattleVariables
 	call _LoadTrainerPic
 	xor a

@@ -115,6 +115,16 @@ RandoHashResult::
 	ld bc, 4
 	jp CopyData
 
+; de = n -> de = a random number below n, from sRandoRng (RandoMart)
+RandoRandDE::
+	call RandoSRAM
+	ld b, d
+	ld c, e
+	call RandoRand
+	ld d, b
+	ld e, c
+	ret
+
 ; save RAM bank 1, where all of this lives
 RandoSRAM::
 	ld a, SRAM_ENABLE

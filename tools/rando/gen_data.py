@@ -28,7 +28,10 @@ The formats, all read by engine/rando/*.asm:
   RandoMapWarps   dw per map: 0, or a list of dw slot per warp ($ffff: stays)
   RandoBallLocs   db map, db sprite, db loc ... ; db $ff
   RandoHiddenLocs db loc per HiddenItemCoords entry ($ff: not shuffled)
-  RandoMartPool   db items ... ; db $ff
+  RandoMartSizes  db per mart: 0 (keeps its list) or how many it sells
+  RandoMartAlways db what every shuffled mart sells
+  RandoMartPool   db the items the rest are drawn from
+  RandoMartKeys   dd per mart: its random numbers start from the seed xor this
 """
 import os
 import sys
@@ -188,8 +191,11 @@ class Tables:
         # the doors as they were, for worlds that keep them
         w('RandoVanilla:')
         dw([self.slot_of[g.vanilla[e]] for e in self.slots])
+        cur[0] = 'rev'
+        csr('Rev', rev)
         # marts (built when one opens, from the seed): for each, 0 if it keeps
         # its list, else how many it sells; what every one sells; the pool
+        cur[0] = 'run'
         lists = RZ.mart_lists(rom)
         always, pool = RZ.mart_pool(rom, lists)
         w('RandoMartSizes::')
@@ -198,12 +204,15 @@ class Tables:
         db(always)
         w('RandoMartPool::')
         db(pool)
+        # each mart's random numbers start from the seed xor this
+        w('RandoMartKeys::')
+        for i in range(len(lists)):
+            k = ((i + 1) * 0x9E3779B9) & 0xFFFFFFFF
+            db([k & 0xFF, k >> 8 & 0xFF, k >> 16 & 0xFF, k >> 24])
         files['consts'].append('DEF RANDO_MARTS EQU %d' % len(lists))
         files['consts'].append('DEF RANDO_MART_ALWAYS EQU %d' % len(always))
-        cur[0] = 'rev'
-        csr('Rev', rev)
+        files['consts'].append('DEF RANDO_MART_POOL EQU %d' % len(pool))
         # runtime: warps
-        cur[0] = 'run'
         w('RandoSlotWarp::')
         sw = []
         for e in self.slots:
@@ -238,7 +247,6 @@ class Tables:
         for name in L.GIFTS:
             k = [i for i, l in enumerate(C.locs) if l['key'] == ('gift', name)][0]
             files['consts'].append('DEF RANDO_LOC_%s EQU %d' % (name, k))
-        files['consts'].append('DEF RANDO_MART_POOL EQU %d' % len(pool))
         for f, lines in files.items():
             with open('%s_%s.asm' % (base, f), 'w') as out:
                 out.write('\n'.join(lines) + '\n')

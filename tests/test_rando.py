@@ -152,6 +152,54 @@ class GeneratorTestCase(unittest.TestCase):
         g.poke("wRandoFlags", 0)
         self.assertEqual(g.call("RandoGiftItem", de=0x7705)["de"] & 0xFF, 0x77)
 
+    def test_marts(self):
+        g, T = self.game, self.tables
+        lists = randomizer.mart_lists(T.rom)
+        for seed in (0, 1, 0xDEADBEEF):
+            for i in range(len(lists)):
+                g.reset()
+                g.poke("wRandoFlags", 1 << 3)  # MARTS
+                g.poke("wRandoSeed", *seed.to_bytes(4, "little"))
+                g.poke("wItemScratch", i)
+                g.call("LoadMartInventory")
+                want = randomizer.mart(T.rom, lists, seed, i)
+                got = g.peek("wItemList", len(want) + 2)
+                self.assertEqual(got, [len(want)] + want + [0xFF], (seed, i))
+
+    def test_marts_off(self):
+        g, T = self.game, self.tables
+        lists = randomizer.mart_lists(T.rom)
+        g.poke("wRandoFlags", DOORS | KEYS | ITEMS)
+        g.poke("wItemScratch", 1)
+        g.call("LoadMartInventory")
+        self.assertEqual(g.peek("wItemList", len(lists[1]) + 2), [len(lists[1])] + lists[1] + [0xFF])
+
+    def trainer_team(self, seed, rng, flags=0x80):
+        g = self.game
+        g.reset()
+        g.poke("wRandoFlags", flags)  # a seed was typed
+        g.poke("wRandoSeed", *seed.to_bytes(4, "little"))
+        events = g.addr("wEventFlags")
+        g.poke(events + 0x8D8 // 8, g.peek(events + 0x8D8 // 8) | 1 << (0x8D8 % 8))  # RANDOM TRNR
+        g.poke("wTrainerClass", 1)
+        g.poke("wTrainerNo", 3)
+        for addr, value in zip((0xFFD3, 0xFFD4, 0xFFF0, 0xFFF1), rng):
+            g.poke(addr, value)
+        g.call("RandoReadTrainer", max_frames=600)
+        after = [g.peek(a) for a in (0xFFD3, 0xFFD4, 0xFFF0, 0xFFF1)]
+        return g.peek("wEnemyPartyCount", 7), after
+
+    def test_seeded_trainers(self):
+        team, after = self.trainer_team(0x1234, (1, 2, 3, 4))
+        self.assertEqual(after, [1, 2, 3, 4])  # the game's own numbers carry on
+        self.assertEqual(self.trainer_team(0x1234, (9, 8, 7, 6))[0], team)
+        teams = {tuple(self.trainer_team(seed, (1, 2, 3, 4))[0]) for seed in range(6)}
+        self.assertGreater(len(teams), 1)
+
+    def test_unseeded_trainers(self):
+        teams = {tuple(self.trainer_team(0x1234, rng, flags=0)[0]) for rng in [(1, 2, 3, 4), (9, 8, 7, 6), (5, 5, 5, 5)]}
+        self.assertGreater(len(teams), 1)
+
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)
         for s, p in enumerate(partners):

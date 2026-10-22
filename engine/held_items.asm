@@ -945,7 +945,8 @@ LoadMartInventory:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	jp LoadItemList
+	call LoadItemList
+	jpba RandoMart ; or the randomizer's list
 
 INCLUDE "data/mart_lists.asm"
 

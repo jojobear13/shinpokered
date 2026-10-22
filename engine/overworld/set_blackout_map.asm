@@ -18,6 +18,7 @@ SetLastBlackoutMap:
 .notresthouse
 	ld a, [wLastMap]
 	ld [wLastBlackoutMap], a
+	callba RandoBlackoutMap ; with shuffled doors, the center's own town
 .done
 	pop hl
 	ret

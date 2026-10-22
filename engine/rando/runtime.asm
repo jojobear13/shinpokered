@@ -278,3 +278,245 @@ RandoHiddenItem::
 	ld a, e
 	ld [wHiddenObjectFunctionArgument], a
 	ret
+
+; LoadMartInventory: with MARTS, mart [wItemScratch]'s wItemList is made
+; from the seed (randomizer.mart): what every mart sells, then picks from
+; the pool, as many as it sold before. Nothing is stored.
+RandoMart::
+	ld a, [wRandoFlags]
+	bit RANDO_MARTS_F, a
+	ret z
+	ld a, [wItemScratch]
+	ld e, a
+	ld d, 0
+	ld hl, RandoMartSizes
+	add hl, de
+	ld a, [hl]
+	and a
+	ret z                        ; this one keeps its list
+	push af
+	; its random numbers: the seed xor its key (never 0)
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, 1
+	ld [MBC1SRamBank], a
+	ld hl, RandoMartKeys
+	add hl, de
+	add hl, de
+	add hl, de
+	add hl, de
+	ld de, wRandoSeed
+	ld bc, sRandoRng
+	ld a, 4
+.key
+	push af
+	ld a, [de]
+	xor [hl]
+	ld [bc], a
+	inc hl
+	inc de
+	inc bc
+	pop af
+	dec a
+	jr nz, .key
+	ld hl, sRandoRng
+	ld a, [hli]
+	or [hl]
+	inc hl
+	or [hl]
+	inc hl
+	or [hl]
+	jr nz, .seeded
+	ld hl, sRandoRng
+	ld a, $91
+	ld [hli], a
+	ld a, $f4
+	ld [hli], a
+	ld a, $45
+	ld [hli], a
+	ld [hl], $25
+.seeded
+	; the pool, in save RAM's scratch
+	ld hl, RandoMartPool
+	ld de, sRandoRest
+	ld bc, RANDO_MART_POOL
+	call CopyData
+	ld a, RANDO_MART_POOL
+	ld [sRandoRestN], a
+	; the list
+	pop af
+	ld hl, wItemList
+	ld [hli], a
+	sub RANDO_MART_ALWAYS
+	ld b, a
+	ld de, RandoMartAlways
+	ld c, RANDO_MART_ALWAYS
+.always
+	ld a, [de]
+	ld [hli], a
+	inc de
+	dec c
+	jr nz, .always
+.pick
+	ld a, b
+	and a
+	jr z, .done
+	push bc
+	push hl
+	ld a, [sRandoRestN]
+	ld e, a
+	ld d, 0
+	callba RandoRandDE
+	call RandoMartTake           ; a = the item
+	pop hl
+	pop bc
+	ld [hli], a
+	dec b
+	jr .pick
+.done
+	ld [hl], $ff
+	jp RandoCloseSRAM
+
+; a = sRandoRest[e], taken out of it
+RandoMartTake:
+	ld d, 0
+	ld hl, sRandoRest
+	add hl, de
+	ld c, [hl]
+	ld a, [sRandoRestN]
+	dec a
+	ld [sRandoRestN], a
+	sub e
+	jr z, .last
+	ld b, a
+.shift
+	inc hl
+	ld a, [hld]
+	ld [hli], a
+	dec b
+	jr nz, .shift
+.last
+	ld a, c
+	ret
+
+; ReadTrainer, from the battle: with a seed and RANDOM TRNR, each trainer's
+; random #MON come from the seed and who the trainer is, so players with the
+; same seed meet the same teams. The game's own random numbers carry on after.
+RandoReadTrainer::
+	ld a, [wRandoFlags]
+	bit RANDO_SEEDED_F, a
+	jr z, .unseeded
+	CheckEvent EVENT_8D8
+	jr nz, .seeded
+.unseeded
+	jpab ReadTrainer
+.seeded
+	ld hl, hRandomAdd
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	push bc
+	ld hl, hRandomLast
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	push bc
+	ld a, [wTrainerClass]
+	ld b, a
+	ld a, [wRandoSeed]
+	xor b
+	ld [hRandomAdd], a
+	ld a, [wTrainerNo]
+	ld b, a
+	ld a, [wRandoSeed + 1]
+	xor b
+	ld [hRandomAdd + 1], a
+	ld a, [wRandoSeed + 2]
+	ld [hRandomLast], a
+	ld a, [wRandoSeed + 3]
+	or 1                         ; never all 0
+	ld [hRandomLast + 1], a
+	ld b, 4                      ; stir
+.stir
+	call Random
+	dec b
+	jr nz, .stir
+	callab ReadTrainer
+	pop bc
+	ld hl, hRandomLast
+	ld a, c
+	ld [hli], a
+	ld [hl], b
+	pop bc
+	ld hl, hRandomAdd
+	ld a, c
+	ld [hli], a
+	ld [hl], b
+	ret
+
+; INDIGO PLATEAU's lobby: with the doors shuffled it can come early, so the
+; ELITE FOUR's door is closed to those without all eight badges (in the
+; original game ROUTE 23's guards saw to it)
+RandoLobbyGate::
+	ld a, [wRandoFlags]
+	bit RANDO_DOORS_F, a
+	ret z
+	ld a, [wObtainedBadges]
+	inc a
+	ret z
+	ld a, [wd730]
+	bit 7, a                     ; already being moved
+	ret nz
+	ld a, [wYCoord]
+	cp 1
+	ret nz
+	ld a, [wXCoord]
+	cp 8
+	ret nz
+	ld hl, RandoLobbyGateText
+	call PrintText
+	ld a, D_DOWN
+	ld [wSimulatedJoypadStatesEnd], a
+	ld a, 1
+	ld [wSimulatedJoypadStatesIndex], a
+	jp StartSimulatingJoypadStates
+
+RandoLobbyGateText:
+	text "Only trainers with"
+	line "all 8 BADGES may"
+	cont "face the ELITE 4!"
+	done
+
+; SetLastBlackoutMap: with the doors shuffled, the map last left outdoors
+; may be any route; a #MON CENTER brings the player back to its own town
+RandoBlackoutMap::
+	ld a, [wRandoFlags]
+	bit RANDO_DOORS_F, a
+	ret z
+	ld a, [wCurMap]
+	ld b, a
+	ld hl, RandoCenterTowns
+.loop
+	ld a, [hli]
+	cp -1
+	ret z
+	cp b
+	ld a, [hli]
+	jr nz, .loop
+	ld [wLastBlackoutMap], a
+	ret
+
+RandoCenterTowns:
+	db VIRIDIAN_POKECENTER, VIRIDIAN_CITY
+	db PEWTER_POKECENTER, PEWTER_CITY
+	db CERULEAN_POKECENTER, CERULEAN_CITY
+	db MT_MOON_POKECENTER, ROUTE_4
+	db ROCK_TUNNEL_POKECENTER, ROUTE_10
+	db VERMILION_POKECENTER, VERMILION_CITY
+	db CELADON_POKECENTER, CELADON_CITY
+	db LAVENDER_POKECENTER, LAVENDER_TOWN
+	db FUCHSIA_POKECENTER, FUCHSIA_CITY
+	db CINNABAR_POKECENTER, CINNABAR_ISLAND
+	db SAFFRON_POKECENTER, SAFFRON_CITY
+	db INDIGO_PLATEAU_LOBBY, INDIGO_PLATEAU
+	db -1
