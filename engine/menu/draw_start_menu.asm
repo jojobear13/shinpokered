@@ -124,7 +124,16 @@ StartMenuChoice:
 	dec e
 	ret
 .pc
+; as PrintPredefTextID does for the Pokémon Center PC: the map's text
+; pointer saved in $ffec, where CHANGE BOX's save takes it back from (a stale
+; one there gave every person on the map the wrong texts)
+	ld hl, wMapTextPtr
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call SetMapTextPointer
 	callba ActivatePC
+	call RestoreMapTextPointer
 	call LoadScreenTilesFromBuffer2
 	call LoadTextBoxTilePatterns
 	call UpdateSprites

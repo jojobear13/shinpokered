@@ -20,6 +20,7 @@ and assume the repo is at `/home/user/shinpokered`.
     python3 rando_mons.py [SEED]           # RANDOM #MON: gifts, Snorlax, Mewtwo, the Elite Four
     python3 explode_check.py               # a self-fainted mon leaves before the other side moves
     python3 catch_exp.py                   # a benched mon levels up from a catch: the pic stays gone
+    python3 menu_pc_check.py               # PC IN MENU: CHANGE BOX leaves the map's texts alone
 
 Results and screenshots go to `/tmp/pk30emu/out`. `lib.py` and `dxlib.py`
 are the shared helpers (party set-up, screen text from the charmap); `story.py`

@@ -2257,13 +2257,17 @@ Bugs reported in play, and what came of each.
   residuals to the end of the round (Gen 4+) lost that check. After the
   first mover's move, a 0-HP mover now faints at once (Explosion, recoil,
   either side). Emulator check: `tools/emu/explode_check.py`.
-- **A ground item in the Rocket Hideout gave Pokémon Center text.** Not
-  reproduced. Every item ball on all four floors (B4F's SILPH SCOPE and LIFT
-  KEY included) and the three hidden items, picked up in the emulator
-  without and with ITEMS randomized (seeds 1 and 7), gave the right item;
-  a sweep of every object's text on every map (`sweep_npcs.py`) showed no
-  nurse text outside the Pokémon Centers; the hidden-object, hidden-item and
-  hide/show tables line up. Needs the floor and the spot.
+- **Objects in the Rocket Hideout gave Pokémon Center text** (a grunt on
+  B1F, the TM ball on B2F, no randomizer). The EXTRAS option PC IN MENU
+  called `ActivatePC` straight from the start menu. The Pokémon Center's PC
+  goes through `PrintPredefTextID`, which saves the map's text pointer in
+  `$ffec`, and CHANGE BOX's save takes it back from there; from the menu,
+  `$ffec` held a stale value (often 0: `CheckForHiddenObject` clears it), so
+  after a box change the map's text pointer table was garbage until the next
+  map, and people and item balls read other texts, the nurse's among them.
+  The menu's PC now saves the pointer the same way and restores it after.
+  Emulator check: `tools/emu/menu_pc_check.py`. (The first pass, picking up
+  every item without the PC, couldn't find it.)
 - **Badge boosts are back** (see Gen 9 rules pass, part 4), with CHALLENGE >
   BADGE BOOST to turn them off.
 
