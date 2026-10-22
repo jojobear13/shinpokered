@@ -6,9 +6,9 @@ A Gen 9 rules fork of Shin Pokémon. Version 0.9.0. A Game Boy hack of Pokémon 
 - **Emulators and hardware.** The ROM works on [BGB](https://bgb.bircd.org/), a highly accurate emulator, so it should also run on real Game Boy / Game Boy Color hardware. Less accurate emulators may show Shin's "Emulator ERROR" warning on the title menu.
 - **Compatibility.** Not compatible with genuine Pokémon cartridges (link trades and battles, Time Capsule), Pokémon Stadium 1 or 2, or Shin Pokémon or vanilla save files. It links only with itself.
 
-Install: Download the BPS patch in Releases and apply it to a legitimate Pokemon Red ROM file.
+Install: Download the BPS patch in Releases and apply it to a legitimate Pokemon ROM file.
 
-Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Design record: [docs/design_brief.md](docs/design_brief.md). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md). Every moveset change from Red and Blue: [docs/moveset_changes.md](docs/moveset_changes.md).
+Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md).
 
 ## Screenshots
 
@@ -95,7 +95,7 @@ Every option starts as the original game played; everything extra is off by defa
 - Gen 9 effects: Acid lowers SpD, String Shot -2 Speed, Minimize +2 evasion, Waterfall/Rock Slide flinch, Dizzy Punch confuses.
 - Tri Attack burns/paralyzes/freezes 20%; Growth raises Atk and SpA; Skull Bash raises Def.
 - A Poison-type user's Toxic never misses.
-- 49 new moves from the learnset audit: Aerial Ace, Air Slash, AncientPower, Aqua Jet, Brine, Bug Bite, Bug Buzz, Bulldoze, Close Combat, Cross Chop, Crunch, Disarming Voice, DragonBreath, Dragon Rush, Drill Run, DynamicPunch, Earth Power, ExtremeSpeed, Fire Fang, Flame Wheel, Flare Blitz, Flash Cannon, Giga Drain, Gunk Shot, Heat Wave, Hyper Voice, Icicle Crash, Incinerate, Leaf Blade, Liquidation, Low Sweep, Mach Punch, Moonblast, Pluck, Poison Fang, Poison Jab, Powder Snow, Psyshock, Razor Shell, Round, Seed Bomb, Shadow Ball, Sludge Bomb, Stomping Tantrum, Stone Edge, Twister, Water Pulse, X-Scissor.
+- 49 new moves: Aerial Ace, Air Slash, AncientPower, Aqua Jet, Brine, Bug Bite, Bug Buzz, Bulldoze, Close Combat, Cross Chop, Crunch, Disarming Voice, DragonBreath, Dragon Rush, Drill Run, DynamicPunch, Earth Power, ExtremeSpeed, Fire Fang, Flame Wheel, Flare Blitz, Flash Cannon, Giga Drain, Gunk Shot, Heat Wave, Hyper Voice, Icicle Crash, Incinerate, Leaf Blade, Liquidation, Low Sweep, Mach Punch, Moonblast, Pluck, Poison Fang, Poison Jab, Powder Snow, Psyshock, Razor Shell, Round, Seed Bomb, Shadow Ball, Sludge Bomb, Stomping Tantrum, Stone Edge, Twister, Water Pulse, X-Scissor.
 - New moves reuse existing animations and sounds.
 - Not implemented: Bug Bite/Pluck/Incinerate berry effects, Stomping Tantrum doubling, Twister vs flying mons.
 - Learnset audit: all 249 recommendations applied (level-up learnsets and starting moves). Every Pokémon's changes from Red and Blue (Shin's and this fork's), the new moves and changed move data are listed in [docs/moveset_changes.md](docs/moveset_changes.md).
