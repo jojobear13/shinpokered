@@ -414,6 +414,8 @@ DoNewGamePlus: ;joenote - selective wram clearing for new game plus
 	;skip clearing box pkmn data
 	
 	pop af
+	ld [wRandoFlags], a
+	pop af
 	ld [wDisplayOptions], a
 	;restore the player ID
 	pop hl

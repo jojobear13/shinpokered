@@ -232,6 +232,14 @@ class GeneratorTestCase(unittest.TestCase):
         self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, flags=ITEMS), (self.GOLEM, 50))
         self.assertEqual(self.scale("RandoScaleDown", self.GOLEM, 50, flags=KEYS), (self.GEODUDE, 12))
 
+    def test_choices_survive_new_game(self):
+        g = self.game
+        for routine in ("SetDefaultNames", "DoNewGamePlus"):
+            g.reset()
+            g.poke("wRandoFlags", DOORS | KEYS | 1 << 3)
+            g.call(routine, max_frames=2000)
+            self.assertEqual(g.peek("wRandoFlags"), DOORS | KEYS | 1 << 3, routine)
+
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)
         for s, p in enumerate(partners):

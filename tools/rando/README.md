@@ -16,9 +16,20 @@ own world (the Japanese Red and Green keep the original layouts).
 - `graph.py`: warps grouped into entrances and their vanilla pairs.
 - `pools.py`: the entrances the door shuffle moves: outside doors with the
   insides they led to, and stairs between inside maps among themselves.
-- `regions.py`: the squares squeezed into ~1,100 regions and ~1,300 edges
-  (exact: same answers as the square graph), the sweep, and the softlock check.
+- `regions.py`: the squares squeezed into regions, then compressed to 497
+  nodes and 721 edges (exact: same answers as the square graph), the sweep,
+  and the softlock check.
 - `randomizer.py`: the seeded shuffle: doors grown from the start so the whole
   world is attached, key items by assumed fill, ground items into the rest,
   then a check that the game can be finished and that no place a player can
   walk into leaves it unfinishable.
+- `gen_data.py`: writes `data/rando/{intl,jp}_*.asm`, the tables the game's
+  generator (`engine/rando/`) and its runtime lookups use. Run it after a
+  change to the maps or the logic, then build again:
+  `python3 tools/rando/gen_data.py && make`.
+
+The game does what `randomizer.py` does, step for step, so for a seed both
+give the same world; `tests/test_rando.py` checks that for every mode, and
+`randomizer.seed_hash` gives the seed a typed seed becomes. Doors only
+(without key items) isn't offered: with the key items where they were, a
+shuffled world can rarely be finished.

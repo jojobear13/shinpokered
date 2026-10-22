@@ -110,18 +110,30 @@ Every option starts as the original game played; everything extra is off by defa
 - Party submenu is STATS, MOVES, SWITCH, CANCEL plus up to four field moves.
 - Bag opens full screen with auto-sorted pockets: ITEMS, MEDICINE, BALLS, BATTLE ITEMS, BERRIES, KEY ITEMS.
 - Bag holds 36 kinds; LEFT/RIGHT change pocket.
-- OPTION screen: five pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS) with two-line explanations.
+- OPTION screen: six pages (GAME, DISPLAY, CHALLENGE, CLAUSES, EXTRAS, RANDOMIZER) with two-line explanations.
 - GAME: TEXT SPEED, BATTLE ANIM, BTL. STYLE, AUDIO, EXP. SHARE, SOUND TEST.
 - DISPLAY: FRAME RATE, SPRITES, MORE COLOR, COLOR FIX, SYMBOLS, TYPE HINT, HP PERCENT.
 - HP PERCENT: the enemy HUD shows its HP as a percentage number (Showdown-style, no % sign) in place of "HP:"; it counts up or down with the bar.
 - CHALLENGE: HARD MODE, AI SWITCHING, LEVEL CAP, SCALING, ALT. MOVES, NUZLOCKE.
 - CLAUSES: ITEM, SLEEP, FREEZE, HYPER BEAM.
-- EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR, SAFARI EVENT, PC IN MENU.
+- EXTRAS: HEAL ON WIN, WARP BACK, CATCH-UP EXP, SAFARI EVENT, PC IN MENU.
+- RANDOMIZER: DOORS, KEY ITEMS, ITEMS, MARTS, RANDOM WILD (OFF/TIER/FULL), RANDOM TRNR (see Randomizer).
 - Defaults match the original game: MEDIUM text, SHIFT, 30 fps, no smart AI switching, COLOR FIX off, all extras off.
 - Rule options can be set from the title screen before NEW GAME.
 - TYPE HINT: OFF (default), ON, or LEARNED (only matchups seen in battle; "?" otherwise).
 - PC IN MENU: start menu PC item opens the full PC (hidden in link rooms).
 - Title screen: "Red 30th Anniversary" (Blue and Green in those builds) under the logo, in the original "Red Version" lettering; main menu shows version 0.9.0.
+
+#### Randomizer
+- Options on the RANDOMIZER page, all off by default; DOORS, KEY ITEMS, ITEMS and MARTS are set from the title screen before NEW GAME.
+- DOORS: every door and staircase is shuffled, two-way (outside doors with insides, stairs with stairs). Red's house, Oak's lab, the Viridian mart (Oak's Parcel), the elevators and the Elite Four to Hall of Fame chain stay put; the S.S. Anne, Safari Zone, Silph Co., Rocket Hideout, Victory Road, Seafoam Islands and Pokémon Mansion keep their insides, with only their ways out shuffled.
+- KEY ITEMS: key items and HMs are shuffled among item balls and gifts (DOORS turns it on). Badges are not shuffled. Hidden items and the Pokédex-count aides never hold key items.
+- ITEMS: the other items in balls, hidden spots and gifts are shuffled.
+- MARTS: each mart (but Viridian's, the bike shop, Shin's special mart and the drink machines) sells Poké Balls, Potions and Escape Ropes plus a random pick from the other marts' items.
+- NEW GAME asks for a SEED (up to 10 letters; none gives a random one). The same seed with the same randomizer options gives the same game, including RANDOM WILD and RANDOM TRNR.
+- The world is checked to be finishable, with no place you can walk into and get stuck. Building it takes about 20 seconds on a Game Boy, 10 on a Game Boy Color, once per game.
+- In a shuffled world (DOORS or KEY ITEMS), trainers' Pokémon more than 2 levels (bosses 3) above your highest, and wild ones above it, come down to it, as their pre-evolution if needed. Only down; SCALING still raises them.
+- With DOORS: the S.S. Anne's sailor always takes the ticket, the Elite Four's door needs all 8 badges, and a Pokémon Center sets its own town for blackouts.
 
 #### Breeding and day care
 - Day care holds two Pokémon; both gain experience.

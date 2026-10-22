@@ -2042,3 +2042,102 @@ and the playtest) is in `docs/verification_plan.md`, with its status table.
   Mewtwo stands elsewhere). New tests: all 12 boxes full through a save
   and load, and a damaged save refused
   (`test_pc_boxes.SaveTest`).
+
+## Randomizer
+
+A randomizer for doors, key items, the other found items and marts, with a
+seed players can share, and levels that scale down when a shuffled world
+sends a player somewhere early. It follows the original Game Boy
+randomizers' shape (the world is built on the console from a seed) rather
+than patching ROMs on a computer.
+
+- **Options** (RANDOMIZER page, all off): DOORS, KEY ITEMS, ITEMS, MARTS,
+  and Shin's RANDOM WILD and RANDOM TRNR, moved there from EXTRAS. The first
+  four are `wRandoFlags` bits (saved; carried over NEW GAME and NEW GAME+)
+  and can only be changed from the title screen: from the start menu
+  (`wOptionsInGame`) the setters refuse with a buzz. DOORS turns KEY ITEMS
+  on and KEY ITEMS off turns DOORS off: with the key items where they were,
+  a door shuffle almost never gives a world that can be finished (147 of 150
+  tries failed: Bill behind Cut, Cut behind Bill's ticket, and so on).
+- **The seed.** At NEW GAME, if anything is randomized, a SEED? naming
+  screen (`NAME_SEED_SCREEN`, ten letters). The text and a settings byte
+  (the four choices, RANDOM WILD's two bits, RANDOM TRNR) are hashed
+  (FNV-1a's start, each byte xored in and stirred with the generator's
+  xorshift32) into `wRandoSeed`, so different settings never share a world.
+  Nothing typed: a random seed. A typed seed also gives Shin's wild
+  randomizer its one-byte seed and (`RandoReadTrainer`) seeds RANDOM TRNR
+  per trainer from the seed, class and number, putting the game's own
+  random numbers back afterwards. `randomizer.seed_hash` computes the same.
+- **The world model** (`tools/rando/`, README there): read from the built
+  ROM, so each layout gets its own (Red/Blue/Blue-JP, and Red-JP/Green with
+  the original Japanese maps). Squares and moves (ledges, Cut, Surf,
+  Strength, the tile-pair rules) become regions, then a compressed graph of
+  497 nodes and 721 edges whose requirements are single atoms (badges,
+  events, items, HMs). Scripted rules are written out in `logic.py`.
+- **What stays put**: Red's house, Oak's lab, the Viridian mart (Oak's
+  Parcel), the elevators, and the lobby to Hall of Fame chain. The S.S.
+  Anne with its dock, the Safari Zone, Silph Co., the Rocket Hideout,
+  Victory Road, Seafoam Islands and the Pokémon Mansion keep their insides
+  (puzzles, a ship that sails, a timed game); only their ways out are
+  shuffled. Outside doors pair with insides, stairs between inside maps with
+  each other, always both ways.
+- **The algorithm** (`randomizer.py`, the reference): the door shuffle grows
+  the world from the start, pairing a slot not yet reached with an open one
+  (dead ends first while there are doors to spare, then places that open
+  more), then pairs what is left; key items by assumed fill (the twelve the
+  logic needs first, then the others anywhere a key item may go), the rest
+  shuffled into the free locations; then two checks: the game can be
+  finished, and no place a player can walk into (round by round as items
+  come) leaves it unfinishable. Any failure: try again with the next random
+  numbers. With ITEMS off, each location keeps its item where it can and
+  the items key items pushed out go, in order, where the key items were.
+  Hidden items and the Pokédex-count aides never hold key items.
+- **On the Game Boy** (`engine/rando/`, banks $36-$38): `generator.asm`,
+  `doors.asm` and `items.asm` port the reference step for step, the same
+  random numbers in the same order, so `tests/test_rando.py` can demand the
+  same doors, items and number of tries for each mode and both layouts.
+  The searches (`core.asm`) are assembled twice (`{RP}` label prefix), in
+  the generator's bank and in the softlock check's, each with its own copy
+  of the graph. They work in save RAM bank 1 (`sRando*`, a union for the
+  scratch) and use `wOverworldMap` as their stack. A search takes the
+  events and locations it reaches and follows what they open from the nodes
+  already reached (per-atom source lists), so it runs once through the
+  world however much it gains. The door shuffle keeps each slot's "more to
+  reach" bits until a slot in its area is reached (`RandoKindsBack`).
+- **Saving**: only the seed and the choices are in the save (the five
+  unused bytes after `wRandomizerSeed`). The world (pairings, placements)
+  lives in save RAM bank 1 with a tag; CONTINUE builds it again if the tag
+  isn't the save's. Building takes about 1,250 frames on a Game Boy for a
+  world found on the first try (1.9 tries on average, at most 9 in 200
+  seeds), half that in a Game Boy Color's double speed, which it switches
+  to for the build.
+- **In the game** (`runtime.asm`): `WarpFound2` sends a shuffled warp to its
+  partner's arrival; item balls, hidden items and the 17 gifts
+  (`rando_gift`) give the placed item; marts build their list from the seed
+  when they open (`RandoMart`: what every mart sells, then picks from the
+  pool, nothing stored). The gifts' texts now name the item given
+  ("received HM02!" was fixed text; "an S.S.TICKET" loses its article).
+  With DOORS: the S.S. Anne's sailor always takes the ticket (the dock may
+  be a way through after the ship has left), the lobby's door to the Elite
+  Four needs all eight badges (Route 23's guards no longer see to it), and
+  a Pokémon Center sets its own town for blackouts (`wLastMap` may be a
+  route).
+- **Levels scale down** in shuffled worlds (DOORS or KEY ITEMS): a trainer's
+  Pokémon more than 2 levels (a boss's 3) above the party's highest, and a
+  wild one above it, comes down to it, and to its pre-evolution while it
+  couldn't have evolved at that level (`RandoDevolve`, from the evolution
+  data; stones and trades count as level 30). Only down, only then; Shin's
+  SCALING still raises levels and is its own option.
+- **Known limits**: the HM gift people's later lines ("HM02 is FLY") and
+  the fishing gurus' "take this and fish" still describe the vanilla gift;
+  the fishing hotkey hint shows whatever was given.
+- **Fixed during the work** (not released): the options change first pushed
+  `wRandoFlags` in NEW GAME+ without popping it; the NEW GAME+ tests caught
+  the crash.
+- **Tests**: `tests/test_rando.py` (generator against the reference for every
+  mode, both layouts; the seed hash; warps, balls, hidden items, gifts and
+  marts looked up; seeded trainers; scaling; choices kept over NEW GAME),
+  `tests/test_options.py` (the page, DOORS and KEY ITEMS together, the
+  lock). In the emulator: NEW GAME with a typed seed builds the same world
+  as the reference (DMG and GBC timings above), and `tools/emu/rando_walk.py`
+  walks through the doors of four towns and back.

@@ -16,6 +16,7 @@ and assume the repo is at `/home/user/shinpokered`.
     python3 story_save.py                  # save and CONTINUE, NEW GAME+
     python3 colors.py                      # COLOR FIX and MORE COLOR combinations
     python3 sameboy_check.py [cgb dmg sgb] # the same save played in SameBoy
+    python3 rando_walk.py [SEED]           # doors of a randomized world, walked through
 
 Results and screenshots go to `/tmp/pk30emu/out`. `lib.py` and `dxlib.py`
 are the shared helpers (party set-up, screen text from the charmap); `story.py`
