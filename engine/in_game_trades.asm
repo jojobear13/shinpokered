@@ -14,6 +14,9 @@ DoInGameTradeDialogue:
 	ld [wInGameTradeGiveMonSpecies], a
 	ld a, [hli]
 	ld [wInGameTradeReceiveMonSpecies], a
+	push hl
+	callba RandoTrade ; TRADES: others of similar strength
+	pop hl
 	ld a, [hli]
 	push af
 	ld de, wInGameTradeMonNick

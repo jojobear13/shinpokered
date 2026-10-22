@@ -1020,3 +1020,30 @@ RandoPrizes::
 	dec b
 	jr nz, .loop
 	ret
+
+; ---- in-game trades (TRADES): what is asked for and what is given become
+; others of similar strength, per trade per seed
+RandoTrade::
+	ld a, [wRandoFlags2]
+	bit RANDO2_TRADES_F, a
+	ret z
+	ld hl, wInGameTradeGiveMonSpecies
+	ld e, 0
+	call .mon
+	ld hl, wInGameTradeReceiveMonSpecies
+	ld e, 1
+.mon
+	push hl
+	ld a, [wWhichTrade]
+	ld c, a
+	ld d, 0
+	ld b, RKEY_TRADE
+	call RandoKey
+	pop hl
+	push hl
+	ld a, [hl]
+	ld c, $ff
+	call RandoSimilar
+	pop hl
+	ld [hl], a
+	jp RandoCloseSRAM

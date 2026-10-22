@@ -280,5 +280,26 @@ class RandoMonsTest(unittest.TestCase):
         self.assertEqual(got, self.special("VOLTORB", 0x53, 4))
 
 
+    # ---- trades
+    def trade(self, which, give, get, seed=8, flags2=1 << 3):
+        g = self.game
+        self.setup(seed, flags2=flags2)
+        g.poke("wWhichTrade", which)
+        g.poke("wInGameTradeGiveMonSpecies", self.sp[give])
+        g.poke("wInGameTradeReceiveMonSpecies", self.sp[get])
+        g.call("RandoTrade", max_frames=600)
+        return g.peek("wInGameTradeGiveMonSpecies"), g.peek("wInGameTradeReceiveMonSpecies")
+
+    def test_trades(self):
+        m = self.mons
+        self.assertEqual(self.trade(0, "NIDORINO", "NIDORINA", flags2=0), (self.sp["NIDORINO"], self.sp["NIDORINA"]))
+        got = [self.trade(k, "ABRA", "MR_MIME", seed) for k in range(3) for seed in (1, 2)]
+        self.assertGreater(len(set(got)), 3)
+        for give, get in got:
+            self.assertNotIn(give, m.legendary)
+            self.assertLessEqual(abs(m.bst[get] - m.bst[self.sp["MR_MIME"]]), m.bst[self.sp["MR_MIME"]] // 4 + 4)
+        self.assertEqual(self.trade(4, "ABRA", "MR_MIME", 5), self.trade(4, "ABRA", "MR_MIME", 5))
+
+
 if __name__ == "__main__":
     unittest.main()
