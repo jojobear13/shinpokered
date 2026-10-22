@@ -16,6 +16,7 @@ from harness import REPO_ROOT, Game
 
 sys.path.insert(0, os.path.join(REPO_ROOT, "tools", "rando"))
 import gen_data  # noqa: E402
+import randomizer  # noqa: E402
 
 SEEDS = [1, 2, 3, 0xDEADBEEF, 0x12345678]
 DOORS, KEYS, ITEMS = 1, 2, 4  # wRandoFlags
@@ -76,6 +77,17 @@ class GeneratorTestCase(unittest.TestCase):
         self.assertEqual(
             place, [T.rom.items[py["placement"][l["key"]]] for l in T.C.locs]
         )
+
+    def test_seed_hash(self):
+        g = self.game
+        for text, settings in [("PIKACHU", 7), ("pikachu", 7), ("PIKACHU", 3), ("Race 2026", 0x5F)]:
+            g.reset()
+            g.call("RandoHashStart")
+            for b in randomizer.seed_codes(text) + [settings]:
+                g.call("RandoHashByte", de=b)
+            g.call("RandoHashResult")
+            got = int.from_bytes(bytes(g.peek("wRandoSeed", 4)), "little")
+            self.assertEqual(got, randomizer.seed_hash(randomizer.seed_codes(text), settings), text)
 
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)

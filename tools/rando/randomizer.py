@@ -261,6 +261,36 @@ class Randomizer:
         return None
 
 
+# ---- the seed a player types (engine/rando/runtime.asm)
+def seed_codes(text):
+    """The game's character codes for a seed typed on the naming screen."""
+    out = []
+    for ch in text:
+        if 'A' <= ch <= 'Z':
+            out.append(0x80 + ord(ch) - ord('A'))
+        elif 'a' <= ch <= 'z':
+            out.append(0xA0 + ord(ch) - ord('a'))
+        elif '0' <= ch <= '9':
+            out.append(0xF6 + ord(ch) - ord('0'))
+        elif ch == ' ':
+            out.append(0x7F)
+        else:
+            raise ValueError(ch)
+    return out
+
+
+def seed_hash(codes, settings):
+    """wRandoSeed: FNV-1a's start, each byte (the seed's, then the settings:
+    wRandoFlags' low nibble, RANDOM WILD's two bits, RANDOM TRNR) xored in
+    and stirred with a step of Rng."""
+    r = Rng(0)
+    r.x = 0x811C9DC5
+    for b in list(codes) + [settings]:
+        r.x ^= b
+        r.next()
+    return r.x
+
+
 # ---- marts: each shuffled mart's list is made when it opens, from the
 # world seed and its number (nothing stored)
 STATIC_MARTS = {0, 3, 12, 16}     # Viridian (Oak's Parcel), the bike shop, Shin's special mart, the drinks

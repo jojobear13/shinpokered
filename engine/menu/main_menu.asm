@@ -175,6 +175,7 @@ MainMenu:
 	
 	call GBPalWhiteOutWithDelay3
 	call ClearScreen
+	callba RandoCheckWorld ; built again if save RAM lost it
 	ld a, PLAYER_DIR_DOWN
 	ld [wPlayerDirection], a
 	ld [wPlayerLastStopDirection], a	;joenote - set face down as last direction for 180 degree turn frame

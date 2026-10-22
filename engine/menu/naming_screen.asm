@@ -92,6 +92,11 @@ DisplayNameRaterScreen:
 	scf
 	ret
 
+; the randomizer's seed, into wBuffer (engine/rando/runtime.asm)
+DisplaySeedNamingScreen:
+	ld a, NAME_SEED_SCREEN
+	ld [wNamingScreenType], a
+	ld hl, wBuffer
 DisplayNamingScreen:
 	push hl
 	ld hl, wd730
@@ -494,6 +499,8 @@ PrintNamingText:
 	ld de, RivalsTextString
 	dec a
 	jr z, .notNickname
+	dec a
+	jr nz, .seed
 	ld a, [wcf91]
 	ld [wMonPartySpriteSpecies], a
 	push af
@@ -516,6 +523,10 @@ PrintNamingText:
 	ld de, NameTextString
 .placeString
 	jp PlaceString
+.seed
+	coord hl, 0, 1
+	ld de, SeedTextString
+	jr .placeString
 
 YourTextString:
 	db "YOUR @"
@@ -525,6 +536,9 @@ RivalsTextString:
 
 NameTextString:
 	db "NAME?@"
+
+SeedTextString:
+	db "SEED?@"
 
 NicknameTextString:
 	db "NICKNAME?@"

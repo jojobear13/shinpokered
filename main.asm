@@ -2071,3 +2071,12 @@ INCLUDE "data/rando/intl_gen.asm"
 INCLUDE "data/rando/intl_rev.asm"
 ENDC
 PURGE RP
+
+SECTION "Rando Runtime", ROMX, BANK[$38]
+INCLUDE "engine/rando/runtime.asm"
+IF DEF(_REDGREENJP)
+INCLUDE "data/rando/jp_run.asm"
+ELSE
+INCLUDE "data/rando/intl_run.asm"
+ENDC
+

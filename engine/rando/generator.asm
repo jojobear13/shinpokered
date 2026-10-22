@@ -86,6 +86,35 @@ RandoGenerate::
 	scf
 	ret
 
+; the seed's hash (RandoNewGame): FNV-1a's start, then each byte xored in
+; and stirred with the generator's own random numbers
+RandoHashStart::
+	call RandoSRAM
+	ld hl, sRandoRng
+	ld a, $c5
+	ld [hli], a
+	ld a, $9d
+	ld [hli], a
+	ld a, $1c
+	ld [hli], a
+	ld [hl], $81
+	ret
+
+; e = the byte
+RandoHashByte::
+	call RandoSRAM
+	ld a, [sRandoRng]
+	xor e
+	ld [sRandoRng], a
+	jp RandoRngNext
+
+RandoHashResult::
+	call RandoSRAM
+	ld hl, sRandoRng
+	ld de, wRandoSeed
+	ld bc, 4
+	jp CopyData
+
 ; save RAM bank 1, where all of this lives
 RandoSRAM::
 	ld a, SRAM_ENABLE

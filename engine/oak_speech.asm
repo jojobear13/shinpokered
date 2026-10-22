@@ -85,6 +85,7 @@ OakSpeech:
 	call SetDefaultNames
 	predef InitPlayerData2
 .newgamedone
+	callba RandoNewGame ; a seed, and the world, if anything is randomized
 	call RunDefaultPaletteCommand	;gbcnote - reinitialize the default palette in case the pointers got cleared
 ;joenote - initialize hack version byte as well as...
 	ld a, HACK_VERSION
