@@ -2229,3 +2229,60 @@ written by `gen_data.py` from the ROM through `tools/rando/mons.py`.
   emulator, `tools/emu/rando_mons.py` with every option on: the Lapras and
   dojo gifts, Snorlax, Mewtwo (a legendary), and the Elite Four (each keeps
   its type) all played through.
+
+## Playtest round after the randomizer
+
+Bugs reported in play, and what came of each.
+
+- **Day care: the withdraw menu (two mons, CANCEL) had the sprites over
+  it.** `DayCareChooseMon` drew its box without updating the sprites, which
+  hide only on `UpdateSprites` when a text-box tile is under them. It now
+  updates them after drawing and after restoring the screen.
+- **A caught mon's pic came back after a level-up stats box.** With EXP.
+  SHARE on, a benched mon leveling up from the catch's EXP closed its stats
+  box by restoring screen buffer 1, saved before the catch, pic and all.
+  `CaughtMonExperience` now clears the pic area and saves the buffer first.
+  Emulator check: `tools/emu/catch_exp.py` (old build: the pic returns).
+- **The aide said "an DEXREPEL".** Now "the DEXREPEL".
+- **Forewarn named FOREWARN, not the move.** The move's name went into
+  `wcd6d`, then the ability banner put the ability's name there. The banner
+  now comes first. Test: `test_ability_entry.py`.
+- **Dragon Rage didn't teach TYPE HINT: LEARNED the Dragon matchups**, and
+  its own mark stayed "?". Fixed-damage moves (power 1) recorded nothing.
+  They now record their type's matchups like any attacking move (the type
+  still decides whether they hit), without a "super effective" line and
+  without the critical-hit text. Test: `test_type_chart.py`.
+- **A mon that exploded stayed in through the other side's move.** Gen 1
+  caught it in `HandlePoisonBurnLeechSeed` between the two moves; moving the
+  residuals to the end of the round (Gen 4+) lost that check. After the
+  first mover's move, a 0-HP mover now faints at once (Explosion, recoil,
+  either side). Emulator check: `tools/emu/explode_check.py`.
+- **A ground item in the Rocket Hideout gave Pokémon Center text.** Not
+  reproduced. Every item ball on all four floors (B4F's SILPH SCOPE and LIFT
+  KEY included) and the three hidden items, picked up in the emulator
+  without and with ITEMS randomized (seeds 1 and 7), gave the right item;
+  a sweep of every object's text on every map (`sweep_npcs.py`) showed no
+  nurse text outside the Pokémon Centers; the hidden-object, hidden-item and
+  hide/show tables line up. Needs the floor and the spot.
+- **Badge boosts are back** (see Gen 9 rules pass, part 4), with CHALLENGE >
+  BADGE BOOST to turn them off.
+
+### Item descriptions in the bag (investigated, not built)
+
+- **Layout.** The bag uses the whole screen: pocket header on rows 0-2,
+  six entries of two rows from row 4. A Gold/Silver-style description box
+  fits on rows 12-17 (two lines of 18 letters) if the list shows four
+  entries instead of six (`BAG_ROWS` 6 to 4); the cursor and scroll code
+  already work from `BAG_ROWS`.
+- **Text.** 129 bag items need a line pair (the 137 real items less the 8
+  badges; TMs and HMs aren't bag items). About 32 bytes each, 4.2 KB, plus
+  a 302-byte pointer table by item number.
+- **Space.** The ROM has 8 empty banks and about 87 KB free in the rest, so
+  the text and the drawing code go in a bank of their own. The bag's own
+  bank has 3-5 bytes free, so the one far call from `BagDrawScreen` needs a
+  few bytes moved out (for instance `PocketNames`).
+- **Work.** Writing 129 descriptions that match this game's rules (Gen 9
+  held items, the berries, the DEXREPEL), the box and its redraw on each
+  cursor move (the screen is redrawn whole already), and a test that every
+  bag item has text that fits. The same text could serve the marts' BUY
+  list.
