@@ -8,7 +8,7 @@ A Gen 9 rules fork of Shin Pokémon. Version 0.9.0. A Game Boy hack of Pokémon 
 
 Install: Download the BPS patch in Releases and apply it to a legitimate Pokemon Red ROM file.
 
-Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Design record: [docs/design_brief.md](docs/design_brief.md). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md).
+Build: see [INSTALL.md](INSTALL.md) (`make` builds Red, Blue, Green, Red-JP, Blue-JP and the `_origback` variants). Tests: `make test` (PyBoy). Design record: [docs/design_brief.md](docs/design_brief.md). Shin's original README: [docs/shin_readme.md](docs/shin_readme.md). Every moveset change from Red and Blue: [docs/moveset_changes.md](docs/moveset_changes.md).
 
 ## Screenshots
 
@@ -97,7 +97,7 @@ Every option starts as the original game played; everything extra is off by defa
 - 49 new moves from the learnset audit: Aerial Ace, Air Slash, AncientPower, Aqua Jet, Brine, Bug Bite, Bug Buzz, Bulldoze, Close Combat, Cross Chop, Crunch, Disarming Voice, DragonBreath, Dragon Rush, Drill Run, DynamicPunch, Earth Power, ExtremeSpeed, Fire Fang, Flame Wheel, Flare Blitz, Flash Cannon, Giga Drain, Gunk Shot, Heat Wave, Hyper Voice, Icicle Crash, Incinerate, Leaf Blade, Liquidation, Low Sweep, Mach Punch, Moonblast, Pluck, Poison Fang, Poison Jab, Powder Snow, Psyshock, Razor Shell, Round, Seed Bomb, Shadow Ball, Sludge Bomb, Stomping Tantrum, Stone Edge, Twister, Water Pulse, X-Scissor.
 - New moves reuse existing animations and sounds.
 - Not implemented: Bug Bite/Pluck/Incinerate berry effects, Stomping Tantrum doubling, Twister vs flying mons.
-- Learnset audit: all 249 recommendations applied (level-up learnsets and starting moves).
+- Learnset audit: all 249 recommendations applied (level-up learnsets and starting moves). Every Pokémon's changes from Red and Blue (Shin's and this fork's), the new moves and changed move data are listed in [docs/moveset_changes.md](docs/moveset_changes.md).
 - Horn Drill and Guillotine removed from level-up learnsets.
 - Evolving teaches the new form's level 1 moves (Gen 7+).
 

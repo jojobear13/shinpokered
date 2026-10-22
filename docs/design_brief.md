@@ -1484,6 +1484,11 @@ One commit per group:
   when the spreadsheet is present). A move goes to the proposed level and
   out of wherever the species had it; "Remove" takes Horn Drill and
   Guillotine away. `docs/learnset_changes.md` lists every change.
+  `docs/moveset_changes.md` (from `tools/moveset_changes.py`) lists every
+  moveset change against Red and Blue (pret/pokered), each marked as Shin's
+  or this fork's: level-up and starting moves, TM/HM compatibility, the TM
+  list, the new moves and the old moves' changed data. Re-run it after any
+  learnset or move data change.
 - **Starting moves**: a starting move the sheet moves later comes out of the
   base stats' four; Zubat's only one (Leech Life, now at 12) gives way to
   Absorb, its first damaging Gen 9 level 1 move.
