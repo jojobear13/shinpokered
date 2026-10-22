@@ -49,6 +49,10 @@ GiveFossilToCinnabarLab:
 	ld b, KABUTO
 .fossilSelected
 	ld [wFossilItem], a
+	push af
+	rando_special b ; SPECIAL MON: what it revives into
+	ld b, a
+	pop af
 	ld a, b
 	ld [wFossilMon], a
 	call LoadFossilItemAndMonName

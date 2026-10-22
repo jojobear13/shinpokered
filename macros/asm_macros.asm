@@ -209,3 +209,10 @@ MACRO rando_gift ; location (RANDO_LOC_*), vanilla item -> a
 	callba RandoGiftItem
 	ld a, e
 ENDM
+
+; a one-off #MON: the vanilla one, or SPECIAL MON's for this map
+MACRO rando_special ; vanilla species -> a
+	ld e, \1
+	callba RandoSpecialMon
+	ld a, e
+ENDM

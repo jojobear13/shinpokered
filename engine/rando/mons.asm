@@ -967,3 +967,56 @@ RandoWildHeldPick::
 	pop af
 	ld e, a
 	ret
+
+; ---- the one-off #MON (SPECIAL MON): gifts, legendaries, SNORLAX, the
+; POWER PLANT's, the fossils, the prizes and the old man's WEEDLE
+
+; e = the vanilla #MON -> e = the one there with SPECIAL MON: of similar
+; strength (legendaries for legendaries), one per #MON per map per seed
+RandoSpecialMon::
+	ld a, [wRandoFlags2]
+	bit RANDO2_SPECIAL_F, a
+	ret z
+	push de
+	ld c, e
+	ld a, [wCurMap]
+	ld d, a
+	ld e, 0
+	ld b, RKEY_SPECIAL
+	call RandoKey
+	pop de
+	ld a, e
+	ld c, $ff                    ; any type
+	call RandoSimilar
+	push af
+	call RandoCloseSRAM
+	pop af
+	ld e, a
+	ret
+
+; InitBattleEnemyParameters, a #MON standing on the map (wCurOpponent)
+RandoSpecialBattle::
+	ld a, [wCurOpponent]
+	ld e, a
+	call RandoSpecialMon
+	ld a, e
+	ld [wCurOpponent], a
+	ld [wEnemyMonOrTrainerClass], a
+	ret
+
+; the GAME CORNER's #MON prizes (wPrize1-3)
+RandoPrizes::
+	ld hl, wPrize1
+	ld b, 3
+.loop
+	push bc
+	push hl
+	ld e, [hl]
+	call RandoSpecialMon
+	pop hl
+	ld [hl], e
+	inc hl
+	pop bc
+	dec b
+	jr nz, .loop
+	ret

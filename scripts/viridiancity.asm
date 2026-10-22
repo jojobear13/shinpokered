@@ -101,7 +101,7 @@ ViridianCityScript1:
 	ld [wBattleType], a
 	ld a, 5
 	ld [wCurEnemyLVL], a
-	ld a, WEEDLE
+	rando_special WEEDLE
 	ld [wCurOpponent], a
 	ld a, $2
 	ld [wViridianCityCurScript], a

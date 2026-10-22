@@ -108,6 +108,7 @@ GetPrizeMenuId:
 	jr .putNoThanksText
 .putMonName
 	predef randomMonPrizes	;joenote - randomize the game corner pokemon prizes
+	callba RandoPrizes ; SPECIAL MON
 	ld a, [wPrize1]
 	ld [wd11e], a
 	call GetMonName

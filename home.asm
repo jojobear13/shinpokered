@@ -2739,7 +2739,7 @@ InitBattleEnemyParameters::
 	ret
 .noTrainer
 	ld [wCurEnemyLVL], a
-	ret
+	jpba RandoSpecialBattle ; SPECIAL MON
 
 GetSpritePosition1::
 	ld hl, _GetSpritePosition1

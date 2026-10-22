@@ -340,7 +340,9 @@ SilphCo7Text1:
 .givelapras
 	ld hl, .MeetLaprasGuyText
 	call PrintText
-	lb bc, LAPRAS, 15
+	rando_special LAPRAS
+	ld b, a
+	ld c, 15
 	call GivePokemon
 	jr nc, .done
 	ld a, [wSimulatedJoypadStatesEnd]

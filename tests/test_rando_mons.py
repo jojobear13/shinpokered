@@ -247,5 +247,38 @@ class RandoMonsTest(unittest.TestCase):
         self.assertGreater(len(picks), 10)
 
 
+    # ---- one-off #MON
+    SPECIAL = 1 << 2
+
+    def special(self, name, mapid=0x17, seed=21, flags2=SPECIAL):
+        self.setup(seed, flags2=flags2)
+        self.game.poke("wCurMap", mapid)
+        return self.game.call("RandoSpecialMon", de=self.sp[name], max_frames=600)["de"] & 0xFF
+
+    def test_special_off(self):
+        self.assertEqual(self.special("SNORLAX", flags2=0), self.sp["SNORLAX"])
+
+    def test_special_similar(self):
+        m = self.mons
+        for seed in range(1, 12):
+            got = self.special("ZAPDOS", seed=seed)
+            self.assertIn(got, m.legendary)
+            got = self.special("SNORLAX", seed=seed)
+            self.assertNotIn(got, m.legendary)
+            self.assertLessEqual(abs(m.bst[got] - m.bst[self.sp["SNORLAX"]]), m.bst[self.sp["SNORLAX"]] // 4 + 4)
+        self.assertEqual(self.special("LAPRAS", seed=3), self.special("LAPRAS", seed=3))
+        self.assertNotEqual({self.special("EEVEE", mapid=k) for k in range(8)}, {self.sp["EEVEE"]})
+
+    def test_special_battle(self):
+        g = self.game
+        self.setup(4, flags2=self.SPECIAL)
+        g.poke("wCurMap", 0x53)
+        g.poke("wCurOpponent", self.sp["VOLTORB"])
+        g.call("RandoSpecialBattle", max_frames=600)
+        got = g.peek("wCurOpponent")
+        self.assertEqual(got, g.peek("wEnemyMonOrTrainerClass"))
+        self.assertEqual(got, self.special("VOLTORB", 0x53, 4))
+
+
 if __name__ == "__main__":
     unittest.main()

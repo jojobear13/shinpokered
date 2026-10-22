@@ -273,9 +273,11 @@ FightingDojoText6:
 	call PrintText
 	jr .done
 .GetMon
-	ld a, HITMONLEE
+	rando_special HITMONLEE
+	ld [wcf91], a
 	call DisplayPokedex
 	ld hl, WantHitmonleeText
+	call FightingDojoGiftText
 	call PrintText
 	call YesNoChoice
 	ld a, [wCurrentMenuItem]
@@ -295,6 +297,24 @@ FightingDojoText6:
 .done
 	jp TextScriptEnd
 
+; hl = the gift's text -> hl = one that names it, if SPECIAL MON changed it
+FightingDojoGiftText:
+	ld a, [wRandoFlags2]
+	bit RANDO2_SPECIAL_F, a
+	ret z
+	ld a, [wcf91]
+	ld [wd11e], a
+	call GetMonName
+	ld hl, FightingDojoAnyGiftText
+	ret
+
+FightingDojoAnyGiftText:
+	text "You want"
+	line "@"
+	TX_RAM wcd6d
+	text "?"
+	done
+
 WantHitmonleeText:
 	TX_FAR _WantHitmonleeText
 	db "@"
@@ -308,9 +328,11 @@ FightingDojoText7:
 	call PrintText
 	jr .done
 .GetMon
-	ld a, HITMONCHAN
+	rando_special HITMONCHAN
+	ld [wcf91], a
 	call DisplayPokedex
 	ld hl, WantHitmonchanText
+	call FightingDojoGiftText
 	call PrintText
 	call YesNoChoice
 	ld a, [wCurrentMenuItem]
