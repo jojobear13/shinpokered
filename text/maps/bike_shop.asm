@@ -39,7 +39,9 @@ _BikeShopText_1d824::
 	line "the BIKE VOUCHER"
 ;	cont "for a BICYCLE.@@"
 ;joenote - add hotkey info
-	cont "for a BICYCLE."
+	cont "for @"
+	TX_RAM wcf4b
+	text "."
 	para "Hold A and press"
 	line "SELECT to get on"
 	cont "or off quickly.@@"

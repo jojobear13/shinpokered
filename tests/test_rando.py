@@ -89,6 +89,69 @@ class GeneratorTestCase(unittest.TestCase):
             got = int.from_bytes(bytes(g.peek("wRandoSeed", 4)), "little")
             self.assertEqual(got, randomizer.seed_hash(randomizer.seed_codes(text), settings), text)
 
+    # ---- the game's lookups (engine/rando/runtime.asm), on a built world
+    def built(self, flags=DOORS | KEYS | ITEMS, seed=1):
+        regs, partners, place, _ = self.generate(seed, flags)
+        self.game.poke("wRandoFlags", flags)
+        return partners, place
+
+    def test_warp(self):
+        g, T = self.game, self.tables
+        partners, _ = self.built()
+        g_ = T.g
+        for e in T.slots[::17]:
+            s = T.slot_of[e]
+            mid, i = g_.entrances[e][0]
+            g.poke("wWarpedFromWhichMap", mid)
+            g.poke("wWarpedFromWhichWarp", i)
+            g.poke(0xFF8B, 0xEE)  # hWarpDestinationMap
+            g.call("RandoWarp")
+            p = T.slots[partners[s]]
+            self.assertEqual((g.peek(0xFF8B), g.peek("wDestinationWarpID")), g_.arrival[p], e)
+
+    def test_warp_without_doors(self):
+        g, T = self.game, self.tables
+        self.built()
+        g.poke("wRandoFlags", KEYS | ITEMS)
+        mid, i = T.g.entrances[T.slots[5]][0]
+        g.poke("wWarpedFromWhichMap", mid)
+        g.poke("wWarpedFromWhichWarp", i)
+        g.poke(0xFF8B, 0xEE)
+        g.call("RandoWarp")
+        self.assertEqual(g.peek(0xFF8B), 0xEE)
+
+    def test_items(self):
+        g, T = self.game, self.tables
+        _, place = self.built()
+        locs = T.C.locs
+        for k, l in enumerate(locs):
+            kind = l["key"][0]
+            if kind == "ball":
+                g.poke("wCurMap", l["map"])
+                g.poke(0xFF8C, l["key"][2])  # hSpriteIndexOrTextID
+                self.assertEqual(g.call("RandoBallItem", de=0x77)["de"] & 0xFF, place[k], l["key"])
+            elif kind == "gift":
+                got = g.call("RandoGiftItem", de=0x7700 | k)["de"] & 0xFF
+                self.assertEqual(got, place[k], l["key"])
+        hidden = [k for k, l in enumerate(locs) if l["key"][0] == "hidden"]
+        table = g.peek(
+            (g.bank("RandoHiddenLocs"), g.addr("RandoHiddenLocs")), len(gen_data.hidden_coords(T.rom))
+        )
+        for index, k in enumerate(table):
+            if k in hidden:
+                g.poke("wHiddenItemOrCoinsIndex", index)
+                g.poke("wHiddenObjectFunctionArgument", 0x77)
+                g.call("RandoHiddenItem")
+                self.assertEqual(g.peek("wHiddenObjectFunctionArgument"), place[k])
+                hidden.remove(k)
+        self.assertEqual(hidden, [])
+
+    def test_items_vanilla_when_off(self):
+        g = self.game
+        self.built()
+        g.poke("wRandoFlags", 0)
+        self.assertEqual(g.call("RandoGiftItem", de=0x7705)["de"] & 0xFF, 0x77)
+
     def test_pairs_are_mutual(self):
         _, partners, _, _ = self.generate(7)
         for s, p in enumerate(partners):

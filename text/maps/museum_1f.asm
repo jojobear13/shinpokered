@@ -91,7 +91,9 @@ _Museum1FText_5c28e::
 
 _ReceivedOldAmberText::
 	text "<PLAYER> received"
-	line "OLD AMBER!@@"
+	line "@"
+	TX_RAM wcf4b
+	text "!@@"
 
 _Museum1FText_5c299::
 	text "Ssh! Get the OLD"

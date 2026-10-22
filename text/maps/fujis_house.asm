@@ -47,7 +47,7 @@ _LavenderHouse1Text_1d94c::
 
 _ReceivedFluteText::
 	text "<PLAYER> received"
-	line "a @"
+	line "@"
 	TX_RAM wcf4b
 	text "!@@"
 

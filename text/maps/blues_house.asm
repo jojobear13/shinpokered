@@ -12,7 +12,7 @@ _DaisyOfferMapText::
 	prompt
 
 _GotMapText::
-	text "<PLAYER> got a"
+	text "<PLAYER> got"
 	line "@"
 	TX_RAM wcf4b
 	text "!@@"

@@ -164,7 +164,9 @@ BillsHouseText2:
 	jr nz, .asm_1e8a9
 	ld hl, BillThankYouText
 	call PrintText
-	lb bc, S_S_TICKET, 1
+	rando_gift BILL, S_S_TICKET
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld hl, SSTicketReceivedText

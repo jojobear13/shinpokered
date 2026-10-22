@@ -19,7 +19,9 @@ FuchsiaHouse3Text1:
 	jr nz, .refused
 
 	;joenote - swap super and good rod locations
-	lb bc, SUPER_ROD, 1
+	rando_gift SUPER_ROD_GURU, SUPER_ROD
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .full
 

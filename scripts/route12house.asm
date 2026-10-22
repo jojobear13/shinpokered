@@ -16,7 +16,9 @@ Route12HouseText1:
 	and a
 	jr nz, .asm_a2d76
 	;joenote - swap super and good rod locations
-	lb bc, GOOD_ROD, 1
+	rando_gift GOOD_ROD_GURU, GOOD_ROD
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld hl, wd728

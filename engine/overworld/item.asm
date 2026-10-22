@@ -24,8 +24,9 @@ PickUpItem:
 	ld d, 0
 	ld e, a
 	add hl, de
-	ld a, [hl]
-	ld b, a ; item
+	ld e, [hl] ; item
+	callba RandoBallItem ; or the randomizer's
+	ld b, e
 	ld c, 1 ; quantity
 	call GiveItem
 	jr nc, .BagFull

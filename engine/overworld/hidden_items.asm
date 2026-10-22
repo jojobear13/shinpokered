@@ -2,6 +2,7 @@ HiddenItems:
 	ld hl, HiddenItemCoords
 	call FindHiddenItemOrCoinsIndex
 	ld [wHiddenItemOrCoinsIndex], a
+	callba RandoHiddenItem ; the randomizer's item
 	ld hl, wObtainedHiddenItemsFlags
 	ld a, [wHiddenItemOrCoinsIndex]
 	ld c, a

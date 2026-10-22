@@ -21,7 +21,7 @@ Route11GateUpstairsText2:
 	jr c, .asm_4949b
 	ld a, 30 ; pokemon needed
 	ld [hOaksAideRequirement], a
-	ld a, ITEMFINDER ; oak's aide reward
+	rando_gift AIDE_ROUTE11, ITEMFINDER ; oak's aide reward
 	ld [hOaksAideRewardItem], a
 	ld [wd11e], a
 	call GetItemName

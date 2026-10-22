@@ -12,7 +12,9 @@ Route16HouseText1:
 	jr nz, .asm_13616
 	ld hl, Route16HouseText3
 	call PrintText
-	lb bc, HM_02, 1
+	rando_gift ROUTE16_GIRL, HM_02
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	SetEvent EVENT_GOT_HM02

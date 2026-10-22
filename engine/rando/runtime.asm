@@ -152,3 +152,129 @@ RandoCloseSRAM:
 RandoBuildingText:
 	db   "Building the world"
 	next "for this seed...@"
+
+; ---- the world, as the player goes
+
+; save RAM bank 1, if the world is built and something in it is shuffled: nc;
+; else carry (and save RAM closed)
+RandoOpenWorld:
+	ld a, [wRandoFlags]
+	and RANDO_WORLD
+	scf
+	ret z
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, 1
+	ld [MBC1SRamBank], a
+	ld a, [sRandoValid]
+	cp RANDO_DATA_VERSION
+	ret z
+	call RandoCloseSRAM
+	scf
+	ret
+
+; WarpFound2: through a shuffled door, to where its partner leads
+RandoWarp::
+	ld a, [wRandoFlags]
+	bit RANDO_DOORS_F, a
+	ret z
+	ld a, [wWarpedFromWhichMap]
+	ld l, a
+	ld h, 0
+	add hl, hl
+	ld de, RandoMapWarps
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	or h
+	ret z                        ; no shuffled doors on this map
+	ld a, [wWarpedFromWhichWarp]
+	ld e, a
+	ld d, 0
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld e, a
+	ld d, [hl]
+	and d
+	inc a
+	ret z                        ; this warp stays
+	call RandoOpenWorld
+	ret c
+	ld hl, sRandoPartner
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	call RandoCloseSRAM
+	ld hl, RandoSlotWarp
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld [hWarpDestinationMap], a
+	ld a, [hl]
+	ld [wDestinationWarpID], a
+	ret
+
+; e = location, d = its vanilla item -> e = the item there
+RandoGiftItem::
+	call RandoOpenWorld
+	jr c, .vanilla
+	ld hl, sRandoPlace
+	ld d, 0
+	add hl, de
+	ld e, [hl]
+	jp RandoCloseSRAM
+.vanilla
+	ld e, d
+	ret
+
+; PickUpItem: e = the ball's vanilla item (hSpriteIndexOrTextID on wCurMap)
+; -> e = the item there
+RandoBallItem::
+	ld d, e
+	ld hl, RandoBallLocs
+	ld a, [hSpriteIndexOrTextID]
+	ld c, a
+	ld a, [wCurMap]
+	ld b, a
+.find
+	ld a, [hli]
+	cp $ff
+	jr z, .vanilla
+	cp b
+	jr nz, .skip
+	ld a, [hl]
+	cp c
+	jr z, .found
+.skip
+	inc hl
+	inc hl
+	jr .find
+.found
+	inc hl
+	ld e, [hl]
+	jr RandoGiftItem
+.vanilla
+	ld e, d
+	ret
+
+; HiddenItems: wHiddenObjectFunctionArgument becomes the item there
+RandoHiddenItem::
+	ld a, [wHiddenItemOrCoinsIndex]
+	ld e, a
+	ld d, 0
+	ld hl, RandoHiddenLocs
+	add hl, de
+	ld a, [hl]
+	cp $ff
+	ret z
+	ld e, a
+	ld a, [wHiddenObjectFunctionArgument]
+	ld d, a
+	call RandoGiftItem
+	ld a, e
+	ld [wHiddenObjectFunctionArgument], a
+	ret

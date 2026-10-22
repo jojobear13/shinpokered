@@ -114,7 +114,9 @@ FanClubText5:
 	; tell the story
 	ld hl, .storytext
 	call PrintText
-	lb bc, BIKE_VOUCHER, 1
+	rando_gift FAN_CLUB, BIKE_VOUCHER
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld hl, .receivedvouchertext

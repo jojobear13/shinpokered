@@ -15,7 +15,9 @@ VermilionHouse2Text1:
 	ld a, [wCurrentMenuItem]
 	and a
 	jr nz, .asm_eb1b7
-	lb bc, OLD_ROD, 1
+	rando_gift OLD_ROD_GURU, OLD_ROD
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld hl, wd728

@@ -202,3 +202,10 @@ ENDM
 MACRO ldPal
 	ld \1, \2 << 6 | \3 << 4 | \4 << 2 | \5
 ENDM
+
+; a gift's item: the vanilla one, or the randomizer's for that location
+MACRO rando_gift ; location (RANDO_LOC_*), vanilla item -> a
+	ld de, (\2) << 8 | RANDO_LOC_\1
+	callba RandoGiftItem
+	ld a, e
+ENDM

@@ -191,7 +191,9 @@ Museum1FText3:
 	jr nz, .asm_5c285
 	ld hl, Museum1FText_5c28e
 	call PrintText
-	lb bc, OLD_AMBER, 1
+	rando_gift MUSEUM, OLD_AMBER
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	SetEvent EVENT_GOT_OLD_AMBER

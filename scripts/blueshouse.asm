@@ -37,7 +37,9 @@ BluesHouseText1:
 .GiveMap
 	ld hl, DaisyOfferMapText
 	call PrintText
-	lb bc, TOWN_MAP, 1
+	rando_gift DAISY, TOWN_MAP
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld a, HS_TOWN_MAP

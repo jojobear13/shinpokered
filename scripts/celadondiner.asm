@@ -31,7 +31,9 @@ CeladonDinerText5:
 	jr nz, .asm_eb14d
 	ld hl, CeladonDinerText_491a7
 	call PrintText
-	lb bc, COIN_CASE, 1
+	rando_gift DINER, COIN_CASE
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	SetEvent EVENT_GOT_COIN_CASE

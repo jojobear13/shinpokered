@@ -22,7 +22,9 @@ SSAnne7Text1:
 	call PrintText
 	ld hl, ReceivingHM01Text
 	call PrintText
-	lb bc, HM_01, 1
+	rando_gift SS_CAPTAIN, HM_01
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld hl, ReceivedHM01Text

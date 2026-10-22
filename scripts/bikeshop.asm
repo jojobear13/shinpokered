@@ -19,7 +19,9 @@ BikeShopText1:
 	jr z, .asm_41190
 	ld hl, BikeShopText_1d81f
 	call PrintText
-	lb bc, BICYCLE, 1
+	rando_gift BIKE_SHOP, BICYCLE
+	ld b, a
+	ld c, 1
 	call GiveItem
 	jr nc, .BagFull
 	ld a, BIKE_VOUCHER
