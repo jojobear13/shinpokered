@@ -59,6 +59,9 @@ SCREEN_WIDTH_PIXELS  EQU SCREEN_WIDTH * 8
 SCREEN_HEIGHT_PIXELS EQU SCREEN_HEIGHT * 8
 
 BYTES_PER_TILE EQU 16
+TILE_WIDTH  EQU  8 ; width of tile in pixels
+TILE_HEIGHT EQU  8 ; height of tile in pixels
+TILE_SIZE   EQU 16 ; size of tile in bytes (2 bits/pixel)
 
 BG_MAP_WIDTH  EQU 32
 BG_MAP_HEIGHT EQU 32

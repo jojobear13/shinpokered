@@ -99,3 +99,17 @@ rUNKNOWN5   EQU $ff75 ; (8Fh) - Bit 4-6 (Read/Write)
 rUNKNOWN6   EQU $ff76 ; (00h) - Always 00h (Read Only)
 rUNKNOWN7   EQU $ff77 ; (00h) - Always 00h (Read Only)
 rIE         EQU $ffff ; Interrupt Enable (R/W)
+
+;OAM Attributes
+def B_OAM_PRIO  equ 7 ; whether the OBJ is drawn below BG colors 1-3
+def B_OAM_YFLIP equ 6 ; whether the whole OBJ is flipped vertically
+def B_OAM_XFLIP equ 5 ; whether the whole OBJ is flipped horizontally
+def B_OAM_PAL1  equ 4 ; (DMG only) which of the two palettes the OBJ uses
+def B_OAM_BANK1 equ 3 ; (CGB only) which VRAM bank the OBJ takes its tile(s) from
+def OAM_PRIO  equ 1 << B_OAM_PRIO
+def OAM_YFLIP equ 1 << B_OAM_YFLIP
+def OAM_XFLIP equ 1 << B_OAM_XFLIP
+def OAM_PAL0  equ 0 << B_OAM_PAL1
+def OAM_PAL1  equ 1 << B_OAM_PAL1
+def OAM_BANK0 equ 0 << B_OAM_BANK1
+def OAM_BANK1 equ 1 << B_OAM_BANK1

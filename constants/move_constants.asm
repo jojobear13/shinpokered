@@ -1,3 +1,6 @@
+NO_MOVE EQU $00
+CANNOT_MOVE EQU $ff
+
 const_value = 1
 
 	const POUND        ; 01
