@@ -27,7 +27,7 @@ AttackAnimationPointers:
 	dw JumpKickAnim
 	dw RollingKickAnim
 	dw SandAttackAnim
-	dw HeatButtAnim
+	dw HeadbuttAnim
 	dw HornAttackAnim
 	dw FuryAttackAnim
 	dw HornDrillAnim
@@ -78,7 +78,7 @@ AttackAnimationPointers:
 	dw PoisonPowderAnim
 	dw StunSporeAnim
 	dw SleepPowderAnim
-	dw PedalDanceAnim
+	dw PetalDanceAnim
 	dw StringShotAnim
 	dw DragonRageAnim
 	dw FireSpinAnim
@@ -164,6 +164,7 @@ AttackAnimationPointers:
 	dw SlashAnim
 	dw SubstituteAnim
 	dw StruggleAnim
+;pointers higher than Struggle are for miscellaneous animations
 	dw ShowPicAnim
 	dw EnemyFlashAnim
 	dw PlayerFlashAnim
@@ -190,7 +191,7 @@ AttackAnimationPointers:
 	dw SleepEnemyAnim
 	dw ConfusedPlayerAnim
 	dw ConfusedEnemyAnim
-	dw FaintAnim	;C0
+	dw SlideDownAnim	;C0
 	dw BallTossAnim
 	dw BallShakeAnim
 	dw BallPoofAnim
@@ -208,7 +209,30 @@ AttackAnimationPointers:
 ;	db tileset_and_delay, sound_id, subanimation_id
 ; if first byte >= $D8
 ;	db special_effect_id, sound_id
-; $FF terminated
+; $FF terminated (-1 is the same as $FF)
+
+;Simplifying this structure with a macro
+
+;\1: sound_id
+;\2: special_effect_id or subanimation_id
+; if \2 is a subanimation_id:
+;\3: tileset_id
+;\4: delay
+MACRO battle_anim
+	IF _NARG == 4
+		db (\3 << 6) | \4
+		db \1 - 1
+		db \2
+	ELSE
+		db \2
+		db \1 - 1
+	ENDC
+ENDM
+
+; The 0 or 1 in the name of a subanim indicates whether to use tileset 0 or 1.
+; "Both" indicates either can be used for different images using the same animation.
+
+
 ZigZagScreenAnim:
 	db SE_WAVY_SCREEN, $FF
 	db $FF
@@ -228,1984 +252,1999 @@ DoubleSlapAnim:
 	db $FF
 
 CometPunchAnim:
-	db $04,$03,$02
-	db $04,$03,$02
-	db $FF
+	battle_anim COMET_PUNCH, SUBANIM_0_STAR_THRICE, 0, 4
+	battle_anim COMET_PUNCH, SUBANIM_0_STAR_THRICE, 0, 4
+	db -1 ; end
 
 MegaPunchAnim:
-	db $46,$04,$04
-	db $FF
+	battle_anim MEGA_PUNCH, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 PayDayAnim:
-	db $08,$00,$01
-	db $04,$05,$52
-	db $FF
+	battle_anim POUND, SUBANIM_0_STAR_TWICE, 0, 8
+	battle_anim PAY_DAY, SUBANIM_0_COIN_BOUNCE, 0, 4
+	db -1 ; end
 
 FirePunchAnim:
-	db $06,$06,$02
-	db $46,$FF,$11
-	db $FF
+	battle_anim FIRE_PUNCH, SUBANIM_0_STAR_THRICE, 0, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAMES, 1, 6
+	db -1 ; end
 
 IcePunchAnim:
-	db $06,$07,$02
-	db $10,$FF,$2F
-	db $FF
+	battle_anim ICE_PUNCH, SUBANIM_0_STAR_THRICE, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_ICE_RISE, 0, 16
+	db -1 ; end
 
 ThunderPunchAnim:
-	db $06,$08,$02
-	db SE_DARK_SCREEN_PALETTE, $FF
-	db $46,$FF,$2B
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim THUNDERPUNCH, SUBANIM_0_STAR_THRICE, 0, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_1_LIGHTNING, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ScratchAnim:
-	db $06,$09,$0F
-	db $FF
+	battle_anim SCRATCH, SUBANIM_0_SCRATCHES, 0, 6
+	db -1 ; end
 
 VicegripAnim:
-	db $08,$0A,$2A
-	db $FF
+	battle_anim VICEGRIP, SUBANIM_0_SLICE_BOTH_SIDES, 0, 8
+	db -1 ; end
 
 GuillotineAnim:
-	db $06,$0B,$2A
-	db $FF
+	battle_anim GUILLOTINE, SUBANIM_0_SLICE_BOTH_SIDES, 0, 6
+	db -1 ; end
 
 RazorWindAnim:
-	db $04,$0C,$16
-	db $FF
+	battle_anim RAZOR_WIND, SUBANIM_0_SLICE, 0, 4
+	db -1 ; end
 
 SwordsDanceAnim:
-	db $46,$0D,$18
-	db $46,$0D,$18
-	db $46,$0D,$18
-	db $FF
+	battle_anim SWORDS_DANCE, SUBANIM_1_SWORDS_CIRCLING, 1, 6
+	battle_anim SWORDS_DANCE, SUBANIM_1_SWORDS_CIRCLING, 1, 6
+	battle_anim SWORDS_DANCE, SUBANIM_1_SWORDS_CIRCLING, 1, 6
+	db -1 ; end
 
 CutAnim:
-	db SE_DARK_SCREEN_FLASH, $0E
-	db $04,$FF,$16
-	db $FF
+	battle_anim CUT, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_0_SLICE, 0, 4
+	db -1 ; end
 
 GustAnim:
-	db $46,$0F,$10
-	db $06,$FF,$02
-	db $FF
+	battle_anim GUST, SUBANIM_1_TORNADO, 1, 6
+	battle_anim NO_MOVE, SUBANIM_0_STAR_THRICE, 0, 6
+	db -1 ; end
 
 WingAttackAnim:
-	db $46,$10,$04
-	db $FF
+	battle_anim WING_ATTACK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 WhirlwindAnim:
-	db $46,$11,$10
-	db SE_SLIDE_ENEMY_MON_OFF, $FF
-	db $FF
+	battle_anim WHIRLWIND, SUBANIM_1_TORNADO, 1, 6
+	battle_anim NO_MOVE, SE_SLIDE_ENEMY_MON_OFF
+	db -1 ; end
 
 FlyAnim:
-	db $46,$12,$04
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim FLY, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 BindAnim:
-	db $04,$13,$23
-	db $04,$13,$23
-	db $FF
+	battle_anim BIND, SUBANIM_0_BIND, 0, 4
+	battle_anim BIND, SUBANIM_0_BIND, 0, 4
+	db -1 ; end
 
 SlamAnim:
-	db $06,$14,$02
-	db $FF
+	battle_anim SLAM, SUBANIM_0_STAR_THRICE, 0, 6
+	db -1 ; end
 
 VineWhipAnim:
-	db $01,$15,$16
-	db $08,$FF,$01
-	db $FF
+	battle_anim VINE_WHIP, SUBANIM_0_SLICE, 0, 1
+	battle_anim NO_MOVE, SUBANIM_0_STAR_TWICE, 0, 8
+	db -1 ; end
 
 StompAnim:
-	db $48,$16,$05
-	db $FF
+	battle_anim STOMP, SUBANIM_1_STAR_BIG, 1, 8
+	db -1 ; end
 
 DoubleKickAnim:
-	db $08,$17,$01
-	db $08,$17,$01
-	db $FF
+	battle_anim DOUBLE_KICK, SUBANIM_0_STAR_TWICE, 0, 8
+	battle_anim DOUBLE_KICK, SUBANIM_0_STAR_TWICE, 0, 8
+	db -1 ; end
 
 MegaKickAnim:
-	db $46,$18,$04
-	db $FF
+	battle_anim MEGA_KICK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 JumpKickAnim:
-	db $46,$19,$04
-	db $FF
+	battle_anim JUMP_KICK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 RollingKickAnim:
-	db SE_DARK_SCREEN_FLASH, $1A
-	db $46,$FF,$04
-	db $FF
+	battle_anim ROLLING_KICK, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 SandAttackAnim:
-	db $46,$1B,$28
-	db $FF
+	battle_anim SAND_ATTACK, SUBANIM_1_SAND, 1, 6
+	db -1 ; end
 
-HeatButtAnim:
-	db $46,$1C,$05
-	db $FF
+HeadbuttAnim:
+	battle_anim HEADBUTT, SUBANIM_1_STAR_BIG, 1, 6
+	db -1 ; end
 
 HornAttackAnim:
-	db $06,$1D,$45
-	db $46,$FF,$05
-	db $FF
+	battle_anim HORN_ATTACK, SUBANIM_0_HORN_JAB_TWICE, 0, 6
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 6
+	db -1 ; end
 
 FuryAttackAnim:
-	db $02,$1E,$46
-	db $02,$FF,$46
-	db $FF
+	battle_anim FURY_ATTACK, SUBANIM_0_HORN_JAB_THRICE, 0, 2
+	battle_anim NO_MOVE, SUBANIM_0_HORN_JAB_THRICE, 0, 2
+	db -1 ; end
 
 HornDrillAnim:
-	db $42,$1F,$05
-	db $42,$FF,$05
-	db $42,$FF,$05
-	db $42,$FF,$05
-	db $42,$FF,$05
-	db $FF
+	battle_anim HORN_DRILL, SUBANIM_1_STAR_BIG, 1, 2
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 2
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 2
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 2
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 2
+	db -1 ; end
 
 TackleAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $48
-	db SE_RESET_MON_POSITION, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_RESET_MON_POSITION
+	db -1 ; end
 
 BodySlamAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $48
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_MON_POSITION, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_MON_POSITION
+	db -1 ; end
 
 WrapAnim:
-	db $04,$22,$23
-	db $04,$22,$23
-	db $04,$22,$23
-	db $FF
+	battle_anim WRAP, SUBANIM_0_BIND, 0, 4
+	battle_anim WRAP, SUBANIM_0_BIND, 0, 4
+	battle_anim WRAP, SUBANIM_0_BIND, 0, 4
+	db -1 ; end
 
 TakeDownAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $48
-	db SE_DARK_SCREEN_FLASH, $23
-	db SE_RESET_MON_POSITION, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_MOVE_MON_HORIZONTALLY
+	battle_anim TAKE_DOWN, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_MON_POSITION
+	db -1 ; end
 
 ThrashAnim:
-	db $46,$24,$04
-	db $FF
+	battle_anim THRASH, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 DoubleEdgeAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $48
-	db $06,$FF,$2D
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db SE_MOVE_MON_HORIZONTALLY, $FF
-	db SE_DARK_SCREEN_FLASH, $25
-	db SE_RESET_MON_POSITION, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_CENTERING, 0, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_MOVE_MON_HORIZONTALLY
+	battle_anim DOUBLE_EDGE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_MON_POSITION
+	db -1 ; end
 
 TailWhipAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_RESET_MON_POSITION, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_MOVE_MON_HORIZONTALLY, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_RESET_MON_POSITION, $84
-	db $FF
+	battle_anim AMNESIA, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_RESET_MON_POSITION
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_RESET_MON_POSITION
+	db -1 ; end
 
 PoisonStingAnim:
-	db $06,$27,$00
-	db $FF
+	battle_anim POISON_STING, SUBANIM_0_STAR, 0, 6
+	db -1 ; end
 
 TwineedleAnim:
-	db $05,$28,$01
-	db $05,$28,$01
-	db $FF
+	battle_anim TWINEEDLE, SUBANIM_0_STAR_TWICE, 0, 5
+	battle_anim TWINEEDLE, SUBANIM_0_STAR_TWICE, 0, 5
+	db -1 ; end
 
 PinMissileAnim:
-	db $03,$29,$01
-	db $FF
+	battle_anim PIN_MISSILE, SUBANIM_0_STAR_TWICE, 0, 3
+	db -1 ; end
 
 LeerAnim:
-	db SE_DARK_SCREEN_PALETTE, $48
-	db SE_DARK_SCREEN_FLASH, $2A
-	db SE_DARK_SCREEN_FLASH, $2A
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARK_SCREEN_PALETTE
+	battle_anim LEER, SE_DARK_SCREEN_FLASH
+	battle_anim LEER, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 BiteAnim:
-	db $08,$2B,$02
-	db $FF
+	battle_anim BITE, SUBANIM_0_STAR_THRICE, 0, 8
+	db -1 ; end
 
 GrowlAnim:
-	db $46,$2C,$12
-	db $FF
+	battle_anim GROWL, SUBANIM_0_HEART_1_MUSIC, 1, 6
+	db -1 ; end
 
 RoarAnim:
-	db $46,$2D,$15
-	db $46,$2D,$15
-	db $46,$2D,$15
-	db $FF
+	battle_anim ROAR, SUBANIM_1_SHOUT, 1, 6
+	battle_anim ROAR, SUBANIM_1_SHOUT, 1, 6
+	battle_anim ROAR, SUBANIM_1_SHOUT, 1, 6
+	db -1 ; end
 
 SingAnim:
-	db $46,$2E,$12
-	db $50,$FF,$40
-	db $50,$FF,$40
-	db $FF
+	battle_anim SING, SUBANIM_0_HEART_1_MUSIC, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_MUSIC_CIRCLING_ENEMY, 1, 16
+	battle_anim NO_MOVE, SUBANIM_1_MUSIC_CIRCLING_ENEMY, 1, 16
+	db -1 ; end
 
 SupersonicAnim:
-	db $06,$2F,$31
-	db $FF
+	battle_anim SUPERSONIC, SUBANIM_0_SOUND_WAVE, 0, 6
+	db -1 ; end
 
 SonicBoomAnim:
-	db $46,$2D,$15
-	db $46,$2D,$15
-	db $46,$0F,$10
-	db $46,$FF,$05
-	db $FF
+	battle_anim ROAR, SUBANIM_1_SHOUT, 1, 6
+	battle_anim ROAR, SUBANIM_1_SHOUT, 1, 6
+	battle_anim GUST, SUBANIM_1_TORNADO, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG, 1, 6
+	db -1 ; end
 
 DisableAnim:
-	db SE_DARK_SCREEN_PALETTE, $48
-	db SE_DARK_SCREEN_FLASH, $2A
-	db SE_DARK_SCREEN_FLASH, $2A
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARK_SCREEN_PALETTE
+	battle_anim LEER, SE_DARK_SCREEN_FLASH
+	battle_anim LEER, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 AcidAnim:
-	db $46,$32,$13
-	db $46,$32,$14
-	db $FF
+	battle_anim ACID, SUBANIM_1_BLOB_TOSS, 1, 6
+	battle_anim ACID, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
+	db -1 ; end
 
 EmberAnim:
-	db $46,$33,$11
-	db $FF
+	battle_anim EMBER, SUBANIM_1_FLAMES, 1, 6
+	db -1 ; end
 
 FlamethrowerAnim:
-	db $46,$34,$1F
-	db $46,$34,$0C
-	db $46,$34,$0D
-	db $FF
+	battle_anim FLAMETHROWER, SUBANIM_1_FLAME_BEAM, 1, 6
+	battle_anim FLAMETHROWER, SUBANIM_1_FLAME_COLUMN_1, 1, 6
+	battle_anim FLAMETHROWER, SUBANIM_1_FLAME_COLUMN_2, 1, 6
+	db -1 ; end
 
 MistAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db SE_WATER_DROPLETS_EVERYWHERE, $38
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim SURF, SE_WATER_DROPLETS_EVERYWHERE
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 WaterGunAnim:
-	db $06,$36,$2C
-	db $FF
+	battle_anim WATER_GUN, SUBANIM_0_WATER_DROPLETS, 0, 6
+	db -1 ; end
 
 HydroPumpAnim:
-	db $06,$37,$1A
-	db $06,$37,$1A
-	db $FF
+	battle_anim HYDRO_PUMP, SUBANIM_0_WATER_COLUMNS, 0, 6
+	battle_anim HYDRO_PUMP, SUBANIM_0_WATER_COLUMNS, 0, 6
+	db -1 ; end
 
 SurfAnim:
-	db SE_WATER_DROPLETS_EVERYWHERE, $38
-	db $06,$37,$1A
-	db $FF
+	battle_anim SURF, SE_WATER_DROPLETS_EVERYWHERE
+	battle_anim HYDRO_PUMP, SUBANIM_0_WATER_COLUMNS, 0, 6
+	db -1 ; end
 
 IceBeamAnim:
-	db $03,$39,$2E
-	db $10,$FF,$2F
-	db $FF
+	battle_anim ICE_BEAM, SUBANIM_0_BEAM, 0, 3
+	battle_anim NO_MOVE, SUBANIM_0_ICE_RISE, 0, 16
+	db -1 ; end
 
 BlizzardAnim:
-	db $04,$3A,$38
-	db $04,$37,$38
-	db $FF
+	battle_anim BLIZZARD, SUBANIM_0_ICE_FALL, 0, 4
+	battle_anim HYDRO_PUMP, SUBANIM_0_ICE_FALL, 0, 4
+	db -1 ; end
 
 PsyBeamAnim:
-	db $03,$3B,$2E
-	db SE_FLASH_SCREEN_LONG, $FF
-	db $FF
+	battle_anim PSYBEAM, SUBANIM_0_BEAM, 0, 3
+	battle_anim NO_MOVE, SE_FLASH_SCREEN_LONG
+	db -1 ; end
 
 BubbleBeamAnim:
-	db $12,$3C,$35
-	db $FF
+	battle_anim BUBBLEBEAM, SUBANIM_0_WATER_BUBBLES, 0, 18
+	db -1 ; end
 
 AuroraBeamAnim:
-	db $03,$3D,$2E
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db $FF
+	battle_anim AURORA_BEAM, SUBANIM_0_BEAM, 0, 3
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	db -1 ; end
 
 HyperBeamAnim:
-	db SE_DARK_SCREEN_PALETTE, $48
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db $02,$3E,$2E
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $46,$04,$04
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim HYPER_BEAM, SUBANIM_0_BEAM, 0, 2
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim MEGA_PUNCH, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 PeckAnim:
-	db $08,$3F,$01
-	db $FF
+	battle_anim PECK, SUBANIM_0_STAR_TWICE, 0, 8
+	db -1 ; end
 
 DrillPeckAnim:
-	db $46,$40,$04
-	db $FF
+	battle_anim DRILL_PECK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 SubmissionAnim:
-	db SE_SLIDE_MON_OFF, $41
-	db $06,$FF,$01
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim SUBMISSION, SE_SLIDE_MON_OFF
+	battle_anim NO_MOVE, SUBANIM_0_STAR_TWICE, 0, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 LowKickAnim:
-	db SE_SLIDE_MON_OFF, $42
-	db $46,$FF,$04
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim LOW_KICK, SE_SLIDE_MON_OFF
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 CounterAnim:
-	db SE_SLIDE_MON_OFF, $43
-	db $46,$FF,$04
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim COUNTER, SE_SLIDE_MON_OFF
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 SeismicTossAnim:
-	db SE_BLINK_ENEMY_MON, $FF
-	db $41,$8B,$4E
-	db SE_HIDE_ENEMY_MON_PIC, $FF
-	db SE_SLIDE_MON_OFF, $FF
-	db $42,$44,$4F
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_SHOW_MON_PIC, $FF
-	db $41,$44,$50
-	db SE_SHOW_ENEMY_MON_PIC, $FF
-	db SE_SHAKE_SCREEN, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_BLINK_ENEMY_MON
+	battle_anim BARRAGE, SUBANIM_1_SPHERE_BIG, 1, 1
+	battle_anim NO_MOVE, SE_HIDE_ENEMY_MON_PIC
+	battle_anim NO_MOVE, SE_SLIDE_MON_OFF
+	battle_anim SEISMIC_TOSS, SUBANIM_1_SPHERE_BIG_RISE, 1, 2
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	battle_anim SEISMIC_TOSS, SUBANIM_1_SPHERE_BIG_FALL, 1, 1
+	battle_anim NO_MOVE, SE_SHOW_ENEMY_MON_PIC
+	battle_anim NO_MOVE, SE_SHAKE_SCREEN
+	db -1 ; end
 
 StrengthAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $48
-	db SE_RESET_MON_POSITION, $FF
-	db $46,$06,$04
-	db $FF
+	battle_anim LEECH_SEED, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_RESET_MON_POSITION
+	battle_anim FIRE_PUNCH, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 AbsorbAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $46
-	db $06,$FF,$21
-	db $06,$FF,$22
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim ABSORB, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 0, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 MegaDrainAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $47
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $06,$FF,$21
-	db $06,$FF,$22
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim MEGA_DRAIN, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 0, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 LeechSeedAnim:
-	db $46,$48,$1B
-	db $55,$4D,$1C
-	db $FF
+	battle_anim LEECH_SEED, SUBANIM_1_SEED_TOSS, 1, 6
+	battle_anim STUN_SPORE, SUBANIM_1_SEED_LAND, 1, 21
+	db -1 ; end
 
 GrowthAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $49
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim GROWTH, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 RazorLeafAnim:
-	db SE_LEAVES_FALLING, $4A
-	db $41,$80,$44
-	db $01,$0C,$16
-	db $FF
+	battle_anim RAZOR_LEAF, SE_LEAVES_FALLING
+	battle_anim SWIFT, SUBANIM_1_LEAVES_TOSS, 1, 1
+	battle_anim RAZOR_WIND, SUBANIM_0_SLICE, 0, 1
+	db -1 ; end
 
 SolarBeamAnim:
-	db $06,$4B,$2E
-	db $06,$FF,$01
-	db $FF
+	battle_anim SOLARBEAM, SUBANIM_0_BEAM, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_STAR_TWICE, 0, 6
+	db -1 ; end
 
 PoisonPowderAnim:
-	db $06,$4C,$36
-	db $FF
+	battle_anim POISONPOWDER, SUBANIM_0_CIRCLES_FALLING, 0, 6
+	db -1 ; end
 
 StunSporeAnim:
-	db $06,$4D,$36
-	db $FF
+	battle_anim STUN_SPORE, SUBANIM_0_CIRCLES_FALLING, 0, 6
+	db -1 ; end
 
 SleepPowderAnim:
-	db $06,$4E,$36
-	db $FF
+	battle_anim SLEEP_POWDER, SUBANIM_0_CIRCLES_FALLING, 0, 6
+	db -1 ; end
 
-PedalDanceAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $4F
-	db SE_PETALS_FALLING, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+PetalDanceAnim:
+	battle_anim PETAL_DANCE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_PETALS_FALLING
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 StringShotAnim:
-	db $08,$50,$37
-	db $FF
+	battle_anim STRING_SHOT, SUBANIM_0_STRING_SHOT, 0, 8
+	db -1 ; end
 
 DragonRageAnim:
-	db $46,$51,$1F
-	db $46,$FF,$0C
-	db $46,$FF,$0D
-	db $46,$FF,$0E
-	db $FF
+	battle_anim DRAGON_RAGE, SUBANIM_1_FLAME_BEAM, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_1, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_2, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_3, 1, 6
+	db -1 ; end
 
 FireSpinAnim:
-	db $46,$52,$0C
-	db $46,$FF,$0D
-	db $46,$FF,$0E
-	db $FF
+	battle_anim FIRE_SPIN, SUBANIM_1_FLAME_COLUMN_1, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_2, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_3, 1, 6
+	db -1 ; end
 
 ThunderShockAnim:
-	db $42,$53,$29
-	db $FF
+	battle_anim THUNDERSHOCK, SUBANIM_1_LIGHTNING_BALL, 1, 2
+	db -1 ; end
 
 ThunderBoltAnim:
-	db $41,$54,$29
-	db $41,$54,$29
-	db $FF
+	battle_anim THUNDERBOLT, SUBANIM_1_LIGHTNING_BALL, 1, 1
+	battle_anim THUNDERBOLT, SUBANIM_1_LIGHTNING_BALL, 1, 1
+	db -1 ; end
 
 ThunderWaveAnim:
-	db $42,$55,$29
-	db $02,$FF,$23
-	db $04,$FF,$23
-	db $FF
+	battle_anim THUNDER_WAVE, SUBANIM_1_LIGHTNING_BALL, 1, 2
+	battle_anim NO_MOVE, SUBANIM_0_BIND, 0, 2
+	battle_anim NO_MOVE, SUBANIM_0_BIND, 0, 4
+	db -1 ; end
 
 ThunderAnim:
-	db SE_DARK_SCREEN_PALETTE, $56
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $46,$FF,$2B
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $42,$54,$29
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim THUNDER, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_1_LIGHTNING, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim THUNDERBOLT, SUBANIM_1_LIGHTNING_BALL, 1, 2
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 RockThrowAnim:
-	db $04,$57,$30
-	db $FF
+	battle_anim ROCK_THROW, SUBANIM_0_ROCKS_FALL_ENEMY, 0, 4
+	db -1 ; end
 
 EarthquakeAnim:
-	db SE_SHAKE_SCREEN, $58
-	db SE_SHAKE_SCREEN, $58
-	db $FF
+	battle_anim EARTHQUAKE, SE_SHAKE_SCREEN
+	battle_anim EARTHQUAKE, SE_SHAKE_SCREEN
+	db -1 ; end
 
 FissureAnim:
-	db SE_DARK_SCREEN_FLASH, $59
-	db SE_SHAKE_SCREEN, $FF
-	db SE_DARK_SCREEN_FLASH, $59
-	db SE_SHAKE_SCREEN, $FF
-	db $FF
+	battle_anim FISSURE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_SHAKE_SCREEN
+	battle_anim FISSURE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_SHAKE_SCREEN
+	db -1 ; end
 
 DigAnim:
-	db $46,$5A,$04
-	db SE_SLIDE_MON_UP, $FF
-	db $FF
+	battle_anim DIG, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SLIDE_MON_UP
+	db -1 ; end
 
 ToxicAnim:
-	db SE_WATER_DROPLETS_EVERYWHERE, $38
-	db $46,$5B,$14
-	db $FF
+	battle_anim SURF, SE_WATER_DROPLETS_EVERYWHERE
+	battle_anim TOXIC, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
+	db -1 ; end
 
 ConfusionAnim:
-	db SE_FLASH_SCREEN_LONG, $5C
-	db $FF
+	battle_anim CONFUSION, SE_FLASH_SCREEN_LONG
+	db -1 ; end
 
 PsychicAnim:
-	db SE_FLASH_SCREEN_LONG, $5D
-	db SE_WAVY_SCREEN, $FF
-	db $FF
+	battle_anim PSYCHIC_M, SE_FLASH_SCREEN_LONG
+	battle_anim NO_MOVE, SE_WAVY_SCREEN
+	db -1 ; end
 
 HypnosisAnim:
-	db SE_FLASH_SCREEN_LONG, $5E
-	db $FF
+	battle_anim HYPNOSIS, SE_FLASH_SCREEN_LONG
+	db -1 ; end
 
 MeditateAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $5F
-	db $46,$FF,$43
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim MEDITATE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 AgilityAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $60
+	battle_anim AGILITY, SE_LIGHT_SCREEN_PALETTE
 	db SE_DELAY_ANIMATION_10, $FF	;joenote - added this to make the animation more obvious
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 QuickAttackAnim:
-	db SE_SLIDE_MON_OFF, $61
-	db $46,$FF,$04
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim QUICK_ATTACK, SE_SLIDE_MON_OFF
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 RageAnim:
-	db $06,$62,$01
-	db $FF
+	battle_anim RAGE, SUBANIM_0_STAR_TWICE, 0, 6
+	db -1 ; end
 
 TeleportAnim:
-	db SE_SQUISH_MON_PIC, $63
-	db SE_SHOOT_BALLS_UPWARD, $FF
-	db $FF
+	battle_anim TELEPORT, SE_SQUISH_MON_PIC
+	battle_anim NO_MOVE, SE_SHOOT_BALLS_UPWARD
+	db -1 ; end
 
 NightShadeAnim:
-	db SE_FLASH_SCREEN_LONG, $5C
-	db SE_WAVY_SCREEN, $FF
-	db $FF
+	battle_anim CONFUSION, SE_FLASH_SCREEN_LONG
+	battle_anim NO_MOVE, SE_WAVY_SCREEN
+	db -1 ; end
 
 MimicAnim:
-	db $46,$65,$21
-	db $46,$65,$22
-	db $FF
+	battle_anim MIMIC, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 1, 6
+	battle_anim MIMIC, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 1, 6
+	db -1 ; end
 
 ScreechAnim:
-	db $46,$66,$12
-	db $FF
+	battle_anim SCREECH, SUBANIM_0_HEART_1_MUSIC, 1, 6
+	db -1 ; end
 
 DoubleTeamAnim:
-	db SE_DARK_SCREEN_PALETTE, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db SE_SHAKE_BACK_AND_FORTH, $67
-	db SE_SHOW_MON_PIC, $FF
-	db $46,$6F,$33
-	db $FF
+	battle_anim NO_MOVE, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	battle_anim DOUBLE_TEAM, SE_SHAKE_BACK_AND_FORTH
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	battle_anim BARRIER, SUBANIM_1_BARRIER, 1, 6
+	db -1 ; end
 
 RecoverAnim:
-	db SE_BLINK_MON, $68
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim RECOVER, SE_BLINK_MON
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 HardenAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $69
-	db $46,$FF,$43
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim HARDEN, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 MinimizeAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $6A
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_MINIMIZE_MON, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim MINIMIZE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_MINIMIZE_MON
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 SmokeScreenAnim:
-	db $46,$6B,$28
-	db $04,$FF,$0A
-	db SE_DARKEN_MON_PALETTE, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DARK_SCREEN_PALETTE, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_DARKEN_MON_PALETTE, $FF
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim SMOKESCREEN, SUBANIM_1_SAND, 1, 6
+	battle_anim NO_MOVE, SUBANIM_0_BALL_POOF_ENEMY, 0, 4
+	battle_anim NO_MOVE, SE_DARKEN_MON_PALETTE
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_DARKEN_MON_PALETTE
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ConfuseRayAnim:
-	db SE_DARK_SCREEN_PALETTE, $6C
-	db $46,$FF,$3E
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim CONFUSE_RAY, SE_DARK_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_1_STAR_BIG_TOSS, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 WithdrawAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $6E
-	db SE_SLIDE_MON_DOWN, $FF
-	db $06,$FF,$51
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim DEFENSE_CURL, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SLIDE_MON_DOWN
+	battle_anim NO_MOVE, SUBANIM_0_SHELL, 0, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 DefenseCurlAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $6E
-	db $06,$FF,$43
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim DEFENSE_CURL, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 0, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 BarrierAnim:
-	db $46,$6F,$33
-	db $46,$6F,$33
-	db $FF
+	battle_anim BARRIER, SUBANIM_1_BARRIER, 1, 6
+	battle_anim BARRIER, SUBANIM_1_BARRIER, 1, 6
+	db -1 ; end
 
 LightScreenAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db $46,$70,$33
-	db $46,$70,$33
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim LIGHT_SCREEN, SUBANIM_1_BARRIER, 1, 6
+	battle_anim LIGHT_SCREEN, SUBANIM_1_BARRIER, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 HazeAnim:
-	db SE_DARKEN_MON_PALETTE, $FF
-	db SE_WATER_DROPLETS_EVERYWHERE, $38
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_DARKEN_MON_PALETTE
+	battle_anim SURF, SE_WATER_DROPLETS_EVERYWHERE
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ReflectAnim:
-	db SE_DARK_SCREEN_PALETTE, $FF
-	db $46,$72,$33
-	db $46,$72,$33
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_DARK_SCREEN_PALETTE
+	battle_anim REFLECT, SUBANIM_1_BARRIER, 1, 6
+	battle_anim REFLECT, SUBANIM_1_BARRIER, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 FocusEnergyAnim:
-	db SE_SPIRAL_BALLS_INWARD, $73
-	db $FF
+	battle_anim FOCUS_ENERGY, SE_SPIRAL_BALLS_INWARD
+	db -1 ; end
 
 BideAnim:
-	db $46,$74,$04
-	db $FF
+	battle_anim BIDE, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 MetronomeAnim:
-	db SE_MOVE_MON_HORIZONTALLY, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_RESET_MON_POSITION, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_MOVE_MON_HORIZONTALLY, $84
-	db SE_DELAY_ANIMATION_10, $FF
-	db SE_RESET_MON_POSITION, $84
-	db $FF
+	battle_anim AMNESIA, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_RESET_MON_POSITION
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_MOVE_MON_HORIZONTALLY
+	battle_anim NO_MOVE, SE_DELAY_ANIMATION_10
+	battle_anim AMNESIA, SE_RESET_MON_POSITION
+	db -1 ; end
 
 MirrorMoveAnim:
-	db $08,$76,$01
-	db $FF
+	battle_anim MIRROR_MOVE, SUBANIM_0_STAR_TWICE, 0, 8
+	db -1 ; end
 
 SelfdestructAnim:
-	db $43,$77,$34
-	db $FF
+	battle_anim SELFDESTRUCT, SUBANIM_1_SELFDESTRUCT, 1, 3
+	db -1 ; end
 
 EggBombAnim:
-	db $44,$78,$41
-	db $44,$78,$42
-	db $FF
+	battle_anim EGG_BOMB, SUBANIM_1_CIRCLE_BLACK_TOSS, 1, 4
+	battle_anim EGG_BOMB, SUBANIM_1_EXPLOSION_SMALL_ENEMY, 1, 4
+	db -1 ; end
 
 LickAnim:
-	db $46,$7B,$14
-	db $FF
+	battle_anim SLUDGE, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
+	db -1 ; end
 
 SmogAnim:
-	db SE_DARKEN_MON_PALETTE, $48
-	db $46,$7A,$19
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARKEN_MON_PALETTE
+	battle_anim SMOG, SUBANIM_1_CLOUD_TOSS, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 SludgeAnim:
-	db $46,$7B,$13
-	db $46,$7B,$14
-	db $FF
+	battle_anim SLUDGE, SUBANIM_1_BLOB_TOSS, 1, 6
+	battle_anim SLUDGE, SUBANIM_1_BLOB_DRIP_ENEMY, 1, 6
+	db -1 ; end
 
 BoneClubAnim:
-	db $08,$7C,$02
-	db $FF
+	battle_anim BONE_CLUB, SUBANIM_0_STAR_THRICE, 0, 8
+	db -1 ; end
 
 FireBlastAnim:
-	db $46,$7D,$1F
-	db $46,$FF,$20
-	db $46,$FF,$20
-	db $46,$FF,$0C
-	db $46,$FF,$0D
-	db $FF
+	battle_anim FIRE_BLAST, SUBANIM_1_FLAME_BEAM, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_STAR, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_STAR, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_1, 1, 6
+	battle_anim NO_MOVE, SUBANIM_1_FLAME_COLUMN_2, 1, 6
+	db -1 ; end
 
 WaterfallAnim:
-	db SE_SLIDE_MON_DOWN, $48
-	db $06,$37,$1A
-	db $08,$FF,$02
-	db SE_SLIDE_MON_UP, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_SLIDE_MON_DOWN
+	battle_anim HYDRO_PUMP, SUBANIM_0_WATER_COLUMNS, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_STAR_THRICE, 0, 8
+	battle_anim NO_MOVE, SE_SLIDE_MON_UP
+	db -1 ; end
 
 ClampAnim:
-	db $08,$7F,$2A
-	db $06,$83,$23
-	db $06,$83,$23
-	db $FF
+	battle_anim CLAMP, SUBANIM_0_SLICE_BOTH_SIDES, 0, 8
+	battle_anim CONSTRICT, SUBANIM_0_BIND, 0, 6
+	battle_anim CONSTRICT, SUBANIM_0_BIND, 0, 6
+	db -1 ; end
 
 SwiftAnim:
-	db $43,$80,$3F
-	db $FF
+	battle_anim SWIFT, SUBANIM_1_STARS_SMALL_TOSS, 1, 3
+	db -1 ; end
 
 SkullBashAnim:
-	db $46,$81,$05
-	db $FF
+	battle_anim SKULL_BASH, SUBANIM_1_STAR_BIG, 1, 6
+	db -1 ; end
 
 SpikeCannonAnim:
-	db $44,$82,$04
-	db $FF
+	battle_anim SPIKE_CANNON, SUBANIM_1_STAR_BIG_MOVING, 1, 4
+	db -1 ; end
 
 ConstrictAnim:
-	db $06,$83,$23
-	db $06,$83,$23
-	db $06,$83,$23
-	db $FF
+	battle_anim CONSTRICT, SUBANIM_0_BIND, 0, 6
+	battle_anim CONSTRICT, SUBANIM_0_BIND, 0, 6
+	battle_anim CONSTRICT, SUBANIM_0_BIND, 0, 6
+	db -1 ; end
 
 AmnesiaAnim:
-	db $08,$84,$25
-	db $08,$84,$25
-	db $FF
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED, 0, 8
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED, 0, 8
+	db -1 ; end
 
 KinesisAnim:
-	db $08,$85,$01
-	db $FF
+	battle_anim KINESIS, SUBANIM_0_STAR_TWICE, 0, 8
+	db -1 ; end
 
 SoftboiledAnim:
-	db SE_SLIDE_MON_HALF_OFF, $48
-	db $08,$86,$4C
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_SLIDE_MON_HALF_OFF
+	battle_anim SOFTBOILED, SUBANIM_0_EGG_SHAKING, 0, 8
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 HiJumpKickAnim:
-	db $46,$87,$04
-	db $FF
+	battle_anim HI_JUMP_KICK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 GlareAnim:
-	db SE_DARK_SCREEN_PALETTE, $48
-	db SE_DARK_SCREEN_FLASH, $88
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARK_SCREEN_PALETTE
+	battle_anim GLARE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 DreamEaterAnim:
-	db SE_FLASH_SCREEN_LONG, $89
-	db SE_DARK_SCREEN_PALETTE, $89
-	db $08,$89,$02
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim DREAM_EATER, SE_FLASH_SCREEN_LONG
+	battle_anim DREAM_EATER, SE_DARK_SCREEN_PALETTE
+	battle_anim DREAM_EATER, SUBANIM_0_STAR_THRICE, 0, 8
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 PoisonGasAnim:
-	db $46,$8A,$19
-	db $FF
+	battle_anim POISON_GAS, SUBANIM_1_CLOUD_TOSS, 1, 6
+	db -1 ; end
 
 BarrageAnim:
-	db $43,$8B,$41
-	db $05,$FF,$55
-	db $FF
+	battle_anim BARRAGE, SUBANIM_1_CIRCLE_BLACK_TOSS, 1, 3
+	battle_anim NO_MOVE, SUBANIM_0_STAR_HIGH, 0, 5
+	db -1 ; end
 
 LeechLifeAnim:
-	db $08,$8C,$02
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $06,$FF,$21
-	db $06,$FF,$22
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $FF
+	battle_anim LEECH_LIFE, SUBANIM_0_STAR_THRICE, 0, 8
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 0, 6
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 0, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	db -1 ; end
 
 LovelyKissAnim:
-	db $06,$8D,$12
-	db $FF
+	battle_anim LOVELY_KISS, SUBANIM_0_HEART_1_MUSIC, 0, 6
+	db -1 ; end
 
 SkyAttackAnim:
-	db SE_SQUISH_MON_PIC, $8E
-	db SE_SHOOT_BALLS_UPWARD, $FF
-	db $46,$87,$04
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim SKY_ATTACK, SE_SQUISH_MON_PIC
+	battle_anim NO_MOVE, SE_SHOOT_BALLS_UPWARD
+	battle_anim HI_JUMP_KICK, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 TransformAnim:
-	db $46,$8F,$21
-	db $44,$8F,$22
-	db $08,$FF,$47
-	db SE_TRANSFORM_MON, $FF
-	db $FF
+	battle_anim TRANSFORM, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 1, 6
+	battle_anim TRANSFORM, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 1, 4
+	battle_anim NO_MOVE, SUBANIM_0_BALL_POOF, 0, 8
+	battle_anim NO_MOVE, SE_TRANSFORM_MON
+	db -1 ; end
 
 BubbleAnim:
-	db $16,$90,$35
-	db $FF
+	battle_anim BUBBLE, SUBANIM_0_WATER_BUBBLES, 0, 22
+	db -1 ; end
 
 DizzyPunchAnim:
-	db $06,$91,$17
-	db $06,$91,$17
-	db $06,$91,$17
-	db $06,$02,$02
-	db $FF
+	battle_anim DIZZY_PUNCH, SUBANIM_0_BIRDIES_CIRCLING_ENEMY, 0, 6
+	battle_anim DIZZY_PUNCH, SUBANIM_0_BIRDIES_CIRCLING_ENEMY, 0, 6
+	battle_anim DIZZY_PUNCH, SUBANIM_0_BIRDIES_CIRCLING_ENEMY, 0, 6
+	battle_anim DOUBLESLAP, SUBANIM_0_STAR_THRICE, 0, 6
+	db -1 ; end
 
 SporeAnim:
-	db $06,$92,$36
-	db $FF
+	battle_anim SPORE, SUBANIM_0_CIRCLES_FALLING, 0, 6
+	db -1 ; end
 
 FlashAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $48
-	db SE_DARK_SCREEN_FLASH, $88
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_LIGHT_SCREEN_PALETTE
+	battle_anim GLARE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 PsywaveAnim:
-	db $06,$2F,$31
-	db SE_WAVY_SCREEN, $5C
-	db $FF
+	battle_anim SUPERSONIC, SUBANIM_0_SOUND_WAVE, 0, 6
+	battle_anim CONFUSION, SE_WAVY_SCREEN
+	db -1 ; end
 
 SplashAnim:
-	db SE_BOUNCE_UP_AND_DOWN, $95
-	db $FF
+	battle_anim SPLASH, SE_BOUNCE_UP_AND_DOWN
+	db -1 ; end
 
 AcidArmorAnim:
-	db SE_SLIDE_MON_DOWN_AND_HIDE, $96
-	db $FF
+	battle_anim ACID_ARMOR, SE_SLIDE_MON_DOWN_AND_HIDE
+	db -1 ; end
 
 CrabHammerAnim:
-	db $46,$97,$05
-	db $06,$FF,$2A
-	db $FF
+	battle_anim CRABHAMMER, SUBANIM_1_STAR_BIG, 1, 6
+	battle_anim NO_MOVE, SUBANIM_0_SLICE_BOTH_SIDES, 0, 6
+	db -1 ; end
 
 ExplosionAnim:
-	db $43,$98,$34
-	db $FF
+	battle_anim EXPLOSION, SUBANIM_1_SELFDESTRUCT, 1, 3
+	db -1 ; end
 
 FurySwipesAnim:
-	db $04,$99,$0F
-	db $FF
+	battle_anim FURY_SWIPES, SUBANIM_0_SCRATCHES, 0, 4
+	db -1 ; end
 
 BonemerangAnim:
-	db $06,$9A,$02
-	db $FF
+	battle_anim BONEMERANG, SUBANIM_0_STAR_THRICE, 0, 6
+	db -1 ; end
 
 RestAnim:
-	db $10,$9B,$3A
-	db $10,$9B,$3A
-	db $FF
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP, 0, 16
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP, 0, 16
+	db -1 ; end
 
 RockSlideAnim:
-	db $04,$9C,$1D
-	db $03,$9C,$1E
-	db $46,$9D,$04
-	db $FF
+	battle_anim ROCK_SLIDE, SUBANIM_0_ROCKS_LIFT, 0, 4
+	battle_anim ROCK_SLIDE, SUBANIM_0_ROCKS_TOSS, 0, 3
+	battle_anim HYPER_FANG, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	db -1 ; end
 
 HyperFangAnim:
-	db $06,$9D,$02
-	db $FF
+	battle_anim HYPER_FANG, SUBANIM_0_STAR_THRICE, 0, 6
+	db -1 ; end
 
 SharpenAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $9E
-	db $46,$FF,$43
-	db SE_DARK_SCREEN_FLASH, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim SHARPEN, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ConversionAnim:
-	db SE_DARK_SCREEN_FLASH, $9F
-	db $46,$FF,$21
-	db $46,$FF,$22
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $FF
+	battle_anim CONVERSION, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLES_1_SQUARES_CENTERING_ENEMY, 1, 6
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_TOSS_BACK, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	db -1 ; end
 
 TriAttackAnim:
-	db SE_DARK_SCREEN_FLASH, $A0
-	db $46,$FF,$4D
-	db SE_DARK_SCREEN_FLASH, $FF
-	db $FF
+	battle_anim TRI_ATTACK, SE_DARK_SCREEN_FLASH
+	battle_anim NO_MOVE, SUBANIM_1_TRIANGLE_TOSS, 1, 6
+	battle_anim NO_MOVE, SE_DARK_SCREEN_FLASH
+	db -1 ; end
 
 SuperFangAnim:
-	db SE_DARK_SCREEN_PALETTE, $48
-	db $46,$A1,$04
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim LEECH_SEED, SE_DARK_SCREEN_PALETTE
+	battle_anim SUPER_FANG, SUBANIM_1_STAR_BIG_MOVING, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 SlashAnim:
-	db $06,$A2,$0F
-	db $FF
+	battle_anim SLASH, SUBANIM_0_SCRATCHES, 0, 6
+	db -1 ; end
 
 SubstituteAnim:
-	db SE_SLIDE_MON_OFF, $A3
-	db $08,$FF,$47
-	db SE_SUBSTITUTE_MON, $FF
-	db $FF
+	battle_anim SUBSTITUTE, SE_SLIDE_MON_OFF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_POOF, 0, 8
+	battle_anim NO_MOVE, SE_SUBSTITUTE_MON
+	db -1 ; end
 
 BallTossAnim:
-	db $03,$FF,$06
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_TOSS_HIGH, 0, 3
+	db -1 ; end
 
 GreatTossAnim:
-	db $03,$FF,$07
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_TOSS_MIDDLE, 0, 3
+	db -1 ; end
 
 UltraTossAnim:
-	db $02,$FF,$08
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_TOSS_LOW, 0, 2
+	db -1 ; end
 
 BallShakeAnim:
-	db $04,$FF,$09
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_SHAKE_ENEMY, 0, 4
+	db -1 ; end
 
 BallPoofAnim:
-	db $04,$FF,$0A
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_POOF_ENEMY, 0, 4
+	db -1 ; end
 
 ShowPicAnim:
-	db SE_SHOW_ENEMY_MON_PIC, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_SHOW_ENEMY_MON_PIC
+	db -1 ; end
 
 HidePicAnim:
-	db SE_HIDE_ENEMY_MON_PIC, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_HIDE_ENEMY_MON_PIC
+	db -1 ; end
 
 EnemyFlashAnim:
-	db SE_SHOW_MON_PIC, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_SHOW_MON_PIC
+	db -1 ; end
 
 PlayerFlashAnim:
-	db SE_FLASH_MON_PIC, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_FLASH_MON_PIC
+	db -1 ; end
 
 EnemyHUDShakeAnim:
-	db SE_SHAKE_ENEMY_HUD, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_SHAKE_ENEMY_HUD
+	db -1 ; end
 
 TradeBallDropAnim:
-	db $86,$FF,$48
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_2_TRADE_BALL_DROP, 2, 6
+	db -1 ; end
 
 TradeBallAppear1Anim:
-	db $84,$FF,$49
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_2_TRADE_BALL_SHAKE, 2, 4
+	db -1 ; end
 
 TradeBallAppear2Anim:
-	db $86,$FF,$4A
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_2_TRADE_BALL_APPEAR, 2, 6
+	db -1 ; end
 
 TradeBallPoofAnim:
-	db $86,$FF,$4B
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_2_TRADE_BALL_POOF, 2, 6
+	db -1 ; end
 
 XStatItemAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ShrinkingSquareAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db $46,$FF,$43
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 XStatItemBlackAnim:
-	db SE_DARKEN_MON_PALETTE, $FF
-	db SE_SPIRAL_BALLS_INWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_DARKEN_MON_PALETTE
+	battle_anim NO_MOVE, SE_SPIRAL_BALLS_INWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ShrinkingSquareBlackAnim:
-	db SE_DARKEN_MON_PALETTE, $FF
-	db $46,$FF,$43
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_DARKEN_MON_PALETTE
+	battle_anim NO_MOVE, SUBANIM_0_CIRCLE_1_SQUARE_CLOSING, 1, 6
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 UnusedAnim:
-	db SE_LIGHT_SCREEN_PALETTE, $FF
-	db SE_SHOOT_MANY_BALLS_UPWARD, $FF
-	db SE_RESET_SCREEN_PALETTE, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_LIGHT_SCREEN_PALETTE
+	battle_anim NO_MOVE, SE_SHOOT_MANY_BALLS_UPWARD
+	battle_anim NO_MOVE, SE_RESET_SCREEN_PALETTE
+	db -1 ; end
 
 ParalyzeAnim:
-	db $04,$13,$24
-	db $04,$13,$24
-	db $FF
+	battle_anim BIND, SUBANIM_0_STATUS_PARALYZED, 0, 4
+	battle_anim BIND, SUBANIM_0_STATUS_PARALYZED, 0, 4
+	db -1 ; end
 
 PoisonAnim:
-	db $08,$13,$27
-	db $08,$13,$27
-	db $FF
+	battle_anim BIND, SUBANIM_0_STATUS_POISONED, 0, 8
+	battle_anim BIND, SUBANIM_0_STATUS_POISONED, 0, 8
+	db -1 ; end
 
 SleepPlayerAnim:
-	db $10,$9B,$3A
-	db $10,$9B,$3A
-	db $FF
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP, 0, 16
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP, 0, 16
+	db -1 ; end
 
 SleepEnemyAnim:
-	db $10,$9B,$3B
-	db $10,$9B,$3B
-	db $FF
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP_ENEMY, 0, 16
+	battle_anim REST, SUBANIM_0_STATUS_SLEEP_ENEMY, 0, 16
+	db -1 ; end
 
 ConfusedPlayerAnim:
-	db $08,$84,$25
-	db $08,$84,$25
-	db $FF
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED, 0, 8
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED, 0, 8
+	db -1 ; end
 
 ConfusedEnemyAnim:
-	db $08,$84,$26
-	db $08,$84,$26
-	db $FF
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED_ENEMY, 0, 8
+	battle_anim AMNESIA, SUBANIM_0_STATUS_CONFUSED_ENEMY, 0, 8
+	db -1 ; end
 
 BallBlockAnim:
-	db $03,$FF,$0B
-	db $FF
+	battle_anim NO_MOVE, SUBANIM_0_BALL_BLOCK, 0, 3
+	db -1 ; end
 
-FaintAnim:
-	db SE_SLIDE_MON_DOWN, $5A
-	db $FF
+SlideDownAnim:
+	battle_anim DIG, SE_SLIDE_MON_DOWN
+	db -1 ; end
 
 ShakeScreenAnim:
-	db SE_SHAKE_SCREEN, $FF
-	db $FF
+	battle_anim NO_MOVE, SE_SHAKE_SCREEN
+	db -1 ; end
 
 ThrowRockAnim:
-	db $03,$8B,$53
-	db $FF
+	battle_anim BARRAGE, SUBANIM_0_SAFARI_ROCK, 0, 3
+	db -1 ; end
 
 ThrowBaitAnim:
-	db $03,$8B,$54
-	db $FF
+	battle_anim BARRAGE, SUBANIM_0_SAFARI_BAIT, 0, 3
+	db -1 ; end
 
 SubanimationPointers:
-	dw Subanimation00
-	dw Subanimation01
-	dw Subanimation02
-	dw Subanimation03
-	dw Subanimation04
-	dw Subanimation05
-	dw Subanimation06
-	dw Subanimation07
-	dw Subanimation08
-	dw Subanimation09
-	dw Subanimation0a
-	dw Subanimation0b
-	dw Subanimation0c
-	dw Subanimation0d
-	dw Subanimation0e
-	dw Subanimation0f
-	dw Subanimation10
-	dw Subanimation11
-	dw Subanimation12
-	dw Subanimation13
-	dw Subanimation14
-	dw Subanimation15
-	dw Subanimation16
-	dw Subanimation17
-	dw Subanimation18
-	dw Subanimation19
-	dw Subanimation1a
-	dw Subanimation1b
-	dw Subanimation1c
-	dw Subanimation1d
-	dw Subanimation1e
-	dw Subanimation1f
-	dw Subanimation20
-	dw Subanimation21
-	dw Subanimation22
-	dw Subanimation23
-	dw Subanimation24
-	dw Subanimation25
-	dw Subanimation26
-	dw Subanimation27
-	dw Subanimation28
-	dw Subanimation29
-	dw Subanimation2a
-	dw Subanimation2b
-	dw Subanimation2c
-	dw Subanimation2d
-	dw Subanimation2e
-	dw Subanimation2f
-	dw Subanimation30
-	dw Subanimation31
-	dw Subanimation32
-	dw Subanimation33
-	dw Subanimation34
-	dw Subanimation35
-	dw Subanimation36
-	dw Subanimation37
-	dw Subanimation38
-	dw Subanimation39
-	dw Subanimation3a
-	dw Subanimation3b
-	dw Subanimation3c
-	dw Subanimation3d
-	dw Subanimation3e
-	dw Subanimation3f
-	dw Subanimation40
-	dw Subanimation41
-	dw Subanimation42
-	dw Subanimation43
-	dw Subanimation44
-	dw Subanimation45
-	dw Subanimation46
-	dw Subanimation47
-	dw Subanimation48
-	dw Subanimation49
-	dw Subanimation4a
-	dw Subanimation4b
-	dw Subanimation4c
-	dw Subanimation4d
-	dw Subanimation4e
-	dw Subanimation4f
-	dw Subanimation50
-	dw Subanimation51
-	dw Subanimation52
-	dw Subanimation53
-	dw Subanimation54
-	dw Subanimation55
-
-Subanimation04:
-	db $43
-	db $02,$1a,$00
-	db $02,$10,$00
-	db $02,$03,$00
-
-Subanimation05:
-	db $41
-	db $02,$10,$00
-
-Subanimation08:
-	db $0b
-	db $03,$30,$00
-	db $03,$44,$00
-	db $03,$94,$00
-	db $03,$60,$00
-	db $03,$76,$00
-	db $03,$9f,$00
-	db $03,$8d,$00
-	db $03,$a0,$00
-	db $03,$1a,$00
-	db $03,$a1,$00
-	db $03,$34,$00
-
-Subanimation07:
-	db $0b
-	db $03,$30,$00
-	db $03,$a2,$00
-	db $03,$31,$00
-	db $03,$a3,$00
-	db $03,$32,$00
-	db $03,$a4,$00
-	db $03,$92,$00
-	db $03,$a5,$00
-	db $03,$15,$00
-	db $03,$a6,$00
-	db $03,$34,$00
-
-Subanimation06:
-	db $0b
-	db $03,$30,$00
-	db $03,$a2,$00
-	db $03,$93,$00
-	db $03,$61,$00
-	db $03,$73,$00
-	db $03,$a7,$00
-	db $03,$33,$00
-	db $03,$a8,$00
-	db $03,$0e,$00
-	db $03,$a9,$00
-	db $03,$34,$00
-
-Subanimation09:
-	db $04
-	db $03,$21,$04
-	db $04,$21,$04
-	db $03,$21,$04
-	db $05,$21,$04
-
-Subanimation0a:
-	db $46
-	db $06,$1b,$00
-	db $07,$1b,$00
-	db $08,$36,$00
-	db $09,$36,$00
-	db $0a,$15,$00
-	db $0a,$15,$00
-
-Subanimation0b:
-	db $04
-	db $01,$2d,$00
-	db $03,$2f,$00
-	db $03,$35,$00
-	db $03,$4d,$00
-
-Subanimation55:
-	db $41
-	db $01,$9d,$00
-
-Subanimation11:
-	db $4c
-	db $0b,$26,$00
-	db $0c,$26,$00
-	db $0b,$26,$00
-	db $0c,$26,$00
-	db $0b,$28,$00
-	db $0c,$28,$00
-	db $0b,$28,$00
-	db $0c,$28,$00
-	db $0b,$27,$00
-	db $0c,$27,$00
-	db $0b,$27,$00
-	db $0c,$27,$00
-
-Subanimation2b:
-	db $4b
-	db $0d,$03,$03
-	db $0e,$03,$03
-	db $0f,$03,$00
-	db $0d,$11,$00
-	db $0d,$11,$00
-	db $0d,$37,$00
-	db $0d,$37,$00
-	db $10,$21,$00
-	db $10,$21,$00
-	db $11,$1b,$00
-	db $11,$1b,$00
-
-Subanimation2c:
-	db $4c
-	db $12,$01,$00
-	db $12,$0f,$00
-	db $12,$1b,$00
-	db $12,$25,$00
-	db $13,$38,$00
-	db $13,$38,$02
-	db $14,$38,$00
-	db $14,$38,$02
-	db $15,$38,$00
-	db $15,$38,$00
-	db $16,$38,$00
-	db $16,$38,$00
-
-Subanimation12:
-	db $69
-	db $17,$30,$00
-	db $17,$39,$00
-	db $17,$3a,$00
-	db $17,$3b,$00
-	db $17,$3c,$00
-	db $17,$3d,$00
-	db $17,$3e,$00
-	db $17,$3f,$00
-	db $17,$1f,$00
-
-Subanimation00:
-	db $41
-	db $01,$17,$00
-
-Subanimation01:
-	db $42
-	db $01,$0f,$00
-	db $01,$1d,$00
-
-Subanimation02:
-	db $43
-	db $01,$12,$00
-	db $01,$15,$00
-	db $01,$1c,$00
-
-Subanimation03:
-	db $44
-	db $01,$0b,$00
-	db $01,$11,$00
-	db $01,$18,$00
-	db $01,$1d,$00
-
-Subanimation0c:
-	db $43
-	db $0c,$20,$00
-	db $0c,$21,$00
-	db $0c,$23,$00
-
-Subanimation0d:
-	db $46
-	db $0c,$20,$02
-	db $0c,$15,$00
-	db $0c,$21,$02
-	db $0c,$17,$00
-	db $0c,$23,$02
-	db $0c,$19,$00
-
-Subanimation0e:
-	db $49
-	db $0c,$20,$02
-	db $0c,$15,$02
-	db $0c,$07,$00
-	db $0c,$21,$02
-	db $0c,$17,$02
-	db $0c,$09,$00
-	db $0c,$23,$02
-	db $0c,$19,$02
-	db $0c,$0c,$00
-
-Subanimation1f:
-	db $85
-	db $0c,$30,$03
-	db $0c,$40,$03
-	db $0c,$41,$03
-	db $0c,$42,$03
-	db $0c,$21,$00
-
-Subanimation2e:
-	db $2e
-	db $18,$43,$02
-	db $75,$52,$04
-	db $19,$43,$02
-	db $75,$63,$04
-	db $1a,$43,$02
-	db $75,$4d,$04
-	db $1b,$43,$02
-	db $75,$97,$04
-	db $1c,$43,$02
-	db $75,$98,$04
-	db $1d,$43,$02
-	db $75,$58,$04
-	db $1e,$43,$02
-	db $75,$1b,$00
-
-Subanimation2f:
-	db $44
-	db $1f,$24,$00
-	db $20,$20,$00
-	db $21,$1a,$00
-	db $22,$15,$00
-
-Subanimation30:
-	db $52
-	db $23,$00,$02
-	db $23,$02,$02
-	db $23,$04,$00
-	db $23,$07,$02
-	db $23,$02,$02
-	db $23,$04,$00
-	db $23,$0e,$02
-	db $23,$02,$02
-	db $23,$0c,$00
-	db $25,$07,$00
-	db $25,$0e,$00
-	db $25,$15,$00
-	db $24,$24,$02
-	db $23,$1c,$02
-	db $23,$23,$00
-	db $23,$21,$02
-	db $24,$28,$00
-	db $24,$28,$00
-
-Subanimation0f:
-	db $4c
-	db $26,$0e,$02
-	db $26,$16,$02
-	db $26,$1c,$00
-	db $27,$0e,$02
-	db $27,$16,$02
-	db $27,$1c,$00
-	db $28,$0e,$02
-	db $28,$16,$02
-	db $28,$1c,$00
-	db $29,$0e,$02
-	db $29,$16,$02
-	db $29,$1c,$00
-
-Subanimation16:
-	db $4c
-	db $2a,$05,$00
-	db $2b,$05,$02
-	db $2b,$0c,$02
-	db $2a,$11,$04
-	db $2b,$11,$02
-	db $2b,$17,$02
-	db $2a,$1b,$04
-	db $2b,$1b,$02
-	db $2b,$20,$02
-	db $2a,$2f,$04
-	db $2c,$00,$02
-	db $2c,$00,$00
-
-Subanimation10:
-	db $88
-	db $2d,$44,$00
-	db $2e,$45,$00
-	db $2d,$46,$00
-	db $2e,$47,$00
-	db $2d,$48,$00
-	db $2e,$49,$00
-	db $2d,$2f,$00
-	db $2e,$1a,$00
-
-Subanimation31:
-	db $2a
-	db $2f,$46,$00
-	db $2f,$4a,$00
-	db $2f,$4b,$00
-	db $2f,$4c,$00
-	db $2f,$4d,$00
-	db $2f,$4e,$00
-	db $2f,$4f,$00
-	db $2f,$50,$00
-	db $2f,$2e,$00
-	db $2f,$51,$00
-
-Subanimation13:
-	db $86
-	db $30,$31,$00
-	db $30,$32,$00
-	db $30,$92,$00
-	db $30,$0e,$00
-	db $30,$0f,$00
-	db $30,$10,$00
-
-Subanimation14:
-	db $49
-	db $30,$10,$00
-	db $30,$10,$03
-	db $31,$1c,$04
-	db $31,$21,$04
-	db $31,$26,$00
-	db $30,$10,$02
-	db $31,$1d,$04
-	db $31,$22,$04
-	db $31,$27,$00
-
-Subanimation41:
-	db $85
-	db $03,$31,$00
-	db $03,$32,$00
-	db $03,$92,$00
-	db $03,$0e,$00
-	db $03,$10,$00
-
-Subanimation42:
-	db $43
-	db $48,$08,$00
-	db $49,$08,$00
-	db $5a,$08,$00
-
-Subanimation15:
-	db $22
-	db $35,$52,$00
-	db $35,$53,$00
-
-Subanimation17:
-	db $44
-	db $36,$54,$00
-	db $36,$55,$00
-	db $37,$56,$00
-	db $37,$57,$00
-
-Subanimation18:
-	db $a4
-	db $36,$54,$00
-	db $36,$55,$00
-	db $37,$56,$00
-	db $37,$57,$00
-
-Subanimation40:
-	db $46
-	db $17,$54,$00
-	db $17,$55,$00
-	db $17,$0e,$00
-	db $17,$56,$00
-	db $17,$57,$00
-	db $17,$13,$00
-
-Subanimation19:
-	db $8c
-	db $38,$31,$00
-	db $39,$31,$00
-	db $38,$32,$00
-	db $39,$32,$00
-	db $38,$92,$00
-	db $39,$92,$00
-	db $38,$0e,$00
-	db $39,$0e,$00
-	db $38,$0f,$00
-	db $39,$0f,$00
-	db $38,$10,$00
-	db $39,$10,$00
-
-Subanimation1a:
-	db $50
-	db $3a,$08,$00
-	db $3b,$08,$00
-	db $3c,$08,$00
-	db $3d,$08,$00
-	db $3e,$08,$00
-	db $3f,$08,$00
-	db $3e,$08,$00
-	db $3f,$08,$00
-	db $3a,$0b,$00
-	db $3b,$0b,$00
-	db $3c,$0b,$00
-	db $3d,$0b,$00
-	db $3e,$0b,$00
-	db $3f,$0b,$00
-	db $3e,$0b,$00
-	db $3f,$0b,$00
-
-Subanimation1b:
-	db $84
-	db $40,$31,$00
-	db $40,$32,$00
-	db $40,$92,$00
-	db $40,$15,$00
-
-Subanimation1c:
-	db $43
-	db $41,$58,$00
-	db $41,$59,$00
-	db $41,$21,$00
-
-Subanimation1d:
-	db $af
-	db $24,$9a,$00
-	db $23,$1b,$02
-	db $24,$22,$00
-	db $23,$16,$02
-	db $23,$1d,$02
-	db $24,$98,$00
-	db $25,$2c,$04
-	db $25,$2a,$04
-	db $25,$99,$04
-	db $25,$62,$04
-	db $25,$99,$04
-	db $25,$62,$04
-	db $25,$99,$04
-	db $25,$62,$04
-	db $25,$99,$03
-
-Subanimation1e:
-	db $01
-	db $25,$75,$00
-
-Subanimation20:
-	db $42
-	db $42,$07,$00
-	db $43,$07,$00
-
-Subanimation21:
-	db $43
-	db $44,$00,$00
-	db $45,$08,$00
-	db $46,$10,$02
-
-Subanimation22:
-	db $8b
-	db $47,$10,$00
-	db $47,$56,$00
-	db $47,$07,$00
-	db $47,$aa,$00
-	db $47,$ab,$00
-	db $47,$ac,$00
-	db $47,$ad,$00
-	db $47,$ae,$00
-	db $47,$af,$00
-	db $47,$89,$00
-	db $47,$b0,$00
-
-Subanimation2d:
-	;db $66		;joenote - this should be $26 instead, else double-edge is off-center for enemy 'mons
-	db $26
-	db $44,$64,$00
-	db $45,$65,$00
-	db $46,$66,$00
-	db $47,$66,$00
-	db $47,$66,$00
-	db $47,$66,$00
-
-Subanimation39:
-	db $61
-	db $47,$67,$00
-
-Subanimation4e:
-	db $41
-	db $71,$0f,$03
-
-Subanimation4f:
-	db $47
-	db $71,$0f,$00
-	db $71,$08,$00
-	db $71,$01,$00
-	db $71,$95,$00
-	db $72,$95,$00
-	db $73,$95,$00
-	db $74,$95,$00
-
-Subanimation50:
-	db $48
-	db $74,$95,$00
-	db $73,$95,$00
-	db $72,$95,$00
-	db $71,$95,$00
-	db $71,$01,$00
-	db $71,$08,$00
-	db $71,$0f,$00
-	db $71,$16,$00
-
-Subanimation29:
-	db $5d
-	db $48,$0f,$00
-	db $4a,$68,$03
-	db $4b,$2a,$03
-	db $49,$0f,$00
-	db $4a,$68,$03
-	db $4b,$2a,$00
-	db $4c,$6a,$03
-	db $4d,$69,$03
-	db $49,$6b,$00
-	db $4c,$6a,$03
-	db $4d,$69,$00
-	db $4a,$68,$03
-	db $4b,$2a,$03
-	db $49,$6c,$00
-	db $4a,$68,$03
-	db $4b,$2a,$00
-	db $4c,$6a,$03
-	db $4d,$69,$03
-	db $49,$6d,$00
-	db $4c,$6a,$03
-	db $4d,$2a,$00
-	db $4a,$68,$03
-	db $4b,$2a,$03
-	db $49,$0f,$00
-	db $4a,$68,$03
-	db $4b,$2a,$00
-	db $4c,$6a,$03
-	db $4d,$2a,$03
-	db $49,$6b,$00
-
-Subanimation2a:
-	db $44
-	db $4e,$2b,$00
-	db $4f,$2b,$00
-	db $50,$2b,$00
-	db $50,$2b,$00
-
-Subanimation23:
-	db $42
-	db $51,$2d,$00
-	db $51,$6e,$00
-
-Subanimation24:
-	db $a2
-	db $51,$2d,$00
-	db $51,$6e,$00
-
-Subanimation25:
-	db $62
-	db $52,$71,$00
-	db $52,$72,$00
-
-Subanimation26:
-	db $02
-	db $52,$01,$00
-	db $52,$2c,$00
-
-Subanimation3a:
-	db $63
-	db $53,$71,$00
-	db $53,$7f,$00
-	db $53,$81,$00
-
-Subanimation3b:
-	db $03
-	db $53,$01,$00
-	db $53,$15,$00
-	db $53,$2c,$00
-
-Subanimation27:
-	db $a2
-	db $54,$01,$00
-	db $54,$2c,$00
-
-Subanimation28:
-	db $23
-	db $55,$73,$03
-	db $56,$73,$03
-	db $57,$73,$00
-
-Subanimation32:
-	db $63
-	db $47,$74,$00
-	db $47,$43,$00
-	db $47,$75,$00
-
-Subanimation33:
-	db $26
-	db $58,$76,$00
-	db $34,$76,$00
-	db $58,$76,$00
-	db $34,$76,$00
-	db $58,$76,$00
-	db $34,$76,$00
-
-Subanimation3c:
-	db $67
-	db $59,$79,$03
-	db $59,$7b,$03
-	db $59,$77,$03
-	db $59,$7a,$03
-	db $59,$78,$03
-	db $59,$7c,$03
-	db $59,$76,$00
-
-Subanimation3d:
-	db $08
-	db $3a,$4d,$00
-	db $3b,$4d,$00
-	db $3c,$4d,$00
-	db $3d,$4d,$00
-	db $3e,$4d,$00
-	db $3f,$4d,$00
-	db $3e,$4d,$00
-	db $3f,$4d,$00
-
-Subanimation34:
-	db $35
-	db $48,$7d,$00
-	db $49,$7d,$00
-	db $5a,$7d,$00
-	db $48,$30,$00
-	db $49,$30,$00
-	db $5a,$30,$00
-	db $48,$7e,$00
-	db $49,$7e,$00
-	db $5a,$7e,$00
-	db $48,$7f,$00
-	db $49,$7f,$00
-	db $5a,$7f,$00
-	db $48,$80,$00
-	db $49,$80,$00
-	db $5a,$80,$00
-	db $48,$81,$00
-	db $49,$81,$00
-	db $5a,$81,$00
-	db $48,$82,$00
-	db $49,$82,$00
-	db $5a,$82,$00
-
-Subanimation35:
-	db $24
-	db $5b,$83,$03
-	db $5c,$84,$03
-	db $5d,$85,$03
-	db $5e,$09,$00
-
-Subanimation36:
-	db $48
-	db $5f,$2a,$00
-	db $5f,$00,$00
-	db $60,$2a,$00
-	db $60,$00,$00
-	db $61,$2a,$00
-	db $61,$00,$00
-	db $62,$2a,$00
-	db $62,$00,$00
-
-Subanimation37:
-	db $2a
-	db $63,$89,$00
-	db $64,$75,$00
-	db $63,$76,$00
-	db $65,$0d,$00
-	db $65,$86,$00
-	db $65,$12,$00
-	db $65,$87,$00
-	db $65,$17,$00
-	db $65,$88,$00
-	db $65,$1a,$00
-
-Subanimation38:
-	db $50
-	db $66,$8a,$00
-	db $66,$33,$00
-	db $66,$2e,$00
-	db $67,$24,$03
-	db $66,$01,$04
-	db $66,$10,$04
-	db $66,$1d,$04
-	db $67,$28,$03
-	db $66,$2a,$04
-	db $66,$0e,$04
-	db $66,$1b,$04
-	db $67,$26,$03
-	db $66,$03,$04
-	db $66,$12,$04
-	db $66,$1e,$04
-	db $67,$29,$00
-
-Subanimation3e:
-	db $92
-	db $02,$31,$00
-	db $34,$31,$00
-	db $02,$31,$00
-	db $02,$32,$00
-	db $34,$32,$00
-	db $02,$32,$00
-	db $02,$92,$00
-	db $34,$92,$00
-	db $02,$92,$00
-	db $02,$0e,$00
-	db $34,$0e,$00
-	db $02,$0e,$00
-	db $02,$0f,$00
-	db $34,$0f,$00
-	db $02,$0f,$00
-	db $02,$10,$00
-	db $34,$10,$00
-	db $02,$10,$00
-
-Subanimation3f:
-	db $72
-	db $68,$4b,$00
-	db $68,$8c,$00
-	db $68,$20,$00
-	db $68,$1c,$00
-	db $68,$19,$00
-	db $68,$14,$00
-	db $68,$76,$00
-	db $68,$8d,$00
-	db $68,$15,$00
-	db $68,$10,$00
-	db $68,$0c,$00
-	db $68,$06,$00
-	db $68,$8e,$00
-	db $68,$8f,$00
-	db $68,$90,$00
-	db $68,$26,$00
-	db $68,$23,$00
-	db $68,$1f,$00
-
-Subanimation44:
-	db $2c
-	db $69,$4b,$00
-	db $69,$8c,$00
-	db $69,$20,$00
-	db $69,$1c,$00
-	db $69,$19,$00
-	db $69,$14,$00
-	db $69,$76,$00
-	db $69,$8d,$00
-	db $69,$15,$00
-	db $69,$10,$00
-	db $69,$0c,$00
-	db $69,$06,$00
-
-Subanimation43:
-	db $a3
-	db $6a,$07,$00
-	db $6b,$0f,$00
-	db $6c,$17,$00
-
-Subanimation45:
-	db $24
-	db $6d,$8b,$00
-	db $6d,$84,$00
-	db $6d,$63,$00
-	db $6d,$8c,$00
-
-Subanimation46:
-	db $26
-	db $6d,$8b,$00
-	db $6d,$84,$00
-	db $6d,$63,$00
-	db $6d,$8c,$00
-	db $6d,$0a,$00
-	db $6d,$89,$00
-
-Subanimation47:
-	db $23
-	db $06,$82,$00
-	db $07,$82,$00
-	db $08,$96,$00
-
-Subanimation48:
-	db $06
-	db $03,$41,$04
-	db $03,$48,$04
-	db $04,$48,$04
-	db $03,$48,$04
-	db $05,$48,$04
-	db $03,$48,$03
-
-Subanimation49:
-	db $04
-	db $04,$48,$04
-	db $03,$48,$04
-	db $05,$48,$04
-	db $03,$48,$03
-
-Subanimation4a:
-	db $01
-	db $04,$84,$03
-
-Subanimation4b:
-	db $03
-	db $06,$72,$00
-	db $07,$72,$00
-	db $08,$72,$00
-
-Subanimation4c:
-	db $68
-	db $6f,$30,$00
-	db $6e,$30,$00
-	db $70,$30,$00
-	db $6e,$30,$00
-	db $6f,$30,$00
-	db $6e,$30,$00
-	db $70,$30,$00
-	db $6e,$30,$00
-
-Subanimation4d:
-	db $26
-	db $32,$4b,$00
-	db $33,$4f,$00
-	db $32,$20,$00
-	db $33,$16,$00
-	db $32,$19,$00
-	db $33,$0d,$00
-
-Subanimation51:
-	db $a6
-	db $76,$1b,$00
-	db $34,$1b,$00
-	db $76,$1b,$00
-	db $34,$1b,$00
-	db $76,$1b,$00
-	db $34,$1b,$00
-
-Subanimation52:
-	db $47
-	db $77,$25,$00
-	db $77,$9b,$00
-	db $77,$1a,$00
-	db $77,$9c,$00
-	db $77,$2f,$00
-	db $77,$50,$00
-	db $77,$8c,$00
-
-Subanimation53:
-	db $0c
-	db $78,$30,$00
-	db $78,$a2,$00
-	db $78,$93,$00
-	db $78,$61,$00
-	db $78,$73,$00
-	db $78,$a7,$00
-	db $78,$33,$00
-	db $78,$a8,$00
-	db $78,$0e,$00
-	db $78,$a9,$00
-	db $78,$34,$00
-	db $01,$9e,$00
-
-Subanimation54:
-	db $0b
-	db $79,$30,$00
-	db $79,$a2,$00
-	db $79,$93,$00
-	db $79,$61,$00
-	db $79,$73,$00
-	db $79,$a7,$00
-	db $79,$33,$00
-	db $79,$a8,$00
-	db $79,$0e,$00
-	db $79,$a9,$00
-	db $79,$34,$00
+	dw Subanim_0Star
+	dw Subanim_0StarTwice
+	dw Subanim_0StarThrice
+	dw Subanim_0StarDescending
+	dw Subanim_1StarBigMoving
+	dw Subanim_1StarBig
+	dw Subanim_0BallTossHigh
+	dw Subanim_0BallTossMiddle
+	dw Subanim_0BallTossLow
+	dw Subanim_0BallShakeEnemy
+	dw Subanim_0BallPoofEnemy
+	dw Subanim_0BallBlock
+	dw Subanim_1FlameColumn1
+	dw Subanim_1FlameColumn2
+	dw Subanim_1FlameColumn3
+	dw Subanim_0Scratches
+	dw Subanim_1Tornado
+	dw Subanim_1Flames
+	dw Subanim_0Heart_1Music
+	dw Subanim_1BlobToss
+	dw Subanim_1BlobDripEnemy
+	dw Subanim_1Shout
+	dw Subanim_0Slice
+	dw Subanim_0BirdiesCirclingEnemy
+	dw Subanim_1SwordsCircling
+	dw Subanim_1CloudToss
+	dw Subanim_0WaterColumns
+	dw Subanim_1SeedToss
+	dw Subanim_1SeedLand
+	dw Subanim_0RocksLift
+	dw Subanim_0RocksToss
+	dw Subanim_1FlameBeam
+	dw Subanim_1FlameStar
+	dw Subanim_0Circles_1Squares_CenteringEnemy
+	dw Subanim_0Circle_1Square_TossBack
+	dw Subanim_0Bind
+	dw Subanim_0StatusParalyzed
+	dw Subanim_0StatusConfused
+	dw Subanim_0StatusConfusedEnemy
+	dw Subanim_0StatusPoisoned
+	dw Subanim_1Sand
+	dw Subanim_1LightningBall
+	dw Subanim_0SliceBothSides
+	dw Subanim_1Lightning
+	dw Subanim_0WaterDroplets
+	dw Subanim_0CirclesCentering
+	dw Subanim_0Beam
+	dw Subanim_0IceRise
+	dw Subanim_0RocksFallEnemy
+	dw Subanim_0SoundWave
+	dw Subanim_0Circle_1Square_HalfToss ; unused
+	dw Subanim_1Barrier
+	dw Subanim_1Selfdestruct
+	dw Subanim_0WaterBubbles
+	dw Subanim_0CirclesFalling
+	dw Subanim_0StringShot
+	dw Subanim_0IceFall
+	dw Subanim_0Circle_1Square_Appears ; unused
+	dw Subanim_0StatusSleep
+	dw Subanim_0StatusSleepEnemy
+	dw Subanim_0Water_1Fire_Barrier ; unused
+	dw Subanim_0Water_1Fire_Geyser ; unused
+	dw Subanim_1StarBigToss
+	dw Subanim_1StarsSmallToss
+	dw Subanim_1MusicCirclingEnemy
+	dw Subanim_1CircleBlackToss
+	dw Subanim_1ExplosionSmallEnemy
+	dw Subanim_0Circle_1Square_Closing
+	dw Subanim_1LeavesToss
+	dw Subanim_0HornJabTwice
+	dw Subanim_0HornJabThrice
+	dw Subanim_0BallPoof
+	dw Subanim_2TradeBallDrop
+	dw Subanim_2TradeBallShake
+	dw Subanim_2TradeBallAppear
+	dw Subanim_2TradeBallPoof
+	dw Subanim_0EggShaking
+	dw Subanim_1TriangleToss
+	dw Subanim_1SphereBig
+	dw Subanim_1SphereBigRise
+	dw Subanim_1SphereBigFall
+	dw Subanim_0Shell
+	dw Subanim_0CoinBounce
+	dw Subanim_0SafariRock
+	dw Subanim_0SafariBait
+	dw Subanim_0StarHigh
+
+
+; format:
+; subanim type, count
+; REPT count
+;     db frame block id, base coordinate id, frame block mode
+; ENDR
+
+MACRO subanim
+	db (\1 << 5) | \2
+ENDM
+
+
+Subanim_1StarBigMoving:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_02, BASECOORD_1A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_03, FRAMEBLOCKMODE_00
+
+Subanim_1StarBig:
+	subanim SUBANIMTYPE_HFLIP, 1
+	db FRAMEBLOCK_02, BASECOORD_10, FRAMEBLOCKMODE_00
+
+Subanim_0BallTossLow:
+	subanim SUBANIMTYPE_NORMAL, 11
+	db FRAMEBLOCK_03, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_44, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_94, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_60, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_9F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_8D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A0, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_1A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A1, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_34, FRAMEBLOCKMODE_00
+
+Subanim_0BallTossMiddle:
+	subanim SUBANIMTYPE_NORMAL, 11
+	db FRAMEBLOCK_03, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A2, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A3, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A4, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A5, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A6, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_34, FRAMEBLOCKMODE_00
+
+Subanim_0BallTossHigh:
+	subanim SUBANIMTYPE_NORMAL, 11
+	db FRAMEBLOCK_03, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A2, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_93, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_61, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_73, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A7, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_33, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A8, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_A9, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_34, FRAMEBLOCKMODE_00
+
+Subanim_0BallShakeEnemy:
+	subanim SUBANIMTYPE_NORMAL, 4
+	db FRAMEBLOCK_03, BASECOORD_21, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_04, BASECOORD_21, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_21, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_05, BASECOORD_21, FRAMEBLOCKMODE_04
+
+Subanim_0BallPoofEnemy:
+	subanim SUBANIMTYPE_HFLIP, 6
+	db FRAMEBLOCK_06, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_07, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_08, BASECOORD_36, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_09, BASECOORD_36, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0A, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0A, BASECOORD_15, FRAMEBLOCKMODE_00
+
+Subanim_0BallBlock:
+	subanim SUBANIMTYPE_NORMAL, 4
+	db FRAMEBLOCK_01, BASECOORD_2D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_2F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_35, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_4D, FRAMEBLOCKMODE_00
+
+Subanim_0StarHigh:
+	subanim SUBANIMTYPE_HFLIP, 1
+	db FRAMEBLOCK_01, BASECOORD_9D, FRAMEBLOCKMODE_00
+
+Subanim_1Flames:
+	subanim SUBANIMTYPE_HFLIP, 12
+	db FRAMEBLOCK_0B, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0B, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0B, BASECOORD_28, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_28, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0B, BASECOORD_28, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_28, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0B, BASECOORD_27, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_27, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0B, BASECOORD_27, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_27, FRAMEBLOCKMODE_00
+
+Subanim_1Lightning:
+	subanim SUBANIMTYPE_HFLIP, 11
+	db FRAMEBLOCK_0D, BASECOORD_03, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0E, BASECOORD_03, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0F, BASECOORD_03, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0D, BASECOORD_11, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0D, BASECOORD_11, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0D, BASECOORD_37, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0D, BASECOORD_37, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_10, BASECOORD_21, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_10, BASECOORD_21, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_11, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_11, BASECOORD_1B, FRAMEBLOCKMODE_00
+
+Subanim_0WaterDroplets:
+	subanim SUBANIMTYPE_HFLIP, 12
+	db FRAMEBLOCK_12, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_12, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_12, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_12, BASECOORD_25, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_13, BASECOORD_38, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_13, BASECOORD_38, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_14, BASECOORD_38, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_14, BASECOORD_38, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_15, BASECOORD_38, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_15, BASECOORD_38, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_16, BASECOORD_38, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_16, BASECOORD_38, FRAMEBLOCKMODE_00
+
+Subanim_0Heart_1Music:
+	subanim SUBANIMTYPE_COORDFLIP, 9
+	db FRAMEBLOCK_17, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_39, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_3F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_1F, FRAMEBLOCKMODE_00
+
+Subanim_0Star:
+	subanim SUBANIMTYPE_HFLIP, 1
+	db FRAMEBLOCK_01, BASECOORD_17, FRAMEBLOCKMODE_00
+
+Subanim_0StarTwice:
+	subanim SUBANIMTYPE_HFLIP, 2
+	db FRAMEBLOCK_01, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_1D, FRAMEBLOCKMODE_00
+
+Subanim_0StarThrice:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_01, BASECOORD_12, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_1C, FRAMEBLOCKMODE_00
+
+Subanim_0StarDescending:
+	subanim SUBANIMTYPE_HFLIP, 4
+	db FRAMEBLOCK_01, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_11, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_18, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_1D, FRAMEBLOCKMODE_00
+
+Subanim_1FlameColumn1:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_0C, BASECOORD_20, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_21, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_23, FRAMEBLOCKMODE_00
+
+Subanim_1FlameColumn2:
+	subanim SUBANIMTYPE_HFLIP, 6
+	db FRAMEBLOCK_0C, BASECOORD_20, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_21, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_17, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_23, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_19, FRAMEBLOCKMODE_00
+
+Subanim_1FlameColumn3:
+	subanim SUBANIMTYPE_HFLIP, 9
+	db FRAMEBLOCK_0C, BASECOORD_20, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_15, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_07, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_21, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_17, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_09, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_0C, BASECOORD_23, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_19, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_0C, BASECOORD_0C, FRAMEBLOCKMODE_00
+
+Subanim_1FlameBeam:
+	subanim SUBANIMTYPE_REVERSE, 5
+	db FRAMEBLOCK_0C, BASECOORD_30, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0C, BASECOORD_40, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0C, BASECOORD_41, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0C, BASECOORD_42, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_0C, BASECOORD_21, FRAMEBLOCKMODE_00
+
+Subanim_0Beam:
+	subanim SUBANIMTYPE_HVFLIP, 14
+	db FRAMEBLOCK_18, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_52, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_19, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_63, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_1A, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_4D, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_1B, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_97, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_1C, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_98, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_1D, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_58, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_1E, BASECOORD_43, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_75, BASECOORD_1B, FRAMEBLOCKMODE_00
+
+Subanim_0IceRise:
+	subanim SUBANIMTYPE_HFLIP, 4
+	db FRAMEBLOCK_1F, BASECOORD_24, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_20, BASECOORD_20, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_21, BASECOORD_1A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_22, BASECOORD_15, FRAMEBLOCKMODE_00
+
+Subanim_0RocksFallEnemy:
+	subanim SUBANIMTYPE_HFLIP, 18
+	db FRAMEBLOCK_23, BASECOORD_00, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_02, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_04, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_23, BASECOORD_07, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_02, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_04, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_23, BASECOORD_0E, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_02, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_0C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_25, BASECOORD_07, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_25, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_25, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_24, BASECOORD_24, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_1C, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_23, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_23, BASECOORD_21, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_24, BASECOORD_28, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_24, BASECOORD_28, FRAMEBLOCKMODE_00
+
+Subanim_0Scratches:
+	subanim SUBANIMTYPE_HFLIP, 12
+	db FRAMEBLOCK_26, BASECOORD_0E, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_26, BASECOORD_16, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_26, BASECOORD_1C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_27, BASECOORD_0E, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_27, BASECOORD_16, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_27, BASECOORD_1C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_28, BASECOORD_0E, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_28, BASECOORD_16, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_28, BASECOORD_1C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_29, BASECOORD_0E, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_29, BASECOORD_16, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_29, BASECOORD_1C, FRAMEBLOCKMODE_00
+
+Subanim_0Slice:
+	subanim SUBANIMTYPE_HFLIP, 12
+	db FRAMEBLOCK_2A, BASECOORD_05, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2B, BASECOORD_05, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2B, BASECOORD_0C, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2A, BASECOORD_11, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_2B, BASECOORD_11, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2B, BASECOORD_17, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2A, BASECOORD_1B, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_2B, BASECOORD_1B, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2B, BASECOORD_20, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2A, BASECOORD_2F, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_2C, BASECOORD_00, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_2C, BASECOORD_00, FRAMEBLOCKMODE_00
+
+Subanim_1Tornado:
+	subanim SUBANIMTYPE_REVERSE, 8
+	db FRAMEBLOCK_2D, BASECOORD_44, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2E, BASECOORD_45, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2D, BASECOORD_46, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2E, BASECOORD_47, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2D, BASECOORD_48, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2E, BASECOORD_49, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2D, BASECOORD_2F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2E, BASECOORD_1A, FRAMEBLOCKMODE_00
+
+Subanim_0SoundWave:
+	subanim SUBANIMTYPE_HVFLIP, 10
+	db FRAMEBLOCK_2F, BASECOORD_46, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_4F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_50, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_2E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_2F, BASECOORD_51, FRAMEBLOCKMODE_00
+
+Subanim_1BlobToss:
+	subanim SUBANIMTYPE_REVERSE, 6
+	db FRAMEBLOCK_30, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_10, FRAMEBLOCKMODE_00
+
+Subanim_1BlobDripEnemy:
+	subanim SUBANIMTYPE_HFLIP, 9
+	db FRAMEBLOCK_30, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_10, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_31, BASECOORD_1C, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_31, BASECOORD_21, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_31, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_30, BASECOORD_10, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_31, BASECOORD_1D, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_31, BASECOORD_22, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_31, BASECOORD_27, FRAMEBLOCKMODE_00
+
+Subanim_1CircleBlackToss:
+	subanim SUBANIMTYPE_REVERSE, 5
+	db FRAMEBLOCK_03, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_03, BASECOORD_10, FRAMEBLOCKMODE_00
+
+Subanim_1ExplosionSmallEnemy:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_08, FRAMEBLOCKMODE_00
+
+Subanim_1Shout:
+	subanim SUBANIMTYPE_HVFLIP, 2
+	db FRAMEBLOCK_35, BASECOORD_52, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_35, BASECOORD_53, FRAMEBLOCKMODE_00
+
+Subanim_0BirdiesCirclingEnemy:
+	subanim SUBANIMTYPE_HFLIP, 4
+	db FRAMEBLOCK_36, BASECOORD_54, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_36, BASECOORD_55, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_37, BASECOORD_56, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_37, BASECOORD_57, FRAMEBLOCKMODE_00
+
+Subanim_1SwordsCircling:
+	subanim SUBANIMTYPE_ENEMY, 4
+	db FRAMEBLOCK_36, BASECOORD_54, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_36, BASECOORD_55, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_37, BASECOORD_56, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_37, BASECOORD_57, FRAMEBLOCKMODE_00
+
+Subanim_1MusicCirclingEnemy:
+	subanim SUBANIMTYPE_HFLIP, 6
+	db FRAMEBLOCK_17, BASECOORD_54, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_55, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_56, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_57, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_17, BASECOORD_13, FRAMEBLOCKMODE_00
+
+Subanim_1CloudToss:
+	subanim SUBANIMTYPE_REVERSE, 12
+	db FRAMEBLOCK_38, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_38, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_38, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_38, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_38, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_38, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_39, BASECOORD_10, FRAMEBLOCKMODE_00
+
+Subanim_0WaterColumns:
+	subanim SUBANIMTYPE_HFLIP, 16
+	db FRAMEBLOCK_3A, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3B, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3C, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3D, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3A, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3B, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3C, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3D, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_0B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_0B, FRAMEBLOCKMODE_00
+
+Subanim_1SeedToss:
+	subanim SUBANIMTYPE_REVERSE, 4
+	db FRAMEBLOCK_40, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_40, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_40, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_40, BASECOORD_15, FRAMEBLOCKMODE_00
+
+Subanim_1SeedLand:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_41, BASECOORD_58, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_41, BASECOORD_59, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_41, BASECOORD_21, FRAMEBLOCKMODE_00
+
+Subanim_0RocksLift:
+	subanim SUBANIMTYPE_ENEMY, 15
+	db FRAMEBLOCK_24, BASECOORD_9A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_23, BASECOORD_1B, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_24, BASECOORD_22, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_23, BASECOORD_16, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_23, BASECOORD_1D, FRAMEBLOCKMODE_02
+	db FRAMEBLOCK_24, BASECOORD_98, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_25, BASECOORD_2C, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_2A, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_99, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_62, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_99, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_62, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_99, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_62, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_25, BASECOORD_99, FRAMEBLOCKMODE_03
+
+Subanim_0RocksToss:
+	subanim SUBANIMTYPE_NORMAL, 1
+	db FRAMEBLOCK_25, BASECOORD_75, FRAMEBLOCKMODE_00
+
+Subanim_1FlameStar:
+	subanim SUBANIMTYPE_HFLIP, 2
+	db FRAMEBLOCK_42, BASECOORD_07, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_43, BASECOORD_07, FRAMEBLOCKMODE_00
+
+Subanim_0Circles_1Squares_CenteringEnemy:
+	subanim SUBANIMTYPE_HFLIP, 3
+	db FRAMEBLOCK_44, BASECOORD_00, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_45, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_46, BASECOORD_10, FRAMEBLOCKMODE_02
+
+Subanim_0Circle_1Square_TossBack:
+	subanim SUBANIMTYPE_REVERSE, 11
+	db FRAMEBLOCK_47, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_56, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_07, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AA, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AB, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AC, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AD, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AE, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_AF, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_89, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_B0, FRAMEBLOCKMODE_00
+
+Subanim_0CirclesCentering:
+;	subanim SUBANIMTYPE_COORDFLIP, 6
+;joenote - above should be SUBANIMTYPE_HVFLIP instead, else double-edge is off-center for enemy 'mons
+	subanim SUBANIMTYPE_HVFLIP, 6
+	db FRAMEBLOCK_44, BASECOORD_64, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_45, BASECOORD_65, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_46, BASECOORD_66, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_66, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_66, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_66, FRAMEBLOCKMODE_00
+
+Subanim_0Circle_1Square_Appears:
+	subanim SUBANIMTYPE_COORDFLIP, 1
+	db FRAMEBLOCK_47, BASECOORD_67, FRAMEBLOCKMODE_00
+
+Subanim_1SphereBig:
+	subanim SUBANIMTYPE_HFLIP, 1
+	db FRAMEBLOCK_71, BASECOORD_0F, FRAMEBLOCKMODE_03
+
+Subanim_1SphereBigRise:
+	subanim SUBANIMTYPE_HFLIP, 7
+	db FRAMEBLOCK_71, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_72, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_73, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_74, BASECOORD_95, FRAMEBLOCKMODE_00
+
+Subanim_1SphereBigFall:
+	subanim SUBANIMTYPE_HFLIP, 8
+	db FRAMEBLOCK_74, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_73, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_72, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_95, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_08, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_71, BASECOORD_16, FRAMEBLOCKMODE_00
+
+Subanim_1LightningBall:
+	subanim SUBANIMTYPE_HFLIP, 29
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4C, BASECOORD_6A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4D, BASECOORD_69, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_6B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4C, BASECOORD_6A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4D, BASECOORD_69, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_6C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4C, BASECOORD_6A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4D, BASECOORD_69, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_6D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4C, BASECOORD_6A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4D, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4A, BASECOORD_68, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4B, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4C, BASECOORD_6A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_4D, BASECOORD_2A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_6B, FRAMEBLOCKMODE_00
+
+Subanim_0SliceBothSides:
+	subanim SUBANIMTYPE_HFLIP, 4
+	db FRAMEBLOCK_4E, BASECOORD_2B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_4F, BASECOORD_2B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_50, BASECOORD_2B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_50, BASECOORD_2B, FRAMEBLOCKMODE_00
+
+Subanim_0Bind:
+	subanim SUBANIMTYPE_HFLIP, 2
+	db FRAMEBLOCK_51, BASECOORD_2D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_51, BASECOORD_6E, FRAMEBLOCKMODE_00
+
+Subanim_0StatusParalyzed:
+	subanim SUBANIMTYPE_ENEMY, 2
+	db FRAMEBLOCK_51, BASECOORD_2D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_51, BASECOORD_6E, FRAMEBLOCKMODE_00
+
+Subanim_0StatusConfused:
+	subanim SUBANIMTYPE_COORDFLIP, 2
+	db FRAMEBLOCK_52, BASECOORD_71, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_52, BASECOORD_72, FRAMEBLOCKMODE_00
+
+Subanim_0StatusConfusedEnemy:
+	subanim SUBANIMTYPE_NORMAL, 2
+	db FRAMEBLOCK_52, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_52, BASECOORD_2C, FRAMEBLOCKMODE_00
+
+Subanim_0StatusSleep:
+	subanim SUBANIMTYPE_COORDFLIP, 3
+	db FRAMEBLOCK_53, BASECOORD_71, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_53, BASECOORD_7F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_53, BASECOORD_81, FRAMEBLOCKMODE_00
+
+Subanim_0StatusSleepEnemy:
+	subanim SUBANIMTYPE_NORMAL, 3
+	db FRAMEBLOCK_53, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_53, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_53, BASECOORD_2C, FRAMEBLOCKMODE_00
+
+Subanim_0StatusPoisoned:
+	subanim SUBANIMTYPE_ENEMY, 2
+	db FRAMEBLOCK_54, BASECOORD_01, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_54, BASECOORD_2C, FRAMEBLOCKMODE_00
+
+Subanim_1Sand:
+	subanim SUBANIMTYPE_HVFLIP, 3
+	db FRAMEBLOCK_55, BASECOORD_73, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_56, BASECOORD_73, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_57, BASECOORD_73, FRAMEBLOCKMODE_00
+
+Subanim_0Circle_1Square_HalfToss:
+	subanim SUBANIMTYPE_COORDFLIP, 3
+	db FRAMEBLOCK_47, BASECOORD_74, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_43, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_47, BASECOORD_75, FRAMEBLOCKMODE_00
+
+Subanim_1Barrier:
+	subanim SUBANIMTYPE_HVFLIP, 6
+	db FRAMEBLOCK_58, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_58, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_58, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_76, FRAMEBLOCKMODE_00
+
+Subanim_0Water_1Fire_Barrier:
+	subanim SUBANIMTYPE_COORDFLIP, 7
+	db FRAMEBLOCK_59, BASECOORD_79, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_7B, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_77, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_7A, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_78, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_7C, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_59, BASECOORD_76, FRAMEBLOCKMODE_00
+
+Subanim_0Water_1Fire_Geyser:
+	subanim SUBANIMTYPE_NORMAL, 8
+	db FRAMEBLOCK_3A, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3B, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3C, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3D, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3E, BASECOORD_4D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_3F, BASECOORD_4D, FRAMEBLOCKMODE_00
+
+Subanim_1Selfdestruct:
+	subanim SUBANIMTYPE_HVFLIP, 21
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_7D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_7D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_7D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_7E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_7E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_7E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_7F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_7F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_7F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_80, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_80, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_80, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_81, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_81, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_81, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_SMALL_BLACK_CIRCLE, BASECOORD_82, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_LARGE_BLACK_CIRCLE, BASECOORD_82, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5A, BASECOORD_82, FRAMEBLOCKMODE_00
+
+Subanim_0WaterBubbles:
+	subanim SUBANIMTYPE_HVFLIP, 4
+	db FRAMEBLOCK_5B, BASECOORD_83, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_5C, BASECOORD_84, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_5D, BASECOORD_85, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_5E, BASECOORD_09, FRAMEBLOCKMODE_00
+
+Subanim_0CirclesFalling:
+	subanim SUBANIMTYPE_HFLIP, 8
+	db FRAMEBLOCK_5F, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_5F, BASECOORD_00, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_60, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_60, BASECOORD_00, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_61, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_61, BASECOORD_00, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_62, BASECOORD_2A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_62, BASECOORD_00, FRAMEBLOCKMODE_00
+
+Subanim_0StringShot:
+	subanim SUBANIMTYPE_HVFLIP, 10
+	db FRAMEBLOCK_63, BASECOORD_89, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_64, BASECOORD_75, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_63, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_0D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_86, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_12, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_87, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_17, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_88, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_65, BASECOORD_1A, FRAMEBLOCKMODE_00
+
+Subanim_0IceFall:
+	subanim SUBANIMTYPE_HFLIP, 16
+	db FRAMEBLOCK_66, BASECOORD_8A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_66, BASECOORD_33, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_66, BASECOORD_2E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_67, BASECOORD_24, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_66, BASECOORD_01, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_10, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_1D, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_67, BASECOORD_28, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_66, BASECOORD_2A, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_0E, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_1B, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_67, BASECOORD_26, FRAMEBLOCKMODE_03
+	db FRAMEBLOCK_66, BASECOORD_03, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_12, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_66, BASECOORD_1E, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_67, BASECOORD_29, FRAMEBLOCKMODE_00
+
+Subanim_1StarBigToss:
+	subanim SUBANIMTYPE_REVERSE, 18
+	db FRAMEBLOCK_02, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_31, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_32, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_92, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_02, BASECOORD_10, FRAMEBLOCKMODE_00
+
+Subanim_1StarsSmallToss:
+	subanim SUBANIMTYPE_COORDFLIP, 18
+	db FRAMEBLOCK_68, BASECOORD_4B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_8C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_20, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_1C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_19, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_14, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_8D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_0C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_06, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_8E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_8F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_90, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_26, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_23, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_68, BASECOORD_1F, FRAMEBLOCKMODE_00
+
+Subanim_1LeavesToss:
+	subanim SUBANIMTYPE_HVFLIP, 12
+	db FRAMEBLOCK_69, BASECOORD_4B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_8C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_20, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_1C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_19, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_14, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_76, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_8D, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_15, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_10, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_0C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_69, BASECOORD_06, FRAMEBLOCKMODE_00
+
+Subanim_0Circle_1Square_Closing:
+	subanim SUBANIMTYPE_ENEMY, 3
+	db FRAMEBLOCK_6A, BASECOORD_07, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6B, BASECOORD_0F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6C, BASECOORD_17, FRAMEBLOCKMODE_00
+
+Subanim_0HornJabTwice:
+	subanim SUBANIMTYPE_HVFLIP, 4
+	db FRAMEBLOCK_6D, BASECOORD_8B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_84, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_63, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_8C, FRAMEBLOCKMODE_00
+
+Subanim_0HornJabThrice:
+	subanim SUBANIMTYPE_HVFLIP, 6
+	db FRAMEBLOCK_6D, BASECOORD_8B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_84, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_63, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_8C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_0A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6D, BASECOORD_89, FRAMEBLOCKMODE_00
+
+Subanim_0BallPoof:
+	subanim SUBANIMTYPE_HVFLIP, 3
+	db FRAMEBLOCK_06, BASECOORD_82, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_07, BASECOORD_82, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_08, BASECOORD_96, FRAMEBLOCKMODE_00
+
+Subanim_2TradeBallDrop:
+	subanim SUBANIMTYPE_NORMAL, 6
+	db FRAMEBLOCK_03, BASECOORD_41, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_04, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_05, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_48, FRAMEBLOCKMODE_03
+
+Subanim_2TradeBallShake:
+	subanim SUBANIMTYPE_NORMAL, 4
+	db FRAMEBLOCK_04, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_05, BASECOORD_48, FRAMEBLOCKMODE_04
+	db FRAMEBLOCK_03, BASECOORD_48, FRAMEBLOCKMODE_03
+
+Subanim_2TradeBallAppear:
+	subanim SUBANIMTYPE_NORMAL, 1
+	db FRAMEBLOCK_04, BASECOORD_84, FRAMEBLOCKMODE_03
+
+Subanim_2TradeBallPoof:
+	subanim SUBANIMTYPE_NORMAL, 3
+	db FRAMEBLOCK_06, BASECOORD_72, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_07, BASECOORD_72, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_08, BASECOORD_72, FRAMEBLOCKMODE_00
+
+Subanim_0EggShaking:
+	subanim SUBANIMTYPE_COORDFLIP, 8
+	db FRAMEBLOCK_6F, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6E, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_70, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6E, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6F, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6E, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_70, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_6E, BASECOORD_30, FRAMEBLOCKMODE_00
+
+Subanim_1TriangleToss:
+	subanim SUBANIMTYPE_HVFLIP, 6
+	db FRAMEBLOCK_32, BASECOORD_4B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_33, BASECOORD_4F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_32, BASECOORD_20, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_33, BASECOORD_16, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_32, BASECOORD_19, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_33, BASECOORD_0D, FRAMEBLOCKMODE_00
+
+Subanim_0Shell:
+	subanim SUBANIMTYPE_ENEMY, 6
+	db FRAMEBLOCK_76, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_76, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_76, BASECOORD_1B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_34, BASECOORD_1B, FRAMEBLOCKMODE_00
+
+Subanim_0CoinBounce:
+	subanim SUBANIMTYPE_HFLIP, 7
+	db FRAMEBLOCK_77, BASECOORD_25, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_9B, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_1A, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_9C, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_2F, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_50, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_77, BASECOORD_8C, FRAMEBLOCKMODE_00
+
+Subanim_0SafariRock:
+	subanim SUBANIMTYPE_NORMAL, 12
+	db FRAMEBLOCK_78, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_A2, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_93, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_61, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_73, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_A7, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_33, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_A8, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_A9, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_78, BASECOORD_34, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_01, BASECOORD_9E, FRAMEBLOCKMODE_00
+
+Subanim_0SafariBait:
+	subanim SUBANIMTYPE_NORMAL, 11
+	db FRAMEBLOCK_79, BASECOORD_30, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_A2, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_93, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_61, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_73, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_A7, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_33, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_A8, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_0E, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_A9, FRAMEBLOCKMODE_00
+	db FRAMEBLOCK_79, BASECOORD_34, FRAMEBLOCKMODE_00
+
+
 
 FrameBlockPointers:
 	dw FrameBlock00
@@ -2281,7 +2320,7 @@ FrameBlockPointers:
 	dw FrameBlock46
 	dw FrameBlock47
 	dw SmallBlackCircleFrameBlock
-	dw LargeBlockCircleFrameBlock
+	dw LargeBlackCircleFrameBlock
 	dw FrameBlock4a
 	dw FrameBlock4b
 	dw FrameBlock4c
@@ -2339,1292 +2378,1300 @@ FrameBlockPointers:
 ; second byte = x offset
 ; third byte = tile id (it's actually tile id - $31)
 ; fourth byte = tile properties (xflip/yflip/etc.)
+
+MACRO dbsprite
+; x tile, y tile, x pixel, y pixel, vtile offset, attributes
+	db (\2 * TILE_WIDTH) % $100 + \4, (\1 * TILE_WIDTH) % $100 + \3, \5, \6
+ENDM
+
 FrameBlock01:
-	db $09
-	db $00,$00,$2c,$00
-	db $00,$08,$2d,$00
-	db $00,$10,$2c,$20
-	db $08,$00,$3c,$00
-	db $08,$08,$3d,$00
-	db $08,$10,$3c,$20
-	db $10,$00,$2c,$40
-	db $10,$08,$2d,$40
-	db $10,$10,$2c,$60
+	db 9 ; #
+	dbsprite  0,  0,  0,  0, $2c, 0
+	dbsprite  1,  0,  0,  0, $2d, 0
+	dbsprite  2,  0,  0,  0, $2c, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $3c, 0
+	dbsprite  1,  1,  0,  0, $3d, 0
+	dbsprite  2,  1,  0,  0, $3c, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $2c, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $2d, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $2c, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock02:
-	db $10
-	db $00,$00,$20,$00
-	db $00,$08,$21,$00
-	db $00,$10,$21,$20
-	db $00,$18,$20,$20
-	db $08,$00,$30,$00
-	db $08,$08,$31,$00
-	db $08,$10,$31,$20
-	db $08,$18,$30,$20
-	db $10,$00,$30,$40
-	db $10,$08,$31,$40
-	db $10,$10,$31,$60
-	db $10,$18,$30,$60
-	db $18,$00,$20,$40
-	db $18,$08,$21,$40
-	db $18,$10,$21,$60
-	db $18,$18,$20,$60
+	db 16 ; #
+	dbsprite  0,  0,  0,  0, $20, 0
+	dbsprite  1,  0,  0,  0, $21, 0
+	dbsprite  2,  0,  0,  0, $21, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $20, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $30, 0
+	dbsprite  1,  1,  0,  0, $31, 0
+	dbsprite  2,  1,  0,  0, $31, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $30, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $30, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $31, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $31, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $30, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $20, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $21, OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $21, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $20, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock03:
-	db $04
-	db $00,$00,$02,$00
-	db $00,$08,$02,$20
-	db $08,$00,$12,$00
-	db $08,$08,$12,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $02, 0
+	dbsprite  1,  0,  0,  0, $02, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $12, 0
+	dbsprite  1,  1,  0,  0, $12, OAM_XFLIP
 
 FrameBlock04:
-	db $04
-	db $00,$00,$06,$00
-	db $00,$08,$07,$00
-	db $08,$00,$16,$00
-	db $08,$08,$17,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $06, 0
+	dbsprite  1,  0,  0,  0, $07, 0
+	dbsprite  0,  1,  0,  0, $16, 0
+	dbsprite  1,  1,  0,  0, $17, 0
 
 FrameBlock05:
-	db $04
-	db $00,$00,$07,$20
-	db $00,$08,$06,$20
-	db $08,$00,$17,$20
-	db $08,$08,$16,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $07, OAM_XFLIP
+	dbsprite  1,  0,  0,  0, $06, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $17, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $16, OAM_XFLIP
 
 FrameBlock06:
-	db $0c
-	db $00,$08,$23,$00
-	db $08,$00,$32,$00
-	db $08,$08,$33,$00
-	db $00,$10,$23,$20
-	db $08,$10,$33,$20
-	db $08,$18,$32,$20
-	db $10,$00,$32,$40
-	db $10,$08,$33,$40
-	db $18,$08,$23,$40
-	db $10,$10,$33,$60
-	db $10,$18,$32,$60
-	db $18,$10,$23,$60
+	db 12 ; #
+	dbsprite  1,  0,  0,  0, $23, 0
+	dbsprite  0,  1,  0,  0, $32, 0
+	dbsprite  1,  1,  0,  0, $33, 0
+	dbsprite  2,  0,  0,  0, $23, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $33, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $32, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $32, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $33, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $33, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $32, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock07:
-	db $10
-	db $00,$00,$20,$00
-	db $00,$08,$21,$00
-	db $08,$00,$30,$00
-	db $08,$08,$31,$00
-	db $00,$10,$21,$20
-	db $00,$18,$20,$20
-	db $08,$10,$31,$20
-	db $08,$18,$30,$20
-	db $10,$00,$30,$40
-	db $10,$08,$31,$40
-	db $18,$00,$20,$40
-	db $18,$08,$21,$40
-	db $10,$10,$31,$60
-	db $10,$18,$30,$60
-	db $18,$10,$21,$60
-	db $18,$18,$20,$60
+	db 16 ; #
+	dbsprite  0,  0,  0,  0, $20, 0
+	dbsprite  1,  0,  0,  0, $21, 0
+	dbsprite  0,  1,  0,  0, $30, 0
+	dbsprite  1,  1,  0,  0, $31, 0
+	dbsprite  2,  0,  0,  0, $21, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $20, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $31, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $30, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $30, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $31, OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $20, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $21, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $31, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $30, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $21, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $20, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock08:
-	db $10
-	db $00,$00,$20,$00
-	db $00,$08,$21,$00
-	db $08,$00,$30,$00
-	db $08,$08,$31,$00
-	db $00,$18,$21,$20
-	db $00,$20,$20,$20
-	db $08,$18,$31,$20
-	db $08,$20,$30,$20
-	db $18,$00,$30,$40
-	db $18,$08,$31,$40
-	db $20,$00,$20,$40
-	db $20,$08,$21,$40
-	db $18,$18,$31,$60
-	db $18,$20,$30,$60
-	db $20,$18,$21,$60
-	db $20,$20,$20,$60
+	db 16 ; #
+	dbsprite  0,  0,  0,  0, $20, 0
+	dbsprite  1,  0,  0,  0, $21, 0
+	dbsprite  0,  1,  0,  0, $30, 0
+	dbsprite  1,  1,  0,  0, $31, 0
+	dbsprite  3,  0,  0,  0, $21, OAM_XFLIP
+	dbsprite  4,  0,  0,  0, $20, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $31, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $30, OAM_XFLIP
+	dbsprite  0,  3,  0,  0, $30, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $31, OAM_YFLIP
+	dbsprite  0,  4,  0,  0, $20, OAM_YFLIP
+	dbsprite  1,  4,  0,  0, $21, OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $31, OAM_XFLIP | OAM_YFLIP
+	dbsprite  4,  3,  0,  0, $30, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  4,  0,  0, $21, OAM_XFLIP | OAM_YFLIP
+	dbsprite  4,  4,  0,  0, $20, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock09:
-	db $0c
-	db $00,$00,$24,$00
-	db $00,$08,$25,$00
-	db $08,$00,$34,$00
-	db $00,$18,$25,$20
-	db $00,$20,$24,$20
-	db $08,$20,$34,$20
-	db $18,$00,$34,$40
-	db $20,$00,$24,$40
-	db $20,$08,$25,$40
-	db $18,$20,$34,$60
-	db $20,$18,$25,$60
-	db $20,$20,$24,$60
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $24, 0
+	dbsprite  1,  0,  0,  0, $25, 0
+	dbsprite  0,  1,  0,  0, $34, 0
+	dbsprite  3,  0,  0,  0, $25, OAM_XFLIP
+	dbsprite  4,  0,  0,  0, $24, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $34, OAM_XFLIP
+	dbsprite  0,  3,  0,  0, $34, OAM_YFLIP
+	dbsprite  0,  4,  0,  0, $24, OAM_YFLIP
+	dbsprite  1,  4,  0,  0, $25, OAM_YFLIP
+	dbsprite  4,  3,  0,  0, $34, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  4,  0,  0, $25, OAM_XFLIP | OAM_YFLIP
+	dbsprite  4,  4,  0,  0, $24, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock0a:
-	db $0c
-	db $00,$00,$24,$00
-	db $00,$08,$25,$00
-	db $08,$00,$34,$00
-	db $00,$20,$25,$20
-	db $00,$28,$24,$20
-	db $08,$28,$34,$20
-	db $20,$00,$34,$40
-	db $28,$00,$24,$40
-	db $28,$08,$25,$40
-	db $20,$28,$34,$60
-	db $28,$20,$25,$60
-	db $28,$28,$24,$60
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $24, 0
+	dbsprite  1,  0,  0,  0, $25, 0
+	dbsprite  0,  1,  0,  0, $34, 0
+	dbsprite  4,  0,  0,  0, $25, OAM_XFLIP
+	dbsprite  5,  0,  0,  0, $24, OAM_XFLIP
+	dbsprite  5,  1,  0,  0, $34, OAM_XFLIP
+	dbsprite  0,  4,  0,  0, $34, OAM_YFLIP
+	dbsprite  0,  5,  0,  0, $24, OAM_YFLIP
+	dbsprite  1,  5,  0,  0, $25, OAM_YFLIP
+	dbsprite  5,  4,  0,  0, $34, OAM_XFLIP | OAM_YFLIP
+	dbsprite  4,  5,  0,  0, $25, OAM_XFLIP | OAM_YFLIP
+	dbsprite  5,  5,  0,  0, $24, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock0b:
-	db $04
-	db $00,$00,$05,$00
-	db $00,$08,$05,$20
-	db $08,$00,$15,$00
-	db $08,$08,$15,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $05, 0
+	dbsprite  1,  0,  0,  0, $05, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $15, 0
+	dbsprite  1,  1,  0,  0, $15, OAM_XFLIP
 
 FrameBlock0c:
-	db $04
-	db $00,$00,$04,$00
-	db $00,$08,$04,$20
-	db $08,$00,$14,$00
-	db $08,$08,$14,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $04, 0
+	dbsprite  1,  0,  0,  0, $04, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $14, 0
+	dbsprite  1,  1,  0,  0, $14, OAM_XFLIP
 
 FrameBlock0d:
-	db $08
-	db $00,$00,$0c,$00
-	db $00,$08,$0d,$00
-	db $08,$00,$1c,$00
-	db $08,$08,$1d,$00
-	db $10,$00,$1d,$60
-	db $10,$08,$1c,$60
-	db $18,$00,$0d,$60
-	db $18,$08,$0c,$60
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $0c, 0
+	dbsprite  1,  0,  0,  0, $0d, 0
+	dbsprite  0,  1,  0,  0, $1c, 0
+	dbsprite  1,  1,  0,  0, $1d, 0
+	dbsprite  0,  2,  0,  0, $1d, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $1c, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $0d, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $0c, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock0e:
-	db $04
-	db $20,$00,$0c,$00
-	db $20,$08,$0d,$00
-	db $28,$00,$1c,$00
-	db $28,$08,$1d,$00
+	db 4 ; #
+	dbsprite  0,  4,  0,  0, $0c, 0
+	dbsprite  1,  4,  0,  0, $0d, 0
+	dbsprite  0,  5,  0,  0, $1c, 0
+	dbsprite  1,  5,  0,  0, $1d, 0
 
 FrameBlock0f:
-	db $04
-	db $30,$00,$1d,$60
-	db $30,$08,$1c,$60
-	db $38,$00,$0d,$60
-	db $38,$08,$0c,$60
+	db 4 ; #
+	dbsprite  0,  6,  0,  0, $1d, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  6,  0,  0, $1c, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  7,  0,  0, $0d, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  7,  0,  0, $0c, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock10:
-	db $08
-	db $00,$00,$0e,$00
-	db $00,$08,$0f,$00
-	db $08,$00,$1e,$00
-	db $08,$08,$1f,$00
-	db $00,$10,$0f,$20
-	db $00,$18,$0e,$20
-	db $08,$10,$1f,$20
-	db $08,$18,$1e,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $0e, 0
+	dbsprite  1,  0,  0,  0, $0f, 0
+	dbsprite  0,  1,  0,  0, $1e, 0
+	dbsprite  1,  1,  0,  0, $1f, 0
+	dbsprite  2,  0,  0,  0, $0f, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $0e, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $1f, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $1e, OAM_XFLIP
 
 FrameBlock11:
-	db $08
-	db $00,$00,$0e,$00
-	db $00,$08,$0f,$00
-	db $08,$00,$1e,$00
-	db $08,$08,$1f,$00
-	db $00,$20,$0f,$20
-	db $00,$28,$0e,$20
-	db $08,$20,$1f,$20
-	db $08,$28,$1e,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $0e, 0
+	dbsprite  1,  0,  0,  0, $0f, 0
+	dbsprite  0,  1,  0,  0, $1e, 0
+	dbsprite  1,  1,  0,  0, $1f, 0
+	dbsprite  4,  0,  0,  0, $0f, OAM_XFLIP
+	dbsprite  5,  0,  0,  0, $0e, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $1f, OAM_XFLIP
+	dbsprite  5,  1,  0,  0, $1e, OAM_XFLIP
 
 FrameBlock12:
-	db $03
-	db $00,$00,$37,$00
-	db $08,$10,$37,$00
-	db $00,$20,$37,$00
+	db 3 ; #
+	dbsprite  0,  0,  0,  0, $37, 0
+	dbsprite  2,  1,  0,  0, $37, 0
+	dbsprite  4,  0,  0,  0, $37, 0
 
 FrameBlock13:
-	db $04
-	db $00,$00,$36,$00
-	db $00,$08,$36,$20
-	db $08,$00,$36,$40
-	db $08,$08,$36,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $36, 0
+	dbsprite  1,  0,  0,  0, $36, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $36, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $36, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock14:
-	db $08
-	db $00,$10,$28,$00
-	db $00,$18,$28,$20
-	db $08,$10,$38,$00
-	db $08,$18,$38,$20
-	db $00,$20,$36,$00
-	db $00,$28,$36,$20
-	db $08,$20,$36,$40
-	db $08,$28,$36,$60
+	db 8 ; #
+	dbsprite  2,  0,  0,  0, $28, 0
+	dbsprite  3,  0,  0,  0, $28, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $38, 0
+	dbsprite  3,  1,  0,  0, $38, OAM_XFLIP
+	dbsprite  4,  0,  0,  0, $36, 0
+	dbsprite  5,  0,  0,  0, $36, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $36, OAM_YFLIP
+	dbsprite  5,  1,  0,  0, $36, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock15:
-	db $0c
-	db $00,$00,$28,$00
-	db $00,$08,$28,$20
-	db $08,$00,$38,$00
-	db $08,$08,$38,$20
-	db $00,$10,$29,$00
-	db $00,$18,$29,$20
-	db $08,$10,$39,$00
-	db $08,$18,$39,$20
-	db $00,$20,$28,$00
-	db $00,$28,$28,$20
-	db $08,$20,$38,$00
-	db $08,$28,$38,$20
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $28, 0
+	dbsprite  1,  0,  0,  0, $28, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $38, 0
+	dbsprite  1,  1,  0,  0, $38, OAM_XFLIP
+	dbsprite  2,  0,  0,  0, $29, 0
+	dbsprite  3,  0,  0,  0, $29, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $39, 0
+	dbsprite  3,  1,  0,  0, $39, OAM_XFLIP
+	dbsprite  4,  0,  0,  0, $28, 0
+	dbsprite  5,  0,  0,  0, $28, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $38, 0
+	dbsprite  5,  1,  0,  0, $38, OAM_XFLIP
 
 FrameBlock16:
-	db $08
-	db $00,$00,$29,$00
-	db $00,$08,$29,$20
-	db $08,$00,$39,$00
-	db $08,$08,$39,$20
-	db $00,$20,$29,$00
-	db $00,$28,$29,$20
-	db $08,$20,$39,$00
-	db $08,$28,$39,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $29, 0
+	dbsprite  1,  0,  0,  0, $29, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $39, 0
+	dbsprite  1,  1,  0,  0, $39, OAM_XFLIP
+	dbsprite  4,  0,  0,  0, $29, 0
+	dbsprite  5,  0,  0,  0, $29, OAM_XFLIP
+	dbsprite  4,  1,  0,  0, $39, 0
+	dbsprite  5,  1,  0,  0, $39, OAM_XFLIP
 
 FrameBlock17:
-	db $04
-	db $00,$00,$08,$00
-	db $00,$08,$09,$00
-	db $08,$00,$18,$00
-	db $08,$08,$19,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $08, 0
+	dbsprite  1,  0,  0,  0, $09, 0
+	dbsprite  0,  1,  0,  0, $18, 0
+	dbsprite  1,  1,  0,  0, $19, 0
 
 FrameBlock18:
-	db $01
-	db $18,$00,$45,$60
+	db 1 ; #
+	dbsprite  0,  3,  0,  0, $45, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock19:
-	db $02
-	db $18,$08,$45,$00
-	db $10,$08,$46,$60
+	db 2 ; #
+	dbsprite  1,  3,  0,  0, $45, 0
+	dbsprite  1,  2,  0,  0, $46, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock1a:
-	db $02
-	db $10,$10,$45,$60
-	db $18,$10,$46,$00
+	db 2 ; #
+	dbsprite  2,  2,  0,  0, $45, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $46, 0
 
 FrameBlock1b:
-	db $02
-	db $10,$18,$45,$00
-	db $08,$18,$46,$60
+	db 2 ; #
+	dbsprite  3,  2,  0,  0, $45, 0
+	dbsprite  3,  1,  0,  0, $46, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock1c:
-	db $02
-	db $08,$20,$45,$60
-	db $10,$20,$46,$00
+	db 2 ; #
+	dbsprite  4,  1,  0,  0, $45, OAM_XFLIP | OAM_YFLIP
+	dbsprite  4,  2,  0,  0, $46, 0
 
 FrameBlock1d:
-	db $02
-	db $08,$28,$45,$00
-	db $00,$28,$46,$60
+	db 2 ; #
+	dbsprite  5,  1,  0,  0, $45, 0
+	dbsprite  5,  0,  0,  0, $46, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock1e:
-	db $02
-	db $00,$30,$45,$60
-	db $08,$30,$46,$00
+	db 2 ; #
+	dbsprite  6,  0,  0,  0, $45, OAM_XFLIP | OAM_YFLIP
+	dbsprite  6,  1,  0,  0, $46, 0
 
 FrameBlock75:
-	db $04
-	db $00,$00,$43,$00
-	db $00,$08,$43,$20
-	db $08,$00,$22,$00
-	db $08,$08,$43,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $43, 0
+	dbsprite  1,  0,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $22, 0
+	dbsprite  1,  1,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock1f:
-	db $02
-	db $00,$00,$03,$00
-	db $00,$30,$03,$20
+	db 2 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  6,  0,  0,  0, $03, OAM_XFLIP
 
 FrameBlock20:
-	db $06
-	db $00,$00,$03,$00
-	db $00,$30,$03,$20
-	db $08,$08,$03,$00
-	db $08,$28,$03,$20
-	db $08,$00,$13,$00
-	db $08,$30,$13,$20
+	db 6 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  6,  0,  0,  0, $03, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $03, 0
+	dbsprite  5,  1,  0,  0, $03, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $13, 0
+	dbsprite  6,  1,  0,  0, $13, OAM_XFLIP
 
 FrameBlock21:
-	db $0c
-	db $00,$00,$03,$00
-	db $00,$30,$03,$20
-	db $08,$08,$03,$00
-	db $08,$28,$03,$20
-	db $08,$00,$13,$00
-	db $08,$30,$13,$20
-	db $10,$10,$03,$00
-	db $10,$20,$03,$20
-	db $10,$08,$13,$00
-	db $10,$28,$13,$20
-	db $10,$00,$03,$00
-	db $10,$30,$03,$20
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  6,  0,  0,  0, $03, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $03, 0
+	dbsprite  5,  1,  0,  0, $03, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $13, 0
+	dbsprite  6,  1,  0,  0, $13, OAM_XFLIP
+	dbsprite  2,  2,  0,  0, $03, 0
+	dbsprite  4,  2,  0,  0, $03, OAM_XFLIP
+	dbsprite  1,  2,  0,  0, $13, 0
+	dbsprite  5,  2,  0,  0, $13, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $03, 0
+	dbsprite  6,  2,  0,  0, $03, OAM_XFLIP
 
 FrameBlock22:
-	db $13
-	db $00,$00,$03,$00
-	db $08,$00,$13,$00
-	db $10,$00,$03,$00
-	db $18,$00,$13,$00
-	db $08,$08,$03,$00
-	db $10,$08,$13,$00
-	db $18,$08,$03,$00
-	db $10,$10,$03,$00
-	db $18,$10,$13,$00
-	db $18,$18,$03,$00
-	db $10,$20,$03,$20
-	db $18,$20,$13,$20
-	db $08,$28,$03,$20
-	db $10,$28,$13,$20
-	db $18,$28,$03,$20
-	db $00,$30,$03,$20
-	db $08,$30,$13,$20
-	db $10,$30,$03,$20
-	db $18,$30,$13,$20
+	db 19 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  0,  1,  0,  0, $13, 0
+	dbsprite  0,  2,  0,  0, $03, 0
+	dbsprite  0,  3,  0,  0, $13, 0
+	dbsprite  1,  1,  0,  0, $03, 0
+	dbsprite  1,  2,  0,  0, $13, 0
+	dbsprite  1,  3,  0,  0, $03, 0
+	dbsprite  2,  2,  0,  0, $03, 0
+	dbsprite  2,  3,  0,  0, $13, 0
+	dbsprite  3,  3,  0,  0, $03, 0
+	dbsprite  4,  2,  0,  0, $03, OAM_XFLIP
+	dbsprite  4,  3,  0,  0, $13, OAM_XFLIP
+	dbsprite  5,  1,  0,  0, $03, OAM_XFLIP
+	dbsprite  5,  2,  0,  0, $13, OAM_XFLIP
+	dbsprite  5,  3,  0,  0, $03, OAM_XFLIP
+	dbsprite  6,  0,  0,  0, $03, OAM_XFLIP
+	dbsprite  6,  1,  0,  0, $13, OAM_XFLIP
+	dbsprite  6,  2,  0,  0, $03, OAM_XFLIP
+	dbsprite  6,  3,  0,  0, $13, OAM_XFLIP
 
 FrameBlock23:
-	db $04
-	db $00,$00,$0a,$00
-	db $00,$08,$0b,$00
-	db $08,$00,$1a,$00
-	db $08,$08,$1b,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $0a, 0
+	dbsprite  1,  0,  0,  0, $0b, 0
+	dbsprite  0,  1,  0,  0, $1a, 0
+	dbsprite  1,  1,  0,  0, $1b, 0
 
 FrameBlock24:
-	db $02
-	db $08,$00,$0a,$00
-	db $08,$08,$0b,$00
+	db 2 ; #
+	dbsprite  0,  1,  0,  0, $0a, 0
+	dbsprite  1,  1,  0,  0, $0b, 0
 
 FrameBlock25:
-	db $0c
-	db $10,$00,$0a,$00
-	db $10,$08,$0b,$00
-	db $18,$00,$1a,$00
-	db $18,$08,$1b,$00
-	db $00,$10,$0a,$00
-	db $00,$18,$0b,$00
-	db $08,$10,$1a,$00
-	db $08,$18,$1b,$00
-	db $08,$20,$0a,$00
-	db $08,$28,$0b,$00
-	db $10,$20,$1a,$00
-	db $10,$28,$1b,$00
+	db 12 ; #
+	dbsprite  0,  2,  0,  0, $0a, 0
+	dbsprite  1,  2,  0,  0, $0b, 0
+	dbsprite  0,  3,  0,  0, $1a, 0
+	dbsprite  1,  3,  0,  0, $1b, 0
+	dbsprite  2,  0,  0,  0, $0a, 0
+	dbsprite  3,  0,  0,  0, $0b, 0
+	dbsprite  2,  1,  0,  0, $1a, 0
+	dbsprite  3,  1,  0,  0, $1b, 0
+	dbsprite  4,  1,  0,  0, $0a, 0
+	dbsprite  5,  1,  0,  0, $0b, 0
+	dbsprite  4,  2,  0,  0, $1a, 0
+	dbsprite  5,  2,  0,  0, $1b, 0
 
 FrameBlock26:
-	db $04
-	db $00,$10,$44,$00
-	db $00,$18,$44,$20
-	db $08,$10,$44,$40
-	db $08,$18,$44,$60
+	db 4 ; #
+	dbsprite  2,  0,  0,  0, $44, 0
+	dbsprite  3,  0,  0,  0, $44, OAM_XFLIP
+	dbsprite  2,  1,  0,  0, $44, OAM_YFLIP
+	dbsprite  3,  1,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock27:
-	db $05
-	db $08,$08,$44,$00
-	db $08,$10,$44,$20
-	db $10,$08,$44,$40
-	db $10,$10,$44,$60
-	db $00,$18,$47,$00
+	db 5 ; #
+	dbsprite  1,  1,  0,  0, $44, 0
+	dbsprite  2,  1,  0,  0, $44, OAM_XFLIP
+	dbsprite  1,  2,  0,  0, $44, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  0,  0,  0, $47, 0
 
 FrameBlock28:
-	db $06
-	db $10,$00,$44,$00
-	db $10,$08,$44,$20
-	db $18,$00,$44,$40
-	db $18,$08,$44,$60
-	db $08,$10,$47,$00
-	db $02,$16,$47,$00
+	db 6 ; #
+	dbsprite  0,  2,  0,  0, $44, 0
+	dbsprite  1,  2,  0,  0, $44, OAM_XFLIP
+	dbsprite  0,  3,  0,  0, $44, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  1,  0,  0, $47, 0
+	dbsprite  2,  0,  6,  2, $47, 0
 
 FrameBlock29:
-	db $04
-	db $18,$00,$47,$00
-	db $12,$06,$47,$00
-	db $0c,$0c,$47,$00
-	db $06,$12,$47,$00
+	db 4 ; #
+	dbsprite  0,  3,  0,  0, $47, 0
+	dbsprite  0,  2,  6,  2, $47, 0
+	dbsprite  1,  1,  4,  4, $47, 0
+	dbsprite  2,  0,  2,  6, $47, 0
 
 FrameBlock2a:
-	db $04
-	db $00,$00,$44,$00
-	db $00,$08,$44,$20
-	db $08,$00,$44,$40
-	db $08,$08,$44,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $44, 0
+	dbsprite  1,  0,  0,  0, $44, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $44, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock2b:
-	db $02
-	db $06,$02,$47,$00
-	db $00,$08,$47,$00
+	db 2 ; #
+	dbsprite  0,  0,  2,  6, $47, 0
+	dbsprite  1,  0,  0,  0, $47, 0
 
 FrameBlock2c:
-	db $01
-	db $a0,$00,$4d,$00
+	db 1 ; #
+	dbsprite  0, 20,  0,  0, $4d, 0
 
 FrameBlock2d:
-	db $08
-	db $00,$00,$26,$00
-	db $00,$08,$27,$00
-	db $08,$00,$36,$00
-	db $08,$08,$37,$00
-	db $10,$00,$28,$00
-	db $10,$08,$29,$00
-	db $18,$00,$38,$00
-	db $18,$08,$39,$00
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $26, 0
+	dbsprite  1,  0,  0,  0, $27, 0
+	dbsprite  0,  1,  0,  0, $36, 0
+	dbsprite  1,  1,  0,  0, $37, 0
+	dbsprite  0,  2,  0,  0, $28, 0
+	dbsprite  1,  2,  0,  0, $29, 0
+	dbsprite  0,  3,  0,  0, $38, 0
+	dbsprite  1,  3,  0,  0, $39, 0
 
 FrameBlock2e:
-	db $08
-	db $00,$00,$27,$20
-	db $00,$08,$26,$20
-	db $08,$00,$37,$20
-	db $08,$08,$36,$20
-	db $10,$00,$29,$20
-	db $10,$08,$28,$20
-	db $18,$00,$39,$20
-	db $18,$08,$38,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $27, OAM_XFLIP
+	dbsprite  1,  0,  0,  0, $26, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $37, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $36, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $29, OAM_XFLIP
+	dbsprite  1,  2,  0,  0, $28, OAM_XFLIP
+	dbsprite  0,  3,  0,  0, $39, OAM_XFLIP
+	dbsprite  1,  3,  0,  0, $38, OAM_XFLIP
 
 FrameBlock2f:
-	db $04
-	db $00,$00,$0c,$00
-	db $00,$08,$0d,$00
-	db $08,$00,$0c,$40
-	db $08,$08,$0d,$40
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $0c, 0
+	dbsprite  1,  0,  0,  0, $0d, 0
+	dbsprite  0,  1,  0,  0, $0c, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $0d, OAM_YFLIP
 
 FrameBlock30:
-	db $04
-	db $00,$00,$44,$00
-	db $00,$08,$44,$20
-	db $08,$00,$44,$40
-	db $08,$08,$44,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $44, 0
+	dbsprite  1,  0,  0,  0, $44, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $44, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock31:
-	db $01
-	db $00,$00,$45,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $45, 0
 
 FrameBlock32:
-	db $07
-	db $00,$00,$4d,$00
-	db $00,$08,$2f,$00
-	db $00,$10,$4d,$20
-	db $08,$00,$4e,$00
-	db $08,$08,$07,$00
-	db $08,$10,$4e,$20
-	db $10,$08,$3f,$00
+	db 7 ; #
+	dbsprite  0,  0,  0,  0, $4d, 0
+	dbsprite  1,  0,  0,  0, $2f, 0
+	dbsprite  2,  0,  0,  0, $4d, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $4e, 0
+	dbsprite  1,  1,  0,  0, $07, 0
+	dbsprite  2,  1,  0,  0, $4e, OAM_XFLIP
+	dbsprite  1,  2,  0,  0, $3f, 0
 
 FrameBlock33:
-	db $07
-	db $00,$08,$3f,$40
-	db $08,$00,$4e,$40
-	db $08,$08,$07,$40
-	db $08,$10,$4e,$60
-	db $10,$00,$4d,$40
-	db $10,$08,$2f,$40
-	db $10,$10,$4d,$60
+	db 7 ; #
+	dbsprite  1,  0,  0,  0, $3f, OAM_YFLIP
+	dbsprite  0,  1,  0,  0, $4e, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $07, OAM_YFLIP
+	dbsprite  2,  1,  0,  0, $4e, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  2,  0,  0, $4d, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $2f, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $4d, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock34:
-	db $01
-	db $a0,$00,$00,$10
+	db 1 ; #
+	dbsprite  0, 20,  0,  0, $00, OAM_PAL1
 
 FrameBlock35:
-	db $06
-	db $00,$00,$2a,$00
-	db $00,$08,$2b,$00
-	db $08,$00,$3a,$00
-	db $10,$00,$3a,$40
-	db $18,$00,$2a,$40
-	db $18,$08,$2b,$40
+	db 6 ; #
+	dbsprite  0,  0,  0,  0, $2a, 0
+	dbsprite  1,  0,  0,  0, $2b, 0
+	dbsprite  0,  1,  0,  0, $3a, 0
+	dbsprite  0,  2,  0,  0, $3a, OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $2a, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $2b, OAM_YFLIP
 
 FrameBlock36:
-	db $04
-	db $00,$00,$00,$00
-	db $00,$08,$01,$00
-	db $08,$00,$10,$00
-	db $08,$08,$11,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $00, 0
+	dbsprite  1,  0,  0,  0, $01, 0
+	dbsprite  0,  1,  0,  0, $10, 0
+	dbsprite  1,  1,  0,  0, $11, 0
 
 FrameBlock37:
-	db $04
-	db $00,$00,$01,$a0
-	db $00,$08,$00,$a0
-	db $08,$00,$11,$a0
-	db $08,$08,$10,$a0
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $01, OAM_PRIO | OAM_XFLIP
+	dbsprite  1,  0,  0,  0, $00, OAM_PRIO | OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $11, OAM_PRIO | OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $10, OAM_PRIO | OAM_XFLIP
 
 FrameBlock38:
-	db $04
-	db $00,$00,$0a,$00
-	db $00,$08,$0b,$00
-	db $08,$00,$1a,$00
-	db $08,$08,$1b,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $0a, 0
+	dbsprite  1,  0,  0,  0, $0b, 0
+	dbsprite  0,  1,  0,  0, $1a, 0
+	dbsprite  1,  1,  0,  0, $1b, 0
 
 FrameBlock39:
-	db $04
-	db $00,$00,$0b,$20
-	db $00,$08,$0a,$20
-	db $08,$00,$1b,$20
-	db $08,$08,$1a,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $0b, OAM_XFLIP
+	dbsprite  1,  0,  0,  0, $0a, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $1b, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $1a, OAM_XFLIP
 
 FrameBlock3a:
-	db $04
-	db $20,$00,$05,$00
-	db $20,$08,$05,$20
-	db $28,$00,$15,$00
-	db $28,$08,$15,$20
+	db 4 ; #
+	dbsprite  0,  4,  0,  0, $05, 0
+	dbsprite  1,  4,  0,  0, $05, OAM_XFLIP
+	dbsprite  0,  5,  0,  0, $15, 0
+	dbsprite  1,  5,  0,  0, $15, OAM_XFLIP
 
 FrameBlock3b:
-	db $05
-	db $18,$00,$04,$00
-	db $18,$08,$04,$20
-	db $20,$00,$14,$00
-	db $20,$08,$14,$20
-	db $28,$04,$41,$00
+	db 5 ; #
+	dbsprite  0,  3,  0,  0, $04, 0
+	dbsprite  1,  3,  0,  0, $04, OAM_XFLIP
+	dbsprite  0,  4,  0,  0, $14, 0
+	dbsprite  1,  4,  0,  0, $14, OAM_XFLIP
+	dbsprite  0,  5,  4,  0, $41, 0
 
 FrameBlock3c:
-	db $06
-	db $10,$00,$05,$00
-	db $10,$08,$05,$20
-	db $18,$00,$15,$00
-	db $18,$08,$15,$20
-	db $20,$04,$42,$00
-	db $28,$04,$42,$00
+	db 6 ; #
+	dbsprite  0,  2,  0,  0, $05, 0
+	dbsprite  1,  2,  0,  0, $05, OAM_XFLIP
+	dbsprite  0,  3,  0,  0, $15, 0
+	dbsprite  1,  3,  0,  0, $15, OAM_XFLIP
+	dbsprite  0,  4,  4,  0, $42, 0
+	dbsprite  0,  5,  4,  0, $42, 0
 
 FrameBlock3d:
-	db $07
-	db $08,$00,$04,$00
-	db $08,$08,$04,$20
-	db $10,$00,$14,$00
-	db $10,$08,$14,$20
-	db $18,$04,$41,$00
-	db $20,$04,$41,$00
-	db $28,$04,$41,$00
+	db 7 ; #
+	dbsprite  0,  1,  0,  0, $04, 0
+	dbsprite  1,  1,  0,  0, $04, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $14, 0
+	dbsprite  1,  2,  0,  0, $14, OAM_XFLIP
+	dbsprite  0,  3,  4,  0, $41, 0
+	dbsprite  0,  4,  4,  0, $41, 0
+	dbsprite  0,  5,  4,  0, $41, 0
 
 FrameBlock3e:
-	db $08
-	db $00,$00,$05,$00
-	db $00,$08,$05,$20
-	db $08,$00,$15,$00
-	db $08,$08,$15,$20
-	db $10,$04,$42,$00
-	db $18,$04,$42,$00
-	db $20,$04,$42,$00
-	db $28,$04,$42,$00
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $05, 0
+	dbsprite  1,  0,  0,  0, $05, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $15, 0
+	dbsprite  1,  1,  0,  0, $15, OAM_XFLIP
+	dbsprite  0,  2,  4,  0, $42, 0
+	dbsprite  0,  3,  4,  0, $42, 0
+	dbsprite  0,  4,  4,  0, $42, 0
+	dbsprite  0,  5,  4,  0, $42, 0
 
 FrameBlock3f:
-	db $08
-	db $00,$00,$04,$00
-	db $00,$08,$04,$20
-	db $08,$00,$14,$00
-	db $08,$08,$14,$20
-	db $10,$04,$41,$00
-	db $18,$04,$41,$00
-	db $20,$04,$41,$00
-	db $28,$04,$41,$00
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $04, 0
+	dbsprite  1,  0,  0,  0, $04, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $14, 0
+	dbsprite  1,  1,  0,  0, $14, OAM_XFLIP
+	dbsprite  0,  2,  4,  0, $41, 0
+	dbsprite  0,  3,  4,  0, $41, 0
+	dbsprite  0,  4,  4,  0, $41, 0
+	dbsprite  0,  5,  4,  0, $41, 0
 
 FrameBlock40:
-	db $03
-	db $00,$00,$3d,$00
-	db $00,$08,$3d,$00
-	db $08,$08,$3d,$00
+	db 3 ; #
+	dbsprite  0,  0,  0,  0, $3d, 0
+	dbsprite  1,  0,  0,  0, $3d, 0
+	dbsprite  1,  1,  0,  0, $3d, 0
 
 FrameBlock41:
-	db $04
-	db $00,$00,$06,$00
-	db $00,$08,$06,$20
-	db $08,$00,$16,$00
-	db $08,$08,$17,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $06, 0
+	dbsprite  1,  0,  0,  0, $06, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $16, 0
+	dbsprite  1,  1,  0,  0, $17, 0
 
 FrameBlock42:
-	db $0b
-	db $00,$10,$42,$00
-	db $08,$00,$42,$00
-	db $08,$08,$42,$00
-	db $08,$10,$42,$00
-	db $08,$18,$42,$00
-	db $08,$20,$42,$00
-	db $10,$10,$42,$00
-	db $18,$08,$42,$00
-	db $18,$18,$42,$00
-	db $20,$00,$42,$00
-	db $20,$20,$42,$00
+	db 11 ; #
+	dbsprite  2,  0,  0,  0, $42, 0
+	dbsprite  0,  1,  0,  0, $42, 0
+	dbsprite  1,  1,  0,  0, $42, 0
+	dbsprite  2,  1,  0,  0, $42, 0
+	dbsprite  3,  1,  0,  0, $42, 0
+	dbsprite  4,  1,  0,  0, $42, 0
+	dbsprite  2,  2,  0,  0, $42, 0
+	dbsprite  1,  3,  0,  0, $42, 0
+	dbsprite  3,  3,  0,  0, $42, 0
+	dbsprite  0,  4,  0,  0, $42, 0
+	dbsprite  4,  4,  0,  0, $42, 0
 
 FrameBlock43:
-	db $0b
-	db $00,$10,$41,$00
-	db $08,$00,$41,$00
-	db $08,$08,$41,$00
-	db $08,$10,$41,$00
-	db $08,$18,$41,$00
-	db $08,$20,$41,$00
-	db $10,$10,$41,$00
-	db $18,$08,$41,$00
-	db $18,$18,$41,$00
-	db $20,$00,$41,$00
-	db $20,$20,$41,$00
+	db 11 ; #
+	dbsprite  2,  0,  0,  0, $41, 0
+	dbsprite  0,  1,  0,  0, $41, 0
+	dbsprite  1,  1,  0,  0, $41, 0
+	dbsprite  2,  1,  0,  0, $41, 0
+	dbsprite  3,  1,  0,  0, $41, 0
+	dbsprite  4,  1,  0,  0, $41, 0
+	dbsprite  2,  2,  0,  0, $41, 0
+	dbsprite  1,  3,  0,  0, $41, 0
+	dbsprite  3,  3,  0,  0, $41, 0
+	dbsprite  0,  4,  0,  0, $41, 0
+	dbsprite  4,  4,  0,  0, $41, 0
 
 FrameBlock44:
-	db $04
-	db $00,$00,$49,$00
-	db $00,$28,$49,$00
-	db $28,$00,$49,$00
-	db $28,$28,$49,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  5,  0,  0,  0, $49, 0
+	dbsprite  0,  5,  0,  0, $49, 0
+	dbsprite  5,  5,  0,  0, $49, 0
 
 FrameBlock45:
-	db $04
-	db $00,$00,$49,$00
-	db $00,$18,$49,$00
-	db $18,$00,$49,$00
-	db $18,$18,$49,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  3,  0,  0,  0, $49, 0
+	dbsprite  0,  3,  0,  0, $49, 0
+	dbsprite  3,  3,  0,  0, $49, 0
 
 FrameBlock46:
-	db $04
-	db $00,$00,$49,$00
-	db $00,$08,$49,$00
-	db $08,$00,$49,$00
-	db $08,$08,$49,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  1,  0,  0,  0, $49, 0
+	dbsprite  0,  1,  0,  0, $49, 0
+	dbsprite  1,  1,  0,  0, $49, 0
 
 FrameBlock47:
-	db $04
-	db $00,$00,$43,$00
-	db $00,$08,$43,$20
-	db $08,$00,$43,$40
-	db $08,$08,$43,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $43, 0
+	dbsprite  1,  0,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $43, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
 
 SmallBlackCircleFrameBlock:
-	db $04
-	db $08,$08,$33,$00
-	db $08,$10,$33,$20
-	db $10,$08,$33,$40
-	db $10,$10,$33,$60
+	db 4 ; #
+	dbsprite  1,  1,  0,  0, $33, 0
+	dbsprite  2,  1,  0,  0, $33, OAM_XFLIP
+	dbsprite  1,  2,  0,  0, $33, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $33, OAM_XFLIP | OAM_YFLIP
 
-LargeBlockCircleFrameBlock:
-	db $10
-	db $00,$00,$22,$00
-	db $00,$08,$23,$00
-	db $00,$10,$23,$20
-	db $00,$18,$22,$20
-	db $08,$00,$32,$00
-	db $08,$08,$43,$00
-	db $08,$10,$43,$20
-	db $08,$18,$32,$20
-	db $10,$00,$32,$40
-	db $10,$08,$43,$40
-	db $10,$10,$43,$60
-	db $10,$18,$32,$60
-	db $18,$00,$22,$40
-	db $18,$08,$23,$40
-	db $18,$10,$23,$60
-	db $18,$18,$22,$60
+LargeBlackCircleFrameBlock:
+	db 16 ; #
+	dbsprite  0,  0,  0,  0, $22, 0
+	dbsprite  1,  0,  0,  0, $23, 0
+	dbsprite  2,  0,  0,  0, $23, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $22, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $32, 0
+	dbsprite  1,  1,  0,  0, $43, 0
+	dbsprite  2,  1,  0,  0, $43, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $32, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $32, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $43, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $32, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $22, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $22, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock71:
-	db $10
-	db $00,$00,$22,$00
-	db $00,$08,$3b,$00
-	db $00,$10,$23,$20
-	db $00,$18,$22,$20
-	db $08,$00,$32,$00
-	db $08,$08,$43,$00
-	db $08,$10,$43,$20
-	db $08,$18,$32,$20
-	db $10,$00,$32,$40
-	db $10,$08,$43,$40
-	db $10,$10,$43,$60
-	db $10,$18,$32,$60
-	db $18,$00,$22,$40
-	db $18,$08,$23,$40
-	db $18,$10,$23,$60
-	db $18,$18,$22,$60
+	db 16 ; #
+	dbsprite  0,  0,  0,  0, $22, 0
+	dbsprite  1,  0,  0,  0, $3b, 0
+	dbsprite  2,  0,  0,  0, $23, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $22, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $32, 0
+	dbsprite  1,  1,  0,  0, $43, 0
+	dbsprite  2,  1,  0,  0, $43, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $32, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $32, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $43, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $32, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $22, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $22, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock72:
-	db $0c
-	db $00,$00,$32,$00
-	db $00,$08,$43,$00
-	db $00,$10,$43,$20
-	db $00,$18,$32,$20
-	db $08,$00,$32,$40
-	db $08,$08,$43,$40
-	db $08,$10,$43,$60
-	db $08,$18,$32,$60
-	db $10,$00,$22,$40
-	db $10,$08,$23,$40
-	db $10,$10,$23,$60
-	db $10,$18,$22,$60
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $32, 0
+	dbsprite  1,  0,  0,  0, $43, 0
+	dbsprite  2,  0,  0,  0, $43, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $32, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $32, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $43, OAM_YFLIP
+	dbsprite  2,  1,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  1,  0,  0, $32, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  2,  0,  0, $22, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $22, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock73:
-	db $08
-	db $00,$00,$32,$40
-	db $00,$08,$43,$40
-	db $00,$10,$43,$60
-	db $00,$18,$32,$60
-	db $08,$00,$22,$40
-	db $08,$08,$23,$40
-	db $08,$10,$23,$60
-	db $08,$18,$22,$60
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $32, OAM_YFLIP
+	dbsprite  1,  0,  0,  0, $43, OAM_YFLIP
+	dbsprite  2,  0,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  0,  0,  0, $32, OAM_XFLIP | OAM_YFLIP
+	dbsprite  0,  1,  0,  0, $22, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  1,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  1,  0,  0, $22, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock74:
-	db $04
-	db $00,$00,$22,$40
-	db $00,$08,$23,$40
-	db $00,$10,$23,$60
-	db $00,$18,$22,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $22, OAM_YFLIP
+	dbsprite  1,  0,  0,  0, $23, OAM_YFLIP
+	dbsprite  2,  0,  0,  0, $23, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  0,  0,  0, $22, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock4a:
-	db $04
-	db $08,$18,$4c,$20
-	db $20,$08,$4b,$00
-	db $30,$20,$4c,$00
-	db $18,$30,$4b,$40
+	db 4 ; #
+	dbsprite  3,  1,  0,  0, $4c, OAM_XFLIP
+	dbsprite  1,  4,  0,  0, $4b, 0
+	dbsprite  4,  6,  0,  0, $4c, 0
+	dbsprite  6,  3,  0,  0, $4b, OAM_YFLIP
 
 FrameBlock4b:
-	db $04
-	db $00,$18,$4c,$00
-	db $20,$00,$4b,$40
-	db $38,$20,$4c,$20
-	db $18,$38,$4b,$00
+	db 4 ; #
+	dbsprite  3,  0,  0,  0, $4c, 0
+	dbsprite  0,  4,  0,  0, $4b, OAM_YFLIP
+	dbsprite  4,  7,  0,  0, $4c, OAM_XFLIP
+	dbsprite  7,  3,  0,  0, $4b, 0
 
 FrameBlock4c:
-	db $04
-	db $10,$08,$4a,$40
-	db $30,$10,$4a,$00
-	db $28,$30,$4a,$20
-	db $08,$28,$4a,$60
+	db 4 ; #
+	dbsprite  1,  2,  0,  0, $4a, OAM_YFLIP
+	dbsprite  2,  6,  0,  0, $4a, 0
+	dbsprite  6,  5,  0,  0, $4a, OAM_XFLIP
+	dbsprite  5,  1,  0,  0, $4a, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock4d:
-	db $04
-	db $08,$00,$4a,$20
-	db $38,$08,$4a,$60
-	db $30,$38,$4a,$40
-	db $00,$30,$4a,$00
+	db 4 ; #
+	dbsprite  0,  1,  0,  0, $4a, OAM_XFLIP
+	dbsprite  1,  7,  0,  0, $4a, OAM_XFLIP | OAM_YFLIP
+	dbsprite  7,  6,  0,  0, $4a, OAM_YFLIP
+	dbsprite  6,  0,  0,  0, $4a, 0
 
 FrameBlock4e:
-	db $08
-	db $00,$30,$44,$00
-	db $00,$38,$44,$20
-	db $08,$30,$44,$40
-	db $08,$38,$44,$60
-	db $26,$0a,$44,$00
-	db $26,$12,$44,$20
-	db $2e,$0a,$44,$40
-	db $2e,$12,$44,$60
+	db 8 ; #
+	dbsprite  6,  0,  0,  0, $44, 0
+	dbsprite  7,  0,  0,  0, $44, OAM_XFLIP
+	dbsprite  6,  1,  0,  0, $44, OAM_YFLIP
+	dbsprite  7,  1,  0,  0, $44, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  4,  2,  6, $44, 0
+	dbsprite  2,  4,  2,  6, $44, OAM_XFLIP
+	dbsprite  1,  5,  2,  6, $44, OAM_YFLIP
+	dbsprite  2,  5,  2,  6, $44, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock4f:
-	db $0c
-	db $0e,$22,$44,$00
-	db $0e,$2a,$44,$20
-	db $16,$22,$44,$40
-	db $16,$2a,$44,$60
-	db $06,$32,$47,$00
-	db $00,$38,$47,$00
-	db $1a,$16,$44,$00
-	db $1a,$1e,$44,$20
-	db $22,$16,$44,$40
-	db $22,$1e,$44,$60
-	db $30,$08,$47,$00
-	db $2a,$0e,$47,$00
+	db 12 ; #
+	dbsprite  4,  1,  2,  6, $44, 0
+	dbsprite  5,  1,  2,  6, $44, OAM_XFLIP
+	dbsprite  4,  2,  2,  6, $44, OAM_YFLIP
+	dbsprite  5,  2,  2,  6, $44, OAM_XFLIP | OAM_YFLIP
+	dbsprite  6,  0,  2,  6, $47, 0
+	dbsprite  7,  0,  0,  0, $47, 0
+	dbsprite  2,  3,  6,  2, $44, 0
+	dbsprite  3,  3,  6,  2, $44, OAM_XFLIP
+	dbsprite  2,  4,  6,  2, $44, OAM_YFLIP
+	dbsprite  3,  4,  6,  2, $44, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  6,  0,  0, $47, 0
+	dbsprite  1,  5,  6,  2, $47, 0
 
 FrameBlock50:
-	db $08
-	db $06,$32,$47,$00
-	db $00,$38,$47,$00
-	db $12,$26,$47,$00
-	db $0c,$2c,$47,$00
-	db $1e,$1a,$47,$00
-	db $18,$20,$47,$00
-	db $2a,$0e,$47,$00
-	db $24,$14,$47,$00
+	db 8 ; #
+	dbsprite  6,  0,  2,  6, $47, 0
+	dbsprite  7,  0,  0,  0, $47, 0
+	dbsprite  4,  2,  6,  2, $47, 0
+	dbsprite  5,  1,  4,  4, $47, 0
+	dbsprite  3,  3,  2,  6, $47, 0
+	dbsprite  4,  3,  0,  0, $47, 0
+	dbsprite  1,  5,  6,  2, $47, 0
+	dbsprite  2,  4,  4,  4, $47, 0
 
 FrameBlock51:
-	db $08
-	db $00,$00,$35,$20
-	db $08,$00,$35,$40
-	db $10,$00,$35,$00
-	db $18,$00,$35,$60
-	db $00,$40,$35,$00
-	db $08,$40,$35,$60
-	db $10,$40,$35,$20
-	db $18,$40,$35,$40
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $35, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $35, OAM_YFLIP
+	dbsprite  0,  2,  0,  0, $35, 0
+	dbsprite  0,  3,  0,  0, $35, OAM_XFLIP | OAM_YFLIP
+	dbsprite  8,  0,  0,  0, $35, 0
+	dbsprite  8,  1,  0,  0, $35, OAM_XFLIP | OAM_YFLIP
+	dbsprite  8,  2,  0,  0, $35, OAM_XFLIP
+	dbsprite  8,  3,  0,  0, $35, OAM_YFLIP
 
 FrameBlock52:
-	db $04
-	db $00,$00,$2a,$00
-	db $00,$08,$2b,$00
-	db $08,$00,$3a,$00
-	db $08,$08,$3b,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $2a, 0
+	dbsprite  1,  0,  0,  0, $2b, 0
+	dbsprite  0,  1,  0,  0, $3a, 0
+	dbsprite  1,  1,  0,  0, $3b, 0
 
 FrameBlock53:
-	db $03
-	db $00,$00,$3f,$00
-	db $00,$08,$3f,$00
-	db $08,$06,$3f,$00
+	db 3 ; #
+	dbsprite  0,  0,  0,  0, $3f, 0
+	dbsprite  1,  0,  0,  0, $3f, 0
+	dbsprite  0,  1,  6,  0, $3f, 0
 
 FrameBlock54:
-	db $04
-	db $00,$00,$0e,$00
-	db $00,$08,$0e,$20
-	db $08,$00,$0f,$00
-	db $08,$08,$0f,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $0e, 0
+	dbsprite  1,  0,  0,  0, $0e, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $0f, 0
+	dbsprite  1,  1,  0,  0, $0f, OAM_XFLIP
 
 FrameBlock55:
-	db $03
-	db $10,$00,$2c,$00
-	db $10,$08,$3c,$00
-	db $10,$10,$2d,$00
+	db 3 ; #
+	dbsprite  0,  2,  0,  0, $2c, 0
+	dbsprite  1,  2,  0,  0, $3c, 0
+	dbsprite  2,  2,  0,  0, $2d, 0
 
 FrameBlock56:
-	db $06
-	db $10,$10,$31,$00
-	db $10,$18,$31,$00
-	db $08,$10,$2c,$00
-	db $08,$18,$3c,$00
-	db $08,$20,$2d,$00
-	db $10,$20,$2d,$00
+	db 6 ; #
+	dbsprite  2,  2,  0,  0, $31, 0
+	dbsprite  3,  2,  0,  0, $31, 0
+	dbsprite  2,  1,  0,  0, $2c, 0
+	dbsprite  3,  1,  0,  0, $3c, 0
+	dbsprite  4,  1,  0,  0, $2d, 0
+	dbsprite  4,  2,  0,  0, $2d, 0
 
 FrameBlock57:
-	db $09
-	db $08,$20,$31,$00
-	db $10,$20,$31,$00
-	db $08,$28,$31,$00
-	db $10,$28,$31,$00
-	db $00,$20,$2c,$00
-	db $00,$28,$3c,$00
-	db $00,$30,$2d,$00
-	db $08,$30,$2d,$00
-	db $10,$30,$2d,$00
+	db 9 ; #
+	dbsprite  4,  1,  0,  0, $31, 0
+	dbsprite  4,  2,  0,  0, $31, 0
+	dbsprite  5,  1,  0,  0, $31, 0
+	dbsprite  5,  2,  0,  0, $31, 0
+	dbsprite  4,  0,  0,  0, $2c, 0
+	dbsprite  5,  0,  0,  0, $3c, 0
+	dbsprite  6,  0,  0,  0, $2d, 0
+	dbsprite  6,  1,  0,  0, $2d, 0
+	dbsprite  6,  2,  0,  0, $2d, 0
 
 FrameBlock58:
-	db $07
-	db $00,$00,$46,$00
-	db $08,$02,$47,$00
-	db $10,$03,$48,$00
-	db $18,$04,$48,$00
-	db $20,$05,$48,$00
-	db $28,$05,$48,$00
-	db $30,$05,$48,$00
+	db 7 ; #
+	dbsprite  0,  0,  0,  0, $46, 0
+	dbsprite  0,  1,  2,  0, $47, 0
+	dbsprite  0,  2,  3,  0, $48, 0
+	dbsprite  0,  3,  4,  0, $48, 0
+	dbsprite  0,  4,  5,  0, $48, 0
+	dbsprite  0,  5,  5,  0, $48, 0
+	dbsprite  0,  6,  5,  0, $48, 0
 
 FrameBlock59:
-	db $01
-	db $00,$00,$42,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $42, 0
 
 FrameBlock5a:
-	db $0c
-	db $00,$00,$24,$00
-	db $00,$08,$25,$00
-	db $08,$00,$34,$00
-	db $00,$10,$25,$20
-	db $00,$18,$24,$20
-	db $08,$18,$34,$20
-	db $10,$00,$34,$40
-	db $18,$00,$24,$40
-	db $18,$08,$25,$40
-	db $10,$18,$34,$60
-	db $18,$10,$25,$60
-	db $18,$18,$24,$60
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $24, 0
+	dbsprite  1,  0,  0,  0, $25, 0
+	dbsprite  0,  1,  0,  0, $34, 0
+	dbsprite  2,  0,  0,  0, $25, OAM_XFLIP
+	dbsprite  3,  0,  0,  0, $24, OAM_XFLIP
+	dbsprite  3,  1,  0,  0, $34, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $34, OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $24, OAM_YFLIP
+	dbsprite  1,  3,  0,  0, $25, OAM_YFLIP
+	dbsprite  3,  2,  0,  0, $34, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  3,  0,  0, $25, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $24, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock5b:
-	db $04
-	db $00,$00,$43,$00
-	db $00,$08,$43,$20
-	db $08,$00,$43,$40
-	db $08,$08,$43,$60
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $43, 0
+	dbsprite  1,  0,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $43, OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock5c:
-	db $08
-	db $00,$00,$49,$00
-	db $02,$08,$49,$00
-	db $18,$00,$49,$00
-	db $10,$10,$49,$00
-	db $08,$00,$43,$00
-	db $08,$08,$43,$20
-	db $10,$00,$43,$40
-	db $10,$08,$43,$60
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  1,  0,  0,  2, $49, 0
+	dbsprite  0,  3,  0,  0, $49, 0
+	dbsprite  2,  2,  0,  0, $49, 0
+	dbsprite  0,  1,  0,  0, $43, 0
+	dbsprite  1,  1,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $43, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock5d:
-	db $0b
-	db $00,$00,$49,$00
-	db $18,$02,$49,$00
-	db $14,$10,$49,$00
-	db $08,$00,$43,$00
-	db $00,$08,$43,$20
-	db $10,$00,$43,$40
-	db $10,$08,$43,$60
-	db $04,$08,$43,$00
-	db $04,$10,$43,$20
-	db $0c,$08,$43,$40
-	db $0c,$10,$43,$60
+	db 11 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  0,  3,  2,  0, $49, 0
+	dbsprite  2,  2,  0,  4, $49, 0
+	dbsprite  0,  1,  0,  0, $43, 0
+	dbsprite  1,  0,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $43, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  0,  0,  4, $43, 0
+	dbsprite  2,  0,  0,  4, $43, OAM_XFLIP
+	dbsprite  1,  1,  0,  4, $43, OAM_YFLIP
+	dbsprite  2,  1,  0,  4, $43, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock5e:
-	db $0f
-	db $00,$08,$49,$00
-	db $08,$10,$49,$00
-	db $20,$00,$49,$00
-	db $08,$00,$43,$00
-	db $08,$08,$43,$20
-	db $10,$00,$43,$40
-	db $10,$08,$43,$60
-	db $10,$10,$43,$00
-	db $10,$18,$43,$20
-	db $18,$10,$43,$40
-	db $18,$18,$43,$60
-	db $20,$08,$43,$00
-	db $20,$10,$43,$20
-	db $28,$08,$43,$40
-	db $28,$10,$43,$60
+	db 15 ; #
+	dbsprite  1,  0,  0,  0, $49, 0
+	dbsprite  2,  1,  0,  0, $49, 0
+	dbsprite  0,  4,  0,  0, $49, 0
+	dbsprite  0,  1,  0,  0, $43, 0
+	dbsprite  1,  1,  0,  0, $43, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $43, OAM_YFLIP
+	dbsprite  1,  2,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $43, 0
+	dbsprite  3,  2,  0,  0, $43, OAM_XFLIP
+	dbsprite  2,  3,  0,  0, $43, OAM_YFLIP
+	dbsprite  3,  3,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  4,  0,  0, $43, 0
+	dbsprite  2,  4,  0,  0, $43, OAM_XFLIP
+	dbsprite  1,  5,  0,  0, $43, OAM_YFLIP
+	dbsprite  2,  5,  0,  0, $43, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock5f:
-	db $04
-	db $00,$00,$49,$00
-	db $00,$10,$49,$00
-	db $00,$20,$49,$00
-	db $00,$30,$49,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  2,  0,  0,  0, $49, 0
+	dbsprite  4,  0,  0,  0, $49, 0
+	dbsprite  6,  0,  0,  0, $49, 0
 
 FrameBlock60:
-	db $08
-	db $00,$00,$49,$00
-	db $00,$10,$49,$00
-	db $00,$20,$49,$00
-	db $00,$30,$49,$00
-	db $08,$08,$49,$00
-	db $08,$18,$49,$00
-	db $08,$28,$49,$00
-	db $08,$38,$49,$00
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  2,  0,  0,  0, $49, 0
+	dbsprite  4,  0,  0,  0, $49, 0
+	dbsprite  6,  0,  0,  0, $49, 0
+	dbsprite  1,  1,  0,  0, $49, 0
+	dbsprite  3,  1,  0,  0, $49, 0
+	dbsprite  5,  1,  0,  0, $49, 0
+	dbsprite  7,  1,  0,  0, $49, 0
 
 FrameBlock61:
-	db $0c
-	db $00,$00,$49,$00
-	db $00,$10,$49,$00
-	db $00,$20,$49,$00
-	db $00,$30,$49,$00
-	db $08,$08,$49,$00
-	db $08,$18,$49,$00
-	db $08,$28,$49,$00
-	db $08,$38,$49,$00
-	db $10,$00,$49,$00
-	db $10,$10,$49,$00
-	db $10,$20,$49,$00
-	db $10,$30,$49,$00
+	db 12 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  2,  0,  0,  0, $49, 0
+	dbsprite  4,  0,  0,  0, $49, 0
+	dbsprite  6,  0,  0,  0, $49, 0
+	dbsprite  1,  1,  0,  0, $49, 0
+	dbsprite  3,  1,  0,  0, $49, 0
+	dbsprite  5,  1,  0,  0, $49, 0
+	dbsprite  7,  1,  0,  0, $49, 0
+	dbsprite  0,  2,  0,  0, $49, 0
+	dbsprite  2,  2,  0,  0, $49, 0
+	dbsprite  4,  2,  0,  0, $49, 0
+	dbsprite  6,  2,  0,  0, $49, 0
 
 FrameBlock62:
-	db $0f
-	db $00,$00,$49,$00
-	db $00,$10,$49,$00
-	db $00,$20,$49,$00
-	db $00,$30,$49,$00
-	db $08,$08,$49,$00
-	db $08,$18,$49,$00
-	db $08,$28,$49,$00
-	db $08,$38,$49,$00
-	db $10,$00,$49,$00
-	db $10,$10,$49,$00
-	db $10,$20,$49,$00
-	db $10,$30,$49,$00
-	db $18,$08,$49,$00
-	db $18,$18,$49,$00
-	db $18,$28,$49,$00
-	db $18,$38,$49,$00 ; unused
+	db 15 ; #
+	dbsprite  0,  0,  0,  0, $49, 0
+	dbsprite  2,  0,  0,  0, $49, 0
+	dbsprite  4,  0,  0,  0, $49, 0
+	dbsprite  6,  0,  0,  0, $49, 0
+	dbsprite  1,  1,  0,  0, $49, 0
+	dbsprite  3,  1,  0,  0, $49, 0
+	dbsprite  5,  1,  0,  0, $49, 0
+	dbsprite  7,  1,  0,  0, $49, 0
+	dbsprite  0,  2,  0,  0, $49, 0
+	dbsprite  2,  2,  0,  0, $49, 0
+	dbsprite  4,  2,  0,  0, $49, 0
+	dbsprite  6,  2,  0,  0, $49, 0
+	dbsprite  1,  3,  0,  0, $49, 0
+	dbsprite  3,  3,  0,  0, $49, 0
+	dbsprite  5,  3,  0,  0, $49, 0
+	dbsprite  7,  3,  0,  0, $49, 0
 
 FrameBlock63:
-	db $06
-	db $10,$00,$26,$00
-	db $10,$08,$27,$00
-	db $08,$10,$26,$00
-	db $08,$18,$27,$00
-	db $00,$20,$26,$00
-	db $00,$28,$27,$00
+	db 6 ; #
+	dbsprite  0,  2,  0,  0, $26, 0
+	dbsprite  1,  2,  0,  0, $27, 0
+	dbsprite  2,  1,  0,  0, $26, 0
+	dbsprite  3,  1,  0,  0, $27, 0
+	dbsprite  4,  0,  0,  0, $26, 0
+	dbsprite  5,  0,  0,  0, $27, 0
 
 FrameBlock64:
-	db $06
-	db $18,$00,$27,$00
-	db $10,$08,$26,$00
-	db $10,$10,$27,$00
-	db $08,$18,$26,$00
-	db $08,$20,$27,$00
-	db $00,$28,$26,$00
+	db 6 ; #
+	dbsprite  0,  3,  0,  0, $27, 0
+	dbsprite  1,  2,  0,  0, $26, 0
+	dbsprite  2,  2,  0,  0, $27, 0
+	dbsprite  3,  1,  0,  0, $26, 0
+	dbsprite  4,  1,  0,  0, $27, 0
+	dbsprite  5,  0,  0,  0, $26, 0
 
 FrameBlock65:
-	db $06
-	db $00,$00,$1c,$00
-	db $00,$08,$1d,$00
-	db $10,$00,$1c,$00
-	db $10,$08,$1d,$00
-	db $20,$00,$1c,$00
-	db $20,$08,$1d,$00
+	db 6 ; #
+	dbsprite  0,  0,  0,  0, $1c, 0
+	dbsprite  1,  0,  0,  0, $1d, 0
+	dbsprite  0,  2,  0,  0, $1c, 0
+	dbsprite  1,  2,  0,  0, $1d, 0
+	dbsprite  0,  4,  0,  0, $1c, 0
+	dbsprite  1,  4,  0,  0, $1d, 0
 
 FrameBlock66:
-	db $02
-	db $00,$00,$03,$00
-	db $08,$00,$13,$00
+	db 2 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  0,  1,  0,  0, $13, 0
 
 FrameBlock67:
-	db $01
-	db $00,$00,$03,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
 
 FrameBlock68:
-	db $04
-	db $00,$00,$03,$00
-	db $00,$08,$03,$20
-	db $08,$00,$13,$00
-	db $08,$08,$13,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $03, 0
+	dbsprite  1,  0,  0,  0, $03, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $13, 0
+	dbsprite  1,  1,  0,  0, $13, OAM_XFLIP
 
 FrameBlock69:
-	db $01
-	db $00,$00,$06,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $06, 0
 
 FrameBlock6a:
-	db $08
-	db $00,$00,$2e,$00
-	db $00,$30,$2e,$20
-	db $30,$00,$2e,$40
-	db $30,$30,$2e,$60
-	db $00,$18,$2f,$00
-	db $30,$18,$2f,$40
-	db $18,$00,$3e,$00
-	db $18,$30,$3e,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $2e, 0
+	dbsprite  6,  0,  0,  0, $2e, OAM_XFLIP
+	dbsprite  0,  6,  0,  0, $2e, OAM_YFLIP
+	dbsprite  6,  6,  0,  0, $2e, OAM_XFLIP | OAM_YFLIP
+	dbsprite  3,  0,  0,  0, $2f, 0
+	dbsprite  3,  6,  0,  0, $2f, OAM_YFLIP
+	dbsprite  0,  3,  0,  0, $3e, 0
+	dbsprite  6,  3,  0,  0, $3e, OAM_XFLIP
 
 FrameBlock6b:
-	db $08
-	db $00,$00,$2e,$00
-	db $00,$20,$2e,$20
-	db $20,$00,$2e,$40
-	db $20,$20,$2e,$60
-	db $00,$10,$2f,$00
-	db $20,$10,$2f,$40
-	db $10,$00,$3e,$00
-	db $10,$20,$3e,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $2e, 0
+	dbsprite  4,  0,  0,  0, $2e, OAM_XFLIP
+	dbsprite  0,  4,  0,  0, $2e, OAM_YFLIP
+	dbsprite  4,  4,  0,  0, $2e, OAM_XFLIP | OAM_YFLIP
+	dbsprite  2,  0,  0,  0, $2f, 0
+	dbsprite  2,  4,  0,  0, $2f, OAM_YFLIP
+	dbsprite  0,  2,  0,  0, $3e, 0
+	dbsprite  4,  2,  0,  0, $3e, OAM_XFLIP
 
 FrameBlock6c:
-	db $08
-	db $00,$00,$2e,$00
-	db $00,$10,$2e,$20
-	db $10,$00,$2e,$40
-	db $10,$10,$2e,$60
-	db $00,$08,$2f,$00
-	db $10,$08,$2f,$40
-	db $08,$00,$3e,$00
-	db $08,$10,$3e,$20
+	db 8 ; #
+	dbsprite  0,  0,  0,  0, $2e, 0
+	dbsprite  2,  0,  0,  0, $2e, OAM_XFLIP
+	dbsprite  0,  2,  0,  0, $2e, OAM_YFLIP
+	dbsprite  2,  2,  0,  0, $2e, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  0,  0,  0, $2f, 0
+	dbsprite  1,  2,  0,  0, $2f, OAM_YFLIP
+	dbsprite  0,  1,  0,  0, $3e, 0
+	dbsprite  2,  1,  0,  0, $3e, OAM_XFLIP
 
 FrameBlock6d:
-	db $02
-	db $00,$00,$1e,$00
-	db $00,$08,$1f,$00
+	db 2 ; #
+	dbsprite  0,  0,  0,  0, $1e, 0
+	dbsprite  1,  0,  0,  0, $1f, 0
 
 FrameBlock6e:
-	db $04
-	db $00,$00,$48,$00
-	db $00,$08,$48,$20
-	db $08,$00,$12,$00
-	db $08,$08,$12,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $48, 0
+	dbsprite  1,  0,  0,  0, $48, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $12, 0
+	dbsprite  1,  1,  0,  0, $12, OAM_XFLIP
 
 FrameBlock6f:
-	db $04
-	db $00,$00,$4a,$00
-	db $00,$08,$07,$00
-	db $08,$00,$16,$00
-	db $08,$08,$17,$00
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $4a, 0
+	dbsprite  1,  0,  0,  0, $07, 0
+	dbsprite  0,  1,  0,  0, $16, 0
+	dbsprite  1,  1,  0,  0, $17, 0
 
 FrameBlock70:
-	db $04
-	db $00,$00,$07,$20
-	db $00,$08,$4a,$20
-	db $08,$00,$17,$20
-	db $08,$08,$16,$20
+	db 4 ; #
+	dbsprite  0,  0,  0,  0, $07, OAM_XFLIP
+	dbsprite  1,  0,  0,  0, $4a, OAM_XFLIP
+	dbsprite  0,  1,  0,  0, $17, OAM_XFLIP
+	dbsprite  1,  1,  0,  0, $16, OAM_XFLIP
 
 FrameBlock76:
-	db $07
-	db $00,$10,$2f,$00
-	db $01,$08,$2f,$00
-	db $01,$18,$2f,$00
-	db $02,$00,$2e,$00
-	db $02,$20,$2e,$20
-	db $0a,$00,$3e,$00
-	db $0a,$20,$3e,$20
+	db 7 ; #
+	dbsprite  2,  0,  0,  0, $2f, 0
+	dbsprite  1,  0,  0,  1, $2f, 0
+	dbsprite  3,  0,  0,  1, $2f, 0
+	dbsprite  0,  0,  0,  2, $2e, 0
+	dbsprite  4,  0,  0,  2, $2e, OAM_XFLIP
+	dbsprite  0,  1,  0,  2, $3e, 0
+	dbsprite  4,  1,  0,  2, $3e, OAM_XFLIP
 
 FrameBlock77:
-	db $04
-	db $00,$02,$4b,$00
-	db $00,$0a,$4c,$00
-	db $08,$00,$4c,$60
-	db $08,$08,$4b,$60
+	db 4 ; #
+	dbsprite  0,  0,  2,  0, $4b, 0
+	dbsprite  1,  0,  2,  0, $4c, 0
+	dbsprite  0,  1,  0,  0, $4c, OAM_XFLIP | OAM_YFLIP
+	dbsprite  1,  1,  0,  0, $4b, OAM_XFLIP | OAM_YFLIP
 
 FrameBlock78:
-	db $01
-	db $00,$00,$4d,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $4d, 0
 
 FrameBlock79:
-	db $01
-	db $00,$00,$4e,$00
+	db 1 ; #
+	dbsprite  0,  0,  0,  0, $4e, 0
+
+
 
 FrameBlockBaseCoords:
-	db $10,$68
-	db $10,$70
-	db $10,$78
-	db $10,$80
-	db $10,$88
-	db $10,$90
-	db $10,$98
-	db $18,$68
-	db $18,$70
-	db $18,$78
-	db $34,$28
-	db $18,$80
-	db $18,$88
-	db $18,$98
-	db $20,$68
-	db $20,$70
-	db $20,$78
-	db $20,$80
-	db $20,$88
-	db $20,$90
-	db $20,$98
-	db $28,$68
-	db $28,$70
-	db $28,$78
-	db $28,$80
-	db $28,$88
-	db $30,$68
-	db $30,$70
-	db $30,$78
-	db $30,$80
-	db $30,$90
-	db $30,$98
-	db $38,$68
-	db $38,$78
-	db $38,$80
-	db $38,$88
-	db $40,$68
-	db $40,$70
-	db $40,$78
-	db $40,$80
-	db $40,$88
-	db $40,$98
-	db $10,$60
-	db $18,$60
-	db $20,$60
-	db $28,$60
-	db $30,$60
-	db $40,$60
-	db $58,$28
-	db $43,$38
-	db $33,$48
-	db $20,$58
-	db $32,$78
-	db $58,$58
-	db $2C,$6C
-	db $34,$80
-	db $48,$70
-	db $42,$36
-	db $38,$44
-	db $40,$52
-	db $48,$60
-	db $3E,$6E
-	db $28,$7C
-	db $28,$8A
-	db $50,$3C
-	db $48,$50
-	db $40,$64
-	db $38,$38
-	db $50,$30
-	db $50,$38
-	db $50,$40
-	db $50,$48
-	db $50,$50
-	db $48,$58
-	db $50,$44
-	db $48,$48
-	db $48,$4C
-	db $40,$50
-	db $40,$54
-	db $38,$58
-	db $38,$5C
-	db $30,$64
-	db $48,$40
-	db $48,$39
-	db $24,$88
-	db $24,$70
-	db $1C,$70
-	db $1C,$88
-	db $34,$68
-	db $34,$88
-	db $68,$50
-	db $60,$50
-	db $68,$60
-	db $58,$50
-	db $60,$60
-	db $68,$40
-	db $40,$40
-	db $38,$40
-	db $0B,$60
-	db $44,$48
-	db $40,$14
-	db $48,$1C
-	db $50,$24
-	db $4C,$24
-	db $10,$62
-	db $12,$62
-	db $12,$60
-	db $20,$72
-	db $22,$72
-	db $22,$70
-	db $28,$62
-	db $50,$0A
-	db $52,$0A
-	db $38,$30
-	db $40,$48
-	db $30,$48
-	db $40,$30
-	db $30,$40
-	db $38,$48
-	db $40,$4A
-	db $48,$4B
-	db $50,$4C
-	db $58,$4D
-	db $60,$4D
-	db $68,$4D
-	db $38,$10
-	db $50,$10
-	db $38,$28
-	db $48,$18
-	db $40,$20
-	db $48,$20
-	db $40,$3C
-	db $38,$50
-	db $28,$64
-	db $1C,$90
-	db $24,$80
-	db $2C,$70
-	db $30,$38
-	db $10,$50
-	db $3C,$40
-	db $40,$58
-	db $30,$58
-	db $58,$48
-	db $50,$58
-	db $48,$68
-	db $40,$18
-	db $28,$58
-	db $40,$38
-	db $48,$38
-	db $08,$70
-	db $44,$1C
-	db $3C,$58
-	db $38,$60
-	db $08,$60
-	db $38,$70
-	db $38,$6C
-	db $38,$64
-	db $1C,$74
-	db $2E,$74
-	db $34,$50
-	db $2F,$60
-	db $31,$70
-	db $4C,$30
-	db $3B,$40
-	db $2D,$50
-	db $26,$60
-	db $2D,$70
-	db $28,$50
-	db $1E,$60
-	db $29,$70
-	db $16,$60
-	db $14,$58
-	db $12,$54
-	db $14,$50
-	db $18,$4C
-	db $1C,$48
-	db $48,$28
+	db $10, $68 ; BASECOORD_00
+	db $10, $70 ; BASECOORD_01
+	db $10, $78 ; BASECOORD_02
+	db $10, $80 ; BASECOORD_03
+	db $10, $88 ; BASECOORD_04
+	db $10, $90 ; BASECOORD_05
+	db $10, $98 ; BASECOORD_06
+	db $18, $68 ; BASECOORD_07
+	db $18, $70 ; BASECOORD_08
+	db $18, $78 ; BASECOORD_09
+	db $34, $28 ; BASECOORD_0A
+	db $18, $80 ; BASECOORD_0B
+	db $18, $88 ; BASECOORD_0C
+	db $18, $98 ; BASECOORD_0D
+	db $20, $68 ; BASECOORD_0E
+	db $20, $70 ; BASECOORD_0F
+	db $20, $78 ; BASECOORD_10
+	db $20, $80 ; BASECOORD_11
+	db $20, $88 ; BASECOORD_12
+	db $20, $90 ; BASECOORD_13
+	db $20, $98 ; BASECOORD_14
+	db $28, $68 ; BASECOORD_15
+	db $28, $70 ; BASECOORD_16
+	db $28, $78 ; BASECOORD_17
+	db $28, $80 ; BASECOORD_18
+	db $28, $88 ; BASECOORD_19
+	db $30, $68 ; BASECOORD_1A
+	db $30, $70 ; BASECOORD_1B
+	db $30, $78 ; BASECOORD_1C
+	db $30, $80 ; BASECOORD_1D
+	db $30, $90 ; BASECOORD_1E
+	db $30, $98 ; BASECOORD_1F
+	db $38, $68 ; BASECOORD_20
+	db $38, $78 ; BASECOORD_21
+	db $38, $80 ; BASECOORD_22
+	db $38, $88 ; BASECOORD_23
+	db $40, $68 ; BASECOORD_24
+	db $40, $70 ; BASECOORD_25
+	db $40, $78 ; BASECOORD_26
+	db $40, $80 ; BASECOORD_27
+	db $40, $88 ; BASECOORD_28
+	db $40, $98 ; BASECOORD_29
+	db $10, $60 ; BASECOORD_2A
+	db $18, $60 ; BASECOORD_2B
+	db $20, $60 ; BASECOORD_2C
+	db $28, $60 ; BASECOORD_2D
+	db $30, $60 ; BASECOORD_2E
+	db $40, $60 ; BASECOORD_2F
+	db $58, $28 ; BASECOORD_30
+	db $43, $38 ; BASECOORD_31
+	db $33, $48 ; BASECOORD_32
+	db $20, $58 ; BASECOORD_33
+	db $32, $78 ; BASECOORD_34
+	db $58, $58 ; BASECOORD_35
+	db $2C, $6C ; BASECOORD_36
+	db $34, $80 ; BASECOORD_37
+	db $48, $70 ; BASECOORD_38
+	db $42, $36 ; BASECOORD_39
+	db $38, $44 ; BASECOORD_3A
+	db $40, $52 ; BASECOORD_3B
+	db $48, $60 ; BASECOORD_3C
+	db $3E, $6E ; BASECOORD_3D
+	db $28, $7C ; BASECOORD_3E
+	db $28, $8A ; BASECOORD_3F
+	db $50, $3C ; BASECOORD_40
+	db $48, $50 ; BASECOORD_41
+	db $40, $64 ; BASECOORD_42
+	db $38, $38 ; BASECOORD_43
+	db $50, $30 ; BASECOORD_44
+	db $50, $38 ; BASECOORD_45
+	db $50, $40 ; BASECOORD_46
+	db $50, $48 ; BASECOORD_47
+	db $50, $50 ; BASECOORD_48
+	db $48, $58 ; BASECOORD_49
+	db $50, $44 ; BASECOORD_4A
+	db $48, $48 ; BASECOORD_4B
+	db $48, $4C ; BASECOORD_4C
+	db $40, $50 ; BASECOORD_4D
+	db $40, $54 ; BASECOORD_4E
+	db $38, $58 ; BASECOORD_4F
+	db $38, $5C ; BASECOORD_50
+	db $30, $64 ; BASECOORD_51
+	db $48, $40 ; BASECOORD_52
+	db $48, $39 ; BASECOORD_53
+	db $24, $88 ; BASECOORD_54
+	db $24, $70 ; BASECOORD_55
+	db $1C, $70 ; BASECOORD_56
+	db $1C, $88 ; BASECOORD_57
+	db $34, $68 ; BASECOORD_58
+	db $34, $88 ; BASECOORD_59
+	db $68, $50 ; BASECOORD_5A
+	db $60, $50 ; BASECOORD_5B
+	db $68, $60 ; BASECOORD_5C
+	db $58, $50 ; BASECOORD_5D
+	db $60, $60 ; BASECOORD_5E
+	db $68, $40 ; BASECOORD_5F
+	db $40, $40 ; BASECOORD_60
+	db $38, $40 ; BASECOORD_61
+	db $0B, $60 ; BASECOORD_62
+	db $44, $48 ; BASECOORD_63
+	db $40, $14 ; BASECOORD_64
+	db $48, $1C ; BASECOORD_65
+	db $50, $24 ; BASECOORD_66
+	db $4C, $24 ; BASECOORD_67
+	db $10, $62 ; BASECOORD_68
+	db $12, $62 ; BASECOORD_69
+	db $12, $60 ; BASECOORD_6A
+	db $20, $72 ; BASECOORD_6B
+	db $22, $72 ; BASECOORD_6C
+	db $22, $70 ; BASECOORD_6D
+	db $28, $62 ; BASECOORD_6E
+	db $50, $0A ; BASECOORD_6F
+	db $52, $0A ; BASECOORD_70
+	db $38, $30 ; BASECOORD_71
+	db $40, $48 ; BASECOORD_72
+	db $30, $48 ; BASECOORD_73
+	db $40, $30 ; BASECOORD_74
+	db $30, $40 ; BASECOORD_75
+	db $38, $48 ; BASECOORD_76
+	db $40, $4A ; BASECOORD_77
+	db $48, $4B ; BASECOORD_78
+	db $50, $4C ; BASECOORD_79
+	db $58, $4D ; BASECOORD_7A
+	db $60, $4D ; BASECOORD_7B
+	db $68, $4D ; BASECOORD_7C
+	db $38, $10 ; BASECOORD_7D
+	db $50, $10 ; BASECOORD_7E
+	db $38, $28 ; BASECOORD_7F
+	db $48, $18 ; BASECOORD_80
+	db $40, $20 ; BASECOORD_81
+	db $48, $20 ; BASECOORD_82
+	db $40, $3C ; BASECOORD_83
+	db $38, $50 ; BASECOORD_84
+	db $28, $64 ; BASECOORD_85
+	db $1C, $90 ; BASECOORD_86
+	db $24, $80 ; BASECOORD_87
+	db $2C, $70 ; BASECOORD_88
+	db $30, $38 ; BASECOORD_89
+	db $10, $50 ; BASECOORD_8A
+	db $3C, $40 ; BASECOORD_8B
+	db $40, $58 ; BASECOORD_8C
+	db $30, $58 ; BASECOORD_8D
+	db $58, $48 ; BASECOORD_8E
+	db $50, $58 ; BASECOORD_8F
+	db $48, $68 ; BASECOORD_90
+	db $40, $18 ; BASECOORD_91
+	db $28, $58 ; BASECOORD_92
+	db $40, $38 ; BASECOORD_93
+	db $48, $38 ; BASECOORD_94
+	db $08, $70 ; BASECOORD_95
+	db $44, $1C ; BASECOORD_96
+	db $3C, $58 ; BASECOORD_97
+	db $38, $60 ; BASECOORD_98
+	db $08, $60 ; BASECOORD_99
+	db $38, $70 ; BASECOORD_9A
+	db $38, $6C ; BASECOORD_9B
+	db $38, $64 ; BASECOORD_9C
+	db $1C, $74 ; BASECOORD_9D
+	db $2E, $74 ; BASECOORD_9E
+	db $34, $50 ; BASECOORD_9F
+	db $2F, $60 ; BASECOORD_A0
+	db $31, $70 ; BASECOORD_A1
+	db $4C, $30 ; BASECOORD_A2
+	db $3B, $40 ; BASECOORD_A3
+	db $2D, $50 ; BASECOORD_A4
+	db $26, $60 ; BASECOORD_A5
+	db $2D, $70 ; BASECOORD_A6
+	db $28, $50 ; BASECOORD_A7
+	db $1E, $60 ; BASECOORD_A8
+	db $29, $70 ; BASECOORD_A9
+	db $16, $60 ; BASECOORD_AA
+	db $14, $58 ; BASECOORD_AB
+	db $12, $54 ; BASECOORD_AC
+	db $14, $50 ; BASECOORD_AD
+	db $18, $4C ; BASECOORD_AE
+	db $1C, $48 ; BASECOORD_AF
+	db $48, $28 ; BASECOORD_B0
 
-FrameBlock00:
+FrameBlock00:	;unused
 	db $00,$00
