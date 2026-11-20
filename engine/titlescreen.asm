@@ -126,6 +126,7 @@ IF DEF(_RED) && !DEF(_RGTITLE)
 	ld [hl], a
 ENDC
 
+IF !DEF(_RED) || DEF(_RGTITLE)
 ; place tiles for title screen copyright
 IF DEF(_REDGREENJP)
 	coord hl, 3, 17
@@ -155,6 +156,7 @@ ELSE
 ENDC
 
 .next
+ENDC
 	call SaveScreenTilesToBuffer2
 	call LoadScreenTilesFromBuffer2
 	call EnableLCD
