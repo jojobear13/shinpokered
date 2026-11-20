@@ -572,5 +572,5 @@ ENDC
 IF DEF(_GREEN)
 	db $62,$63,$64,$7F,$65,$66,$67,$68,$69,"@" ; "Green Version"
 ENDC
-NintenText: db "NINTEN@"
-SonyText:   db "SONY@"
+NintenText: db "Ninten@"
+SonyText:   db "Sony@"

@@ -10,21 +10,21 @@ _ViridianHouseText1::
 
 _ViridianHouseText2::
 	text "My Daddy loves"
-	line "#MON too."
+	line "#mon too."
 	done
 
 _ViridianHouseText_1d5b1::
-	text "SPEARY: Tetweet!"
+	text "Speary: Tetweet!"
 	done
 
 _ViridianHouseText4::
-	text "SPEAROW"
-	line "Name: SPEARY"
+	text "Spearow"
+	line "Name: speary"
 	done
 
 ;joenote - adding clause brothers
 _ClauseBrother_ItemIntro::
-	text "ITEM CLAUSE BRO"
+	text "Item clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_ItemDesc::
@@ -35,37 +35,37 @@ _ClauseBrother_ItemDesc::
 	done
 
 _ClauseBrother_SleepIntro::
-	text "SLEEP CLAUSE BRO"
+	text "Sleep clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_SleepDesc::
 	text "With my stamp,"
-	line "only one #MON"
-	cont "SLP per team is"
+	line "only one #mon"
+	cont "slp per team is"
 	cont "allowed during"
 	cont "trainer matches."
 	done
 	
 _ClauseBrother_FreezeIntro::
-	text "FREEZE CLAUSE BRO"
+	text "Freeze clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_FreezeDesc::
 	text "With my stamp,"
-	line "only one #MON"
-	cont "FRZ per team is"
+	line "only one #mon"
+	cont "frz per team is"
 	cont "allowed during"
 	cont "trainer matches."
 	done
 	
 _ClauseBrother_TrapIntro::
-	text "TRAP CLAUSE BRO"
+	text "Trap clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_TrapDesc::
 	text "With my stamp,"
 	line "trapping moves"
-	cont "like WRAP will"
+	cont "like wrap will"
 	cont "start going 2nd"
 	cont "if trying to use"
 	cont "them more than 2x"
@@ -73,16 +73,16 @@ _ClauseBrother_TrapDesc::
 	done
 
 _ClauseBrother_HyperbeamIntro::
-	text "H.BEAM CLAUSE BRO"
+	text "H.Beam clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_HyperbeamDesc::
 	text "With my stamp,"
 	line "the powerful move"
-	cont "HYPER BEAM need"
+	cont "Hyper Beam need"
 	cont "not recharge if"
 	cont "it knocks-out the"
-	cont "opposing #MON!"
+	cont "opposing #mon!"
 	done
 
 _ClauseBrother_OFF::

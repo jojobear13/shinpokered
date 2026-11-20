@@ -17,10 +17,10 @@ CeruleanGymScript_5c6d0:
 	jp LoadGymLeaderAndCityName
 
 Gym2CityName:
-	db "CERULEAN CITY@"
+	db "Cerulean City@"
 
 Gym2LeaderName:
-	db "MISTY@"
+	db "Misty@"
 
 CeruleanGymScript_5c6ed:
 	xor a

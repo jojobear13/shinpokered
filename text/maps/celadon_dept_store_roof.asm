@@ -6,7 +6,7 @@ _CeladonMartRoofText_484ee::
 _CeladonMartRoofText_484f3::
 	text "Yay!"
 
-	para "FRESH WATER!"
+	para "Fresh Water!"
 
 	para "Thank you!"
 
@@ -25,7 +25,7 @@ _CeladonMartRoofText_484fe::
 	;TX_RAM wcf4b
 	;text " contains"
 	text "TM13 contains"	;joenote - don't dynamically call the name as it just messes up the text borders
-	line "ICE BEAM!"
+	line "Ice Beam!"
 
 	para "It can freeze the"
 	line "target sometimes!@@"
@@ -33,7 +33,7 @@ _CeladonMartRoofText_484fe::
 _CeladonMartRoofText_48504::
 	text "Yay!"
 
-	para "SODA POP!"
+	para "Soda Pop!"
 
 	para "Thank you!"
 
@@ -56,12 +56,12 @@ _CeladonMartRoofText_4850f::
 ;
 ;	para "It can spook the"
 ;	line "target sometimes!@@"
-	line "ROCK SLIDE!@@"
+	line "Rock Slide!@@"
 
 _CeladonMartRoofText_48515::
 	text "Yay!"
 
-	para "LEMONADE!"
+	para "Lemonade!"
 
 	para "Thank you!"
 
@@ -75,7 +75,7 @@ _ReceivedTM49Text::
 _CeladonMartRoofText_48520::
 	db $0
 	para "TM49 contains"
-	line "TRI ATTACK!@@"
+	line "Tri Attack!@@"
 
 _CeladonMartRoofText_48526::
 	text "You don't have"
@@ -111,8 +111,8 @@ _CeladonMartRoofText4::
 	done
 
 _CeladonMartRoofText6::
-	text "ROOFTOP SQUARE:"
-	line "VENDING MACHINES"
+	text "Rooftop square:"
+	line "vending machines"
 	done
 
 _VendingMachineText1::

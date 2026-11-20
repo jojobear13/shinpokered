@@ -305,7 +305,7 @@ Route19Text11:
 	db "@"
 
 _TXTDrinkStandSign:
-	text "JOE'S DRINK STAND"
+	text "Joe'S drink stand"
 	line "Sip on the shore!"
 	done
 	db "@"

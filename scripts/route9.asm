@@ -288,18 +288,18 @@ Route9PathBlockNPC:
 	call PrintText
 	jp TextScriptEnd
 _Route9PathBlockNPC_Block:
-	text "ROUTE 9 is closed"
+	text "Route 9 is closed"
 	line "for construction."
 
 	para "My foreman hopes"
 	line "we'll be done in"
 	cont "time for his"
 	cont "cruise on the"
-	cont "S.S.ANNE."
+	cont "S.S.Anne."
 	done
 	db "@"
 _Route9PathBlockNPC_Pass:
-	text "ROUTE 9 is clear"
+	text "Route 9 is clear"
 	line "for travel."
 	done
 	db "@"

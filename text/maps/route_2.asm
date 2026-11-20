@@ -1,9 +1,9 @@
 _Route2Text3::
-	text "ROUTE 2"
-	line "VIRIDIAN CITY -"
-	cont "PEWTER CITY"
+	text "Route 2"
+	line "Viridian City -"
+	cont "Pewter City"
 	done
 
 _Route2Text4::
-	text "DIGLETT's CAVE"
+	text "Diglett's Cave"
 	done

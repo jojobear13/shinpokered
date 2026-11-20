@@ -1,6 +1,6 @@
 _VermilionHouse2Text_560b1::
-	text "I'm the FISHING"
-	line "GURU!"
+	text "I'm the fishing"
+	line "guru!"
 
 	para "I simply Looove"
 	line "fishing!"
@@ -18,7 +18,7 @@ _VermilionHouse2Text_560b6::
 
 ;joenote - add hotkey info
 	para "Hold A and press"
-	line "SELECT to use the"
+	line "select to use the"
 	cont "rod quickly.@@"
 
 	para "<PLAYER> received"

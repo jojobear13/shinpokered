@@ -25,7 +25,7 @@ _SSAnne6Text4::
 
 _SSAnne6Text5::
 	text "Did you hear about"
-	line "SNORLAX?"
+	line "Snorlax?"
 
 	para "All it does is"
 	line "eat and sleep!"
@@ -41,7 +41,7 @@ _SSAnne6Text6::
 
 _SSAnne6Text_61807::
 	text "Er-hem! Indeed I"
-	line "am le CHEF!"
+	line "am le chef!"
 
 	para "Le main course is"
 	prompt
@@ -102,9 +102,9 @@ _SSAnne6Text_GymGuy2::
 	
 	para "But everyone has"
 	line "to use exactly 3"
-	cont "#MON."
+	cont "#mon."
 	
-	para "Your #MON get"
+	para "Your #mon get"
 	line "healed before"
 	cont "each round."
 	
@@ -137,7 +137,7 @@ _SSAnne6Text_GymGuy_party::
 	done
 
 _SSAnne6Text_GymGuy_bye::
-	text "Later then CHAMP!"
+	text "Later then champ!"
 	done
 	
 _SSAnne6Text_GymGuy_ready::
@@ -154,13 +154,13 @@ _SSAnne6Text_GymGuy_win::
 	line "do it!"
 	
 	para "<PLAYER> won a"
-	line "MASTER BALL!@@"
+	line "Master Ball!@@"
 	
 _SSAnne6Text_GymGuy_pikachu::
-	text "Your PIKACHU is"
+	text "Your Pikachu is"
 	line "really special!"
 	
 	para "In recongnition,"
 	line "I've made it able"
-	cont "to learn SURF!"
+	cont "to learn surf!"
 	prompt

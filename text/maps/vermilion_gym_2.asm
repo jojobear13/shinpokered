@@ -7,16 +7,16 @@ _VermilionGymText_5cb72::
 
 	para "But, it's useless"
 	line "against ground-"
-	cont "type #MON!"
+	cont "type #mon!"
 	done
 
 _VermilionGymText_5cb77::
-	text "The THUNDERBADGE"
+	text "The thunderbadge"
 	line "cranks up your"
-	cont "#MON's DEFENSE!"	;joenote - changed SPEED to DEFENSE in order to fix a typo
+	cont "#mon's defense!"	;joenote - changed SPEED to DEFENSE in order to fix a typo
 
 	para "It also lets your"
-	line "#MON FLY any"
+	line "#mon fly any"
 	cont "time, kid!"
 
 	para "You're special,"
@@ -32,10 +32,10 @@ _ReceivedTM24Text::
 _TM24ExplanationText::
 	db $0
 	para "TM24 contains"
-	line "THUNDERBOLT!"
+	line "thunderbolt!"
 
 	para "Teach it to an"
-	line "electric #MON!"
+	line "electric #mon!"
 	done
 
 _TM24NoRoomText::
@@ -50,13 +50,13 @@ _ReceivedThunderbadgeText::
 	line "deal, kid!"
 
 	para "Fine then, take"
-	line "the THUNDERBADGE!"
+	line "the thunderbadge!"
 	prompt
 
 _VermilionGymBattleText1::
 	text "When I was in the"
-	line "Army, LT.SURGE"
-	cont "was my strict CO!"
+	line "Army, lt.Surge"
+	cont "was my strict co!"
 	done
 
 _VermilionGymEndBattleText1::
@@ -68,7 +68,7 @@ _VermilionGymAfterBattleText1::
 	text "The door won't"
 	line "open?"
 
-	para "LT.SURGE always"
+	para "Lt.Surge always"
 	line "was cautious!"
 	done
 
@@ -85,7 +85,7 @@ _VermilionGymEndBattleText2::
 _VermilionGymAfterBattleText2::
 	text "OK, I'll talk!"
 
-	para "LT.SURGE said he"
+	para "Lt.Surge said he"
 	line "hid door switches"
 	cont "inside something!"
 	done
@@ -101,7 +101,7 @@ _VermilionGymEndBattleText3::
 	prompt
 
 _VermilionGymAfterBattleText3::
-	text "LT.SURGE set up"
+	text "Lt.Surge set up"
 	line "double locks!"
 	cont "Here's a hint!"
 
@@ -115,22 +115,22 @@ _VermilionGymText_5cbf4::
 	text "Yo! Champ in"
 	line "making!"
 
-	para "LT.SURGE has a"
+	para "Lt.Surge has a"
 	line "nickname. People"
 	cont "refer to him as"
 	cont "the Lightning"
 	cont "American!"
 
 	para "He's an expert on"
-	line "electric #MON!"
+	line "electric #mon!"
 
 ;	para "Birds and water"	;joenote - This is a text error that was translated. Supposed to be flying not bird.
 	para "Flying and water"
-	line "#MON are at"
+	line "#mon are at"
 	cont "risk! Beware of"
 	cont "paralysis too!"
 
-	para "LT.SURGE is very"
+	para "Lt.Surge is very"
 	line "cautious!"
 
 	para "You'll have to"

@@ -14,7 +14,7 @@ _Route16AfterBattleText1::
 	done
 
 _Route16BattleText2::
-	text "Nice BIKE!"
+	text "Nice bike!"
 	line "Hand it over!"
 	done
 
@@ -25,7 +25,7 @@ _Route16EndBattleText2::
 
 _Route16AfterBattleText2::
 	text "Forget it, who"
-	line "needs your BIKE!"
+	line "needs your bike!"
 	done
 
 _Route16BattleText3::
@@ -54,8 +54,8 @@ _Route16EndBattleText4::
 
 _Route16AfterBattleText4::
 	text "You can also get"
-	line "to FUCHSIA from"
-	cont "VERMILION using a"
+	line "to Fuchsia from"
+	cont "Vermilion using a"
 	cont "coastal road."
 	done
 
@@ -70,7 +70,7 @@ _Route16EndBattleText5::
 	prompt
 
 _Route16AfterBattleText5::
-	text "I like my #MON"
+	text "I like my #mon"
 	line "ferocious! They"
 	cont "tear up enemies!"
 	done
@@ -87,16 +87,16 @@ _Route16EndBattleText6::
 _Route16AfterBattleText6::
 	text "I like harassing"
 	line "people with my"
-	cont "vicious #MON!"
+	cont "vicious #mon!"
 	done
 
 _Route16Text7::
-	text "A sleeping #MON"
+	text "A sleeping #mon"
 	line "blocks the way!"
 	done
 
 _Route16Text10::
-	text "SNORLAX woke up!"
+	text "Snorlax woke up!"
 
 	para "It attacked in a"
 	line "grumpy rage!"
@@ -104,22 +104,22 @@ _Route16Text10::
 
 _Route16Text11::
 	text "With a big yawn,"
-	line "SNORLAX returned"
+	line "Snorlax returned"
 	cont "to the mountains!"
 	done
 
 _Route16Text8::
 	text "Enjoy the slope!"
-	line "CYCLING ROAD"
+	line "Cycling Road"
 	done
 
 _Route16Text9::
-	text "ROUTE 16"
-	line "CELADON CITY -"
-	cont "FUCHSIA CITY"
+	text "Route 16"
+	line "Celadon City -"
+	cont "Fuchsia City"
 	done
 
 _Route16TextUsePokeflute::
 	text "Play the #"
-	line "FLUTE?"
+	line "flute?"
 	done

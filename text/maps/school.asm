@@ -14,16 +14,16 @@ _SchoolText2::
 
 ;joenote - added more explanation
 _SchoolText3::
-	text "FISSURE."
-	para "HORN DRILL."
-	para "GUILLOTINE."
+	text "Fissure."
+	para "Horn Drill."
+	para "Guillotine."
 	
 	para "They take out"
-	line "#MON with just"
+	line "#mon with just"
 	cont "one hit!"
 
 	para "But only rarely,"
 	line "and only if your"
-	cont "#MON moves"
+	cont "#mon moves"
 	cont "first."
 	done

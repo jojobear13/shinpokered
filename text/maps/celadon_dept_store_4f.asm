@@ -1,6 +1,6 @@
 _CeladonMart4Text2::
 	text "I'm getting a"
-	line "# DOLL for my"
+	line "# doll for my"
 	cont "girl friend!"
 	done
 
@@ -9,16 +9,16 @@ _CeladonMart4Text3::
 	line "useful."
 
 	para "You can run from"
-	line "wild #MON by"
+	line "wild #mon by"
 	cont "distracting them"
-	cont "with a # DOLL!"
+	cont "with a # doll!"
 	done
 
 _CeladonMart4Text4::
 	text "Express yourself"
 	line "with gifts!"
 
-	para "4F: WISEMAN GIFTS"
+	para "4F: Wiseman gifts"
 
 	para "Evolution Special!"
 	line "Element STONEs on"

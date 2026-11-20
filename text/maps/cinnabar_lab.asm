@@ -1,29 +1,29 @@
 _Lab1Text1::
-	text "We study #MON"
+	text "We study #mon"
 	line "extensively here."
 
 	para "People often bring"
-	line "us rare #MON"
+	line "us rare #mon"
 	cont "for examination."
 	done
 
 _Lab1Text2::
 	text "A photo of the"
-	line "LAB's founder,"
-	cont "DR.FUJI!"
+	line "lab's founder,"
+	cont "dr.Fuji!"
 	done
 
 _Lab1Text3::
-	text "#MON LAB"
+	text "#mon Lab"
 	line "Meeting Room"
 	done
 
 _Lab1Text4::
-	text "#MON LAB"
+	text "#mon Lab"
 	line "R-and-D Room"
 	done
 
 _Lab1Text5::
-	text "#MON LAB"
+	text "#mon Lab"
 	line "Testing Room"
 	done

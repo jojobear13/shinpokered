@@ -1,6 +1,6 @@
 _FuchsiaHouse1Text1::
-	text "SAFARI ZONE's"
-	line "WARDEN is old,"
+	text "Safari Zone's"
+	line "warden is old,"
 	cont "but still active!"
 
 	para "All his teeth are"
@@ -9,7 +9,7 @@ _FuchsiaHouse1Text1::
 
 _FuchsiaHouse1Text2::
 	text "Hmm? You've met"
-	line "BILL?"
+	line "Bill?"
 
 	para "He's my grandson!"
 
@@ -19,8 +19,8 @@ _FuchsiaHouse1Text2::
 	done
 
 _FuchsiaHouse1Text3::
-	text "BILL files his"
-	line "own #MON data"
+	text "Bill files his"
+	line "own #mon data"
 	cont "on his PC!"
 
 	para "Did he show you?"

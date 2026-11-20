@@ -1,12 +1,12 @@
 _SSAnne8Text8::
-	text "WIGGLYTUFF: Puup"
+	text "Wigglytuff: Puup"
 	line "pupuu!@@"
 
 _SSAnne8BattleText1::
 	text "I travel alone"
 	line "on my journeys!"
 
-	para "My #MON are my"
+	para "My #mon are my"
 	line "only friends!"
 	done
 
@@ -36,7 +36,7 @@ _SSAnne8AfterBattleText2::
 	done
 
 _SSAnne8BattleText3::
-	text "I love #MON!"
+	text "I love #mon!"
 	line "Do you?"
 	done
 
@@ -50,12 +50,12 @@ _SSAnne8AfterBattleText3::
 	line "friend, OK?"
 
 	para "Then we can trade"
-	line "#MON!"
+	line "#mon!"
 	done
 
 _SSAnne8BattleText4::
 	text "I collected these"
-	line "#MON from all"
+	line "#mon from all"
 	cont "around the world!"
 	done
 
@@ -67,11 +67,11 @@ _SSAnne8EndBattleText4::
 
 _SSAnne8AfterBattleText4::
 	text "You hurt my poor"
-	line "worldly #MON!"
+	line "worldly #mon!"
 
 	para "I demand that you"
 	line "heal them at a"
-	cont "#MON CENTER!"
+	cont "#mon Center!"
 	done
 
 _SSAnne8Text5::
@@ -87,7 +87,7 @@ _SSAnne8Text6::
 
 _SSAnne8Text7::
 	text "I always travel"
-	line "with WIGGLYTUFF!"
+	line "with Wigglytuff!"
 	done
 
 _SSAnne8Text9::
@@ -96,9 +96,9 @@ _SSAnne8Text9::
 	done
 
 _SSAnne8Text11::
-	text "Ssh! I'm a GLOBAL"
-	line "POLICE agent!"
+	text "Ssh! I'm a global"
+	line "police agent!"
 
 	para "I'm on the trail"
-	line "of TEAM ROCKET!"
+	line "of Team Rocket!"
 	done

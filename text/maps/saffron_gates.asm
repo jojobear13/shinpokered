@@ -5,7 +5,7 @@ _SaffronGateText_1dfe7::
 
 ;joenote - add a hint on what to give the guard
 	para "I wish that I had"
-	line "a VENDING MACHINE"
+	line "a vending machine"
 	cont "drink right now."
 
 	para "Oh wait there,"
@@ -27,7 +27,7 @@ _SaffronGateText_1dff1::
 	cont "..."
 	cont "Gulp..."
 	cont "If you want to go"
-	cont "to SAFFRON CITY..."
+	cont "to Saffron City..."
 	cont "..."
 	cont "You can go on"
 	cont "through. I'll"

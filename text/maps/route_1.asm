@@ -1,11 +1,11 @@
 _Route1ViridianMartSampleText::
 	text "Hi! I work at a"
-	line "#MON MART."
+	line "#mon Mart."
 
 	para "It's a convenient"
 	line "shop, so please"
 	cont "visit us in"
-	cont "VIRIDIAN CITY."
+	cont "Viridian City."
 
 	para "I know, I'll give"
 	line "you a sample!"
@@ -21,7 +21,7 @@ _Route1Text_1cae8::
 _Route1Text_1caee::
 	text "We also carry"
 	line "# BALLs for"
-	cont "catching #MON!"
+	cont "catching #mon!"
 	done
 
 _Route1Text_1caf3::
@@ -38,12 +38,12 @@ _Route1Text2::
 	cont "from them."
 
 	para "You can get back"
-	line "to PALLET TOWN"
+	line "to Pallet Town"
 	cont "quicker that way."
 	done
 
 _Route1Text3::
-	text "ROUTE 1"
-	line "PALLET TOWN -"
-	cont "VIRIDIAN CITY"
+	text "Route 1"
+	line "Pallet Town -"
+	cont "Viridian City"
 	done

@@ -1,11 +1,11 @@
 _MtMoon3Text_49f24::
 	text "You want the"
-	line "DOME FOSSIL?"
+	line "Dome Fossil?"
 	done
 
 _MtMoon3Text_49f64::
 	text "You want the"
-	line "HELIX FOSSIL?"
+	line "Helix Fossil?"
 	done
 
 _MtMoon3Text_49f6f::
@@ -39,9 +39,9 @@ _MtMoon3Text_49f8f::
 
 _MtMoon3Text_49f94::
 	text "Far away, on"
-	line "CINNABAR ISLAND,"
-	cont "there's a #MON"
-	cont "LAB."
+	line "Cinnabar Island,"
+	cont "there's a #mon"
+	cont "lab."
 
 	para "They do research"
 	line "on regenerating"
@@ -53,7 +53,7 @@ _MtMoon3Text_49f99::
 	line "this is mine!@@"
 
 _MtMoon3BattleText2::
-	text "TEAM ROCKET will"
+	text "Team Rocket will"
 	line "find the fossils,"
 	cont "revive and sell"
 	cont "them for cash!"
@@ -66,13 +66,13 @@ _MtMoon3EndBattleText2::
 
 _MtMoon3AfterBattleText2::
 	text "You made me mad!"
-	line "TEAM ROCKET will"
+	line "Team Rocket will"
 	cont "blacklist you!"
 	done
 
 _MtMoon3BattleText3::
-	text "We, TEAM ROCKET,"
-	line "are #MON"
+	text "We, Team Rocket,"
+	line "are #mon"
 	cont "gangsters!"
 	done
 
@@ -116,7 +116,7 @@ _MtMoon3EndBattleText5::
 	prompt
 
 _MtMoon3AfterBattleText5::
-	text "#MON lived"
+	text "#mon lived"
 	line "here long before"
 	cont "people came."
 	done

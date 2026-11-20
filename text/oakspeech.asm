@@ -1,28 +1,28 @@
 _OakSpeechText1::
 	text "Hello there!"
 	line "Welcome to the"
-	cont "world of #MON!"
+	cont "world of #mon!"
 
-	para "My name is OAK!"
+	para "My name is Oak!"
 	line "People call me"
-	cont "the #MON PROF!"
+	cont "the #mon prof!"
 	prompt
 
 _OakSpeechText2A::
 	text "This world is"
 	line "inhabited by"
 	cont "creatures called"
-	cont "#MON!@@"
+	cont "#mon!@@"
 
 _OakSpeechText2B::
 	text $51,"For some people,"
-	line "#MON are"
+	line "#mon are"
 	cont "pets. Others use"
 	cont "them for fights."
 
 	para "Myself..."
 
-	para "I study #MON"
+	para "I study #mon"
 	line "as a profession."
 	prompt
 
@@ -45,12 +45,12 @@ _OakSpeechText3::
 	text "<PLAYER>!"
 
 	para "Your very own"
-	line "#MON legend is"
+	line "#mon legend is"
 	cont "about to unfold!"
 
 	para "A world of dreams"
 	line "and adventures"
-	cont "with #MON"
+	cont "with #mon"
 	cont "awaits! Let's go!"
 	done
 

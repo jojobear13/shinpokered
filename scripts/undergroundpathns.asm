@@ -45,7 +45,7 @@ MirrorTrainerText1:
 	jp TextScriptEnd
 	
 MirrorTrainerIntro:
-	text "I am PAGLIACCIO,"
+	text "I am pagliaccio,"
 	line "a performer most"
 	cont "princely and the"
 	cont "master of mimes!"
@@ -58,15 +58,15 @@ MirrorTrainerNotReady:
 	cont "of my costumes."
 	
 	para "I'll be ready"
-	line "after the #MON"
-	cont "LEAGUE finals are"
+	line "after the #mon"
+	cont "league finals are"
 	cont "over."
 	done
 	db "@"
 MirrorTrainerChallenge:
 	text "Care to test your"
 	line "strategies on me,"
-	cont "young CHAMPION?"
+	cont "young champion?"
 	done
 	db "@"
 MirrorTrainerBye:

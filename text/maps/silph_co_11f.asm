@@ -1,7 +1,7 @@
 _SilphCoPresidentText::
-	text "PRESIDENT: Thank"
+	text "President: Thank"
 	line "you for saving"
-	cont "SILPH!"
+	cont "Silph!"
 
 	para "I will never"
 	line "forget you saved"
@@ -26,16 +26,16 @@ _ReceivedSilphCoMasterBallText::
 	text "!@@"
 
 _SilphCo10Text_6231c::
-	text "PRESIDENT: You"
+	text "President: You"
 	line "can't buy that"
 	cont "anywhere!"
 
 	para "It's our secret"
-	line "prototype MASTER"
-	cont "BALL!"
+	line "prototype master"
+	cont "ball!"
 
 	para "It will catch any"
-	line "#MON without"
+	line "#mon without"
 	cont "fail!"
 
 	para "You should be"
@@ -49,7 +49,7 @@ _SilphCoMasterBallNoRoomText::
 	done
 
 _SilphCo11Text2::
-	text "SECRETARY: Thank"
+	text "Secretary: Thank"
 	line "you for rescuing"
 	cont "all of us!"
 
@@ -61,7 +61,7 @@ _SilphCo11Text3::
 	text "Ah <PLAYER>!"
 	line "So we meet again!"
 
-	para "The PRESIDENT and"
+	para "The president and"
 	line "I are discussing"
 	cont "a vital business"
 	cont "proposition."
@@ -82,15 +82,15 @@ _SilphCo10Text_62330::
 _SilphCo10Text_62335::
 	text "Blast it all!"
 	line "You ruined our"
-	cont "plans for SILPH!"
+	cont "plans for Silph!"
 
-	para "But, TEAM ROCKET"
+	para "But, Team Rocket"
 	line "will never fall!"
 
 	para "<PLAYER>! Never"
 	line "forget that all"
-	cont "#MON exist"
-	cont "for TEAM ROCKET!"
+	cont "#mon exist"
+	cont "for Team Rocket!"
 
 	para "I must go, but I"
 	line "shall return!"
@@ -108,13 +108,13 @@ _SilphCo11EndBattleText1::
 
 _SilphCo11AfterBattleText1::
 	text "So, you want to"
-	line "see my BOSS?"
+	line "see my boss?"
 	done
 
 _SilphCo11BattleText2::
 	text "Halt! Do you have"
 	line "an appointment"
-	cont "with my BOSS?"
+	cont "with my boss?"
 	done
 
 _SilphCo11EndBattleText2::
@@ -124,29 +124,29 @@ _SilphCo11EndBattleText2::
 
 _SilphCo11AfterBattleText2::
 	text "Watch your step,"
-	line "my BOSS likes his"
-	cont "#MON tough!"
+	line "my boss likes his"
+	cont "#mon tough!"
 	done
 
 _SilphCo10Text_6237b::
 	text "The monitor has"
-	line "#MON on it!"
+	line "#mon on it!"
 	done
 
 ;;;;;;;;;;;;;;;;;;;;;;joenote - adding text for Chief battle
 _ChiefText_challenge::
 	text "Do you challenge"
-	line "him to a #MON"
+	line "him to a #mon"
 	cont "battle?"
 	done
 
 _ChiefText_prebattle::
 	text "Oh my! Who told"
 	line "you that I train"
-	cont "#MON?"
+	cont "#mon?"
 	
 	para "It's true. I'm a"
-	line "big SAFARI ZONE"
+	line "big Safari Zone"
 	cont "addict."
 	
 	para "Been so since I"
@@ -167,12 +167,12 @@ _ChiefTextVictorySpeech::
 	line "Good times!"
 	
 	para "Nothing like a"
-	line "#MON battle"
+	line "#mon battle"
 	cont "to unwind, eh?"
 	
 	para "I heard another"
-	line "CHAMP was at the"
-	cont "VERMILION dock."
+	line "champ was at the"
+	cont "Vermilion dock."
 	
 	para "She might want"
 	line "to have a battle"

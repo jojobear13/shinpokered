@@ -180,7 +180,7 @@ ItemUseBall:
 	ld hl, wGrassRate
 	ld de, wPlayerName
 	ld bc, NAME_LENGTH
-	call CopyData ; save the player's name in the Wild Monster data (part of the Cinnabar Island Missingno. glitch)
+	call CopyData ; save the player's name in the Wild Monster data (part of the Cinnabar Island MissingNo. glitch)
 	jp .captured
 
 .notOldManBattle
@@ -955,7 +955,7 @@ ItemUseMedicine:
 	jp PrintText
 .emptyPartyText
 	text "You don't have"
-	line "any #MON!"
+	line "any #mon!"
 	prompt
 .notUsingSoftboiled
 	call DisplayPartyMenu
@@ -1653,11 +1653,11 @@ VitaminNoEffectText:
 	db "@"
 
 VitaminText:
-	db "HEALTH@"
-	db "ATTACK@"
-	db "DEFENSE@"
-	db "SPEED@"
-	db "SPECIAL@"
+	db "Health@"
+	db "Attack@"
+	db "Defense@"
+	db "Speed@"
+	db "Special@"
 
 ItemUseBait:
 	ld hl, ThrewBaitText

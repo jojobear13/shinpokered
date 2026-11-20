@@ -11,12 +11,12 @@ _GraphicArtistText::
 
 _WriterText::
 	text "I wrote the story!"
-	line "Isn't ERIKA cute?"
+	line "Isn't Erika cute?"
 
-	para "I like MISTY a"
+	para "I like Misty a"
 	line "lot too!"
 
-	para "Oh, and SABRINA,"
+	para "Oh, and Sabrina,"
 	line "I like her!"
 	done
 
@@ -27,7 +27,7 @@ _GameDesignerText::
 	line "designer!"
 
 	para "Filling up your"
-	line "#DEX is tough,"
+	line "#dex is tough,"
 	cont "but don't quit!"
 
 	para "When you finish,"
@@ -37,7 +37,7 @@ _GameDesignerText::
 _CompletedDexText::
 	text "Wow! Excellent!"
 	line "You completed"
-	cont "your #DEX!"
+	cont "your #dex!"
 	cont "Congratulations!"
 	cont "...@@"
 
@@ -61,6 +61,6 @@ _CeladonMansion3Text7::
 	done
 
 _CeladonMansion3Text8::
-	text "GAME FREAK"
+	text "Game Freak"
 	line "Development Room"
 	done

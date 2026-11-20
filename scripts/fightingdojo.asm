@@ -371,7 +371,7 @@ KarateMasterTutor:
 .finish
 	ret
 .Text1
-	text "Your FLAREON has"
+	text "Your Flareon has"
 	line "the burning heart"
 	cont "of a warrior. I"
 	cont "could teach it a"

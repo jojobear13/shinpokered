@@ -12,7 +12,7 @@ _VictoryRoadGuardText1::
 
 	para "You have to have"
 	line "it to get to"
-	cont "#MON LEAGUE!@@"
+	cont "#mon League!@@"
 
 _VictoryRoadGuardText2::
 	text "You can pass here"
@@ -33,6 +33,6 @@ _VictoryRoadGuardText_513a3::
 	done
 
 _Route23Text8::
-	text "VICTORY ROAD GATE"
-	line "- #MON LEAGUE"
+	text "Victory Road gate"
+	line "- #mon League"
 	done

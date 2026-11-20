@@ -1,6 +1,6 @@
 _Route12HouseText_564c0::
-	text "I'm the FISHING"
-	line "GURU's brother!"
+	text "I'm the fishing"
+	line "guru's brother!"
 
 	para "I simply Looove"
 	line "fishing!"
@@ -18,7 +18,7 @@ _Route12HouseText_564c5::
 
 ;joenote - add hotkey info
 	para "Hold A and press"
-	line "SELECT to use the"
+	line "select to use the"
 	cont "rod quickly.@@"
 
 	para "<PLAYER> received"

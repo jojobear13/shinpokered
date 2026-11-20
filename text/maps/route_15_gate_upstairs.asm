@@ -1,14 +1,14 @@
 _Route15GateUpstairsText_4968c::
-	text "EXP.ALL gives"
+	text "EXP.All gives"
 	line "EXP points to all"
-	cont "the #MON with"
+	cont "the #mon with"
 	cont "you, even if they"
 	cont "don't fight."
 
 	para "It does, however,"
 	line "reduce the amount"
 	cont "of EXP for each"
-	cont "#MON."
+	cont "#mon."
 
 	para "If you don't need"
 	line "it, you should "

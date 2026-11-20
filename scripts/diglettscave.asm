@@ -75,18 +75,18 @@ _TXTBookDesc:
 	db "@"
 
 _TXTBookP1:
-	text "This is my SECRET"
-	line "ROOM. It was dug-"
+	text "This is my secret"
+	line "room. It was dug-"
 	cont "out by a group of"
-	cont "wild DIGLETT."
+	cont "wild Diglett."
 
 	para "Read some more?"
 	done
 	db "@"
 
 _TXTBookP2:
-	text "I heard BILL has"
-	line "a SECRET GARDEN"
+	text "I heard Bill has"
+	line "a secret garden"
 	cont "behind his house."
 	
 	para "But he'll neither"
@@ -94,8 +94,8 @@ _TXTBookP2:
 	cont "it to anyone."
 	
 	para "Maybe if I show"
-	line "him a NEW SPECIES"
-	cont "of #MON..."
+	line "him a new species"
+	cont "of #mon..."
 	
 	para "Keep reading?"
 	done
@@ -103,10 +103,10 @@ _TXTBookP2:
 	
 _TXTBookP3:
 	text "It's said that a"
-	line "MIST STONE can"
+	line "Mist Stone can"
 	cont "unlock the hidden"
 	cont "potential within"
-	cont "a #MON."
+	cont "a #mon."
 	
 	para "Where to find it?"
 	line "Perhaps here, in"
@@ -129,7 +129,7 @@ _TXTMist_Stone:
 	line "a little ways in."
 	
 	para "You recieved the"
-	line "MIST STONE!@@"
+	line "Mist Stone!@@"
 	db "@"
 	
 _TXTBag:

@@ -19,9 +19,9 @@ FuchsiaGymScript_75453:
 	ret
 
 Gym5CityName:
-	db "FUCHSIA CITY@"
+	db "Fuchsia City@"
 Gym5LeaderName:
-	db "KOGA@"
+	db "Koga@"
 
 FuchsiaGymScript_75477:
 	xor a
@@ -491,7 +491,7 @@ KogaTutorMoves:
 	
 _KogaTutorOffer:
 	text "You have a highly"
-	line "talented SCYTHER."
+	line "talented Scyther."
 	cont "I could teach it"
 	cont "the secret way of"
 	cont "becoming a ninja."
@@ -500,7 +500,7 @@ _KogaTutorOffer:
 	line "be so fast that"
 	cont "attacks may pass"
 	cont "through it as if"
-	cont "it were a GHOST."
+	cont "it were a ghost."
 	done
 	db "@"
 
@@ -514,7 +514,7 @@ _KogaTutorOffer2:
 	db "@"
 
 _KogaTutorIntro:
-	text "Your SCYTHER is a"
+	text "Your Scyther is a"
 	line "fine ninja. Shall"
 	cont "I tutor it more?"
 	done

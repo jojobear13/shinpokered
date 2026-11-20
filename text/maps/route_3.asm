@@ -4,13 +4,13 @@ _Route3Text1::
 	cont "Groan..."
 
 	para "That tunnel from"
-	line "CERULEAN takes a"
+	line "Cerulean takes a"
 	cont "lot out of you!"
 	done
 
 _Route3BattleText1::
 	text "Hey! I met you in"
-	line "VIRIDIAN FOREST!"
+	line "Viridian Forest!"
 	done
 
 _Route3EndBattleText1::
@@ -20,7 +20,7 @@ _Route3EndBattleText1::
 
 _Route3AfterBattleText1::
 	text "There are other"
-	line "kinds of #MON"
+	line "kinds of #mon"
 	cont "than those found"
 	cont "in the forest!"
 	done
@@ -38,9 +38,9 @@ _Route3EndBattleText2::
 
 _Route3AfterBattleText2::
 	text "Are you storing"
-	line "your #MON on"
-	cont "PC? Each BOX can"
-	cont "hold 20 #MON!"
+	line "your #mon on"
+	cont "PC? Each box can"
+	cont "hold 20 #mon!"
 	done
 
 _Route3BattleText3::
@@ -66,15 +66,15 @@ _Route3BattleText4::
 
 _Route3EndBattleText4::
 	text "If I"
-	line "had new #MON I"
+	line "had new #mon I"
 	cont "would've won!"
 	prompt
 
 _Route3AfterBattleText4::
-	text "If a #MON BOX"
+	text "If a #mon box"
 	line "on the PC gets"
 	cont "full, just switch"
-	cont "to another BOX!"
+	cont "to another box!"
 	done
 
 _Route3BattleText5::
@@ -111,7 +111,7 @@ _Route3AfterBattleText6::
 
 _Route3BattleText7::
 	text "You can fight my"
-	line "new #MON!"
+	line "new #mon!"
 	done
 
 _Route3EndBattleText7::
@@ -120,7 +120,7 @@ _Route3EndBattleText7::
 	prompt
 
 _Route3AfterBattleText7::
-	text "Trained #MON"
+	text "Trained #mon"
 	line "are stronger than"
 	cont "the wild ones!"
 	done
@@ -135,11 +135,11 @@ _Route3EndBattleText8::
 	prompt
 
 _Route3AfterBattleText8::
-	text "ROUTE 4 is at the"
-	line "foot of MT.MOON."
+	text "Route 4 is at the"
+	line "foot of Mt.Moon."
 	done
 
 _Route3Text10::
-	text "ROUTE 3"
-	line "MT.MOON AHEAD"
+	text "Route 3"
+	line "Mt.Moon ahead"
 	done

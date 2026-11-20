@@ -11,10 +11,10 @@ _CopycatsHouse1FText2::
 
 	para "Her mimicry has"
 	line "earned her the"
-	cont "nickname COPYCAT"
+	cont "nickname copycat"
 	cont "around here!"
 	done
 
 _CopycatsHouse1FText3::
-	text "CHANSEY: Chaan!"
+	text "Chansey: Chaan!"
 	line "Sii!@@"

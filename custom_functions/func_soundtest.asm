@@ -129,7 +129,7 @@ SoundTestTextInstructions1:
 SoundTestTextInstructions2:
 	db "L/R: Change Track@"
 SoundTestTextInstructions3:
-	db "SOUND TEST@"
+	db "Sound Test@"
 SoundTestTextBlankTrack:
 	db "                  @"
 SoundTestTrackList:
@@ -181,7 +181,7 @@ SoundTestTrackList:
 	dw Title_Music_UnusedSong, (MUSIC_UNUSED_SONG << 8) | Bank(Music_UnusedSong)
 
 Title_Music_PalletTown: db "Pallet Town@"
-Title_Music_Pokecenter: db "#MON Center@"
+Title_Music_Pokecenter: db "#Mon Center@"
 Title_Music_Gym: db "Gym@"
 Title_Music_Cities1: db "City 1@"
 Title_Music_Cities2: db "City 2@"
@@ -194,7 +194,7 @@ Title_Music_MeetProfOak: db "Prof. Oak@"
 Title_Music_MeetRival: db "Rival@"
 Title_Music_MuseumGuy: db "To The Museum@"
 Title_Music_SafariZone: db "Safari Zone@"
-Title_Music_PkmnHealed: db "#MON Healed@"
+Title_Music_PkmnHealed: db "#Mon Healed@"
 Title_Music_Routes1: db "Route Theme 1@"
 Title_Music_Routes2: db "Route Theme 2@"
 Title_Music_Routes3: db "Route Theme 3@"
@@ -220,7 +220,7 @@ Title_Music_Dungeon1: db "Dungeon 1@"
 Title_Music_Dungeon2: db "Dungeon 2@"
 Title_Music_Dungeon3: db "Dungeon 3@"
 Title_Music_CinnabarMansion: db "Cinnabar Mansion@"
-Title_Music_PokemonTower: db "#MON Tower@"
+Title_Music_PokemonTower: db "#Mon Tower@"
 Title_Music_SilphCo: db "Silph Co.@"
 Title_Music_MeetEvilTrainer: db "Evil Trainer@"
 Title_Music_MeetFemaleTrainer: db "Female Trainer@"

@@ -38,7 +38,7 @@ _Route6EndBattleText3::
 _Route6AfterBattleText3::
 	text "I like bugs, so"
 	line "I'm going back to"
-	cont "VIRIDIAN FOREST."
+	cont "Viridian Forest."
 	done
 
 _Route6BattleText4::
@@ -53,7 +53,7 @@ _Route6EndBattleText4::
 
 _Route6AfterBattleText4::
 	text "I should carry"
-	line "more #MON with"
+	line "more #mon with"
 	cont "me for safety."
 	done
 
@@ -85,13 +85,13 @@ _Route6EndBattleText6::
 	prompt
 
 _Route6AfterBattleText6::
-	text "Are my #MON"
+	text "Are my #mon"
 	line "weak? Or, am I"
 	cont "just bad?"
 	done
 
 _Route6Text7::	;joenote - swapped city order
-	text "UNDERGROUND PATH"
-	line "VERMILION CITY -"
-	cont "CERULEAN CITY"
+	text "Underground Path"
+	line "Vermilion City -"
+	cont "Cerulean City"
 	done

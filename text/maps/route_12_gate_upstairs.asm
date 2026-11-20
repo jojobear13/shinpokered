@@ -1,7 +1,7 @@
 _TM39PreReceiveText::
-	text "My #MON's"
+	text "My #mon's"
 	line "ashes are stored"
-	cont "in #MON TOWER."
+	cont "in #mon Tower."
 
 	para "You can have this"
 	line "TM. I don't need"
@@ -14,7 +14,7 @@ _ReceivedTM39Text::
 
 _TM39ExplanationText::
 	text "TM39 is a move"
-	line "called SWIFT."
+	line "called swift."
 
 	para "It's very accurate,"
 	line "so use it during"
@@ -38,5 +38,5 @@ _Route12GateUpstairsText_495c4::
 	text "Looked into the"
 	line "binoculars."
 
-	para "It's #MON TOWER!"
+	para "It's #mon Tower!"
 	done

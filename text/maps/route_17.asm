@@ -11,7 +11,7 @@ _Route17EndBattleText1::
 _Route17AfterBattleText1::
 	text "Good stuff is"
 	line "lying around on"
-	cont "CYCLING ROAD!"
+	cont "Cycling Road!"
 	done
 
 _Route17BattleText2::
@@ -31,7 +31,7 @@ _Route17AfterBattleText2::
 
 _Route17BattleText3::
 	text "You heading to"
-	line "FUCHSIA?"
+	line "Fuchsia?"
 	done
 
 _Route17EndBattleText3::
@@ -59,7 +59,7 @@ _Route17AfterBattleText4::
 	done
 
 _Route17BattleText5::
-	text "Let VOLTORB"
+	text "Let Voltorb"
 	line "electrify you!"
 	done
 
@@ -69,13 +69,13 @@ _Route17EndBattleText5::
 	prompt
 
 _Route17AfterBattleText5::
-	text "I got my VOLTORB"
+	text "I got my Voltorb"
 	line "at the abandoned"
-	cont "POWER PLANT."
+	cont "Power Plant."
 	done
 
 _Route17BattleText6::
-	text "My #MON won't"
+	text "My #mon won't"
 	line "evolve! Why?"
 	done
 
@@ -85,7 +85,7 @@ _Route17EndBattleText6::
 	prompt
 
 _Route17AfterBattleText6::
-	text "Maybe some #MON"
+	text "Maybe some #mon"
 	line "need element"
 	cont "STONEs to evolve."
 	done
@@ -119,7 +119,7 @@ _Route17AfterBattleText8::
 	done
 
 _Route17BattleText9::
-	text "Nice BIKE!"
+	text "Nice bike!"
 	line "How's it handle?"
 	done
 
@@ -155,19 +155,19 @@ _Route17Text11::
 	done
 
 _Route17Text12::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "All #MON are"
+	para "All #mon are"
 	line "unique."
 
-	para "Even #MON of"
+	para "Even #mon of"
 	line "the same type and"
 	cont "level grow at"
 	cont "different rates."
 	done
 
 _Route17Text13::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
 	para "Press the A or B"
 	line "Button to stay in"
@@ -176,9 +176,9 @@ _Route17Text13::
 	done
 
 _Route17Text14::
-	text "ROUTE 17"
-	line "CELADON CITY -"
-	cont "FUCHSIA CITY"
+	text "Route 17"
+	line "Celadon City -"
+	cont "Fuchsia City"
 	done
 
 _Route17Text15::
@@ -190,6 +190,6 @@ _Route17Text15::
 	done
 
 _Route17Text16::
-	text "CYCLING ROAD"
+	text "Cycling Road"
 	line "Slope ends here!"
 	done

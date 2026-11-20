@@ -109,14 +109,14 @@ CeladonCityText8_continue:
 	db "@"
 CeladonCityText8_alternate:
 	text "I got an -in- at"
-	line "SILPH CO. for the"
-	cont "MASTER BALL tech,"
+	line "Silph Co. for the"
+	cont "Master Ball tech,"
 	cont "and I supply to a"
-	cont "guy at the DEPT."
-	cont "STORE on the sly."
+	cont "guy at the dept."
+	cont "Store on the sly."
 	
-	para "Who needs TEAM"
-	line "ROCKET for money?"
+	para "Who needs team"
+	line "rocket for money?"
 	done
 	db "@"
 
@@ -228,24 +228,24 @@ BuyCoinsFromRocket:
 _TXTSolicitCoins:
 	text "Pssst! Hey kid."
 	line "Wanna buy some"
-	cont "COINS? 1000 for"
+	cont "coins? 1000 for"
 	cont "only ¥15000."
 	done
 	db "@"
 _TXTRefuseCoins:
 	text "Then make like a"
-	line "BELLSPROUT and"
+	line "Bellsprout and"
 	cont "leave!"
 	
 	para "It's hard enough"
 	line "making money now"
-	cont "that TEAM ROCKET"
+	cont "that Team Rocket"
 	cont "is gone."
 	done
 	db "@"
 _TXTNeedCoinCase:
 	text "Then bring your"
-	line "COIN CASE, dork."
+	line "Coin Case, dork."
 	done
 	db "@"
 _TXTCoinCaseFull:

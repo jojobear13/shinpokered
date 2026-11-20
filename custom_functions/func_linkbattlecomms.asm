@@ -185,13 +185,13 @@ DisplayClauseSplashScreen:
 LinkClausesTXT_Active:
 	db "Active Clauses@"
 LinkClausesTXT_Sleep:
-	db "SLEEP@"
+	db "Sleep@"
 LinkClausesTXT_Freeze:
-	db "FREEZE@"
+	db "Freeze@"
 LinkClausesTXT_Trapping:
-	db "TRAPPING@"
+	db "Trapping@"
 LinkClausesTXT_Hypbeam:
-	db "HYP.BEAM@"
+	db "Hyp.Beam@"
 
 
 ;Check wUnknownSerialCounter. If FFFF is there, then the connection timed out.

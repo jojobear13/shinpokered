@@ -414,6 +414,6 @@ ENDC
 
 _PromptNewID:
 	text "Generate a new"
-	line "TRAINER ID?"
+	line "trainer ID?"
 	done
 	db "@"

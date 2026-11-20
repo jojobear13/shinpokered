@@ -1,6 +1,6 @@
 _FuchsiaHouse3Text_561bd::
-	text "I'm the FISHING"
-	line "GURU's older"
+	text "I'm the fishing"
+	line "guru's older"
 	cont "brother!"
 
 	para "I simply Looove"
@@ -19,7 +19,7 @@ _FuchsiaHouse3Text_561c2::
 
 ;joenote - add hotkey info
 	para "Hold A and press"
-	line "SELECT to use the"
+	line "select to use the"
 	cont "rod quickly.@@"
 
 	para "<PLAYER> received"
@@ -40,11 +40,11 @@ _FuchsiaHouse3Text_56217::
 ;	para "How are the fish"
 ;	line "biting?"
 ;	done
-	para "Use the SUPER ROD"
+	para "Use the Super Rod"
 	line "in any water!"
 	cont "You can catch"
 	cont "different kinds"
-	cont "of #MON."
+	cont "of #mon."
 
 	para "Try fishing"
 	line "wherever you can!"

@@ -1,5 +1,5 @@
 _WardenGibberishText1::
-	text "WARDEN: Hif fuff"
+	text "Warden: Hif fuff"
 	line "hefifoo!"
 
 	para "Ha lof ha feef ee"
@@ -19,17 +19,17 @@ _WardenGibberishText3::
 
 _WardenTeethText1::
 	text "<PLAYER> gave the"
-	line "GOLD TEETH to the"
-	cont "WARDEN!@@"
+	line "Gold Teeth to the"
+	cont "warden!@@"
 
 _WardenTeethText2::
 	db $0
-	para "The WARDEN popped"
+	para "The warden popped"
 	line "in his teeth!"
 	prompt
 
 _WardenThankYouText::
-	text "WARDEN: Thanks,"
+	text "Warden: Thanks,"
 	line "kid! No one could"
 	cont "understand a word"
 	cont "that I said."
@@ -41,7 +41,7 @@ _WardenThankYouText::
 	cont "your trouble."
 
 ;joenote - add hotkey info
-	para "Press SELECT when"
+	para "Press select when"
 	line "facing a boulder"
 	cont "to activate it."	
 	prompt
@@ -53,23 +53,23 @@ _ReceivedHM04Text::
 	text "!@@"
 
 _HM04ExplanationText::
-	text "WARDEN: HM04"
-	line "teaches STRENGTH!"
+	text "Warden: HM04"
+	line "teaches strength!"
 
-	para "It lets #MON"
+	para "It lets #mon"
 	line "move boulders"
 	cont "when you're out-"
 	cont "side of battle."
 
 	para "Oh yes, did you"
-	line "find SECRET HOUSE"
-	cont "in SAFARI ZONE?"
+	line "find secret house"
+	cont "in Safari Zone?"
 
 	para "If you do, you"
 	line "win an HM!"
 
 	para "I hear it's the"
-	line "rare SURF HM."
+	line "rare surf HM."
 	done
 
 _HM04NoRoomText::
@@ -78,11 +78,11 @@ _HM04NoRoomText::
 	done
 
 _FuchsiaHouse2Text_75176::
-	text "#MON photos"
+	text "#mon photos"
 	line "and fossils."
 	done
 
 _FuchsiaHouse2Text_7517b::
-	text "Old #MON"
+	text "Old #mon"
 	line "merchandise."
 	done

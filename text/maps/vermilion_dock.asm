@@ -3,21 +3,21 @@ _VermilionDockText1::
 	done
 
 _VermilionDockSeigaIntro::
-	text "My name is SEIGA."
+	text "My name is seiga."
 	line "Though my friends"
 IF (DEF(_GREEN) || DEF(_REDJP) || DEF(_BLUEJP))
-	cont "call me BLUE."
+	cont "call me blue."
 ELSE
-	cont "call me GREEN."
+	cont "call me green."
 ENDC
 	
-	para "I'm CHAMP of the"
+	para "I'm champ of the"
 	line "Orange Islands"
-	cont "#MON LEAGUE."
+	cont "#mon League."
 
 	para "I'm currently on a"
 	line "victory vacation"
-	cont "on the S.S.ANNE."
+	cont "on the S.S.Anne."
 	
 	para "Oh...This truck?"
 	line "I think it's just"
@@ -31,7 +31,7 @@ _VermilionDockSeigaChallenge::
 	
 	para "How about a"
 	line "friendly battle"
-	cont "between CHAMPS?"
+	cont "between champs?"
 	
 	para "If you win, I'll"
 	line "tell you a secret"
@@ -56,11 +56,11 @@ _VermilionDockSeigaDefeat::
 
 _VermilionDockSeigaVictory::
 	text "A"
-	line "#MON was well-"
+	line "#mon was well-"
 	cont "hidden under the"
 	cont "truck."
 	
-	para "It cried MEW!"
+	para "It cried Mew!"
 	line "and flew towards"
 	cont "Cerulean City."
 	
@@ -71,11 +71,11 @@ _VermilionDockSeigaVictory::
 	cont "went to a lower"
 	cont "level."
 	
-	para "Your 'DEX is much"
+	para "Your 'dex is much"
 	line "more advanced"
 	cont "than my locator."
 	
-	para "Maybe the #MON"
+	para "Maybe the #mon"
 	line "will appear when"
 	cont "it's upgraded"
 	cont "with a diploma."

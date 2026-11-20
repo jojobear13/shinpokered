@@ -1,5 +1,5 @@
 _CeladonHotelText1::
-	text "#MON? No, this"
+	text "#mon? No, this"
 	line "is a hotel for"
 	cont "people."
 
@@ -11,7 +11,7 @@ _CeladonHotelText2::
 	line "with my brother"
 	cont "and boy friend."
 
-	para "CELADON is such a"
+	para "Celadon is such a"
 	line "pretty city!"
 	done
 
@@ -24,8 +24,8 @@ _CeladonHotelText3::
 
 _CeladonHotelCoinGuyText_intro::
 	text "I'm flushed with"
-	line "COINS, yet seeing"
-	cont "#MON is what I"
+	line "coins, yet seeing"
+	cont "#mon is what I"
 	cont "covet."
 	
 	para "Show me a fine"
@@ -38,7 +38,7 @@ _CeladonHotelCoinGuyText_intro::
 
 _CeladonHotelCoinGuyText_needcase::
 	text "Oh, remember to"
-	line "bring a COIN CASE."
+	line "bring a Coin Case."
 	done
 
 _CeladonHotelCoinGuyText_recieved::

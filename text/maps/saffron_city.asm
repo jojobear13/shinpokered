@@ -4,7 +4,7 @@ _SaffronCityText1::
 	done
 
 _SaffronCityText2::
-	text "BOSS said he'll"
+	text "Boss said he'll"
 	line "take this town!"
 	done
 
@@ -14,8 +14,8 @@ _SaffronCityText3::
 	done
 
 _SaffronCityText4::
-	text "SAFFRON belongs"
-	line "to TEAM ROCKET!"
+	text "Saffron belongs"
+	line "to Team Rocket!"
 	done
 
 _SaffronCityText5::
@@ -29,20 +29,20 @@ _SaffronCityText6::
 	done
 
 _SaffronCityText7::
-	text "With SILPH under"
+	text "With Silph under"
 	line "control, we can"
-	cont "exploit #MON"
+	cont "exploit #mon"
 	cont "around the world!"
 	done
 
 _SaffronCityText8::
-	text "You beat TEAM"
-	line "ROCKET all alone?"
+	text "You beat team"
+	line "rocket all alone?"
 	cont "That's amazing!"
 	done
 
 _SaffronCityText9::
-	text "Yeah! TEAM ROCKET"
+	text "Yeah! Team Rocket"
 	line "is gone!"
 	cont "It's safe to go"
 	cont "out again!"
@@ -51,13 +51,13 @@ _SaffronCityText9::
 _SaffronCityText10::
 	text "People should be"
 	line "flocking back to"
-	cont "SAFFRON now."
+	cont "Saffron now."
 	done
 
 _SaffronCityText11::
 	text "I flew here on my"
-	line "PIDGEOT when I"
-	cont "read about SILPH."
+	line "Pidgeot when I"
+	cont "read about Silph."
 
 	para "It's already over?"
 	line "I missed the"
@@ -65,12 +65,12 @@ _SaffronCityText11::
 	done
 
 _SaffronCityText12::
-	text "PIDGEOT: Bi bibii!@@"
+	text "Pidgeot: Bi bibii!@@"
 
 _SaffronCityText13::
-	text "I saw ROCKET"
-	line "BOSS escaping"
-	cont "SILPH's building."
+	text "I saw rocket"
+	line "boss escaping"
+	cont "Silph's building."
 	done
 
 _SaffronCityText14::
@@ -90,28 +90,28 @@ _SaffronCityText15::
 	done
 
 _SaffronCityText16::
-	text "SAFFRON CITY"
+	text "Saffron City"
 	line "Shining, Golden"
 	cont "Land of Commerce"
 	done
 
 _SaffronCityText17::
-	text "FIGHTING DOJO"
+	text "Fighting dojo"
 	done
 
 _SaffronCityText18::
-	text "SAFFRON CITY"
-	line "#MON GYM"
-	cont "LEADER: SABRINA"
+	text "Saffron City"
+	line "#mon gym"
+	cont "leader: Sabrina"
 
 	para "The Master of"
-	line "Psychic #MON!"
+	line "Psychic #mon!"
 	done
 
 _SaffronCityText20::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "FULL HEAL cures"
+	para "Full Heal cures"
 	line "all ailments like"
 	cont "sleep and burns."
 
@@ -121,29 +121,29 @@ _SaffronCityText20::
 	done
 
 _SaffronCityText21::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "New GREAT BALL"
+	para "New Great Ball"
 	line "offers improved"
 	cont "capture rates."
 
 	para "Try it on those"
 	line "hard-to-catch"
-	cont "#MON."
+	cont "#mon."
 	done
 
 _SaffronCityText22::
-	text "SILPH CO."
-	line "OFFICE BUILDING"
+	text "Silph Co."
+	line "Office building"
 	done
 
 _SaffronCityText24::
-	text "MR.PSYCHIC's"
-	line "HOUSE"
+	text "Mr.Psychic's"
+	line "house"
 	done
 
 _SaffronCityText25::
-	text "SILPH's latest"
+	text "Silph's latest"
 	line "product!"
 
 	para "Release to be"

@@ -10,7 +10,7 @@ PrizeDifferentMenuPtrs:
 	dw PrizeMenuTMsCost
 
 NoThanksText:
-	db "NO THANKS@"
+	db "No Thanks@"
 
 PrizeMenuMon1Entries:
 IF DEF(_ENCRED)

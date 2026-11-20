@@ -9,7 +9,7 @@ _Route11AfterBattleText9::
 	done
 
 _Route11BattleText10::
-	text "My #MON should"
+	text "My #mon should"
 	line "be ready by now!"
 	done
 
@@ -24,5 +24,5 @@ _Route11AfterBattleText10::
 	done
 
 _Route11Text11::
-	text "DIGLETT's CAVE"
+	text "Diglett's Cave"
 	done

@@ -1,5 +1,5 @@
 _ViridianForestExitText1::
-	text "Many #MON live"
+	text "Many #mon live"
 	line "only in forests "
 	cont "and caves."
 
@@ -15,5 +15,5 @@ _ViridianForestExitText2::
 
 	para "They can be cut"
 	line "down by a special"
-	cont "#MON move."
+	cont "#mon move."
 	done

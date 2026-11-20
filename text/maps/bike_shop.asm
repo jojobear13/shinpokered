@@ -1,23 +1,23 @@
 IF DEF(_JPTXT)
 _BikeShopText_1d810::
 	text "Hi! Welcome to"
-	line "MIRACLE CYCLE."
+	line "miracle cycle."
 
 	para "Have we got just"
-	line "the BIKE for you!"
+	line "the bike for you!"
 	prompt
 ELSE
 _BikeShopText_1d810::
 	text "Hi! Welcome to"
-	line "our BIKE SHOP."
+	line "our bike shop."
 
 	para "Have we got just"
-	line "the BIKE for you!"
+	line "the bike for you!"
 	prompt
 ENDC
 
 _BikeShopText_1d815::
-	text "It's a cool BIKE!"
+	text "It's a cool bike!"
 	line "Do you want it?"
 	done
 
@@ -29,19 +29,19 @@ _BikeShopCantAffordText::
 _BikeShopText_1d81f::
 	text "Oh, that's..."
 
-	para "A BIKE VOUCHER!"
+	para "A Bike Voucher!"
 
 	para "OK! Here you go!"
 	prompt
 
 _BikeShopText_1d824::
 	text "<PLAYER> exchanged"
-	line "the BIKE VOUCHER"
+	line "the Bike Voucher"
 ;	cont "for a BICYCLE.@@"
 ;joenote - add hotkey info
-	cont "for a BICYCLE."
+	cont "for a bicycle."
 	para "Hold A and press"
-	line "SELECT to get on"
+	line "select to get on"
 	cont "or off quickly.@@"
 
 
@@ -52,10 +52,10 @@ _BikeShopComeAgainText::
 
 _BikeShopText_1d82f::
 	text "How do you like"
-	line "your new BICYCLE?"
+	line "your new bicycle?"
 
 	para "You can take it"
-	line "on CYCLING ROAD"
+	line "on Cycling Road"
 	cont "and in caves!"
 	done
 
@@ -65,13 +65,13 @@ _BikeShopText_1d834::
 	done
 
 _BikeShopText_1d843::
-	text "A plain city BIKE"
+	text "A plain city bike"
 	line "is good enough"
 	cont "for me!"
 
 	para "You can't put a"
 	line "shopping basket"
-	cont "on an MTB!"
+	cont "on an mtb!"
 	done
 
 _BikeShopText_1d85c::
@@ -81,6 +81,6 @@ _BikeShopText_1d85c::
 	done
 
 _BikeShopText_1d861::
-	text "Wow. Your BIKE is"
+	text "Wow. Your bike is"
 	line "really cool!"
 	done

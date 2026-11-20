@@ -1,23 +1,23 @@
 _CeladonMansion1Text1::
-	text "MEOWTH: Meow!@@"
+	text "Meowth: Meow!@@"
 
 _CeladonMansion1Text2::
-	text "My dear #MON"
+	text "My dear #mon"
 	line "keep me company."
 
-	para "MEOWTH even brings"
+	para "Meowth even brings"
 	line "money home!"
 	done
 
 _CeladonMansion1Text3::
-	text "CLEFAIRY: Pi"
+	text "Clefairy: Pi"
 	line "pippippi!@@"
 
 _CeladonMansion1Text4::
-	text "NIDORAN: Kya"
+	text "Nidoran: Kya"
 	line "kyaoo!@@"
 
 _CeladonMansion1Text5::
-	text "CELADON MANSION"
+	text "Celadon mansion"
 	line "Manager's Suite"
 	done

@@ -1,8 +1,8 @@
 _AgathaBeforeBattleText::
-	text "I am AGATHA of"
-	line "the ELITE FOUR!"
+	text "I am Agatha of"
+	line "the elite four!"
 
-	para "OAK's taken a lot"
+	para "Oak's taken a lot"
 	line "of interest in"
 	cont "you, child!"
 
@@ -13,8 +13,8 @@ _AgathaBeforeBattleText::
 
 	para "Now he just wants"
 	line "to fiddle with"
-	cont "his #DEX! He's"
-	cont "wrong! #MON"
+	cont "his #dex! He's"
+	cont "wrong! #mon"
 	cont "are for fighting!"
 
 	para "<PLAYER>! I'll show"

@@ -7,8 +7,8 @@ _ViridianPokeCenterText2::
 	done
 
 _ViridianPokeCenterText3::
-	text "There's a #MON"
-	line "CENTER in every"
+	text "There's a #mon"
+	line "center in every"
 	cont "town ahead."
 
 	para "They don't charge"
@@ -18,7 +18,7 @@ _ViridianPokeCenterText3::
 ;joenote - text for randomized regular trainers
 _ViridianPokeCenter_RegRandomON::
 	text "Not your first"
-	line "try at a #MON"
+	line "try at a #mon"
 	cont "journey?"
 	
 	para "I can make it so"

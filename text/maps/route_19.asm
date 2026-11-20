@@ -25,7 +25,7 @@ _Route19EndBattleText2::
 
 _Route19AfterBattleText2::
 	text "Watch out for"
-	line "TENTACOOL!"
+	line "Tentacool!"
 	done
 
 _Route19BattleText3::
@@ -39,7 +39,7 @@ _Route19EndBattleText3::
 	prompt
 
 _Route19AfterBattleText3::
-	text "I can beat #MON"
+	text "I can beat #mon"
 	line "at swimming!"
 	done
 
@@ -59,7 +59,7 @@ _Route19AfterBattleText4::
 
 _Route19BattleText5::
 	text "I tried diving"
-	line "for #MON, but"
+	line "for #mon, but"
 	cont "it was a no go!"
 	done
 
@@ -69,7 +69,7 @@ _Route19EndBattleText5::
 
 _Route19AfterBattleText5::
 	text "You have to fish"
-	line "for sea #MON!"
+	line "for sea #mon!"
 	done
 
 _Route19BattleText6::
@@ -101,7 +101,7 @@ _Route19EndBattleText7::
 _Route19AfterBattleText7::
 	text "It's still a long"
 	line "way to go to"
-	cont "SEAFOAM ISLANDS."
+	cont "Seafoam Islands."
 	done
 
 _Route19BattleText8::
@@ -116,7 +116,7 @@ _Route19EndBattleText8::
 _Route19AfterBattleText8::
 	text "My boy friend"
 	line "wanted to swim to"
-	cont "SEAFOAM ISLANDS."
+	cont "Seafoam Islands."
 	done
 
 _Route19BattleText9::
@@ -145,13 +145,13 @@ _Route19EndBattleText10::
 	prompt
 
 _Route19AfterBattleText10::
-	text "LAPRAS is so big,"
+	text "Lapras is so big,"
 	line "it must keep you"
 	cont "dry on water."
 	done
 
 _Route19Text11::
-	text "SEA ROUTE 19"
-	line "FUCHSIA CITY -"
-	cont "SEAFOAM ISLANDS"
+	text "Sea Route 19"
+	line "Fuchsia City -"
+	cont "Seafoam Islands"
 	done

@@ -100,7 +100,7 @@ CheckFearowTutor:
 	call PrintText
 	ret
 .Text1
-	text "FEAROW darts"
+	text "Fearow darts"
 	line "about excitedly."
 	prompt
 	db "@"

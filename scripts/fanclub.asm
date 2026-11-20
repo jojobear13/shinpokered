@@ -194,7 +194,7 @@ PikachuTutor:
 	call PrintText
 	ret
 .Text1
-	text "PIKACHU zooms"
+	text "Pikachu zooms"
 	line "around happily."
 	prompt
 	db "@"

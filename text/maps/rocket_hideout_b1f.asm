@@ -13,7 +13,7 @@ _RocketHideout1EndBattleText2::
 
 _RocketHideout1AfterBattleTxt2::
 	text "Are you dissing"
-	line "TEAM ROCKET?"
+	line "Team Rocket?"
 	done
 
 _RocketHideout1BattleText3::
@@ -41,7 +41,7 @@ _RocketHideout1EndBattleText4::
 	prompt
 
 _RocketHideout1AfterBattleTxt4::
-	text "SILPH SCOPE?"
+	text "Silph Scope?"
 	line "I don't know"
 	cont "where it is!"
 	done
@@ -59,7 +59,7 @@ _RocketHideout1EndBattleText5::
 _RocketHideout1AfterBattleTxt5::
 	text "OK, I'll talk!"
 	line "Take the elevator"
-	cont "to see my BOSS!"
+	cont "to see my boss!"
 	done
 
 _RocketHideout1BattleText6::

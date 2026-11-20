@@ -1,11 +1,11 @@
 _SafariZoneCenterText2::
-	text "REST HOUSE"
+	text "Rest house"
 	done
 
 _SafariZoneCenterText3::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "Press the START"
+	para "Press the start"
 	line "Button to check"
 	cont "remaining time!"
 	done

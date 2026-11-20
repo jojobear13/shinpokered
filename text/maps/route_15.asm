@@ -1,6 +1,6 @@
 _Route15BattleText1::
 	text "Let me try out the"
-	line "#MON I just"
+	line "#mon I just"
 	cont "got in a trade!"
 	done
 
@@ -12,7 +12,7 @@ _Route15EndBattleText1::
 _Route15AfterBattleText1::
 	text "You can't change"
 	line "the nickname of"
-	cont "any #MON you"
+	cont "any #mon you"
 	cont "get in a trade."
 
 	para "Only the Original"
@@ -39,7 +39,7 @@ _Route15AfterBattleText2::
 _Route15BattleText3::
 	text "When I whistle, I"
 	line "can summon bird"
-	cont "#MON!"
+	cont "#mon!"
 	done
 
 _Route15EndBattleText3::
@@ -65,7 +65,7 @@ _Route15EndBattleText4::
 
 _Route15AfterBattleText4::
 	text "Did you know moves"
-	line "like EARTHQUAKE"
+	line "like earthquake"
 	cont "don't have any"
 	cont "effect on birds?"
 	done
@@ -86,7 +86,7 @@ _Route15AfterBattleText5::
 	done
 
 _Route15BattleText6::
-	text "I raise #MON"
+	text "I raise #mon"
 	line "because I live"
 	cont "alone!"
 	done
@@ -99,7 +99,7 @@ _Route15EndBattleText6::
 _Route15AfterBattleText6::
 	text "I just like going"
 	line "home to be with"
-	cont "my #MON!"
+	cont "my #mon!"
 	done
 
 _Route15BattleText7::
@@ -116,7 +116,7 @@ _Route15AfterBattleText7::
 	text "You only live"
 	line "once, so I live"
 	cont "as an outlaw!"
-	cont "TEAM ROCKET RULES!"
+	cont "Team Rocket rules!"
 	done
 
 _Route15BattleText8::
@@ -137,7 +137,7 @@ _Route15AfterBattleText8::
 
 _Route15BattleText9::
 	text "What's cool?"
-	line "Trading #MON!"
+	line "Trading #mon!"
 	done
 
 _Route15EndBattleText9::
@@ -146,13 +146,13 @@ _Route15EndBattleText9::
 	prompt
 
 _Route15AfterBattleText9::
-	text "I trade #MON"
+	text "I trade #mon"
 	line "with my friends!"
 	done
 
 _Route15BattleText10::
 	text "Want to play with"
-	line "my #MON?"
+	line "my #mon?"
 	done
 
 _Route15EndBattleText10::
@@ -165,7 +165,7 @@ _Route15AfterBattleText10::
 	line "weaker people.@@"
 
 _Route15Text12::
-	text "ROUTE 15"
-	line "West to FUCHSIA"
-	cont "CITY"
+	text "Route 15"
+	line "West to Fuchsia"
+	cont "city"
 	done

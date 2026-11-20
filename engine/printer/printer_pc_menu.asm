@@ -136,22 +136,22 @@ LoopPrinterPC:
 	jp OpenPrinterPC
 
 PrinterPCMenuText:
-	db   "SETTINGS"
-	next "PRINT #DEX"
-	next "PRINT #MON"
-	next "PRINT BOX"
-	next "PRINT DIPLOMA"
-	next "CANCEL"
+	db   "Settings"
+	next "Print #dex"
+	next "print #mon"
+	next "print box"
+	next "print diploma"
+	next "cancel"
 	db "@"
 PrinterPCMenuText_noDiploma:
-	db   "SETTINGS"
-	next "PRINT #DEX"
-	next "PRINT #MON"
-	next "PRINT BOX"
-	next "CANCEL"
+	db   "Settings"
+	next "Print #dex"
+	next "print #mon"
+	next "print box"
+	next "cancel"
 	db "@"
 PrintBoxNoPCText:
-	db "BOX No.@"
+	db "Box No.@"
 
 
 	
@@ -252,23 +252,23 @@ PCPrintSettings:
 	jr .affirmSettings
 
 PrinterPCSettingsText:
-	db   "LIGHTEST"
-	next "LIGHTER"
-	next "NORMAL"
-	next "DARKER"
-	next "DARKEST"
-	next "BACK"
+	db   "Lightest"
+	next "Lighter"
+	next "normal"
+	next "darker"
+	next "darkest"
+	next "back"
 	db "@"
 PrinterPCSettingsTextSingle00:
-	db "LIGHTEST@"
+	db "Lightest@"
 PrinterPCSettingsTextSingle20:
-	db "LIGHTER @"
+	db "Lighter @"
 PrinterPCSettingsTextSingle40:
-	db "NORMAL  @"
+	db "Normal  @"
 PrinterPCSettingsTextSingle60:
-	db "DARKER  @"
+	db "Darker  @"
 PrinterPCSettingsTextSingle7F:
-	db "DARKEST @"
+	db "Darkest @"
 
 PCPrinterCurrentSettingDisplay:
 	ld a, [wPrinterSettings]

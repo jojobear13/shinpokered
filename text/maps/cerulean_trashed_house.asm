@@ -7,8 +7,8 @@ _CeruleanTrashedText_1d6ab::
 
 	para "They stole a TM"
 	line "for teaching"
-	cont "#MON how to"
-	cont "DIG holes!"
+	cont "#mon how to"
+	cont "dig holes!"
 
 	para "That cost me a"
 	line "bundle, it did!"
@@ -19,13 +19,13 @@ _CeruleanTrashedText_1d6b0::
 	line "lost is lost!"
 
 	para "I decided to teach"
-	line "DIGLETT how to"
-	cont "DIG without a TM!"
+	line "Diglett how to"
+	cont "dig without a TM!"
 	done
 
 _CeruleanHouseTrashedText2::
-	text "TEAM ROCKET must"
-	line "be trying to DIG"
+	text "Team Rocket must"
+	line "be trying to dig"
 	cont "their way into no"
 	cont "good!"
 	done
@@ -37,7 +37,7 @@ _CeruleanHouseTrashedText3::
 	done
 ELSE
 _CeruleanHouseTrashedText3::
-	text "TEAM ROCKET left"
+	text "Team Rocket left"
 	line "a way out!"
 	done
 ENDC

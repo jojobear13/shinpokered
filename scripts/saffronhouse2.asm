@@ -70,7 +70,7 @@ MrPsychicTutor:
 .Text1
 	text "I sense a great"
 	line "mystical power in"
-	cont "your NINETALES."
+	cont "your Ninetales."
 	cont "I could teach it"
 	cont "something nice."
 	done

@@ -109,8 +109,8 @@ _Route24AfterBattleText5::
 	done
 
 _Route24BattleText6::
-	text "This is NUGGET"
-	line "BRIDGE! Beat us 5"
+	text "This is nugget"
+	line "bridge! Beat us 5"
 	cont "trainers and win"
 IF DEF(_JPTXT)	;joenote - dirty joke lost in translation
 	cont "a surprise from"

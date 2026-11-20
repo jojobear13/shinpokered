@@ -3,7 +3,7 @@ _SecretHouseText_4a350::
 
 	para "You're the first"
 	line "person to reach"
-	cont "the SECRET HOUSE!"
+	cont "the secret house!"
 
 	para "I was getting"
 	line "worried that no"
@@ -14,7 +14,7 @@ _SecretHouseText_4a350::
 	line "You have won!"
 
 ;joenote - add hotkey info
-	para "Press SELECT when"
+	para "Press select when"
 	line "you are facing a"
 	cont "shore to use it."	
 	prompt
@@ -26,9 +26,9 @@ _ReceivedHM03Text::
 	text "!@@"
 
 _HM03ExplanationText::
-	text "HM03 is SURF!"
+	text "HM03 is surf!"
 
-	para "#MON will be"
+	para "#mon will be"
 	line "able to ferry you"
 	cont "across water!"
 

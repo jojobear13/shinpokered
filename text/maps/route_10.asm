@@ -12,7 +12,7 @@ _Route10EndBattleText1::
 
 _Route10AfterBattleText1::
 	text "I have more rare"
-	line "#MON at home!"
+	line "#mon at home!"
 	done
 
 _Route10BattleText2::
@@ -50,12 +50,12 @@ ENDC
 
 _Route10BattleText3::
 	text "Hi kid, want to"
-	line "see my #MON?"
+	line "see my #mon?"
 	done
 
 _Route10EndBattleText3::
 	text "Oh no!"
-	line "My #MON!"
+	line "My #mon!"
 	prompt
 
 _Route10AfterBattleText3::
@@ -65,7 +65,7 @@ _Route10AfterBattleText3::
 
 _Route10BattleText4::
 	text "I've been to a"
-	line "#MON GYM a few"
+	line "#mon gym a few"
 	cont "times. But, I"
 	cont "lost each time."
 	done
@@ -108,7 +108,7 @@ _Route10EndBattleText6::
 	prompt
 
 _Route10AfterBattleText6::
-	text "The #MON here"
+	text "The #mon here"
 	line "are so chunky!"
 	cont "There should be a"
 	cont "pink one with a"
@@ -117,9 +117,9 @@ _Route10AfterBattleText6::
 
 _Route10Text9::
 _Route10Text7::
-	text "ROCK TUNNEL"
+	text "Rock Tunnel"
 	done
 
 _Route10Text10::
-	text "POWER PLANT"
+	text "Power Plant"
 	done

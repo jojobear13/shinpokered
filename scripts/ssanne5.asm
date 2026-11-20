@@ -101,7 +101,7 @@ _SSAnne5Text1_ALT:
 	text "Ahoy after-party!"
 	line "The ship will be"
 	cont "moored until the"
-	cont "TENTACOOL blooms"
+	cont "Tentacool blooms"
 	cont "begin dispersing."
 	done
 	db "@"

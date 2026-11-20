@@ -221,7 +221,7 @@ FossilTutor:
 	nop
 	nop
 .Text1
-	text "Your #MON acts"
+	text "Your #mon acts"
 	line "like it recalled"
 	cont "a memory from the"
 	cont "distant past."

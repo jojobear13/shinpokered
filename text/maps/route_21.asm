@@ -20,12 +20,12 @@ _Route21BattleText2::
 
 _Route21EndBattleText2::
 	text "Darn"
-	line "MAGIKARP!"
+	line "Magikarp!"
 	prompt
 
 _Route21AfterBattleText2::
 	text "I seem to only"
-	line "catch MAGIKARP!"
+	line "catch Magikarp!"
 	done
 
 _Route21BattleText3::
@@ -60,7 +60,7 @@ _Route21AfterBattleText4::
 
 _Route21BattleText5::
 	text "I caught all my"
-	line "#MON at sea!"
+	line "#mon at sea!"
 	done
 
 _Route21EndBattleText5::
@@ -70,7 +70,7 @@ _Route21EndBattleText5::
 
 _Route21AfterBattleText5::
 	text "Where'd you catch"
-	line "your #MON?"
+	line "your #mon?"
 	done
 
 _Route21BattleText6::

@@ -1,6 +1,6 @@
 _CeladonCityText1::
-	text "I got my KOFFING"
-	line "in CINNABAR!"
+	text "I got my Koffing"
+	line "in Cinnabar!"
 
 	para "It's nice, but it"
 	line "breathes poison"
@@ -8,13 +8,13 @@ _CeladonCityText1::
 	done
 
 _CeladonCityText2::
-	text "Heheh! This GYM"
+	text "Heheh! This gym"
 	line "is great! It's"
 	cont "full of women!"
 	done
 
 _CeladonCityText3::
-	text "The GAME CORNER"
+	text "The game corner"
 	line "is bad for our"
 	cont "city's image!"
 	done
@@ -47,13 +47,13 @@ _ReceivedTM41Text::
 
 _TM41ExplanationText::
 	text "TM41 teaches"
-	line "SOFTBOILED!"
+	line "softboiled!"
 
-	para "Only one #MON"
+	para "Only one #mon"
 	line "can use it!"
 
-	para "That #MON is"
-	line "CHANSEY!"
+	para "That #mon is"
+	line "Chansey!"
 	done
 
 _TM41NoRoomText::
@@ -63,15 +63,15 @@ _TM41NoRoomText::
 
 _CeladonCityText6::
 	text "This is my trusted"
-	line "pal, POLIWRATH!"
+	line "pal, Poliwrath!"
 
 	para "It evolved from"
-	line "POLIWHIRL when I"
-	cont "used WATER STONE!"
+	line "Poliwhirl when I"
+	cont "used Water Stone!"
 	done
 
 _CeladonCityText7::
-	text "POLIWRATH: Ribi"
+	text "Poliwrath: Ribi"
 	line "ribit!@@"
 
 _CeladonCityText8::
@@ -80,53 +80,53 @@ _CeladonCityText8::
 	done
 
 _CeladonCityText9::
-	text "Keep out of TEAM"
-	line "ROCKET's way!"
+	text "Keep out of team"
+	line "rocket's way!"
 	done
 
 _CeladonCityText10::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "X ACCURACY boosts"
+	para "X Accuracy boosts"
 	line "the accuracy of"
 	cont "techniques!"
 
-	para "DIRE HIT jacks up"
+	para "Dire Hit jacks up"
 	line "the likelihood of"
 	cont "critical hits!"
 
 	para "Get your items at"
-	line "CELADON DEPT."
-	cont "STORE!"
+	line "Celadon dept."
+	cont "Store!"
 	done
 
 _CeladonCityText11::
-	text "CELADON CITY"
+	text "Celadon City"
 	line "The City of"
 	cont "Rainbow Dreams"
 	done
 
 _CeladonCityText13::
-	text "CELADON CITY"
-	line "#MON GYM"
-	cont "LEADER: ERIKA"
+	text "Celadon City"
+	line "#mon gym"
+	cont "leader: Erika"
 
 	para "The Nature Loving"
 	line "Princess!"
 	done
 
 _CeladonCityText14::
-	text "CELADON MANSION"
+	text "Celadon mansion"
 	done
 
 _CeladonCityText15::
 	text "Find what you"
-	line "need at CELADON"
-	cont "DEPT. STORE!"
+	line "need at Celadon"
+	cont "dept. Store!"
 	done
 
 _CeladonCityText16::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
 ;joenote - this description is totally wrong about guard spec
 ;	para "GUARD SPEC."
@@ -134,25 +134,25 @@ _CeladonCityText16::
 ;	cont "against SPECIAL"
 ;	cont "attacks such as"
 ;	cont "fire and water!"
-	para "GUARD SPEC."
-	line "protects #MON"
-	cont "from STAT-down"
+	para "Guard Spec."
+	line "protects #mon"
+	cont "from stat-down"
 	cont "attacks such as"
-	cont "LEER and GROWL!"
+	cont "leer and growl!"
 
 	para "Get your items at"
-	line "CELADON DEPT."
-	cont "STORE!"
+	line "Celadon dept."
+	cont "Store!"
 	done
 
 _CeladonCityText17::
 	text "Coins exchanged"
 	line "for prizes!"
-	cont "PRIZE EXCHANGE"
+	cont "Prize exchange"
 	done
 
 _CeladonCityText18::
-	text "ROCKET GAME CORNER"
+	text "Rocket game corner"
 	line "The playground"
 	cont "for grown-ups!"
 	done

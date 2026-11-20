@@ -4,5 +4,5 @@ _DiglettsCaveEntRoute11Text1::
 	cont "long tunnel!"
 
 	para "It goes right to"
-	line "VIRIDIAN CITY!"
+	line "Viridian City!"
 	done

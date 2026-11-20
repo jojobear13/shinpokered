@@ -38,10 +38,10 @@ _Mansion3AfterBattleText2::
 ;joenote - edited text to be closer to original japanese context
 _Mansion3Text5::
 	text "Diary: Feb. 6"
-	line "A new #MON"
+	line "A new #mon"
 	cont "was gestated with"
-	cont "MEW's superb DNA."
+	cont "Mew's superb dna."
 
 	para "An enhanced new"
-	line "species: MEWTWO."
+	line "species: Mewtwo."
 	done

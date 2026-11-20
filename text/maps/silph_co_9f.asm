@@ -14,7 +14,7 @@ _SilphCo9Text_5d8ef::
 	done
 
 _SilphCo9BattleText1::
-	text "Your #MON seem"
+	text "Your #mon seem"
 	line "to adore you, kid!"
 	done
 
@@ -29,7 +29,7 @@ _SilphCo9AfterBattleText1::
 	done
 
 _SilphCo9BattleText2::
-	text "Your #MON have"
+	text "Your #mon have"
 	line "weak points! I"
 	cont "can nail them!"
 	done
@@ -48,7 +48,7 @@ _SilphCo9AfterBattleText2::
 
 _SilphCo9BattleText3::
 	text "I am one of the 4"
-	line "ROCKET BROTHERS!"
+	line "rocket brothers!"
 	done
 
 _SilphCo9EndBattleText3::

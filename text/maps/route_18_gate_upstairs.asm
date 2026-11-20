@@ -2,7 +2,7 @@ _Route18GateUpstairsText_49993::
 	text "Looked into the"
 	line "binoculars."
 
-	para "PALLET TOWN is in"
+	para "Pallet Town is in"
 	line "the west!"
 	done
 

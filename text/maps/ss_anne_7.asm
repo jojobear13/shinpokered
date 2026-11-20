@@ -1,22 +1,22 @@
 _SSAnne7RubText::
-	text "CAPTAIN: Ooargh..."
+	text "Captain: Ooargh..."
 	line "I feel hideous..."
 	cont "Urrp! Seasick..."
 
 	para "<PLAYER> rubbed"
-	line "the CAPTAIN's"
+	line "the captain's"
 	cont "back!"
 
 	para "Rub-rub..."
 	line "Rub-rub...@@"
 
 _ReceivingHM01Text::
-	text "CAPTAIN: Whew!"
+	text "Captain: Whew!"
 	line "Thank you! I"
 	cont "feel much better!"
 
 	para "You want to see"
-	line "my CUT technique?"
+	line "my cut technique?"
 
 	para "I could show you"
 	line "if I wasn't ill..."
@@ -25,12 +25,12 @@ _ReceivingHM01Text::
 	line "have this!"
 
 	para "Teach it to your"
-	line "#MON and you"
-	cont "can see it CUT"
+	line "#mon and you"
+	cont "can see it cut"
 	cont "any time!"
 	
 ;joenote - add hotkey info
-	para "Press SELECT when"
+	para "Press select when"
 	line "facing grass or a"
 	cont "bush to use it."	
 	prompt
@@ -42,7 +42,7 @@ _ReceivedHM01Text::
 	text "!@@"
 
 _SSAnne7Text_61932::
-	text "CAPTAIN: Whew!"
+	text "Captain: Whew!"
 
 	para "Now that I'm not"
 	line "sick any more, I"
@@ -62,6 +62,6 @@ _SSAnne7Text2::
 _SSAnne7Text3::
 	text "How to Conquer"
 	line "Seasickness..."
-	cont "The CAPTAIN's"
+	cont "The captain's"
 	cont "reading this!"
 	done

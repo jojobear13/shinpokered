@@ -1,16 +1,16 @@
 _Museum2FText1::
-	text "MOON STONE?"
+	text "Moon Stone?"
 
 	para "What's so special"
 	line "about it?"
 
 ;joenote - added text to hint at evolving kadabra
 	para "I heard that some"
-	line "GYM LEADER had a"
-	cont "KADABRA evolve by"
+	line "gym leader had a"
+	cont "Kadabra evolve by"
 	cont "meditating under"
-	cont "the MOON's light,"
-	cont "so why a STONE?"
+	cont "the moon's light,"
+	cont "so why a stone?"
 
 	done
 
@@ -30,7 +30,7 @@ _Museum2FText3::
 	done
 
 _Museum2FText4::
-	text "I want a PIKACHU!"
+	text "I want a Pikachu!"
 	line "It's so cute!"
 
 	para "I asked my Daddy"
@@ -38,17 +38,17 @@ _Museum2FText4::
 	done
 
 _Museum2FText5::
-	text "Yeah, a PIKACHU"
+	text "Yeah, a Pikachu"
 	line "soon, I promise!"
 	done
 
 _Museum2FText6::
-	text "SPACE SHUTTLE"
-	line "COLUMBIA"
+	text "Space shuttle"
+	line "columbia"
 	done
 
 _Museum2FText7::
 	text "Meteorite that"
-	line "fell on MT.MOON."
-	cont "(MOON STONE?)"
+	line "fell on Mt.Moon."
+	cont "(Moon Stone?)"
 	done

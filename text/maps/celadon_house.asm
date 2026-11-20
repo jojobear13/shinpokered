@@ -5,17 +5,17 @@ _CeladonHouseText1::
 	done
 
 _CeladonHouseText2::
-	text "CHIEF!"
+	text "Chief!"
 
 	para "We just shipped"
-	line "2000 #MON as"
+	line "2000 #mon as"
 	cont "slot prizes!"
 	done
 
 _CeladonHouseText3::
 	text "Don't touch the"
 	line "poster at the"
-	cont "GAME CORNER!"
+	cont "game corner!"
 
 	para "There's no secret"
 	line "switch behind it!"
@@ -27,8 +27,8 @@ _CeladonHouseTextChiefIntro::	;joenote - adding text for selling pokemon
 	cont "dough, big time!"
 	
 	para "But I'll run out"
-	line "of prize #MON"
-	cont "without the BOSS."
+	line "of prize #mon"
+	cont "without the boss."
 	
 	para "Hey kid! Nice"
 	line "@"

@@ -1,9 +1,9 @@
 _BillsHouseText_1e865::
 	text "Hiya! I'm a"
-	line "#MON..."
+	line "#mon..."
 	cont "...No I'm not!"
 
-	para "Call me BILL!"
+	para "Call me Bill!"
 	line "I'm a true blue"
 	cont "#MANIAC! Hey!"
 	cont "What's with that"
@@ -13,7 +13,7 @@ _BillsHouseText_1e865::
 	line "you, I screwed up"
 	cont "an experiment and"
 	cont "got combined with"
-	cont "a #MON!"
+	cont "a #mon!"
 
 	para "So, how about it?"
 	line "Help me out here!"
@@ -21,7 +21,7 @@ _BillsHouseText_1e865::
 
 _BillsHouseText_1e86a::
 	text "When I'm in the"
-	line "TELEPORTER, go to"
+	line "teleporter, go to"
 	cont "my PC and run the"
 	cont "Cell Separation"
 	cont "System!"
@@ -38,12 +38,12 @@ _BillsHouseText_1e86f::
 	prompt
 
 _BillThankYouText::
-	text "BILL: Yeehah!"
+	text "Bill: Yeehah!"
 	line "Thanks, bud! I"
 	cont "owe you one!"
 
 	para "So, did you come"
-	line "to see my #MON"
+	line "to see my #mon"
 	cont "collection?"
 	cont "You didn't?"
 	cont "That's a bummer."
@@ -66,8 +66,8 @@ _SSTicketNoRoomText::
 
 _BillsHouseText_1e8cb::
 	text "That cruise ship,"
-	line "S.S.ANNE, is in"
-	cont "VERMILION CITY."
+	line "S.S.Anne, is in"
+	cont "Vermilion City."
 	cont "Its passengers"
 	cont "are all trainers!"
 
@@ -80,19 +80,19 @@ _BillsHouseText_1e8cb::
 	done
 
 _BillsHouseText_1e8da::
-	text "BILL: Look, bud,"
+	text "Bill: Look, bud,"
 	line "just check out"
 	cont "some of my rare"
-	cont "#MON on my PC!"
+	cont "#mon on my PC!"
 	done
 
 ;joenote - textfor bill letting you into his garden	
 _BillGardenText::
-	text "BILL: Hey, bud!"
+	text "Bill: Hey, bud!"
 	line "That really the"
-	cont "fabled MEW? Wow!!"
+	cont "fabled Mew? Wow!!"
 	cont "It's truly a new"
-	cont "#MON species."
+	cont "#mon species."
 	
 	para "As thanks for you"
 	line "showing it to me,"

@@ -1,6 +1,6 @@
 _CopycatsHouse2FText_5ccd4::
 	text "<PLAYER>: Hi! Do"
-	line "you like #MON?"
+	line "you like #mon?"
 
 	para "<PLAYER>: Uh no, I"
 	line "just asked you."
@@ -8,7 +8,7 @@ _CopycatsHouse2FText_5ccd4::
 	para "<PLAYER>: Huh?"
 	line "You're strange!"
 
-	para "COPYCAT: Hmm?"
+	para "Copycat: Hmm?"
 	line "Quit mimicking?"
 
 	para "But, that's my"
@@ -17,7 +17,7 @@ _CopycatsHouse2FText_5ccd4::
 
 _TM31PreReceiveText::
 	text "Oh wow!"
-	line "A # DOLL!"
+	line "A # doll!"
 
 	para "For me?"
 	line "Thank you!"
@@ -35,10 +35,10 @@ _ReceivedTM31Text::
 _TM31ExplanationText1::
 	db $0
 	para "TM31 contains my"
-	line "favorite, MIMIC!"
+	line "favorite, mimic!"
 
 	para "Use it on a good"
-	line "#MON!@@"
+	line "#mon!@@"
 
 _TM31ExplanationText2::
 	text "<PLAYER>: Hi!"
@@ -50,7 +50,7 @@ _TM31ExplanationText2::
 	line "that fun to mimic"
 	cont "my every move?"
 
-	para "COPYCAT: You bet!"
+	para "Copycat: You bet!"
 	line "It's a scream!"
 	done
 
@@ -59,22 +59,22 @@ _TM31NoRoomText::
 	line "this?@@"
 
 _CopycatsHouse2FText2::
-	text "DODUO: Giiih!"
+	text "Doduo: Giiih!"
 
-	para "MIRROR MIRROR ON"
-	line "THE WALL, WHO IS"
-	cont "THE FAIREST ONE"
-	cont "OF ALL?"
+	para "Mirror mirror on"
+	line "the wall, who is"
+	cont "the fairest one"
+	cont "of all?"
 	done
 
 _CopycatsHouse2FText3::
 	text "This is a rare"
-	line "#MON! Huh?"
+	line "#mon! Huh?"
 	cont "It's only a doll!"
 	done
 
 _CopycatsHouse2FText6::
-	text "A game with MARIO"
+	text "A game with mario"
 	line "wearing a bucket"
 	cont "on his head!"
 	done
@@ -87,8 +87,8 @@ _CopycatsHouse2FText_5cd17::
 	para "Skill: Mimicry!"
 	line "Hobby: Collecting"
 	cont "dolls!"
-	cont "Favorite #MON:"
-	cont "CLEFAIRY!"
+	cont "Favorite #mon:"
+	cont "Clefairy!"
 	done
 
 _CopycatsHouse2FText_5cd1c::

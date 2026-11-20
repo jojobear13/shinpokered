@@ -1,6 +1,6 @@
 _TM18PreReceiveText::
 	text "Oh, hi! I finally"
-	line "finished #MON!"
+	line "finished #mon!"
 
 	para "Not done yet?"
 	line "This might be"
@@ -14,13 +14,13 @@ _ReceivedTM18Text::
 	text "!@@"
 
 _TM18ExplanationText::
-	text "TM18 is COUNTER!"
+	text "TM18 is counter!"
 	line "Not like the one"
 	cont "I'm leaning on,"
 	cont "mind you!"
 	
-	para "It meets NORMAL"
-	line "or FIGHTING moves"
+	para "It meets normal"
+	line "or fighting moves"
 	cont "with 2x damage!"
 	done
 
@@ -30,7 +30,7 @@ _TM18NoRoomText::
 	done
 
 _CeladonMart3Text2::
-	text "Captured #MON"
+	text "Captured #mon"
 	line "are registered"
 	cont "with an ID No."
 	cont "and OT, the name"
@@ -45,22 +45,22 @@ _CeladonMart3Text3::
 
 	para "My buddy's going"
 	line "to trade me his"
-	cont "KANGASKHAN for my"
-	cont "HAUNTER!"
+	cont "Kangaskhan for my"
+	cont "Haunter!"
 	done
 
 _CeladonMart3Text4::
 	text "Come on, my sweet"
-	line "HAUNTY-pie!"
+	line "haunty-pie!"
 
 	para "I'm an absolute"
-	line "HAUNTER maniac."
+	line "Haunter maniac."
 
 	para "... ...Huh?"
 
-	para "HAUNTER turned"
+	para "Haunter turned"
 	line "into a different"
-	cont "#MON!"
+	cont "#mon!"
 	done
 ELSE
 _CeladonMart3Text3::
@@ -68,27 +68,27 @@ _CeladonMart3Text3::
 
 	para "My buddy's going"
 	line "to trade me his"
-	cont "KANGASKHAN for my"
-	cont "GRAVELER!"
+	cont "Kangaskhan for my"
+	cont "Graveler!"
 	done
 
 _CeladonMart3Text4::
-	text "Come on GRAVELER!"
+	text "Come on Graveler!"
 
-	para "I love GRAVELER!"
+	para "I love Graveler!"
 	line "I collect them!"
 
 	para "Huh?"
 
-	para "GRAVELER turned"
+	para "Graveler turned"
 	line "into a different"
-	cont "#MON!"
+	cont "#mon!"
 	done
 ENDC
 
 _CeladonMart3Text5::
 	text "You can identify"
-	line "#MON you got"
+	line "#mon you got"
 	cont "in trades by"
 	cont "their ID Numbers!"
 	done
@@ -118,7 +118,7 @@ _CeladonMart3Text13::
 	done
 
 _CeladonMart3Text14::
-	text "3F: TV GAME SHOP"
+	text "3F: TV game shop"
 	done
 
 _CeladonMart3Text15::
@@ -127,18 +127,18 @@ IF DEF(_JPTXT)
 ELSE
 	text "Red and Blue!"
 ENDC
-	line "Both are #MON!"
+	line "Both are #mon!"
 	done
 
 _CeladonMart3Blocker::
 	text "This vendor will"
 	line "be open after the"
-	cont "#MON League"
+	cont "#mon League"
 	cont "Championship."
 	
 	para "Come back to buy"
 	line "rare new items"
-	cont "from SILPH CO."
+	cont "from Silph Co."
 	
 	para "Phew!"
 	line "It is really hot"

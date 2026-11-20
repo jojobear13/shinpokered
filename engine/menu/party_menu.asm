@@ -127,9 +127,9 @@ RedrawPartyMenu_:
 	inc c
 	jp .loop
 .ableToLearnMoveText
-	db "ABLE@"
+	db "Able@"
 .notAbleToLearnMoveText
-	db "NOT ABLE@"
+	db "Not Able@"
 .evolutionStoneMenu
 	push hl
 	ld hl, EvosMovesPointerTable
@@ -184,9 +184,9 @@ RedrawPartyMenu_:
 	pop hl
 	jr .printLevel
 .ableToEvolveText
-	db "ABLE@"
+	db "Able@"
 .notAbleToEvolveText
-	db "NOT ABLE@"
+	db "Not Able@"
 .afterDrawingMonEntries
 	ld b, SET_PAL_PARTY_MENU
 	call RunPaletteCommand

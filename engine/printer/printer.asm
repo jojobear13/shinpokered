@@ -623,13 +623,13 @@ GBPrinter_UpdateStatusMessage:
 	db   "@"
 .CheckingLink:
 	db   ""
-	next " CHECKING LINK...@"
+	next " Checking link...@"
 .Transmitting:
 	db   ""
-	next "  TRANSMITTING...@"
+	next "  Transmitting...@"
 .Printing:
 	db   ""
-	next "    PRINTING...@"
+	next "    Printing...@"
 ;joenote - changed the error messages to actually describe what they mean.
 ;Far more useful than telling the player to check the manual.
 .Error1:
@@ -848,8 +848,8 @@ PrintPCBox_DrawPage1:
 	call PrintPCBox_PlaceBoxMonInfo
 	ret
 
-.PokemonListString: db "POKéMON LIST@"
-.BoxString: db "BOX@"
+.PokemonListString: db "Pokémon List@"
+.BoxString: db "Box@"
 
 PrintPCBox_DrawPage2:
 	call ClearScreen

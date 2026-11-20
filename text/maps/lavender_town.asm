@@ -10,9 +10,9 @@ _LavenderTownText_44141::
 ;joenote - added text to hint at evolving haunter
 	para "So you'll believe"
 	line "that I once saw a"
-	cont "HAUNTER evolve"
+	cont "Haunter evolve"
 	cont "during an awful"
-	cont "THUNDER storm."
+	cont "thunder storm."
 	done
 
 _LavenderTownText_44146::
@@ -27,45 +27,45 @@ _LavenderTownText_44146::
 _LavenderTownText2::
 	text "This town is known"
 	line "as the grave site"
-	cont "of #MON."
+	cont "of #mon."
 
 	para "Memorial services"
 	line "are held in"
-	cont "#MON TOWER."
+	cont "#mon Tower."
 	done
 
 _LavenderTownText3::
 	text "GHOSTs appeared"
-	line "in #MON TOWER."
+	line "in #mon Tower."
 
 	para "I think they're"
 	line "the spirits of"
-	cont "#MON that the"
+	cont "#mon that the"
 	cont "ROCKETs killed."
 	done
 
 _LavenderTownText4::
-	text "LAVENDER TOWN"
+	text "Lavender Town"
 	line "The Noble Purple"
 	cont "Town"
 	done
 
 _LavenderTownText5::
-	text "New SILPH SCOPE!"
+	text "New Silph Scope!"
 
 	para "Make the Invisible"
 	line "Plain to See!"
 
-	para "SILPH CO."
+	para "Silph Co."
 	done
 
 _LavenderTownText8::
-	text "LAVENDER VOLUNTEER"
-	line "#MON HOUSE"
+	text "Lavender volunteer"
+	line "#mon house"
 	done
 
 _LavenderTownText9::
 	text "May the Souls of"
-	line "#MON Rest Easy"
-	cont "#MON TOWER"
+	line "#mon Rest Easy"
+	cont "#mon Tower"
 	done

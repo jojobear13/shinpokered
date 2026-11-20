@@ -3,18 +3,18 @@ _ViridianForestText1::
 	line "some friends!"
 
 	para "They're out for"
-	line "#MON fights!"
+	line "#mon fights!"
 	done
 
 _ViridianForestBattleText1::
 	text "Hey! You have"
-	line "#MON! Come on!"
+	line "#mon! Come on!"
 	cont "Let's battle'em!"
 	done
 
 _ViridianForestEndBattleText1::
 	text "No!"
-	line "CATERPIE can't"
+	line "Caterpie can't"
 	cont "cut it!"
 	prompt
 
@@ -26,13 +26,13 @@ _ViridianFrstAfterBattleText1::
 _ViridianForestBattleText2::
 	text "Yo! You can't jam"
 	line "out if you're a"
-	cont "#MON trainer!"
+	cont "#mon trainer!"
 	done
 
 _ViridianForestEndBattleText2::
 	text "Huh?"
 	line "I ran out of"
-	cont "#MON!"
+	cont "#mon!"
 	prompt
 
 _ViridianFrstAfterBattleText2::
@@ -65,14 +65,14 @@ _ViridianFrstAfterBattleText3::
 _ViridianForestText8::
 	text "I ran out of #"
 	line "BALLs to catch"
-	cont "#MON with!"
+	cont "#mon with!"
 
 	para "You should carry"
 	line "extras!"
 	done
 
 _ViridianForestText9::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
 	para "If you want to"
 	line "avoid battles,"
@@ -82,33 +82,33 @@ _ViridianForestText9::
 
 _ViridianForestText10::
 	text "For poison, use"
-	line "ANTIDOTE! Get it"
-	cont "at #MON MARTs!"
+	line "antidote! Get it"
+	cont "at #mon MARTs!"
 	done
 
 _ViridianForestText11::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "Contact PROF.OAK"
+	para "Contact Prof.Oak"
 	line "via PC to get"
-	cont "your #DEX"
+	cont "your #dex"
 	cont "evaluated!"
 	done
 
 _ViridianForestText12::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
 	para "No stealing of"
-	line "#MON from"
+	line "#mon from"
 	cont "other trainers!"
 	cont "Catch only wild"
-	cont "#MON!"
+	cont "#mon!"
 	done
 
 _ViridianForestText13::
-	text "TRAINER TIPS"
+	text "Trainer tips"
 
-	para "Weaken #MON"
+	para "Weaken #mon"
 	line "before attempting"
 	cont "capture!"
 
@@ -117,7 +117,7 @@ _ViridianForestText13::
 	done
 
 _ViridianForestText14::
-	text "LEAVING"
-	line "VIRIDIAN FOREST"
-	cont "PEWTER CITY AHEAD"
+	text "Leaving"
+	line "Viridian Forest"
+	cont "Pewter City ahead"
 	done

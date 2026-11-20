@@ -77,7 +77,7 @@ TileMap_e9bc1:
 	db $7f, $78, $11, $12, $13
 	db $7f, $7f, $14, $15, $7f
 
-String_e9bd5:  db "PLAY TIME@"
+String_e9bd5:  db "Play Time@"
 
 Func_e9bdf:
 	ld c, 10

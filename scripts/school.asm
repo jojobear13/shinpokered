@@ -52,10 +52,10 @@ AltMoveListsText:
 AltMoveListsON:
 	text "Feelin' lucky?"
 	line "Wanna test yer"
-	cont "#MON skills?"
+	cont "#mon skills?"
 	
 	para "I'll set it up so"
-	line "#MON of other"
+	line "#mon of other"
 	cont "trainers can have"
 	cont "altered move sets"
 	cont "in subtle ways."

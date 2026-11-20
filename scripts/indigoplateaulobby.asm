@@ -48,11 +48,11 @@ IndigoTradeNurseText:
 
 IndigoPlateauLobbyText2_ALT:
 	text "Yo! Once and"
-	line "future CHAMP!"
+	line "future champ!"
 
-	para "At #MON LEAGUE,"
+	para "At #mon League,"
 	line "you have to face"
-	cont "the ELITE FOUR in"
+	cont "the elite four in"
 	cont "succession."
 
 	para "If you lose, you"

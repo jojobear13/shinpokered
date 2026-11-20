@@ -40,7 +40,7 @@ _Mansion4AfterBattleText2::
 ;joenote - edited text to be closer to original japanese context
 _Mansion4Text7::
 	text "Diary; Sept. 1"
-	line "MEWTWO is far too"
+	line "Mewtwo is far too"
 	cont "powerful."
 
 	para "It's no use..."

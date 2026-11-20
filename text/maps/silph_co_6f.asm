@@ -31,33 +31,33 @@ _SilphCo6Text_1a27d::
 	done
 
 _SilphCo6Text_1a28f::
-	text "TEAM ROCKET is"
+	text "Team Rocket is"
 	line "trying to conquer"
 	cont "the world with"
-	cont "#MON!"
+	cont "#mon!"
 	done
 
 _SilphCo6Text_1a294::
-	text "TEAM ROCKET ran"
+	text "Team Rocket ran"
 	line "because of you!"
 	done
 
 _SilphCo6Text_1a2a6::
 	text "They must have"
-	line "targeted SILPH"
-	cont "for our #MON"
+	line "targeted Silph"
+	cont "for our #mon"
 	cont "products."
 	done
 
 _SilphCo6Text_1a2ab::
 	text "Come work for"
-	line "SILPH when you"
+	line "Silph when you"
 	cont "get older!"
 	done
 
 _SilphCo6BattleText2::
 	text "I am one of the 4"
-	line "ROCKET BROTHERS!"
+	line "rocket brothers!"
 	done
 
 _SilphCo6EndBattleText2::
@@ -73,14 +73,14 @@ _SilphCo6AfterBattleText2::
 
 _SilphCo6BattleText3::
 	text "That rotten"
-	line "PRESIDENT!"
+	line "president!"
 
 	para "He shouldn't have"
 	line "sent me to the"
 IF DEF(_JPTXT)
-	cont "TUNGUSKA BRANCH!"
+	cont "tunguska branch!"
 ELSE
-	cont "TIKSI BRANCH!"
+	cont "Tiksi branch!"
 ENDC
 	done
 
@@ -90,9 +90,9 @@ _SilphCo6EndBattleText3::
 
 _SilphCo6AfterBattleText3::
 IF DEF(_JPTXT)
-	text "TUNGUSKA BRANCH?"
+	text "Tunguska branch?"
 ELSE
-	text "TIKSI BRANCH?"
+	text "Tiksi branch?"
 ENDC
 	line "It's in Russian"
 	cont "no man's land!"
@@ -100,7 +100,7 @@ ENDC
 
 _SilphCo6BattleText4::
 	text "You dare betray"
-	line "TEAM ROCKET?"
+	line "Team Rocket?"
 	done
 
 _SilphCo6EndBattleText4::

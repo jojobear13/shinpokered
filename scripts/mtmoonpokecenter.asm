@@ -192,10 +192,10 @@ MagikarpSalesmanText_DragonRageKarp:
 	ld hl, MagikarpSalesmanText_Thanks
 	jp MagikarpSalesmanText.printText
 .Text1
-	text "MAN: Unhappy with"
-	line "your MAGIKARP?"
+	text "Man: Unhappy with"
+	line "your Magikarp?"
 	para "I'll teach it the"
-	line "move DRAGON RAGE"
+	line "move Dragon Rage"
 	cont "for a mere ¥5000!"
 	cont "What do you say?"
 	done
@@ -265,14 +265,14 @@ MagikarpSalesmanText_PayDayRapidashOrFearow:
 	ld hl, MagikarpSalesmanText_Thanks
 	jp MagikarpSalesmanText.printText
 .Text1
-	text "MAN: Want to make"
+	text "Man: Want to make"
 	line "money with that"
 	cont "@"
 	TX_RAM wcd6d
 	db $0
 	cont "of yours?"
 	para "I'll teach it the"
-	line "move PAY DAY for"
+	line "move Pay Day for"
 	cont "a paltry ¥1000!"
 	cont "What do you say?"
 	done
@@ -345,10 +345,10 @@ MagikarpSalesmanText_FlyingPikachu:
 	ld hl, MagikarpSalesmanText_Thanks
 	jp MagikarpSalesmanText.printText
 .Text1
-	text "MAN: Ever see a"
-	line "flying PIKACHU?"
+	text "Man: Ever see a"
+	line "flying Pikachu?"
 	para "I'll teach yours"
-	line "the move FLY for"
+	line "the move fly for"
 	cont "a measly ¥2000!"
 	cont "What do you say?"
 	done
@@ -366,18 +366,18 @@ MagikarpSalesmanText_FlyingPikachu:
 .endloop
 	ret
 .Text2
-	text "MAN: Let's see..."
+	text "Man: Let's see..."
 	line "I'll just go and"
 	cont "tie some balloons"
 	cont "like so. And..."
 	cont "Done!"
-	para "Your PIKACHU has"
-	line "learned FLY!"
+	para "Your Pikachu has"
+	line "learned fly!"
 	done
 	db "@"
 
 MagikarpSalesmanText_Thanks:
-	text "MAN: Thanks kid!"
+	text "Man: Thanks kid!"
 	done
 	db "@"
 

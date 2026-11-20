@@ -8,7 +8,7 @@ _VermilionGymText_5cb6d::
 	cont "That's for sure!"
 
 	para "I tell you kid,"
-	line "electric #MON"
+	line "electric #mon"
 	cont "saved me during"
 	cont "the war!"
 

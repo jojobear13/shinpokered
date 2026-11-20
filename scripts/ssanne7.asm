@@ -97,7 +97,7 @@ SSAnne7Text3:
 	db "@"
 
 _SSAnne7Text_61932_ALT:
-	text "CAPTAIN: Whew!"
+	text "Captain: Whew!"
 
 	para "I'm glad I'm not"
 	line "sick any more..."

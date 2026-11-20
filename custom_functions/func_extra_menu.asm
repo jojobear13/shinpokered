@@ -256,13 +256,13 @@ OptionMenuSoundText:
 	dw OptionMenuEar2
 	dw OptionMenuEar3
 OptionMenuMono:
-	db "     MONO@"
+	db "     Mono@"
 OptionMenuEar1:
-	db "EARPHONE1@"
+	db "Earphone1@"
 OptionMenuEar2:
-	db "EARPHONE2@"
+	db "Earphone2@"
 OptionMenuEar3:
-	db "EARPHONE3@"
+	db "Earphone3@"
 
 
 ;60fps - show the fps setting on the menu when activated
@@ -393,9 +393,9 @@ OptionMenuNoSwitch:
 	dw OptionMenuNoSwitchON
 	dw OptionMenuNoSwitchOFF
 OptionMenuNoSwitchON:
-	db "ORIG.@"
+	db "Orig.@"
 OptionMenuNoSwitchOFF:
-	db "SMART@"
+	db "Smart@"
 
 	
 ;joenote - for toggling the color correction
@@ -463,7 +463,7 @@ ShowBadgeCap:
 OptionMenuCapLevelText:
 	db "L:@"
 OptionMenu5SpacesOFF:
-	db "  OFF@"
+	db "  Off@"
 OptionMenu5Spaces:
 	db "     @"
 
@@ -509,31 +509,31 @@ NuzlockeSettings:
 
 
 TextAudio:
-	db " AUDIO@"
+	db " Audio@"
 TextFPS:
 	db " FPS@"
 TextInstant:
-	db " INST. TXT@"
+	db " Inst. Txt@"
 TextHardMode:
-	db " HARD MODE@"
+	db " Hard Mode@"
 TextAISwitch:
-	db " AI SWAPS@"
+	db " AI Swaps@"
 TextGamma:
-	db " Y SHADER@"
+	db " Y Shader@"
 TextEnhancedGBC:
-	db " ENH. COLOR@"
+	db " Enh. Color@"
 TextBack:
-	db " BACK     SEL: OST@"
+	db " Back     Sel: Ost@"
 
 TextAILevelCap:
-	db " LVL CAP@"
+	db " Lvl Cap@"
 TextNuzlocke:
-	db " NUZLOCKE@"
+	db " Nuzlocke@"
 	
 OptionMenuOnOffText:
 	dw OptionMenuTextON
 	dw OptionMenuTextOFF
 OptionMenuTextON:
-	db "ON @"
+	db "On @"
 OptionMenuTextOFF:
-	db "OFF@"
+	db "Off@"

@@ -1,6 +1,6 @@
 _CeladonPrizeRoomText1::
 	text "I sure do fancy"
-	line "that PORYGON!"
+	line "that Porygon!"
 
 	para "But, it's hard to"
 	line "win at slots!"

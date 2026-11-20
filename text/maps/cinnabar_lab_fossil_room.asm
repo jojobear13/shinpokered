@@ -5,7 +5,7 @@ _Lab4Text_75dc6::
 	line "doctor!"
 
 	para "I study here rare"
-	line "#MON fossils!"
+	line "#mon fossils!"
 
 	para "You! Have you a"
 	line "fossil for me?"
@@ -45,12 +45,12 @@ _Lab4Text_610ae::
 	line "@"
 	TX_RAM wcf4b
 	text ", a"
-	cont "#MON that is"
+	cont "#mon that is"
 	cont "already extinct!"
 
 	para "My Resurrection"
 	line "Machine will make"
-	cont "that #MON live"
+	cont "that #mon live"
 	cont "again!"
 	done
 
@@ -113,7 +113,7 @@ _Lab4Text_Clone3::
 
 _Lab4Text_Clone4::
 	text "Your brand new"
-	line "#MON is all"
+	line "#mon is all"
 	cont "ready to go!"
 	prompt
 
@@ -134,13 +134,13 @@ _Lab4Text_NoMoney::
 _Lab4Text_Party::
 	text "Come back when"
 	line "your team is"
-	cont "2 to 5 #MON."
+	cont "2 to 5 #mon."
 	done	
 
 _Lab4Text_Legend::
 	text "Our computers"
 	line "can't analyze"
-	cont "the #MON in"
+	cont "the #mon in"
 	cont "your top spot."
 	
 	para "It's beyond our"
@@ -152,15 +152,15 @@ _Lab4Text_Book0::
 	done
 	
 _Lab4Text_Book1A::
-	text "MODIFIED CLONES"
+	text "Modified clones"
 	prompt
 _Lab4Text_Book1B::
 	text "This creates a"
 	line "gene-spliced"
 	cont "clone of your 1st"
-	cont "spot #MON with"
-	cont "DNA from your 2nd"
-	cont "spot #MON."
+	cont "spot #mon with"
+	cont "dna from your 2nd"
+	cont "spot #mon."
 
 	para "A Punnet Square"
 	line "analysis is done"
@@ -172,11 +172,11 @@ _Lab4Text_Book1B::
 	done
 
 _Lab4Text_Book2A::
-	text "#MON GENES"
+	text "#mon Genes"
 	prompt
 _Lab4Text_Book2B::
 	text "All Pokemon have"
-	line "DETERMINED VALUES"
+	line "determined values"
 	cont "that effectively"
 	cont "act as genes."
 
@@ -198,14 +198,14 @@ _Lab4Text_Book2B::
 	cont "Gene-B Lo allele."
 
 	para "Respectively they"
-	line "affect ATTACK," 
-	cont "DEFENSE, SPEED,"
-	cont "and SPECIAL in"
+	line "affect attack," 
+	cont "defense, speed,"
+	cont "and special in"
 	cont "that order."
 	done
 
 _Lab4Text_Book3A::
-	text "MIXING #MON DNA"
+	text "Mixing #mon dna"
 	prompt
 _Lab4Text_Book3B::
 

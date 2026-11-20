@@ -85,25 +85,25 @@ _TXTAskReset:
 
 _TXTSleep:
 	text "Activate"
-	line "SLEEP clause?"
+	line "sleep clause?"
 	done
 	db "@"
 
 _TXTFreeze:
 	text "Activate"
-	line "FREEZE clause?"
+	line "freeze clause?"
 	done
 	db "@"
 
 _TXTTrap:
 	text "Activate"
-	line "TRAPPING clause?"
+	line "trapping clause?"
 	done
 	db "@"
 
 _TXTHBeam:
-	text "Activate HYPER"
-	line "BEAM clause?"
+	text "Activate hyper"
+	line "beam clause?"
 	done
 	db "@"
 

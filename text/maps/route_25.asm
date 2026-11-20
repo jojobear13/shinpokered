@@ -10,7 +10,7 @@ _Route25EndBattleText1::
 	prompt
 
 _Route25AfterBattleText1::
-	text "All #MON have"
+	text "All #mon have"
 	line "weaknesses. It's"
 	cont "best to raise"
 	cont "different kinds."
@@ -19,8 +19,8 @@ _Route25AfterBattleText1::
 _Route25BattleText2::
 	text "Dad took me to a"
 	line "great party on"
-	cont "S.S.ANNE at"
-	cont "VERMILION CITY!"
+	cont "S.S.Anne at"
+	cont "Vermilion City!"
 	done
 
 _Route25EndBattleText2::
@@ -29,7 +29,7 @@ _Route25EndBattleText2::
 	prompt
 
 _Route25AfterBattleText2::
-	text "On S.S.ANNE, I"
+	text "On S.S.Anne, I"
 	line "saw trainers from"
 	cont "around the world."
 	done
@@ -76,7 +76,7 @@ _Route25EndBattleText5::
 	prompt
 
 _Route25AfterBattleText5::
-	text "If your #MON"
+	text "If your #mon"
 	line "gets confused or"
 	cont "falls asleep,"
 	cont "switch it!"
@@ -84,7 +84,7 @@ _Route25AfterBattleText5::
 
 _Route25BattleText6::
 	text "My friend has a"
-	line "cute #MON."
+	line "cute #mon."
 	cont "I'm so jealous!"
 	done
 
@@ -94,14 +94,14 @@ _Route25EndBattleText6::
 	prompt
 
 _Route25AfterBattleText6::
-	text "You came from MT."
-	line "MOON? May I have"
-	cont "a CLEFAIRY?"
+	text "You came from mt."
+	line "Moon? May I have"
+	cont "a Clefairy?"
 	done
 
 _Route25BattleText7::
 	text "I just got down"
-	line "from MT.MOON,"
+	line "from Mt.Moon,"
 	cont "but I'm ready!"
 	done
 
@@ -112,13 +112,13 @@ _Route25EndBattleText7::
 
 _Route25AfterBattleText7::
 	text "Drat!"
-	line "A ZUBAT bit me"
+	line "A Zubat bit me"
 	cont "back in there."
 	done
 
 _Route25BattleText8::
 	text "I'm off to see a"
-	line "#MON collector"
+	line "#mon collector"
 	cont "at the cape!"
 	done
 
@@ -130,12 +130,12 @@ _Route25EndBattleText8::
 _Route25AfterBattleText8::
 	text "The collector has"
 	line "many rare kinds"
-	cont "of #MON."
+	cont "of #mon."
 	done
 
 _Route25BattleText9::
 	text "You're going to"
-	line "see BILL? First,"
+	line "see Bill? First,"
 	cont "let's fight!"
 	done
 
@@ -147,12 +147,12 @@ _Route25EndBattleText9::
 _Route25AfterBattleText9::
 	text "The trail below"
 	line "is a shortcut to"
-	cont "CERULEAN CITY."
+	cont "Cerulean City."
 	done
 
 _Route25Text11::
-	text "SEA COTTAGE"
-	line "BILL lives here!"
+	text "Sea Cottage"
+	line "Bill lives here!"
 	done
 
 ;Joenote - setting up the Red battle
@@ -190,5 +190,5 @@ _RedText_decline::
 	
 	para "Four challenges"
 	line "await whoever so"
-	cont "conquers INDIGO."
+	cont "conquers Indigo."
 	done

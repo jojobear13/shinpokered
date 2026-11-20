@@ -1,6 +1,6 @@
 _RockTunnelPokecenterText2::
 	text "The element types"
-	line "of #MON make"
+	line "of #mon make"
 	cont "them stronger"
 	cont "than some types"
 	cont "and weaker than"
@@ -9,5 +9,5 @@ _RockTunnelPokecenterText2::
 
 _RockTunnelPokecenterText3::
 	text "I sold a useless"
-	line "NUGGET for ¥5000!"
+	line "nugget for ¥5000!"
 	done

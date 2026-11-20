@@ -173,9 +173,9 @@ ENDC
 
 MonsNestText:
 IF (DEF(_REDGREENJP) || DEF(_BLUEJP))
-	db "NESTS@"
+	db "Nests@"
 ELSE
-	db "'s NEST@"
+	db "'s Nest@"
 ENDC
 
 LoadTownMap_Fly:
@@ -445,17 +445,17 @@ DrawPlayerOrBirdSprite:
 ;joenote - added messages for immediate map check with the dex area function
 _DexAreaLand::
 	text "Detected nearby!"
-	line "Try WALKING."
+	line "Try walking."
 	done
 	db "@"
 _DexAreaSurf::
 	text "Detected nearby!"
-	line "Try SURFING."
+	line "Try surfing."
 	done
 	db "@"
 _DexAreaSuperRod::
 	text "Detected nearby!"
-	line "Try a SUPER ROD."
+	line "Try a Super Rod."
 	done
 	db "@"
 
@@ -541,7 +541,7 @@ DisplayWildLocations:
 	jp CopyData
 
 AreaUnknownText:
-	db " AREA UNKNOWN@"
+	db " Area Unknown@"
 
 TownMapCoordsToOAMCoords:
 ; in: lower nybble of a = x, upper nybble of a = y
