@@ -170,9 +170,9 @@ DiplomaTextPointersAndCoords:
 	dw DiplomaEmptyText
 	dwCoord 15, 4
 	dw DiplomaCongrats
-	dwCoord 1, 6
+	dwCoord 2, 6
 	dw DiplomaGameFreak
-	dwCoord 1, 16
+	dwCoord 9, 16
 
 MasterText:	;joenote - adding master text
 	db "<Shiny> #Mon Master <Shiny>@"
@@ -188,12 +188,11 @@ DiplomaEmptyText:
 	db "@"
 
 DiplomaCongrats:
-	db   "Congratulations<LF>"
-	db   "This diploma"
-	next "certifies that"
-	next "you have"
-	next "completed"
-	next "your #dex.@"
+	db   "Congratulations!"
+	next "This certifies"
+	next "that you have"
+	next "completed your"
+	next "#dex.@"
 
 DiplomaGameFreak:
 	db "Game Freak@"
