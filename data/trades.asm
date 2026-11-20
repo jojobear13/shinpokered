@@ -37,16 +37,16 @@ ELIF DEF(_ENCBLUEGREEN)
 	db NIDORAN_F, NIDORAN_M,2,"Spot@@@@@@@"
 
 ELIF DEF(_ENCRED)	;joenote - swap the sexes of the Nidos for red version and alter the beedrill trade
-	db NIDORINA,  NIDORINO, 0,"Terry@@@@@@"
+	db NIDORINA,  NIDORINO, 0,"Henry@@@@@@"
 	db ABRA,      MR_MIME,  0,"Marcel@@@@@"
-	db BEEDRILL, BUTTERFREE,2,"Pippin@@@@@"
-	db PONYTA,    SEEL,     0,"Sailor@@@@@"
-	db SPEAROW,   FARFETCHD,2,"Dux@@@@@@@@"
-	db SLOWBRO,   LICKITUNG,0,"Marc@@@@@@@"
-	db POLIWHIRL, JYNX,     1,"Lola@@@@@@@"
+	db BEEDRILL, BUTTERFREE,2,"Malcolm@@@@"
+	db PONYTA,    SEEL,     0,"Newton@@@@@"
+	db SPEAROW,   FARFETCHD,2,"Wuhan@@@@@@"
+	db SLOWBRO,   LICKITUNG,0,"Fidelio@@@@"
+	db POLIWHIRL, JYNX,     1,"Sambo@@@@@@"
 	db RAICHU,    ELECTRODE,1,"Doris@@@@@@"
-	db VENONAT,   TANGELA,  2,"Crinkles@@@"
-	db NIDORAN_M, NIDORAN_F,2,"Spot@@@@@@@"
+	db VENONAT,   TANGELA,  2,"Shibari@@@@"
+	db NIDORAN_M, NIDORAN_F,2,"Anne@@@@@@@"
 
 
 ELSE ;default to use if there is a compiler tag issue
