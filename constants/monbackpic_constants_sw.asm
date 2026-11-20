@@ -134,10 +134,10 @@ DITTO_BK	EQUS	"\"pic/swmonback/dittob.pic\""
 MEOWTH_BK	EQUS	"\"pic/swmonback/meowthb.pic\""
 	INCBIN	"pic/swmonback/krabbyb.pic",0,0
 KRABBY_BK	EQUS	"\"pic/swmonback/krabbyb.pic\""
-	INCBIN	"pic/swmonback/vulpix_altb.pic",0,0
-VULPIX_BK	EQUS	"\"pic/swmonback/vulpix_altb.pic\""
-	INCBIN	"pic/swmonback/ninetales_altb.pic",0,0
-NINETALES_BK	EQUS	"\"pic/swmonback/ninetales_altb.pic\""
+	INCBIN	"pic/swmonback/vulpixb.pic",0,0
+VULPIX_BK	EQUS	"\"pic/swmonback/vulpixb.pic\""
+	INCBIN	"pic/swmonback/ninetalesb.pic",0,0
+NINETALES_BK	EQUS	"\"pic/swmonback/ninetalesb.pic\""
 	INCBIN	"pic/swmonback/pikachu_altb.pic",0,0
 PIKACHU_BK	EQUS	"\"pic/swmonback/pikachu_altb.pic\""
 	INCBIN	"pic/swmonback/raichub.pic",0,0
@@ -176,8 +176,8 @@ JOLTEON_BK	EQUS	"\"pic/swmonback/jolteonb.pic\""
 VAPOREON_BK	EQUS	"\"pic/swmonback/vaporeonb.pic\""
 	INCBIN	"pic/swmonback/machopb.pic",0,0
 MACHOP_BK	EQUS	"\"pic/swmonback/machopb.pic\""
-	INCBIN	"pic/swmonback/zubat_altb.pic",0,0
-ZUBAT_BK	EQUS	"\"pic/swmonback/zubat_altb.pic\""
+	INCBIN	"pic/swmonback/zubatb.pic",0,0
+ZUBAT_BK	EQUS	"\"pic/swmonback/zubatb.pic\""
 	INCBIN	"pic/swmonback/ekansb.pic",0,0
 EKANS_BK	EQUS	"\"pic/swmonback/ekansb.pic\""
 	INCBIN	"pic/swmonback/parasb.pic",0,0
@@ -210,8 +210,8 @@ METAPOD_BK	EQUS	"\"pic/swmonback/metapod_altb.pic\""
 BUTTERFREE_BK	EQUS	"\"pic/swmonback/butterfreeb.pic\""
 	INCBIN	"pic/swmonback/machampb.pic",0,0
 MACHAMP_BK	EQUS	"\"pic/swmonback/machampb.pic\""
-	INCBIN	"pic/swmonback/golduck_altb.pic",0,0
-GOLDUCK_BK	EQUS	"\"pic/swmonback/golduck_altb.pic\""
+	INCBIN	"pic/swmonback/golduckb.pic",0,0
+GOLDUCK_BK	EQUS	"\"pic/swmonback/golduckb.pic\""
 	INCBIN	"pic/swmonback/hypnob.pic",0,0
 HYPNO_BK	EQUS	"\"pic/swmonback/hypnob.pic\""
 	INCBIN	"pic/swmonback/golbatb.pic",0,0
