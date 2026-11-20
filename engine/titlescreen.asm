@@ -1,3 +1,5 @@
+TITLE_PORTRAIT_Y_OFFSET EQU 2
+
 ; copy text of fixed length NAME_LENGTH (like player name, rival name, mon names, ...)
 CopyFixedLengthText:
 	ld bc, NAME_LENGTH
@@ -115,6 +117,8 @@ ENDC
 	ld hl, wOAMBuffer + $28
 IF DEF(_RGTITLE)
 	ld a, $70
+ELIF DEF(_RED)
+	ld a, $74 + TITLE_PORTRAIT_Y_OFFSET
 ELSE
 	ld a, $74
 ENDC
@@ -447,10 +451,6 @@ DrawPlayerCharacter_F:
 	jr DrawPlayerCharacter.copy
 ENDC
 
-IF DEF(_RED) && !DEF(_RGTITLE)
-INCLUDE "engine/oak_title_portrait.asm"
-ENDC
-
 DrawPlayerCharacter:
 	ld hl, PlayerCharacterTitleGraphics
 	ld de, vSprites
@@ -503,6 +503,10 @@ ENDC
 	jr nz, .loop
 	ret
 
+IF DEF(_RED) && !DEF(_RGTITLE)
+INCLUDE "engine/oak_title_portrait.asm"
+ENDC
+
 ClearBothBGMaps:
 	ld hl, vBGMap0
 	ld bc, $400 * 2
@@ -518,7 +522,12 @@ ELSE
 	coord hl, 5, 10
 ENDC
 	call GetMonHeader
+IF DEF(_RED) && !DEF(_RGTITLE)
+	call LoadFrontSpriteByMonIndex
+	jp ShiftTitleMonDown
+ELSE
 	jp LoadFrontSpriteByMonIndex
+ENDC
 
 TitleScreenCopyTileMapToVRAM:
 	ld [H_AUTOBGTRANSFERDEST + 1], a

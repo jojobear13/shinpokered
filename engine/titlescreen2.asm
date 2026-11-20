@@ -142,6 +142,9 @@ GetTitleBallY:
 	pop de
 	and a
 	ret z
+IF DEF(_RED) && !DEF(_RGTITLE)
+	add TITLE_PORTRAIT_Y_OFFSET
+ENDC
 	ld [wOAMBuffer + $28], a
 	inc e
 	ret
