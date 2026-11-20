@@ -44,7 +44,7 @@ _Museum2FText5::
 
 _Museum2FText6::
 	text "Space shuttle"
-	line "columbia"
+	line "Ho-Oh III"
 	done
 
 _Museum2FText7::

@@ -80,7 +80,7 @@ _SilphCo6BattleText3::
 IF DEF(_JPTXT)
 	cont "tunguska branch!"
 ELSE
-	cont "Tiksi branch!"
+	cont "Wintown branch!"
 ENDC
 	done
 
@@ -92,9 +92,9 @@ _SilphCo6AfterBattleText3::
 IF DEF(_JPTXT)
 	text "Tunguska branch?"
 ELSE
-	text "Tiksi branch?"
+	text "Wintown branch?"
 ENDC
-	line "It's in Russian"
+	line "It's in Fiore's"
 	cont "no man's land!"
 	done
 

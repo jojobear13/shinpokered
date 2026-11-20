@@ -17,8 +17,8 @@ _Mansion2AfterBattleText1::
 
 _Mansion2Text3::
 	text "Diary: July 5"
-	line "Guyana,"
-	cont "South America"
+	line "Founja,"
+	cont "Belusylva Island"
 
 	para "A new #mon was"
 	line "discovered deep"

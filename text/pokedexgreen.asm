@@ -202,13 +202,13 @@ _ArcanineDexEntry::
 	dex
 
 _MewDexEntry::
-	text "A South American"
-	next "#MON that was"
-	next "thought to have"
+	text "A #mon from"
+	next "Belusylva Island"
+	next "thought extinct."
 	
-	page "been extinct. It"
-	next "is very smart and"
-	next "learns any move"
+	page "It is very smart"
+	next "and can learn"
+	next "any move"
 	dex
 
 _GyaradosDexEntry::

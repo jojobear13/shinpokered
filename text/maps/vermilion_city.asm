@@ -128,7 +128,7 @@ _VermilionCityText12::
 	cont "leader: lt.Surge"
 
 	para "The Lightning "
-	line "American!"
+	line "Unovan!"
 	done
 
 _VermilionCityText13::

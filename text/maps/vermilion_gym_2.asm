@@ -119,7 +119,7 @@ _VermilionGymText_5cbf4::
 	line "nickname. People"
 	cont "refer to him as"
 	cont "the Lightning"
-	cont "American!"
+	cont "Unovan!"
 
 	para "He's an expert on"
 	line "electric #mon!"
