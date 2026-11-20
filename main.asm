@@ -1986,3 +1986,9 @@ INCLUDE "engine/printer/printer_pc_menu.asm"
 INCLUDE "engine/printer/diploma_page2.asm"
 DiplomaPikachuGraphics:  INCBIN "gfx/printer/diploma_pikachu.2bpp"
 DiplomaPikachuGraphicsEnd:
+
+IF DEF(_RED) && !DEF(_RGTITLE)
+SECTION "Oak title graphics", ROMX
+OakTitleGraphics: INCBIN "gfx/oak_title_layers.2bpp"
+OakTitleGraphicsEnd:
+ENDC

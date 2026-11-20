@@ -1396,3 +1396,7 @@ INCLUDE "data/super_palettes.asm"
 INCLUDE "data/gbc_palettes.asm"
 
 INCLUDE "data/sgb_border.asm"
+
+IF DEF(_RED) && !DEF(_RGTITLE)
+INCLUDE "engine/oak_title_palettes.asm"
+ENDC

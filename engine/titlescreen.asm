@@ -96,7 +96,12 @@ ENDC
 	dec b
 	jr nz, .pokemonLogoLastTileRowLoop
 
+IF DEF(_RED) && !DEF(_RGTITLE)
+	call DrawOakTitleCharacter
+ENDC
+IF !DEF(_RED) || DEF(_RGTITLE)
 	call DrawPlayerCharacter
+ENDC
 
 ; put a pokeball in the player's hand
 	ld hl, wOAMBuffer + $28
@@ -106,6 +111,12 @@ ELSE
 	ld a, $74
 ENDC
 	ld [hl], a
+IF DEF(_RED) && !DEF(_RGTITLE)
+	inc hl
+	ld a, [hl]
+	add 8
+	ld [hl], a
+ENDC
 
 ; place tiles for title screen copyright
 IF DEF(_REDGREENJP)
@@ -160,12 +171,18 @@ ENDC
 	call TitleScreenCopyTileMapToVRAM
 	ld b, SET_PAL_TITLE_SCREEN
 	call RunPaletteCommand
+IF DEF(_RED) && !DEF(_RGTITLE)
+	callba SetOakTitlePalettes
+ENDC
 	
 	ld a, %11100100
 	ld [rBGP], a
 	ld [rOBP0], a
 	call UpdateGBCPal_BGP
 	call UpdateGBCPal_OBP0
+IF DEF(_RED) && !DEF(_RGTITLE)
+	callba SetOakTitleBallPalette
+ENDC
 		
 	push de
 	ld d, CONVERT_BGP
@@ -418,6 +435,10 @@ DrawPlayerCharacter_F:
 	ld bc, FPlayerCharacterTitleGraphicsEnd - FPlayerCharacterTitleGraphics
 	ld a, BANK(FPlayerCharacterTitleGraphics)
 	jr DrawPlayerCharacter.copy
+ENDC
+
+IF DEF(_RED) && !DEF(_RGTITLE)
+INCLUDE "engine/oak_title_portrait.asm"
 ENDC
 
 DrawPlayerCharacter:
