@@ -219,8 +219,8 @@ IF DEF(_FPLAYER)
 DefaultNamesPlayerF:
 	db   "New Name"
 	next "Violet"
-	next "claire"
-	next "jill"
+	next "May"
+	next "Jill"
 	db   "@"
 ENDC
 
@@ -327,7 +327,7 @@ IF DEF(_FPLAYER)
 DefaultNamesPlayerListF:
 	db "New Name@"
 	db "Violet@"
-	db "Claire@"
+	db "May@"
 	db "Jill@"
 ENDC
 
