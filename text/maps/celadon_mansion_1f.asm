@@ -18,6 +18,6 @@ _CeladonMansion1Text4::
 	line "kyaoo!@@"
 
 _CeladonMansion1Text5::
-	text "Celadon mansion"
+	text "Celadon Arms"
 	line "Manager's Suite"
 	done

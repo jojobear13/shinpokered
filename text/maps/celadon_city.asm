@@ -116,7 +116,7 @@ _CeladonCityText13::
 	done
 
 _CeladonCityText14::
-	text "Celadon mansion"
+	text "Celadon Arms"
 	done
 
 _CeladonCityText15::
