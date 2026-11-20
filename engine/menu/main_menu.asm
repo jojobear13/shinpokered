@@ -844,13 +844,7 @@ SetOptionsFromCursorPositions:
 	jr .loop
 .textSpeedMatchFound
 
-	;joenote - set cursor position for lagless text
-	ld a, [wOptions]
-	and TEXT_DELAY_BITS
 	ld a, [hl]
-	jr nz, .settextspeed
-	xor a
-.settextspeed
 
 	ld d, a
 	ld a, [wOptionsBattleAnimCursorX] ; battle animation cursor X coordinate
@@ -891,13 +885,7 @@ SetCursorPositionsFromOptions:
 	pop bc
 	dec hl
 	
-	;joenote - set cursor position for lagless text
-	ld a, [wOptions]
-	and TEXT_DELAY_BITS
 	ld a, [hl]
-	jr nz, .settextspeed
-	ld a, 1
-.settextspeed
 
 	ld [wOptionsTextSpeedCursorX], a ; text speed cursor X coordinate
 	coord hl, 0, 3

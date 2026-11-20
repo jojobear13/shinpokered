@@ -69,6 +69,14 @@ LoadSAV0:
 	ld hl, wUnusedD721
 	res 4, [hl]
 
+	; Legacy instant text used zero delay; restore Fast for those saves.
+	ld a, [wOptions]
+	and TEXT_DELAY_BITS
+	jr nz, .textSpeedReady
+	ld hl, wOptions
+	set 0, [hl] ; TEXT_DELAY_FAST
+.textSpeedReady
+
 	ld hl, wCurMapTileset
 	set 7, [hl]
 

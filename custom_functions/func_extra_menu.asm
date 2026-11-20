@@ -14,7 +14,7 @@ DisplayExtraOptionMenu:
 
 ;draw text box border for lite options
 	coord hl, 0, 0
-	ld b, 6
+	ld b, 5
 	ld c, 18
 	call TextBoxBorder
 ;draw text box border for master options
@@ -26,7 +26,6 @@ DisplayExtraOptionMenu:
 	call PlaceExtraOptionStrings
 	
 	call PlaceSoundSetting	;joenote - display the sound setting
-	call ShowLaglessTextSetting	;joenote - display marker for lagless text or not
 	call ShowHardModeSetting	;joenote - display marker for hard mode or not
 	call ShowNoSwitchSetting	;joenote - display marker for deactivated trainer switching or not
 	call ShowGammaSetting
@@ -56,15 +55,13 @@ DisplayExtraOptionMenu:
 	ld a, [wTopMenuItemY]
 	cp $1 ; cursor over audio?
 	jr z, .cursorAudio
-	cp $2 ; cursor over instant text?
-	jr z, .cursorInstText
-	cp $3 ; cursor over hard mode?
+	cp $2 ; cursor over hard mode?
 	jr z, .cursorHardMode
-	cp $4 ; cursor over ai switching?
+	cp $3 ; cursor over ai switching?
 	jr z, .cursorAISwitch
-	cp $5 ;cursor over gamma shader?
+	cp $4 ;cursor over gamma shader?
 	jr z, .cursorGamma
-	cp $6 ;cursor over enhanced gbc?
+	cp $5 ;cursor over enhanced gbc?
 	jr z, .cursorEnhGBC
 	cp $A ; cursor over lvl cap?
 	jr z, .cursorLvlCap
@@ -76,9 +73,6 @@ DisplayExtraOptionMenu:
 	
 .cursorAudio
 	call CycleSoundSetting
-	jr .getJoypadStateLoop
-.cursorInstText
-	call ToggleLaglessText
 	jr .getJoypadStateLoop
 .cursorHardMode
 	call ToggleHardMode
@@ -114,8 +108,8 @@ DisplayExtraOptionMenu:
 	cp 16
 	ld b, -15
 	jr z, .updateMenuVariables
-	cp 6
-	ld b, 4
+	cp 5
+	ld b, 5
 	jr z, .updateMenuVariables
 	cp 11
 	ld b, 5
@@ -128,7 +122,7 @@ DisplayExtraOptionMenu:
 	ld b, 15
 	jr z, .updateMenuVariables
 	cp 10
-	ld b, -4
+	ld b, -5
 	jr z, .updateMenuVariables
 	cp 16
 	ld b, -5
@@ -156,28 +150,23 @@ PlaceExtraOptionStrings:
 	ld de, TextAudio
 	call PlaceString
 	
-;place instant text
-	coord hl, 1, 2
-	ld de, TextInstant
-	call PlaceString
-
 ;place hard mode text
-	coord hl, 1, 3
+	coord hl, 1, 2
 	ld de, TextHardMode
 	call PlaceString
 
 ;place AI switching text
-	coord hl, 1, 4
+	coord hl, 1, 3
 	ld de, TextAISwitch
 	call PlaceString
 
 ;place gamma shader text
-	coord hl, 1, 5
+	coord hl, 1, 4
 	ld de, TextGamma
 	call PlaceString
 	
 ;place enhanced GBC color text
-	coord hl, 1, 6
+	coord hl, 1, 5
 	ld de, TextEnhancedGBC
 	call PlaceString
 
@@ -254,29 +243,6 @@ OptionMenuEar3:
 	db "Earphone3@"
 
 
-;joenote - for lagless text option
-ToggleLaglessText:
-	ld a, [wOptions]
-	and %11111001
-	xor TEXT_DELAY_FAST
-	ld [wOptions], a
-	;fall through
-ShowLaglessTextSetting:
-	ld hl, OptionMenuOnOffText
-	ld a, [wOptions]
-	and TEXT_DELAY_BITS
-	jr z, .print
-	inc hl
-	inc hl
-.print
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	coord hl, $10, $02
-	call PlaceString
-	ret
-
-
 ;joenote - for hard mode option
 ToggleHardMode:
 	ld a, [wOptions]
@@ -294,7 +260,7 @@ ShowHardModeSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $3
+	coord hl, $10, $2
 	call PlaceString
 	ret
 
@@ -324,7 +290,7 @@ ShowEnhancedGBCSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $6
+	coord hl, $10, $5
 	call PlaceString
 	ret
 
@@ -346,7 +312,7 @@ ShowNoSwitchSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $E, $4
+	coord hl, $E, $3
 	call PlaceString
 	ret
 OptionMenuNoSwitch:
@@ -384,7 +350,7 @@ ShowGammaSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $5
+	coord hl, $10, $4
 	call PlaceString
 	ret
 
@@ -470,8 +436,6 @@ NuzlockeSettings:
 
 TextAudio:
 	db " Audio@"
-TextInstant:
-	db " Inst. Txt@"
 TextHardMode:
 	db " Hard Mode@"
 TextAISwitch:
