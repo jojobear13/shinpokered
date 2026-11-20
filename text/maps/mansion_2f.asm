@@ -46,7 +46,8 @@ _Mansion2Text_520c2::
 	done
 
 _Mansion2Text_520c7::
-	text "Who wouldn't?"
+	text "You flip the"
+	line "switch."
 	prompt
 
 _Mansion2Text_520cc::
