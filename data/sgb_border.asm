@@ -2,7 +2,16 @@ BorderPalettes:
 IF DEF(_REDJP)
 	INCBIN "gfx/red/sgbborder_jp.tilemap"
 ELIF DEF(_RED)
-	INCBIN "gfx/posmonstro/sgbborder.tilemap"
+	; Use the plain blue tile in the two horizontal bands.
+	INCBIN "gfx/posmonstro/sgbborder.tilemap", $000, $040
+	REPT 64
+		dw $103f
+	ENDR
+	INCBIN "gfx/posmonstro/sgbborder.tilemap", $0c0, $580
+	REPT 64
+		dw $103f
+	ENDR
+	INCBIN "gfx/posmonstro/sgbborder.tilemap", $6c0, $040
 ENDC
 IF DEF(_BLUEJP)
 	INCBIN "gfx/blue/sgbborder_jp.tilemap"
