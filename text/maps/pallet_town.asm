@@ -1,7 +1,3 @@
-_OakAppearsText::
-	text "Oak: Hey! Wait!"
-	line "Don't go out!@@"
-
 _OakWalksUpText::
 	text "Oak: It's unsafe!"
 	line "Wild #mon live"

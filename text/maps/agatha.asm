@@ -39,6 +39,6 @@ _AgathaAfterBattleText::
 	done
 
 _AgathaDontRunAwayText::
-	text "Someone's voice:"
-	line "Don't run away!"
+	text "The door locked"
+	line "behind me."
 	done

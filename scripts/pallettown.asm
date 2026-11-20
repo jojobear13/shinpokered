@@ -43,11 +43,7 @@ PalletTownScript0:
 	ret
 
 PalletTownScript1:
-	xor a
-	ld [wcf0d], a
-	ld a, 1
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
+	call OakAppearsReaction
 	ld a, $FF
 	ld [wJoyIgnore], a
 	ld a, HS_PALLET_TOWN_OAK
@@ -95,8 +91,6 @@ PalletTownScript3:
 	ret nz
 	xor a ; ld a, SPRITE_FACING_DOWN
 	ld [wSpriteStateData1 + 9], a
-	ld a, 1
-	ld [wcf0d], a
 	ld a, $FC
 	ld [wJoyIgnore], a
 	ld a, 1
@@ -158,23 +152,10 @@ PalletTownTextPointers:
 	dw PalletTownText7
 
 PalletTownText1:
-	TX_ASM
-	ld a, [wcf0d]
-	and a
-	jr nz, .next
-	ld a, 1
-	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
-	ld hl, OakAppearsText
-	jr .done
-.next
-	ld hl, OakWalksUpText
-.done
-	call PrintText
-	jp TextScriptEnd
+	TX_FAR _OakWalksUpText
+	db "@"
 
-OakAppearsText:
-	TX_FAR _OakAppearsText
-	TX_ASM
+OakAppearsReaction:
 	ld c, 10
 	call DelayFrames
 	xor a
@@ -183,11 +164,7 @@ OakAppearsText:
 	predef EmotionBubble
 	ld a, PLAYER_DIR_DOWN
 	ld [wPlayerMovingDirection], a
-	jp TextScriptEnd
-
-OakWalksUpText:
-	TX_FAR _OakWalksUpText
-	db "@"
+	ret
 
 PalletTownText2: ; girl
 	TX_FAR _PalletTownText2

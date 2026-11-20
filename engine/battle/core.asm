@@ -351,8 +351,7 @@ StartBattle:	;joedebug - start of the battle
 	and a
 	jr nz, .notOutOfSafariBalls
 	call LoadScreenTilesFromBuffer1
-	ld hl, .outOfSafariBallsText
-	jp PrintText
+	ret
 .notOutOfSafariBalls
 	callab PrintSafariZoneBattleText
 	;ld a, [wEnemyMonSpeed + 1]
@@ -389,10 +388,6 @@ StartBattle:	;joedebug - start of the battle
 	cp b
 	jr nc, .checkAnyPartyAlive
 	jr EnemyRan ; if b was greater than the random value, the enemy runs
-
-.outOfSafariBallsText
-	TX_FAR _OutOfSafariBallsText
-	db "@"
 
 .playerSendOutFirstMon
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

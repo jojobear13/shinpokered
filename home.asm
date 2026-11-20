@@ -1116,8 +1116,6 @@ DisplayTextID::
 	ld [wSpriteIndex], a
 	and a
 	jp z, DisplayStartMenu
-	cp TEXT_SAFARI_GAME_OVER
-	jp z, DisplaySafariGameOverText
 	cp TEXT_MON_FAINTED
 	jp z, DisplayPokemonFaintedText
 	cp TEXT_BLACKED_OUT
@@ -1326,10 +1324,6 @@ DisplayPokemonCenterDialogue::
 	pop af
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
-	jp AfterDisplayingTextID
-
-DisplaySafariGameOverText::
-	callab PrintSafariGameOverText
 	jp AfterDisplayingTextID
 
 DisplayPokemonFaintedText::

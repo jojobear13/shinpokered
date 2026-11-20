@@ -543,17 +543,6 @@ _StrengthsAndWeaknessesText::
 	cont "against others."
 	done
 
-_TimesUpText::
-	text "PA: Ding-dong!"
-
-	para "Time's up!"
-	prompt
-
-_GameOverText::
-	text "PA: Your safari"
-	line "game is over!"
-	done
-
 _CinnabarGymQuizIntroText::
 	text "#mon Quiz!"
 
@@ -1065,13 +1054,6 @@ _PokemonStuffText::
 	text "Wow! Tons of"
 	line "#mon stuff!"
 	done
-
-_OutOfSafariBallsText::
-	text "PA: Ding-dong!"
-
-	para "You are out of"
-	line "safari BALLs!"
-	prompt
 
 _WildRanText::
 	text "Wild @"
@@ -2989,12 +2971,6 @@ _MonCannotLearnMachineMoveText::
 	line "@"
 	TX_RAM wcf4b
 	text "."
-	prompt
-
-_ItemUseNotTimeText::
-	text "Oak: <PLAYER>!"
-	line "This isn't the"
-	cont "time to use that! "
 	prompt
 
 _ItemUseNotYoursToUseText::

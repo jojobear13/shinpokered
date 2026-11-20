@@ -62,21 +62,11 @@ SafariZoneGameStillGoing:
 	ret
 
 SafariZoneGameOver:
-	call EnableAutoTextBoxDrawing
 	xor a
+	ld [wJoyIgnore], a
 	ld [wAudioFadeOutControl], a
 	dec a
 	call PlaySound
-	ld c, BANK(SFX_Safari_Zone_PA)
-	ld a, SFX_SAFARI_ZONE_PA
-	call PlayMusic
-.waitForMusicToPlay
-	ld a, [wChannelSoundIDs + Ch4]
-	cp SFX_SAFARI_ZONE_PA
-	jr nz, .waitForMusicToPlay
-	ld a, TEXT_SAFARI_GAME_OVER
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
 	xor a
 	ld [wPlayerMovingDirection], a
 	ld a, SAFARI_ZONE_ENTRANCE
@@ -89,32 +79,6 @@ SafariZoneGameOver:
 	ld a, 1
 	ld [wSafariZoneGameOver], a
 	ret
-
-PrintSafariGameOverText:
-	xor a
-	ld [wJoyIgnore], a
-	ld hl, SafariGameOverText
-	jp PrintText
-
-SafariGameOverText:
-	TX_ASM
-	ld a, [wNumSafariBalls]
-	and a
-	jr z, .noMoreSafariBalls
-	ld hl, TimesUpText
-	call PrintText
-.noMoreSafariBalls
-	ld hl, GameOverText
-	call PrintText
-	jp TextScriptEnd
-
-TimesUpText:
-	TX_FAR _TimesUpText
-	db "@"
-
-GameOverText:
-	TX_FAR _GameOverText
-	db "@"
 
 PrintCinnabarQuiz:
 	ld a, [wSpriteStateData1 + 9]

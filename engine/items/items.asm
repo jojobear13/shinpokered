@@ -2677,8 +2677,9 @@ ItemUseNoEffect:
 	jr ItemUseFailed
 
 ItemUseNotTime:
-	ld hl, ItemUseNotTimeText
-	jr ItemUseFailed
+	xor a
+	ld [wActionResultOrTookBattleTurn], a
+	ret
 
 ItemUseNotYoursToUse:
 	ld hl, ItemUseNotYoursToUseText
@@ -2712,10 +2713,6 @@ ItemUseFailed:
 	xor a
 	ld [wActionResultOrTookBattleTurn], a ; item use failed
 	jp PrintText
-
-ItemUseNotTimeText:
-	TX_FAR _ItemUseNotTimeText
-	db "@"
 
 ItemUseNotYoursToUseText:
 	TX_FAR _ItemUseNotYoursToUseText
