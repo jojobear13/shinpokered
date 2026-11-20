@@ -122,12 +122,8 @@ _CeladonMart3Text14::
 	done
 
 _CeladonMart3Text15::
-IF DEF(_JPTXT)
-	text "Red and Green!"
-ELSE
-	text "Red and Blue!"
-ENDC
-	line "Both are #mon!"
+	text "That little man"
+	line "jumps really high!"
 	done
 
 _CeladonMart3Blocker::
