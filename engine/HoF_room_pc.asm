@@ -4,9 +4,6 @@ HallOfFamePC:
 	ld c, 100
 	call DelayFrames
 	call DisableLCD
-	ld hl, vFont
-	ld bc, $800 / 2
-	call ZeroMemory
 	ld hl, vChars2 + $600
 	ld bc, $200 / 2
 	call ZeroMemory
