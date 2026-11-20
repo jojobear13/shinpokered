@@ -150,9 +150,9 @@ IF DEF(_REDJP)
 	RGB 14,19,29	;version subtitle text color
 ELIF DEF(_RED) && !DEF(_RGTITLE)
 	SGB_WHITE ; slogan background
-	RGB 25,  4,  5 ; slogan fill
-	RGB  3,  7, 14 ; slogan outline
-	RGB  3,  7, 14
+	RGB 30, 30, 17
+	RGB 17, 23, 10
+	RGB 18, 18, 24 ; slogan lettering, matching the logo shadow
 ELIF DEF(_RED)
 	SGB_WHITE 	;white bg
 	RGB 30,30,17	;yellow logo text

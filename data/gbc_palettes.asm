@@ -88,9 +88,9 @@ IF DEF(_BLUE)
 ENDC
 IF DEF(_RED) && !DEF(_RGTITLE)
 	RGB 31, 31, 31 ; slogan background
-	RGB 25,  4,  5 ; slogan fill
-	RGB  3,  7, 14 ; slogan outline
-	RGB  3,  7, 14
+	RGB 31, 31, 0
+	RGB 17, 23, 10
+	RGB 7, 7, 25 ; slogan lettering, matching the logo shadow
 ELIF DEF(_RED)
 	RGB 31, 31, 31	;white bg
 	RGB 31, 31,  0	;unused yellow logo text
