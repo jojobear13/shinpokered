@@ -44,7 +44,7 @@ ELIF DEF(_ENCRED)	;joenote - swap the sexes of the Nidos for red version and alt
 	db SPEAROW,   FARFETCHD,2,"Wuhan@@@@@@"
 	db SLOWBRO,   LICKITUNG,0,"Fidelio@@@@"
 	db POLIWHIRL, JYNX,     1,"Sambo@@@@@@"
-	db RAICHU,    ELECTRODE,1,"Doris@@@@@@"
+	db RAICHU,    ELECTRODE,1,"Theodore@@@"
 	db VENONAT,   TANGELA,  2,"Shibari@@@@"
 	db NIDORAN_M, NIDORAN_F,2,"Anne@@@@@@@"
 
