@@ -240,13 +240,6 @@ InitOptions:
 	set BIT_BATTLE_SHIFT, a ;joenote - SET battle style
 ;	set BIT_BATTLE_HARD, a ;joenote - hard mode
 	ld [wOptions], a
-	ld a, [hGBC]
-	and a
-	ret z
-	;intialize 60 fps if on playing in GBC-mode
-	ld a, [wUnusedD721]
-	set 4, a
-	ld [wUnusedD721], a
 	ret
 
 LinkMenu:

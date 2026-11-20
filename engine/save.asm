@@ -65,6 +65,10 @@ LoadSAV0:
 	ld bc, wMainDataEnd - wMainDataStart
 	call CopyData
 
+	; Clear the retired 60 FPS setting from older saves.
+	ld hl, wUnusedD721
+	res 4, [hl]
+
 	ld hl, wCurMapTileset
 	set 7, [hl]
 

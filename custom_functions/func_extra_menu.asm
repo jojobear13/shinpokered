@@ -14,7 +14,7 @@ DisplayExtraOptionMenu:
 
 ;draw text box border for lite options
 	coord hl, 0, 0
-	ld b, 7
+	ld b, 6
 	ld c, 18
 	call TextBoxBorder
 ;draw text box border for master options
@@ -26,7 +26,6 @@ DisplayExtraOptionMenu:
 	call PlaceExtraOptionStrings
 	
 	call PlaceSoundSetting	;joenote - display the sound setting
-	call Show60FPSSetting	;60fps - display current setting
 	call ShowLaglessTextSetting	;joenote - display marker for lagless text or not
 	call ShowHardModeSetting	;joenote - display marker for hard mode or not
 	call ShowNoSwitchSetting	;joenote - display marker for deactivated trainer switching or not
@@ -57,17 +56,15 @@ DisplayExtraOptionMenu:
 	ld a, [wTopMenuItemY]
 	cp $1 ; cursor over audio?
 	jr z, .cursorAudio
-	cp $2 ; cursor over FPS?
-	jr z, .cursorFPS
-	cp $3 ; cursor over instant text?
+	cp $2 ; cursor over instant text?
 	jr z, .cursorInstText
-	cp $4 ; cursor over hard mode?
+	cp $3 ; cursor over hard mode?
 	jr z, .cursorHardMode
-	cp $5 ; cursor over ai switching?
+	cp $4 ; cursor over ai switching?
 	jr z, .cursorAISwitch
-	cp $6 ;cursor over gamma shader?
+	cp $5 ;cursor over gamma shader?
 	jr z, .cursorGamma
-	cp $7 ;cursor over enhanced gbc?
+	cp $6 ;cursor over enhanced gbc?
 	jr z, .cursorEnhGBC
 	cp $A ; cursor over lvl cap?
 	jr z, .cursorLvlCap
@@ -79,9 +76,6 @@ DisplayExtraOptionMenu:
 	
 .cursorAudio
 	call CycleSoundSetting
-	jr .getJoypadStateLoop
-.cursorFPS
-	call Toggle60FPSSetting
 	jr .getJoypadStateLoop
 .cursorInstText
 	call ToggleLaglessText
@@ -120,8 +114,8 @@ DisplayExtraOptionMenu:
 	cp 16
 	ld b, -15
 	jr z, .updateMenuVariables
-	cp 7
-	ld b, 3
+	cp 6
+	ld b, 4
 	jr z, .updateMenuVariables
 	cp 11
 	ld b, 5
@@ -134,7 +128,7 @@ DisplayExtraOptionMenu:
 	ld b, 15
 	jr z, .updateMenuVariables
 	cp 10
-	ld b, -3
+	ld b, -4
 	jr z, .updateMenuVariables
 	cp 16
 	ld b, -5
@@ -162,33 +156,28 @@ PlaceExtraOptionStrings:
 	ld de, TextAudio
 	call PlaceString
 	
-;place 60fps text
-	coord hl, 1, 2
-	ld de, TextFPS
-	call PlaceString
-	
 ;place instant text
-	coord hl, 1, 3
+	coord hl, 1, 2
 	ld de, TextInstant
 	call PlaceString
 
 ;place hard mode text
-	coord hl, 1, 4
+	coord hl, 1, 3
 	ld de, TextHardMode
 	call PlaceString
 
 ;place AI switching text
-	coord hl, 1, 5
+	coord hl, 1, 4
 	ld de, TextAISwitch
 	call PlaceString
 
 ;place gamma shader text
-	coord hl, 1, 6
+	coord hl, 1, 5
 	ld de, TextGamma
 	call PlaceString
 	
 ;place enhanced GBC color text
-	coord hl, 1, 7
+	coord hl, 1, 6
 	ld de, TextEnhancedGBC
 	call PlaceString
 
@@ -265,35 +254,6 @@ OptionMenuEar3:
 	db "Earphone3@"
 
 
-;60fps - show the fps setting on the menu when activated
-Toggle60FPSSetting:
-	ld a, [wUnusedD721]
-	xor %00010000
-	ld [wUnusedD721], a
-	;fall through
-Show60FPSSetting:
-	ld hl, OptionMenuFPSText
-	ld a, [wUnusedD721]
-	bit 4, a
-	jr nz, .done
-	inc hl
-	inc hl
-.done
-	ld e, [hl]
-	inc hl
-	ld d, [hl]
-	coord hl, $11, $2
-	call PlaceString
-	ret
-OptionMenuFPSText:
-	dw OptionMenu60FPS
-	dw OptionMenu30FPS
-OptionMenu60FPS:
-	db "60@"
-OptionMenu30FPS:
-	db "30@"
-
-	
 ;joenote - for lagless text option
 ToggleLaglessText:
 	ld a, [wOptions]
@@ -312,7 +272,7 @@ ShowLaglessTextSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $03
+	coord hl, $10, $02
 	call PlaceString
 	ret
 
@@ -334,7 +294,7 @@ ShowHardModeSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $4
+	coord hl, $10, $3
 	call PlaceString
 	ret
 
@@ -364,7 +324,7 @@ ShowEnhancedGBCSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $7
+	coord hl, $10, $6
 	call PlaceString
 	ret
 
@@ -386,7 +346,7 @@ ShowNoSwitchSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $E, $5
+	coord hl, $E, $4
 	call PlaceString
 	ret
 OptionMenuNoSwitch:
@@ -424,7 +384,7 @@ ShowGammaSetting:
 	ld e, [hl]
 	inc hl
 	ld d, [hl]
-	coord hl, $10, $6
+	coord hl, $10, $5
 	call PlaceString
 	ret
 
@@ -510,8 +470,6 @@ NuzlockeSettings:
 
 TextAudio:
 	db " Audio@"
-TextFPS:
-	db " FPS@"
 TextInstant:
 	db " Inst. Txt@"
 TextHardMode:
