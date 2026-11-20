@@ -69,7 +69,11 @@ ELSE
 ENDC
 	ld bc, Version_GFXEnd - Version_GFX
 	ld a, BANK(Version_GFX)
+IF DEF(_RED) && !DEF(_RGTITLE)
+	call FarCopyData2
+ELSE
 	call FarCopyDataDouble
+ENDC
 	call ClearBothBGMaps
 
 ; place tiles for pokemon logo (except for the last row)
@@ -555,17 +559,22 @@ ENDC
 
 INCLUDE "data/title_mons.asm"
 
-; Draw the title subtitle on the scrolling background row.
+; Draw the title subtitle in the two scrolling background rows.
 IF DEF(_RED) && !DEF(_RGTITLE)
 ; Tile $50 is the last copyright tile. The title logo ends at $40.
 TITLE_SLOGAN_FIRST_TILE EQU $51
-TITLE_SLOGAN_TILE_COUNT EQU 14
+TITLE_SLOGAN_WIDTH EQU 18
+TITLE_SLOGAN_TILE_COUNT EQU TITLE_SLOGAN_WIDTH * 2
+ASSERT TITLE_SLOGAN_FIRST_TILE + TITLE_SLOGAN_TILE_COUNT <= $7f
 ENDC
 PrintGameVersionOnTitleScreen:
 IF DEF(_RED) && !DEF(_RGTITLE)
-	coord hl, (SCREEN_WIDTH - TITLE_SLOGAN_TILE_COUNT) / 2, 8
+	coord hl, (SCREEN_WIDTH - TITLE_SLOGAN_WIDTH) / 2, 8
 	ld a, TITLE_SLOGAN_FIRST_TILE
-	ld b, TITLE_SLOGAN_TILE_COUNT
+	call .row
+	coord hl, (SCREEN_WIDTH - TITLE_SLOGAN_WIDTH) / 2, 9
+.row
+	ld b, TITLE_SLOGAN_WIDTH
 .tile
 	ld [hli], a
 	inc a

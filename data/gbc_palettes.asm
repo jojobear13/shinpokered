@@ -86,7 +86,12 @@ IF DEF(_BLUE)
 	RGB 21,  0,  4	;unused on title screen
 	RGB  3,  3, 23	;version subtitle text color
 ENDC
-IF DEF(_RED)
+IF DEF(_RED) && !DEF(_RGTITLE)
+	RGB 31, 31, 31 ; slogan background
+	RGB 31, 31, 31 ; slogan fill
+	RGB  3,  7, 14 ; slogan outline
+	RGB  3,  7, 14
+ELIF DEF(_RED)
 	RGB 31, 31, 31	;white bg
 	RGB 31, 31,  0	;unused yellow logo text
 	RGB 17, 23, 10	;unused on title screen

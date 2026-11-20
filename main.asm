@@ -1640,9 +1640,9 @@ IF DEF(_RED) && !DEF(_RGTITLE)
 PUSHS
 SECTION "Red title slogan", ROMX
 Version_GFX:
-	INCBIN "gfx/red/title_slogan.1bpp"
+	INCBIN "gfx/red/title_slogan.2bpp"
 Version_GFXEnd:
-	ASSERT Version_GFXEnd - Version_GFX == TITLE_SLOGAN_TILE_COUNT * 8
+	ASSERT Version_GFXEnd - Version_GFX == TITLE_SLOGAN_TILE_COUNT * 16
 POPS
 ELSE
 Version_GFX:
