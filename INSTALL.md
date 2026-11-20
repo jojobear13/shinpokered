@@ -106,26 +106,17 @@ If you want to compile and install **rgbds** yourself instead, then follow the [
 
 
 
-## Build shinpokered
-
-To download the **shinpokered master** branch source files:
+## Build Personal Red
 
 ```bash
-git clone https://github.com/jojobear13/shinpokered/ --branch master
-cd shinpokered
-```
-To download the **shinpokered lite** branch source files:
-
-```bash
-git clone https://github.com/jojobear13/shinpokered/ --branch lite
-cd shinpokered
-```
-
-To build **pokered.gbc** and **pokeblue.gbc** and **pokegreen.gbc**:
-
-```bash
+git clone https://github.com/DocReality/personal-red.git
+cd personal-red
 make
 ```
+
+The build leaves `red.gbc` in the repository root. Intermediate files are
+built in a temporary directory and removed when the build exits. Use
+`make clean` to remove `red.gbc`.
 
 ### Build with a local rgbds version
 
