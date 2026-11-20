@@ -932,10 +932,9 @@ SlotMachineMapEnd:
 INCLUDE "data/slot_machine_wheels.asm"
 
 SlotMachineTiles1:
-IF DEF(_RED)
+IF DEF(_REDJP)
 	INCBIN "gfx/red/slotmachine1.2bpp"
-ENDC
-IF DEF(_BLUE)
+ELIF DEF(_RED) || DEF(_BLUE)
 	INCBIN "gfx/blue/slotmachine1.2bpp"
 ENDC
 IF DEF(_GREEN)
