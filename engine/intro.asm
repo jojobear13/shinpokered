@@ -469,6 +469,10 @@ DrawHealthAndSafetyWarning:
 	ld [hWY], a
 	call ClearScreen
 	call LoadFontTilePatterns
+	ld de, .aButtonGlyph
+	ld hl, vChars2 + $60 * $10
+	lb bc, BANK(DrawHealthAndSafetyWarning), 1
+	call CopyVideoDataDouble
 	coord hl, 6, 1
 	ld de, .line0
 	call PlaceString
@@ -518,7 +522,16 @@ DrawHealthAndSafetyWarning:
 .line8
 	db "and safety.@"
 .line9
-	db "Press A to continue.@"
+	db "Press ", $60, " to continue.@"
+.aButtonGlyph
+	db %00111100
+	db %01000010
+	db %10011001
+	db %10100101
+	db %10111101
+	db %10100101
+	db %01000010
+	db %00111100
 
 
 IntroDrawBlackBars:
