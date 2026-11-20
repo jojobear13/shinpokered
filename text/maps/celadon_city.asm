@@ -91,7 +91,7 @@ _CeladonCityText10::
 	line "the accuracy of"
 	cont "techniques!"
 
-	para "Dire Hit jacks up"
+	para "X Crit jacks up"
 	line "the likelihood of"
 	cont "critical hits!"
 
@@ -134,7 +134,7 @@ _CeladonCityText16::
 ;	cont "against SPECIAL"
 ;	cont "attacks such as"
 ;	cont "fire and water!"
-	para "Guard Spec."
+	para "X Guard"
 	line "protects #mon"
 	cont "from stat-down"
 	cont "attacks such as"

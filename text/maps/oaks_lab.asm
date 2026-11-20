@@ -418,7 +418,7 @@ _OaksLabText_4420b::
 _OaksLabText_44210::
 	text "Good, you're"
 	line "trying hard!"
-	cont "Get an itemfinder"
+	cont "Get a Dowser"
 	cont "from my aide!"
 	done
 
@@ -432,7 +432,7 @@ _OaksLabText_4421a::
 	text "You finally got at"
 	line "least 50 species!"
 	cont "Be sure to get"
-	cont "EXP.All from my"
+	cont "Exp.Share from my"
 	cont "aide!"
 	done
 

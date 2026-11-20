@@ -1,5 +1,5 @@
 _Route15GateUpstairsText_4968c::
-	text "EXP.All gives"
+	text "Exp.Share gives"
 	line "EXP points to all"
 	cont "the #mon with"
 	cont "you, even if they"

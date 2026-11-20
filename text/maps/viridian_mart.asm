@@ -21,7 +21,7 @@ ViridianMartParcelQuestText::
 
 _ViridianMartText2::
 	text "This shop sells"
-	line "many ANTIDOTEs."
+	line "many Tox Heals."
 	done
 
 _ViridianMartText3::

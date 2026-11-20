@@ -899,7 +899,7 @@ _ViridianBlackboardSleepText::
 	line "asleep even after"
 	cont "battles."
 
-	para "Use awakening to"
+	para "Use Sleep Heal to"
 	line "wake them up!"
 	prompt
 
@@ -911,7 +911,7 @@ _ViridianBlackboardPoisonText::
 	para "Poison lingers"
 	line "after battles."
 
-	para "Use an antidote"
+	para "Use a Tox Heal"
 	line "to cure poison!"
 	prompt
 
@@ -1456,8 +1456,8 @@ _GainedText::
 ;	cont "@@"
 ;joenote - making this less annoying
 _WithExpAllText::
-	text "EXP.All gives the"
-	line "team relatively"
+	text "Exp.Share gives"
+	line "the team"
 	cont "@@"
 
 _BoostedText::
@@ -2921,13 +2921,13 @@ _CoinCaseNumCoinsText::
 	prompt
 
 _ItemfinderFoundItemText::
-	text "Yes! Itemfinder"
+	text "Yes! Dowser"
 	line "indicates there's"
 	cont "an item nearby."
 	prompt
 
 _ItemfinderFoundNothingText::
-	text "Nope! Itemfinder"
+	text "Nope! Dowser"
 	line "isn't responding."
 	prompt
 

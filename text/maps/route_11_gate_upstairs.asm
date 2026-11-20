@@ -3,7 +3,7 @@ _Route11GateUpstairsText_494a3::
 	line "the ground that"
 	cont "can't be seen."
 
-	para "Itemfinder will"
+	para "Dowser will"
 	line "detect an item"
 	cont "close to you."
 

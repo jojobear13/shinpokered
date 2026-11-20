@@ -82,7 +82,7 @@ _ViridianForestText9::
 
 _ViridianForestText10::
 	text "For poison, use"
-	line "antidote! Get it"
+	line "Tox Heal! Get it"
 	cont "at #mon MARTs!"
 	done
 
