@@ -206,13 +206,12 @@ ELSE
 	RGB  3,  3,  3	;reel outline
 ENDC
 	; PAL_SLOTS2
-IF DEF(_RED)
+IF DEF(_REDJP)
 	RGB 31, 31, 31	;"3" icon fill
 	RGB 31, 31,  0	;"3" icon shape color
 	RGB 20,  8, 15	;"3" icon background color
 	RGB  3,  3,  3	;"3" icon outline
-ENDC
-IF DEF(_BLUE)
+ELIF DEF(_RED) || DEF(_BLUE)
 	RGB 31, 31, 31	;"3" icon fill
 	RGB 31, 31,  0	;"3" icon shape color
 	RGB  9,  5, 30	;"3" icon background color
@@ -226,13 +225,12 @@ IF DEF(_GREEN)
 ENDC
 
 	; PAL_SLOTS3
-IF DEF(_RED)
+IF DEF(_REDJP)
 	RGB 31, 31, 31	;"2" icon fill
 	RGB  3, 31,  9	;"2" icon shape color
 	RGB 20,  8, 15	;"2" icon background color
 	RGB  3,  3,  3	;"2" icon outline
-ENDC
-IF DEF(_BLUE)
+ELIF DEF(_RED) || DEF(_BLUE)
 	RGB 31, 31, 31	;"2" icon fill
 	RGB  3, 31,  9	;"2" icon shape color
 	RGB  9,  5, 30	;"2" icon background color
@@ -246,13 +244,12 @@ IF DEF(_GREEN)
 ENDC
 
 	; PAL_SLOTS4
-IF DEF(_RED)
+IF DEF(_REDJP)
 	RGB 31, 31, 31	;"1" icon fill
 	RGB  9,  5, 30	;"1" icon shape color
 	RGB 20,  8, 15	;"1" icon background color
 	RGB  3,  3,  3	;"1" icon outline
-ENDC
-IF DEF(_BLUE)
+ELIF DEF(_RED) || DEF(_BLUE)
 	RGB 31, 31, 31	;"1" icon fill
 	RGB 20,  8, 15	;"1" icon shape color
 	RGB  9,  5, 30	;"1" icon background color
