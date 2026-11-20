@@ -21,7 +21,8 @@ _MansionSwitchText::
 	done
 
 _MansionSwitchPressedText::
-	text "Who wouldn't?"
+	text "You flip the"
+	line "switch."
 	prompt
 
 _MansionSwitchNotPressedText::
