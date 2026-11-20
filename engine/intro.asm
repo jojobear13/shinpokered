@@ -340,14 +340,13 @@ LoadIntroGraphics:
 PlayShootingStar:
 	ld b, SET_PAL_GAME_FREAK_INTRO
 	call RunPaletteCommand
-	callba LoadCopyrightAndTextBoxTiles
-	ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
+	call DrawHealthAndSafetyWarning
+	ldPal a, WHITE, LIGHT_GRAY, DARK_GRAY, BLACK
 	ld [rBGP], a
 	call UpdateGBCPal_BGP
-	ld c, 180
-	;call DelayFrames
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
-;joenote - activate/deactivate gamma shader if select is pressed at copyright screen
+;joenote - activate/deactivate gamma shader if select is pressed at the startup warning
 ;		- Behavior is determined by the destination code in the rom header
 	ld a, [hGBC]
 	and a
@@ -383,9 +382,10 @@ PlayShootingStar:
 	
 .gammaloop
 	call DelayFrame
-	push bc
 	call ReadJoypad
-	pop bc
+	ld a, [hJoyInput]
+	and A_BUTTON
+	jr nz, .dismissWarning
 	ld a, [hJoyInput]
 	and SELECT
 	jr z, .skipgamma
@@ -398,24 +398,26 @@ PlayShootingStar:
 	sub b 	;A is now 01 for JP or 02 for !JP
 	ld [hGBC], a	;Toggle the shader state from the default
 	
-;	Play a SFX and print some tiles to confirm that it worked
-	coord hl, $12, $11
-	ld a, $7D
-	ld [hl], a
-	coord hl, $13, $11
-	ld a, $7E
-	ld [hl], a
+; Play a sound to confirm the shader change
 	ld a, SFX_SNARE_1
 	call PlaySound
 	
 	jr .endgammaloop
 
-.skipgamma	
-	dec c
-	jr nz, .gammaloop
+.skipgamma
+	jr .gammaloop
 .endgammaloop
-	inc c
-	call DelayFrames
+	call DelayFrame
+	call ReadJoypad
+	ld a, [hJoyInput]
+	and A_BUTTON
+	jr z, .endgammaloop
+.dismissWarning
+	call DelayFrame
+	call ReadJoypad
+	ld a, [hJoyInput]
+	and A_BUTTON
+	jr nz, .dismissWarning
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 	call ClearScreen
 	call DisableLCD
@@ -461,6 +463,63 @@ PlayShootingStar:
 	call IntroClearMiddleOfScreen
 	call ClearSprites
 	jp Delay3
+
+DrawHealthAndSafetyWarning:
+	xor a
+	ld [hWY], a
+	call ClearScreen
+	call LoadFontTilePatterns
+	coord hl, 6, 1
+	ld de, .line0
+	call PlaceString
+	coord hl, 1, 3
+	ld de, .line1
+	call PlaceString
+	coord hl, 2, 6
+	ld de, .line2
+	call PlaceString
+	coord hl, 5, 7
+	ld de, .line3
+	call PlaceString
+	coord hl, 1, 8
+	ld de, .line4
+	call PlaceString
+	coord hl, 3, 9
+	ld de, .line5
+	call PlaceString
+	coord hl, 1, 10
+	ld de, .line6
+	call PlaceString
+	coord hl, 4, 11
+	ld de, .line7
+	call PlaceString
+	coord hl, 4, 12
+	ld de, .line8
+	call PlaceString
+	coord hl, 0, 16
+	ld de, .line9
+	jp PlaceString
+.line0
+	db "WARNING@"
+.line1
+	db "HEALTH AND SAFETY@"
+.line2
+	db "Before playing,@"
+.line3
+	db "read your@"
+.line4
+	db "operations manual@"
+.line5
+	db "for important@"
+.line6
+	db "information about@"
+.line7
+	db "your health@"
+.line8
+	db "and safety.@"
+.line9
+	db "Press A to continue.@"
+
 
 IntroDrawBlackBars:
 ; clear the screen and draw black bars on the top and bottom
