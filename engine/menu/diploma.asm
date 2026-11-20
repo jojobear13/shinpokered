@@ -59,34 +59,7 @@ _DisplayDiploma:
 	ld de, wPlayerName
 	call PlaceString
 
-;joenote - support female player character
-IF DEF(_FPLAYER)	
-	ld a, [wUnusedD721]
-	bit 0, a	;check if girl
-	jr nz, .is_fplayer
-	callba DrawPlayerCharacter
-	jr .fplayer_end
-.is_fplayer
-	callba DrawPlayerCharacter_F
-.fplayer_end
-ELSE
-	callba DrawPlayerCharacter
-ENDC
-
-; Move the player 33 pixels right and set the priority bit so he appears
-; behind the background layer.
-	ld hl, wOAMBuffer + $01
-	lb bc, $80, $28
-.adjustPlayerGfxLoop
-	ld a, [hl] ; X
-	add 33
-	ld [hli], a
-	inc hl
-	ld a, b
-	ld [hli], a ; attributes
-	inc hl
-	dec c
-	jr nz, .adjustPlayerGfxLoop
+	call DrawDiplomaPokedex
 
 	call EnableLCD
 	
@@ -105,6 +78,58 @@ ENDC
 	ld [rOBP0], a
 	call UpdateGBCPal_OBP0
 	ret
+
+DrawDiplomaPokedex:
+	ld hl, DiplomaPokedexTiles
+	ld de, vSprites
+	ld bc, DiplomaPokedexTilesEnd - DiplomaPokedexTiles
+	ld a, BANK(DiplomaPokedexTiles)
+	call FarCopyData2
+	call ClearSprites
+
+	ld hl, wOAMBuffer
+	lb de, 120, 130 ; OAM coordinates for screen position (122, 104)
+	ld b, 3
+	xor a
+.row
+	push de
+	ld c, 3
+.tile
+	push af
+	ld a, d
+	ld [hli], a
+	ld a, e
+	ld [hli], a
+	add 8
+	ld e, a
+	pop af
+	ld [hli], a
+	ld [hl], $80 ; Behind background text, using Red's GBC sprite palette
+	inc hl
+	inc a
+	dec c
+	jr nz, .tile
+	pop de
+	push af
+	ld a, d
+	add 8
+	ld d, a
+	pop af
+	dec b
+	jr nz, .row
+	ret
+
+DiplomaPokedexTiles:
+	db $00, $00, $00, $06, $04, $0b, $06, $09, $00, $1f, $00, $1f, $04, $1b, $06, $19
+	db $00, $00, $00, $00, $00, $e0, $02, $fe, $00, $fe, $00, $ff, $00, $ff, $e0, $1f
+	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $80, $00, $c0, $00, $e0
+	db $03, $1c, $0f, $30, $07, $38, $08, $37, $07, $38, $03, $3c, $10, $7f, $00, $7f
+	db $20, $df, $e3, $1f, $c1, $3f, $00, $ff, $21, $de, $03, $fc, $02, $ff, $00, $ff
+	db $00, $fe, $f8, $ff, $fc, $ff, $fc, $ff, $88, $7e, $f8, $06, $3c, $c6, $28, $fe
+	db $00, $7f, $02, $7f, $40, $7f, $38, $3f, $00, $00, $00, $00, $00, $00, $00, $00
+	db $e3, $fc, $c0, $ff, $07, $ff, $01, $ff, $38, $3f, $00, $00, $00, $00, $00, $00
+	db $00, $fe, $00, $fe, $f8, $fc, $78, $fc, $00, $fc, $f4, $fc, $00, $00, $00, $00
+DiplomaPokedexTilesEnd:
 
 UnusedPlayerNameLengthFunc:
 ; Unused function that does a calculation involving the length of the player's
@@ -129,7 +154,7 @@ DiplomaTextPointersAndCoords:
 	dw DiplomaEmptyText
 	dwCoord 15, 4
 	dw DiplomaCongrats
-	dwCoord 2, 6
+	dwCoord 1, 6
 	dw DiplomaGameFreak
 	dwCoord 9, 16
 
@@ -147,11 +172,11 @@ DiplomaEmptyText:
 	db "@"
 
 DiplomaCongrats:
-	db   "Congrats! This"
-	next "diploma certifies"
-	next "that you have"
-	next "completed your"
-	next "#dex.@"
+	db   "Congratulations"
+	next "This diploma"
+	next "certifies that you"
+	next "have completed"
+	next "your #dex.@"
 
 DiplomaGameFreak:
 	db "Game Freak@"
