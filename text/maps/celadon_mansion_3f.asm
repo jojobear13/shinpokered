@@ -61,6 +61,5 @@ _CeladonMansion3Text7::
 	done
 
 _CeladonMansion3Text8::
-	text "Game Freak"
-	line "Development Room"
+	text "Development Room"
 	done
