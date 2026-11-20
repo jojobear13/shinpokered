@@ -471,9 +471,9 @@ DrawHealthAndSafetyWarning:
 	call LoadFontTilePatterns
 	ld de, .aButtonGlyph
 	ld hl, vChars2 + $60 * $10
-	lb bc, BANK(DrawHealthAndSafetyWarning), 1
+	lb bc, BANK(DrawHealthAndSafetyWarning), 2
 	call CopyVideoDataDouble
-	coord hl, 6, 1
+	coord hl, 5, 1
 	ld de, .line0
 	call PlaceString
 	coord hl, 1, 3
@@ -504,7 +504,7 @@ DrawHealthAndSafetyWarning:
 	ld de, .line9
 	jp PlaceString
 .line0
-	db "WARNING@"
+	db $61, " WARNING@"
 .line1
 	db "HEALTH AND SAFETY@"
 .line2
@@ -532,6 +532,15 @@ DrawHealthAndSafetyWarning:
 	db %10100101
 	db %01000010
 	db %00111100
+.warningGlyph
+	db %00011000
+	db %00011000
+	db %00100100
+	db %00100100
+	db %01100110
+	db %01111110
+	db %11100111
+	db %11111111
 
 
 IntroDrawBlackBars:
