@@ -62,7 +62,11 @@ ENDC
 	ld a, BANK(PokemonLogoGraphics)
 	call FarCopyData2          ; second chunk
 	ld hl, Version_GFX
+IF DEF(_RED) && !DEF(_RGTITLE)
+	ld de, vChars2 + TITLE_SLOGAN_FIRST_TILE * $10
+ELSE
 	ld de, vChars2 + $600 - (Version_GFXEnd - Version_GFX - $50)
+ENDC
 	ld bc, Version_GFXEnd - Version_GFX
 	ld a, BANK(Version_GFX)
 	call FarCopyDataDouble
@@ -551,8 +555,24 @@ ENDC
 
 INCLUDE "data/title_mons.asm"
 
-; prints version text (red, blue)
+; Draw the title subtitle on the scrolling background row.
+IF DEF(_RED) && !DEF(_RGTITLE)
+; Tile $50 is the last copyright tile. The title logo ends at $40.
+TITLE_SLOGAN_FIRST_TILE EQU $51
+TITLE_SLOGAN_TILE_COUNT EQU 14
+ENDC
 PrintGameVersionOnTitleScreen:
+IF DEF(_RED) && !DEF(_RGTITLE)
+	coord hl, (SCREEN_WIDTH - TITLE_SLOGAN_TILE_COUNT) / 2, 8
+	ld a, TITLE_SLOGAN_FIRST_TILE
+	ld b, TITLE_SLOGAN_TILE_COUNT
+.tile
+	ld [hli], a
+	inc a
+	dec b
+	jr nz, .tile
+	ret
+ELSE
 IF DEF(_GREEN)
 	coord hl, 6, 8
 ELSE
@@ -560,10 +580,11 @@ ELSE
 ENDC
 	ld de, VersionOnTitleScreenText
 	jp PlaceString
+ENDC
 
 ; these point to special tiles specifically loaded for that purpose and are not usual text
 VersionOnTitleScreenText:
-IF DEF(_RED)
+IF DEF(_RED) && DEF(_RGTITLE)
 	db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
 ENDC
 IF DEF(_BLUE)

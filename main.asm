@@ -1636,6 +1636,15 @@ SECTION "bank1A",ROMX,BANK[$1A]
 
 INCLUDE "engine/battle/decrement_pp.asm"
 
+IF DEF(_RED) && !DEF(_RGTITLE)
+PUSHS
+SECTION "Red title slogan", ROMX
+Version_GFX:
+	INCBIN "gfx/red/title_slogan.1bpp"
+Version_GFXEnd:
+	ASSERT Version_GFXEnd - Version_GFX == TITLE_SLOGAN_TILE_COUNT * 8
+POPS
+ELSE
 Version_GFX:
 IF (DEF(_RED) || DEF(_GREEN))
 	INCBIN "gfx/red/redgreenversion.1bpp" ; 10 tiles
@@ -1644,6 +1653,7 @@ IF DEF(_BLUE)
 	INCBIN "gfx/blue/blueversion.1bpp" ; 8 tiles
 ENDC
 Version_GFXEnd:
+ENDC
 
 Dojo_GFX:
 Gym_GFX:           INCBIN "gfx/tilesets/gym.2bpp"
