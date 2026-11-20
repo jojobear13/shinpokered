@@ -16,7 +16,7 @@ _Route13AfterBattleText2::
 
 _Route13BattleText3::
 	text "I'm told I'm good"
-	line "for a kid!"
+	line "for a girl!"
 	done
 
 _Route13EndBattleText3::

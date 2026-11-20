@@ -41,7 +41,6 @@ _ViridianCityText_19157::
 	para "Watch out for its"
 	line "Poison Sting!"
 	done
-IF DEF(_JPTXT)
 _ViridianCityText_19175::
 	text "Oh Grandpa! Don't"
 	line "pass out here!"
@@ -50,14 +49,6 @@ _ViridianCityText_19175::
 	cont "have to wait till"
 	cont "he sobers up."
 	done
-ELSE
-_ViridianCityText_19175::
-	text "Oh Grandpa! Don't"
-	line "be so mean!"
-	cont "He hasn't had his"
-	cont "coffee yet."
-	done
-ENDC
 
 _ViridianCityText_1917a::
 	text "When I go shop in"
@@ -67,7 +58,6 @@ _ViridianCityText_1917a::
 	cont "Viridian Forest."
 	done
 
-IF DEF(_JPTXT)
 _ViridianCityText_19191::
 	text "Urgh! Hic..."
 	line "hold on there!"
@@ -78,15 +68,6 @@ _ViridianCityText_19191::
 	para "...Hey!"
 	line "I said don't go!"
 	done
-ELSE
-_ViridianCityText_19191::
-	text "You can't go"
-	line "through here!"
-
-	para "This is private"
-	line "property!"
-	done
-ENDC
 
 _ViridianCityText_191ca::
 	text "Yawn!"
@@ -119,7 +100,6 @@ _TM42NoRoomText::
 	text "You have too much"
 	line "stuff already."
 	done
-IF DEF(_JPTXT)
 _ViridianCityText_1920a::
 	text "Mmm......"
 	line "Seems like I was"
@@ -130,19 +110,6 @@ _ViridianCityText_1920a::
 	para "Are you in a"
 	line "hurry?"
 	done
-ELSE
-_ViridianCityText_1920a::
-	text "Ahh, I've had my"
-	line "coffee now and I"
-	cont "feel great!"
-
-	para "Sure you can go"
-	line "through!"
-
-	para "Are you in a"
-	line "hurry?"
-	done
-ENDC
 
 _ViridianCityText_1920f::
 	text "I see you're using"
