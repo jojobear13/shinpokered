@@ -1,4 +1,5 @@
 TITLE_PORTRAIT_Y_OFFSET EQU 2
+TITLE_BALL_Y_OFFSET EQU TITLE_PORTRAIT_Y_OFFSET + 2
 
 ; copy text of fixed length NAME_LENGTH (like player name, rival name, mon names, ...)
 CopyFixedLengthText:
@@ -118,7 +119,7 @@ ENDC
 IF DEF(_RGTITLE)
 	ld a, $70
 ELIF DEF(_RED)
-	ld a, $74 + TITLE_PORTRAIT_Y_OFFSET
+	ld a, $74 + TITLE_BALL_Y_OFFSET
 ELSE
 	ld a, $74
 ENDC
@@ -126,7 +127,7 @@ ENDC
 IF DEF(_RED) && !DEF(_RGTITLE)
 	inc hl
 	ld a, [hl]
-	add 8
+	add 7
 	ld [hl], a
 ENDC
 
