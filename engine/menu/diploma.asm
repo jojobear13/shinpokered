@@ -88,12 +88,12 @@ DrawDiplomaPokedex:
 	call ClearSprites
 
 	ld hl, wOAMBuffer
-	lb de, 120, 130 ; OAM coordinates for screen position (122, 104)
-	ld b, 3
+	lb de, 104, 120 ; OAM coordinates for screen position (112, 88)
+	ld b, 5
 	xor a
 .row
 	push de
-	ld c, 3
+	ld c, 5
 .tile
 	push af
 	ld a, d
@@ -120,15 +120,31 @@ DrawDiplomaPokedex:
 	ret
 
 DiplomaPokedexTiles:
-	db $00, $00, $00, $06, $04, $0b, $06, $09, $00, $1f, $00, $1f, $04, $1b, $06, $19
-	db $00, $00, $00, $00, $00, $e0, $02, $fe, $00, $fe, $00, $ff, $00, $ff, $e0, $1f
-	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $80, $00, $c0, $00, $e0
-	db $03, $1c, $0f, $30, $07, $38, $08, $37, $07, $38, $03, $3c, $10, $7f, $00, $7f
-	db $20, $df, $e3, $1f, $c1, $3f, $00, $ff, $21, $de, $03, $fc, $02, $ff, $00, $ff
-	db $00, $fe, $f8, $ff, $fc, $ff, $fc, $ff, $88, $7e, $f8, $06, $3c, $c6, $28, $fe
-	db $00, $7f, $02, $7f, $40, $7f, $38, $3f, $00, $00, $00, $00, $00, $00, $00, $00
-	db $e3, $fc, $c0, $ff, $07, $ff, $01, $ff, $38, $3f, $00, $00, $00, $00, $00, $00
-	db $00, $fe, $00, $fe, $f8, $fc, $78, $fc, $00, $fc, $f4, $fc, $00, $00, $00, $00
+	db $00, $00, $00, $00, $00, $00, $00, $01, $00, $03, $00, $03, $00, $03, $00, $03
+	db $00, $00, $00, $00, $90, $f0, $00, $fc, $e0, $1f, $f0, $0f, $f0, $0f, $40, $bf
+	db $00, $00, $00, $00, $00, $00, $00, $00, $38, $f8, $00, $ff, $00, $ff, $18, $ff
+	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $80, $80, $80, $80
+	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	db $04, $07, $01, $07, $00, $07, $01, $06, $01, $06, $09, $0e, $01, $0e, $00, $0f
+	db $03, $ff, $f8, $ff, $00, $ff, $fc, $03, $03, $fc, $60, $9f, $7f, $80, $7f, $80
+	db $c8, $ff, $08, $ff, $08, $ff, $08, $ff, $e0, $1f, $21, $df, $b1, $5f, $b0, $5f
+	db $10, $f0, $80, $f8, $80, $fc, $00, $fe, $00, $ff, $00, $ff, $00, $ff, $7f, $ff
+	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $40, $c0, $02, $fe, $81, $ff
+	db $00, $0f, $02, $0d, $02, $0d, $13, $1c, $02, $1d, $00, $1f, $00, $1f, $06, $1f
+	db $7f, $80, $ff, $00, $3f, $c0, $00, $ff, $7c, $83, $7c, $83, $7c, $83, $00, $ff
+	db $b0, $5f, $90, $7f, $10, $ff, $40, $bf, $61, $bf, $61, $bf, $61, $bf, $20, $ff
+	db $7f, $ff, $ff, $ff, $7f, $ff, $00, $ff, $f1, $0f, $ff, $00, $f4, $0b, $ff, $00
+	db $f1, $ff, $f0, $fe, $f0, $fe, $f0, $fe, $00, $fe, $e2, $1e, $b2, $4e, $e2, $1e
+	db $26, $3f, $00, $3f, $03, $3f, $00, $3f, $00, $3f, $47, $7f, $00, $3f, $20, $3f
+	db $18, $ff, $11, $ff, $07, $ff, $07, $ff, $c3, $3f, $23, $ff, $00, $ff, $00, $ff
+	db $00, $ff, $00, $ff, $05, $fe, $c1, $fe, $c0, $ff, $41, $ff, $4b, $ff, $0b, $ff
+	db $31, $fe, $00, $ff, $e2, $1f, $f0, $0f, $00, $ff, $80, $ff, $f7, $ff, $ff, $ff
+	db $e0, $1c, $60, $fc, $40, $fc, $00, $fc, $44, $bc, $04, $fc, $c4, $fc, $e0, $f8
+	db $0f, $0f, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	db $e0, $ff, $0f, $0f, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	db $00, $ff, $f0, $ff, $7e, $7f, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	db $67, $ff, $00, $ff, $00, $ff, $fe, $ff, $00, $00, $00, $00, $00, $00, $00, $00
+	db $e0, $f8, $00, $f8, $08, $f8, $10, $f0, $e0, $e0, $00, $00, $00, $00, $00, $00
 DiplomaPokedexTilesEnd:
 
 UnusedPlayerNameLengthFunc:
@@ -156,7 +172,7 @@ DiplomaTextPointersAndCoords:
 	dw DiplomaCongrats
 	dwCoord 1, 6
 	dw DiplomaGameFreak
-	dwCoord 9, 16
+	dwCoord 1, 16
 
 MasterText:	;joenote - adding master text
 	db "<Shiny> #Mon Master <Shiny>@"
@@ -172,10 +188,11 @@ DiplomaEmptyText:
 	db "@"
 
 DiplomaCongrats:
-	db   "Congratulations"
-	next "This diploma"
-	next "certifies that you"
-	next "have completed"
+	db   "Congratulations<LF>"
+	db   "This diploma"
+	next "certifies that"
+	next "you have"
+	next "completed"
 	next "your #dex.@"
 
 DiplomaGameFreak:
