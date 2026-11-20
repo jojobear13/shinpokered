@@ -165,7 +165,9 @@ ENDC
 	call SaveScreenTilesToBuffer2
 	call LoadScreenTilesFromBuffer2
 	call EnableLCD
-IF DEF(_RED)
+IF DEF(_RED) && !DEF(_RGTITLE)
+	call PickRandomTitleMon
+ELIF DEF(_RED)
 	ld a, CHARMANDER ; which Pokemon to show first on the title screen
 ENDC
 IF DEF(_BLUE)
@@ -390,13 +392,7 @@ TitleScreenPickNewMon:
 
 .loop
 ; Keep looping until a mon different from the current one is picked.
-	call Random
-	and $f
-	ld c, a
-	ld b, 0
-	ld hl, TitleMons
-	add hl, bc
-	ld a, [hl]
+	call PickRandomTitleMon
 	ld hl, wTitleMonSpecies
 
 ; Can't be the same as before.
@@ -416,6 +412,16 @@ TitleScreenPickNewMon:
 	ld [hWY], a
 	ld d, 1 ; scroll out
 	callba TitleScroll
+	ret
+
+PickRandomTitleMon:
+	call Random
+	and $f
+	ld c, a
+	ld b, 0
+	ld hl, TitleMons
+	add hl, bc
+	ld a, [hl]
 	ret
 
 TitleScreenScrollInMon:
