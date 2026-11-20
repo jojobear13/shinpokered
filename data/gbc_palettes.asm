@@ -88,7 +88,7 @@ IF DEF(_BLUE)
 ENDC
 IF DEF(_RED) && !DEF(_RGTITLE)
 	RGB 31, 31, 31 ; slogan background
-	RGB 31, 31, 31 ; slogan fill
+	RGB 25,  4,  5 ; slogan fill
 	RGB  3,  7, 14 ; slogan outline
 	RGB  3,  7, 14
 ELIF DEF(_RED)
