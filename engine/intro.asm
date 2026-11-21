@@ -15,7 +15,7 @@ PlayIntro:
 	ld [hJoyHeld], a
 	inc a
 	ld [H_AUTOBGTRANSFERENABLED], a
-	call PlayShootingStar
+	call PrepareIntroBattle
 	call PlayIntroScene
 	call GBFadeOutToWhite
 	xor a
@@ -321,23 +321,13 @@ LoadIntroGraphics:
 	ld bc, FightIntroBackMonEnd - FightIntroBackMon
 	ld a, BANK(FightIntroBackMon)
 	call FarCopyData2
-	ld hl, GameFreakIntro
-	ld de, vChars2 + (FightIntroBackMonEnd - FightIntroBackMon)
-	ld bc, GameFreakIntroEnd - GameFreakIntro
-	ld a, BANK(GameFreakIntro)
-	call FarCopyData2
-	ld hl, GameFreakIntro
-	ld de, vChars1
-	ld bc, GameFreakIntroEnd - GameFreakIntro
-	ld a, BANK(GameFreakIntro)
-	call FarCopyData2
 	ld hl, FightIntroFrontMon
 	ld de, vChars0
 	ld bc, FightIntroFrontMonEnd - FightIntroFrontMon
 	ld a, BANK(FightIntroFrontMon)
 	jp FarCopyData2
 
-PlayShootingStar:
+PrepareIntroBattle:
 	ld b, SET_PAL_GAME_FREAK_INTRO
 	call RunPaletteCommand
 	call DrawHealthAndSafetyWarning
@@ -429,31 +419,7 @@ PlayShootingStar:
 	ld hl, rLCDC
 	res 5, [hl]
 	set 3, [hl]
-	ld c, 64
-	call DelayFrames
-	callba AnimateShootingStar
-	push af
-
-;joenote - restore "Presents" for the japanese builds
-	coord hl, 7, 11
-	ld de, .presentsTiles
-	ld b, 6
-.presentsTilesLoop
-	ld a, [de]
-	ld [hli], a
-	inc de
-	dec b
-	jr nz, .presentsTilesLoop
-	jr .presentEnd
-.presentsTiles
-	db $67,$68,$69,$6A,$6B,$6C ; "Presents"
-.presentEnd
-
-	pop af
-	jr c, .next ; skip the delay if the user interrupted the animation
-	ld c, 40
-	call DelayFrames
-.next
+	call ClearSprites
 	ld a, BANK(Music_IntroBattle)
 	ld [wAudioROMBank], a
 	ld [wAudioSavedROMBank], a
@@ -461,7 +427,6 @@ PlayShootingStar:
 	ld [wNewSoundID], a
 	call PlaySound
 	call IntroClearMiddleOfScreen
-	call ClearSprites
 	jp Delay3
 
 DrawHealthAndSafetyWarning:
@@ -634,12 +599,6 @@ IntroNidorinoAnimation7:
 	db -6, -12
 	db -4, -10
 	db ANIMATION_END
-
-GameFreakIntro:
-	INCBIN "gfx/gamefreak_intro.2bpp"
-	INCBIN "gfx/gamefreak_logo.2bpp"
-	ds $10 ; blank tile
-GameFreakIntroEnd:
 
 FightIntroBackMon:
 	INCBIN "gfx/intro_fight.2bpp"
