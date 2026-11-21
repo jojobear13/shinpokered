@@ -529,12 +529,7 @@ ELSE
 	coord hl, 5, 10
 ENDC
 	call GetMonHeader
-IF DEF(_RED) && !DEF(_RGTITLE)
-	call LoadFrontSpriteByMonIndex
-	jp ShiftTitleMonDown
-ELSE
 	jp LoadFrontSpriteByMonIndex
-ENDC
 
 TitleScreenCopyTileMapToVRAM:
 	ld [H_AUTOBGTRANSFERDEST + 1], a
