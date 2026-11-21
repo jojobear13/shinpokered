@@ -50,11 +50,6 @@ MainMenu:
 	ld de, NewGameText
 	call PlaceString
 .next2
-;joenote - print the game version
-	coord hl, $00, $11
-	ld de, VersionText
-	call PlaceString
-	
 ;joenote - check for emulator issues
 	callba EmulatorChecks
 	
@@ -501,8 +496,6 @@ HandshakeList:
 	db $0
 	db $a
 	db $ff
-VersionText:
-	db "v1.25.0M@"
 
 WhereWouldYouLikeText:
 	TX_FAR _WhereWouldYouLikeText
