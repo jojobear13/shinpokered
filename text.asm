@@ -2806,8 +2806,8 @@ _ItemUseBallText02::
 	prompt
 
 _ItemUseBallText03::
-	text "Aww! It appeared"
-	line "to be caught! "
+	text "Aargh!"
+	line "Almost had it!"
 	prompt
 
 _ItemUseBallText04::
