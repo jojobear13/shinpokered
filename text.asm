@@ -2806,8 +2806,7 @@ _ItemUseBallText02::
 	prompt
 
 _ItemUseBallText03::
-	text "Aargh!"
-	line "Almost had it!"
+	text "Almost had it!"
 	prompt
 
 _ItemUseBallText04::
