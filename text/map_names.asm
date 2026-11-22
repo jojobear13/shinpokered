@@ -94,7 +94,7 @@ VictoryRoadName:
 DiglettsCaveName:
 	db "Diglett's Cave@"
 RocketHQName:
-	db "Rocket Hq@"
+	db "Rocket HQ@"
 SilphCoName:
 	db "Silph Co.@"
 PokemonMansionName:
