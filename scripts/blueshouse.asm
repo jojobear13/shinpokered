@@ -111,7 +111,7 @@ _TXTShimmerON:
 	text "A glass #BALL"
 	line "shimmers faintly."	
 	para "You sense that"
-	line "certain pokemon"
+	line "certain Pokémon"
 	cont "may manifest some"
 	cont "hidden potential."
 	done
