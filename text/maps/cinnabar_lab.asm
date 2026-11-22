@@ -10,7 +10,7 @@ _Lab1Text1::
 _Lab1Text2::
 	text "A photo of the"
 	line "lab's founder,"
-	cont "dr.Fuji!"
+	cont "Dr. Fuji!"
 	done
 
 _Lab1Text3::

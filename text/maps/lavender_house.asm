@@ -3,7 +3,7 @@ _LavenderHouse2Text1::
 
 _LavenderHouse2Text_1d9dc::
 	text "I hate those"
-	line "horrible ROCKETs!"
+	line "horrible Rockets!"
 
 	para "That poor Cubone's"
 	line "mother..."

@@ -21,6 +21,6 @@ _CeladonMart4Text4::
 	para "4F: Wiseman gifts"
 
 	para "Evolution Special!"
-	line "Element STONEs on"
+	line "Element stones on"
 	cont "sale now!"
 	done

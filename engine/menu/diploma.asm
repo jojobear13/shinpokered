@@ -175,7 +175,7 @@ DiplomaTextPointersAndCoords:
 	dwCoord 9, 16
 
 MasterText:	;joenote - adding master text
-	db "<Shiny> #Mon Master <Shiny>@"
+	db "<Shiny> #mon Master <Shiny>@"
 
 DiplomaText:
 ;	db $70,"Diploma",$70,"@"

@@ -20,8 +20,8 @@ _OaksLabText41::
 	done
 
 _OaksLabText39::
-	text "Those are #"
-	line "BALLs. They"
+	text "Those are"
+	line "Pokéballs. They"
 	cont "contain #mon!"
 	done
 
@@ -101,7 +101,7 @@ _OaksLabDeliverParcelText1::
 _OaksLabDeliverParcelText2::
 	text ""
 	para "Ah! This is the"
-	line "custom # ball"
+	line "custom # Ball"
 	cont "I ordered!"
 	cont "Thank you!"
 	done
@@ -124,7 +124,7 @@ _OaksLabGivePokeballsText1::
 	cont "#mon."
 
 	para "<PLAYER> got 5"
-	line "# BALLs!@@"
+	line "Pokéballs!@@"
 
 _OaksLabGivePokeballsText2::
 	text ""
@@ -204,7 +204,7 @@ _OaksLabChooseMonText::
 	para "Haha!"
 
 	para "They are inside"
-	line "the # BALLs."
+	line "the Pokéballs."
 
 	para "When I was young,"
 	line "I was a serious"

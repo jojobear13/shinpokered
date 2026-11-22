@@ -222,7 +222,7 @@ _ViridianGymText_74bd4::
 
 	para "This will be the"
 	line "toughest of all"
-	cont "the gym LEADERs!"
+	cont "the Gym Leaders!"
 
 	para "I heard that the"
 	line "trainers here"

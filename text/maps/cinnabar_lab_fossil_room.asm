@@ -175,18 +175,18 @@ _Lab4Text_Book2A::
 	text "#mon Genes"
 	prompt
 _Lab4Text_Book2B::
-	text "All Pokemon have"
+	text "All Pokémon have"
 	line "determined values"
 	cont "that effectively"
 	cont "act as genes."
 
-	para "Every Pokemon has"
+	para "Every Pokémon has"
 	line "2 genes: A and B."
 	cont "Each gene has 2"
 	cont "alleles: Hi / Lo."
 	cont "This forms a gene"
 	cont "sequence notation"
-	cont "for each Pokemon."
+	cont "for each Pokémon."
 
 	para "Gene sequences"
 	line "are ordered from"

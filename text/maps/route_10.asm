@@ -77,7 +77,7 @@ _Route10EndBattleText4::
 
 _Route10AfterBattleText4::
 	text "I noticed some"
-	line "#MANIACs"
+	line "#maniacs"
 	cont "prowling around."
 	done
 

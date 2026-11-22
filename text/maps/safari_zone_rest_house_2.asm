@@ -1,5 +1,5 @@
 _SafariZoneRestHouse2Text1::
-	text "Tossing ROCKs at"
+	text "Tossing rocks at"
 	line "#mon might"
 	cont "make them run,"
 	cont "but they'll be"

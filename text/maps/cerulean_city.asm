@@ -130,7 +130,7 @@ _CeruleanCityText6::
 
 	para "Even our police"
 	line "force has trouble"
-	cont "with the ROCKETs!"
+	cont "with the Rockets!"
 	done
 
 _CeruleanCityText_19730::

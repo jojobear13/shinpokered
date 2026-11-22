@@ -1,5 +1,5 @@
 _ViridianCityText1::
-	text "Those # BALLs"
+	text "Those # Balls"
 	line "at your waist!"
 	cont "You have #mon!"
 
@@ -163,7 +163,7 @@ _ViridianCityText10::
 	para "The battle moves"
 	line "of #mon are"
 	cont "limited by their"
-	cont "power POINTs, PP."
+	cont "power points, PP."
 
 	para "To replenish PP,"
 	line "rest your tired"

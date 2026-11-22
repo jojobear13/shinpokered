@@ -1,6 +1,6 @@
 _CeruleanTrashedText_1d6ab::
 	text "Those miserable"
-	line "ROCKETs!"
+	line "Rockets!"
 
 	para "Look what they"
 	line "did here!"

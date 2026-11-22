@@ -82,11 +82,11 @@ SeaCottageName:
 SSAnneName:
 	db "S.S.ANNE@"
 PokemonLeagueName:
-	db "#MON<LF>LEAGUE@"
+	db "#mon<LF>LEAGUE@"
 UndergroundPathName:
 	db "UNDERGROUND<LF>PATH@"
 PokemonTowerName:
-	db "#MON<LF>TOWER@"
+	db "#mon<LF>TOWER@"
 SeafoamIslandsName:
 	db "SEAFOAM<LF>ISLANDS@"
 VictoryRoadName:
@@ -98,7 +98,7 @@ RocketHQName:
 SilphCoName:
 	db "SILPH CO.@"
 PokemonMansionName:
-	db "#MON<LF>MANSION@"
+	db "#mon<LF>MANSION@"
 SafariZoneName:
 	db "SAFARI<LF>ZONE@"
 CeruleanCaveName:

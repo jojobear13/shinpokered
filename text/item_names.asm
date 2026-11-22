@@ -25,7 +25,7 @@ ItemNames:
 	db "Rainbowbadge@"
 	db "Soulbadge@"
 	db "Marshbadge@"
-	db "Volcanobadge@"
+	db "Volcano Badge@"
 	db "Earthbadge@"
 	db "Escape Rope@"
 	db "Repel@"

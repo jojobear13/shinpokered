@@ -72,7 +72,7 @@ _FuchsiaCityVoltorbText::
 	text "Name: Voltorb"
 
 	para "The very image of"
-	line "a # ball."
+	line "a # Ball."
 	prompt
 
 _FuchsiaCityKangaskhanText::

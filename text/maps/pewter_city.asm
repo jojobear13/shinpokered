@@ -1,6 +1,6 @@
 _PewterCityText1::
 	text "It's rumored that"
-	line "CLEFAIRYs came"
+	line "Clefairy came"
 	cont "from the moon!"
 
 	para "They appeared "
@@ -14,7 +14,7 @@ _PewterCityText2::
 	cont "trainers here!"
 
 	para "They're all like"
-	line "bug CATCHERs,"
+	line "Bug Catchers,"
 	cont "but Pewter gym's"
 	cont "Brock is totally"
 	cont "into it!"

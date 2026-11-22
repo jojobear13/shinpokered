@@ -49,7 +49,7 @@ _PokemonTower2Text_6063c::
 _PokemonTower2Text2::
 	text "Even we could not"
 	line "identify the"
-	cont "wayward GHOSTs!"
+	cont "wayward ghosts!"
 
 	para "A Silph Scope"
 	line "might be able to"

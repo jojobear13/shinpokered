@@ -101,7 +101,7 @@ EarthBadgeText:
 	db "Earthbadge@"
 
 VolcanoBadgeText:
-	db "Volcanobadge@"
+	db "Volcano Badge@"
 
 MarshBadgeText:
 	db "Marshbadge@"

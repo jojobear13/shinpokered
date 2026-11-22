@@ -45,7 +45,7 @@ _Route17AfterBattleText3::
 	done
 
 _Route17BattleText4::
-	text "We're BIKERs!"
+	text "We're bikers!"
 	line "Highway stars!"
 	done
 
@@ -87,7 +87,7 @@ _Route17EndBattleText6::
 _Route17AfterBattleText6::
 	text "Maybe some #mon"
 	line "need element"
-	cont "STONEs to evolve."
+	cont "stones to evolve."
 	done
 
 _Route17BattleText7::
@@ -185,8 +185,8 @@ _Route17Text15::
 	text "It's a notice!"
 
 	para "Don't throw the"
-	line "game, throw #"
-	cont "BALLs instead!"
+	line "game. Throw a"
+	cont "Poké Ball instead!"
 	done
 
 _Route17Text16::

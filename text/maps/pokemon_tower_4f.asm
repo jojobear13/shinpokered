@@ -25,7 +25,7 @@ _PokemonTower4EndBattleText2::
 _PokemonTower4AfterBattleText2::
 	text "We can't crack"
 	line "the identity of"
-	cont "the GHOSTs."
+	cont "the ghosts."
 	done
 
 _PokemonTower4BattleText3::

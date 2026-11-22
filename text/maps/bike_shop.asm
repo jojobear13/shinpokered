@@ -75,7 +75,7 @@ _BikeShopText_1d843::
 	done
 
 _BikeShopText_1d85c::
-	text "These BIKEs are"
+	text "These bikes are"
 	line "cool, but they're"
 	cont "way expensive!"
 	done

@@ -392,7 +392,7 @@ _GymStatueText2::
 	done
 
 _ViridianCityPokecenterGuyText::
-	text "#mon CENTERs"
+	text "#mon Centers"
 	line "heal your tired,"
 	cont "hurt or fainted"
 	cont "#mon!"
@@ -418,7 +418,7 @@ _CeruleanPokecenterGuyText::
 	done
 
 _LavenderPokecenterGuyText::
-	text "CUBONEs wear"
+	text "Cubone wear"
 	line "skulls, right?"
 
 	para "People will pay a"
@@ -434,7 +434,7 @@ _MtMoonPokecenterBenchGuyText::
 
 _RockTunnelPokecenterGuyText::
 	text "I heard that"
-	line "GHOSTs haunt"
+	line "ghosts haunt"
 	cont "Lavender Town!"
 	done
 
@@ -571,7 +571,7 @@ _CinnabarQuizQuestionsText1::
 _CinnabarQuizQuestionsText2::
 	text "There are 9"
 	line "certified #mon"
-	cont "league BADGEs?"
+	cont "league badges?"
 	done
 
 _CinnabarQuizQuestionsText3::
@@ -661,7 +661,7 @@ _OakLabEmailText::
 	cont "how you rate as a"
 	cont "trainer!"
 
-	para "#mon League hq"
+	para "#mon League HQ"
 	line "Indigo Plateau"
 
 	para "PS: Prof.Oak,"
@@ -727,7 +727,7 @@ _ViridianSchoolNotebookText1::
 
 	para "First page..."
 
-	para "# BALLs are"
+	para "# Balls are"
 	line "used to catch"
 	cont "#mon."
 
@@ -763,7 +763,7 @@ _ViridianSchoolNotebookText3::
 
 	para "Battles are"
 	line "constantly fought"
-	cont "at #mon GYMs."
+	cont "at #mon gyms."
 	prompt
 
 _ViridianSchoolNotebookText4::
@@ -773,7 +773,7 @@ _ViridianSchoolNotebookText4::
 	line "#mon trainers"
 	cont "is to beat the "
 	cont "top 8 #mon"
-	cont "gym LEADERs."
+	cont "Gym Leaders."
 
 	para "Do so to earn the"
 	line "right to face..."
@@ -798,7 +798,7 @@ _FightingDojoText::
 
 _IndigoPlateauHQText::
 	text "Indigo Plateau"
-	line "#mon League hq"
+	line "#mon League HQ"
 	done
 
 _RedBedroomSNESText::
@@ -1016,13 +1016,13 @@ _IndigoPlateauStatuesText1::
 _IndigoPlateauStatuesText2::
 	text "The ultimate goal"
 	line "of trainers!"
-	cont "#mon League hq"
+	cont "#mon League HQ"
 	done
 
 _IndigoPlateauStatuesText3::
 	text "The highest"
 	line "#mon authority"
-	cont "#mon League hq"
+	cont "#mon League HQ"
 	done
 
 _PokemonBooksText::
@@ -2691,7 +2691,7 @@ _CurrentTooFastText::
 
 _CyclingIsFunText::
 	text "Cycling is fun!"
-	line "Forget SURFing!"
+	line "Forget surfing!"
 	prompt
 
 _FlashLightsAreaText::
@@ -2997,7 +2997,7 @@ _NoCyclingAllowedHereText::
 	prompt
 
 _NoSurfingHereText::
-	text "No SURFing on"
+	text "No surfing on"
 	line "@"
 	TX_RAM wcd6d
 	text " here!"

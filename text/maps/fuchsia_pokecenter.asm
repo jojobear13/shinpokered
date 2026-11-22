@@ -13,8 +13,8 @@ _FuchsiaPokecenterText3::
 	line "trail west of"
 	cont "Viridian City."
 
-	para "It goes to #mon"
-	line "league hq."
-	cont "The hq governs"
+	para "It goes to"
+	line "#mon League HQ."
+	cont "The HQ governs"
 	cont "all trainers."
 	done

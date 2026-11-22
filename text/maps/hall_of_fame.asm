@@ -24,5 +24,5 @@ _HallofFameRoomText1::
 	para "Congratulations,"
 	line "<PLAYER>, you and"
 	cont "your #mon are"
-	cont "hall of FAMERs!"
+	cont "Hall of Famers!"
 	done

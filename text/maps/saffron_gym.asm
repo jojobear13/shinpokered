@@ -205,7 +205,7 @@ _SaffronGymEndBattleText6::
 
 _SaffronGymAfterBattleText6::
 	text "There used to be"
-	line "2 #mon GYMs in"
+	line "2 #mon gyms in"
 	cont "Saffron."
 
 	para "The fighting dojo"

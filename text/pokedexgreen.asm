@@ -174,7 +174,7 @@ _CuboneDexEntry::
 _RhyhornDexEntry::
 	text "Strong but not"
 	next "too bright, this"
-	next "#MON can"
+	next "#mon can"
 	
 	page "shatter even a"
 	next "tower with its"
@@ -192,7 +192,7 @@ _LaprasDexEntry::
 	dex
 
 _ArcanineDexEntry::
-	text "A #MON that is"
+	text "A #mon that is"
 	next "described in"
 	next "Chinese legends."
 	
@@ -293,7 +293,7 @@ _PinsirDexEntry::
 
 _TangelaDexEntry::
 	text "Blue vines cloak"
-	next "the #MON's"
+	next "the #mon's"
 	next "identity in a"
 	
 	page "tangled mass. It"
@@ -414,7 +414,7 @@ _HitmonleeDexEntry::
 _HitmonchanDexEntry::
 	text "The spirit of a"
 	next "pro boxer infuses"
-	next "this #MON."
+	next "this #mon."
 	
 	page "It throws punches"
 	next "that outspeed a"
@@ -583,7 +583,7 @@ _DragoniteDexEntry::
 
 _DoduoDexEntry::
 	text "A two-headed"
-	next "#MON that was"
+	next "#mon that was"
 	next "discovered as a"
 	
 	page "sudden mutation."
@@ -613,7 +613,7 @@ _JynxDexEntry::
 
 _MoltresDexEntry::
 	text "A legendary bird"
-	next "POKéMON. Those"
+	next "Pokémon. Those"
 	next "seeing it are"
 	
 	page "awestruck by its"
@@ -623,7 +623,7 @@ _MoltresDexEntry::
 
 _ArticunoDexEntry::
 	text "A legendary bird"
-	next "POKéMON. With its"
+	next "Pokémon. With its"
 	next "long tail plumes"
 	
 	page "trailing behind,"
@@ -633,7 +633,7 @@ _ArticunoDexEntry::
 
 _ZapdosDexEntry::
 	text "A legendary bird"
-	next "POKéMON. While it"
+	next "Pokémon. While it"
 	next "is flying, it"
 	
 	page "makes crackling"
@@ -732,7 +732,7 @@ _DragonairDexEntry::
 	dex
 
 _KabutoDexEntry::
-	text "This POKéMON was"
+	text "This Pokémon was"
 	next "regenerated from"
 	next "the fossil of an"
 	
@@ -793,7 +793,7 @@ _SandslashDexEntry::
 
 _OmanyteDexEntry::
 	text "This prehistoric"
-	next "POKéMON lived in"
+	next "Pokémon lived in"
 	next "a primordial sea."
 	
 	page "It swims by"
@@ -833,7 +833,7 @@ _WigglytuffDexEntry::
 
 _EeveeDexEntry::
 	text "An extremely rare"
-	next "#MON that may"
+	next "#mon that may"
 	next "evolve in several"
 	
 	page "different ways"
@@ -942,7 +942,7 @@ _WeedleDexEntry::
 	dex
 
 _KakunaDexEntry::
-	text "This #MON is"
+	text "This #mon is"
 	next "in a temporary"
 	next "stage while"
 	
@@ -1037,7 +1037,7 @@ _ButterfreeDexEntry::
 	next "repellent dust."
 	
 	page "As a result, this"
-	next "#MON can fly"
+	next "#mon can fly"
 	next "even in rain"
 	dex
 
@@ -1082,7 +1082,7 @@ _GolbatDexEntry::
 	dex
 
 _MewtwoDexEntry::
-	text "A #MON whose"
+	text "A #mon whose"
 	next "genetic code was"
 	next "recombined often"
 	
@@ -1107,7 +1107,7 @@ _MagikarpDexEntry::
 	next "speed. It is the"
 	
 	page "most weak and"
-	next "pathetic POKéMON"
+	next "pathetic Pokémon"
 	next "in the world"
 	dex
 
@@ -1244,7 +1244,7 @@ _PidgeotDexEntry::
 	dex
 
 _StarmieDexEntry::
-	text "This #MON has"
+	text "This #mon has"
 	next "a geometric body."
 	next "Because of its"
 	
@@ -1258,7 +1258,7 @@ _BulbasaurDexEntry::
 	next "seed on its back"
 	next "from the day this"
 	
-	page "#MON is born."
+	page "#mon is born."
 	next "The seed slowly"
 	next "grows larger"
 	dex
@@ -1380,7 +1380,7 @@ _PorygonDexEntry::
 	
 	page "finally made the"
 	next "first artificial"
-	next "#MON"
+	next "#mon"
 	dex
 
 _AerodactylDexEntry::
@@ -1434,7 +1434,7 @@ _CharmeleonDexEntry::
 	dex
 
 _WartortleDexEntry::
-	text "This #MON is"
+	text "This #mon is"
 	next "very popular as a"
 	next "pet. Its fur-"
 	
@@ -1445,7 +1445,7 @@ _WartortleDexEntry::
 
 _CharizardDexEntry::
 	text "Its wings carry"
-	next "this POKéMON near"
+	next "this Pokémon near"
 	next "an altitude of"
 	
 	page "1,400 m. It blows"

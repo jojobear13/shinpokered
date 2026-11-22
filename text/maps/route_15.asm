@@ -32,7 +32,7 @@ _Route15EndBattleText2::
 
 _Route15AfterBattleText2::
 	text "I'm afraid of"
-	line "BIKERs, they look"
+	line "bikers, they look"
 	cont "so ugly and mean!"
 	done
 

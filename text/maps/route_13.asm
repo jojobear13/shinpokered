@@ -31,7 +31,7 @@ _Route13AfterBattleText3::
 	done
 
 _Route13BattleText4::
-	text "Wow! Your BADGEs"
+	text "Wow! Your badges"
 	line "are too cool!"
 	done
 
@@ -42,8 +42,8 @@ _Route13EndBattleText4::
 
 _Route13AfterBattleText4::
 	text "You got those"
-	line "BADGEs from gym"
-	cont "LEADERs. I know!"
+	line "badges from gym"
+	cont "Leaders. I know!"
 	done
 
 _Route13BattleText5::

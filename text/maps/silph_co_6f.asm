@@ -1,5 +1,5 @@
 _SilphCo6Text_1a24a::
-	text "The ROCKETs came"
+	text "The Rockets came"
 	line "and took over the"
 	cont "building!"
 	done

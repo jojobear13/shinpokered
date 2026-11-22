@@ -18,7 +18,7 @@ _BlaineEndBattleText::
 	line "burnt out!"
 
 	para "You have earned"
-	line "the volcanobadge!@@"
+	line "the Volcano Badge!@@"
 
 _BlaineFireBlastText::
 	text "Fire Blast is the"
@@ -32,7 +32,7 @@ _BlaineFireBlastText::
 _BlaineBadgeText::
 	text "Hah!"
 
-	para "The volcanobadge"
+	para "The Volcano Badge"
 	line "heightens the"
 	cont "special abilities"
 	cont "of your #mon!"
@@ -157,7 +157,7 @@ _CinnabarGymText_75a3d::
 
 _CinnabarGymText_75a68::
 	text "I've been to many"
-	line "GYMs, but this is"
+	line "gyms, but this is"
 	cont "my favorite!"
 	done
 
@@ -200,7 +200,7 @@ _CinnabarGymText_75ac2::
 	line "with water!"
 
 	para "You better take"
-	line "some burn HEALs!"
+	line "some Burn Heals!"
 	done
 
 _CinnabarGymText_75ac7::

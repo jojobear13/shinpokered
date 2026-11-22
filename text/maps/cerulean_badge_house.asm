@@ -1,12 +1,12 @@
 _CeruleanHouse2Text_74e77::
-	text "#mon BADGEs"
+	text "#mon badges"
 	line "are owned only by"
 	cont "skilled trainers."
 
 	para "I see you have"
 	line "at least one."
 
-	para "Those BADGEs have"
+	para "Those badges have"
 	line "amazing secrets!"
 	prompt
 
@@ -14,7 +14,7 @@ _CeruleanHouse2Text_74e7c::
 	text "Now then..."
 
 	para "Which of the 8"
-	line "BADGEs should I"
+	line "badges should I"
 	cont "describe?"
 	done
 

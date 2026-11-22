@@ -63,9 +63,9 @@ _ViridianFrstAfterBattleText3::
 	done
 
 _ViridianForestText8::
-	text "I ran out of #"
-	line "BALLs to catch"
-	cont "#mon with!"
+	text "I ran out of"
+	line "Poké Balls to"
+	cont "catch #mon!"
 
 	para "You should carry"
 	line "extras!"
@@ -83,7 +83,7 @@ _ViridianForestText9::
 _ViridianForestText10::
 	text "For poison, use"
 	line "Tox Heal! Get it"
-	cont "at #mon MARTs!"
+	cont "at #mon Marts!"
 	done
 
 _ViridianForestText11::

@@ -53,7 +53,7 @@ _VoltorbDexEntry::
 	next "power plants."
 	next "Easily mistaken"
 
-	page "for a # ball,"
+	page "for a # Ball,"
 	next "they have zapped"
 	next "many people"
 	dex
@@ -490,7 +490,7 @@ _ElectabuzzDexEntry::
 
 _MagnetonDexEntry::
 	text "Formed by several"
-	next "MAGNEMITEs linked"
+	next "Magnemite linked"
 	next "together. They"
 
 	page "frequently appear"
@@ -835,7 +835,7 @@ _EeveeDexEntry::
 
 	page "it is exposed to"
 	next "radiation from"
-	next "element STONEs"
+	next "element stones"
 	dex
 
 _FlareonDexEntry::
@@ -1165,7 +1165,7 @@ _ClefableDexEntry::
 _WeezingDexEntry::
 	text "Where two kinds"
 	next "of poison gases"
-	next "meet, 2 KOFFINGs"
+	next "meet, 2 Koffing"
 
 	page "can fuse into a"
 	next "Weezing over many"

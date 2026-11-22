@@ -69,7 +69,7 @@ _PokemonTower7BattleText3::
 
 _PokemonTower7EndBattleText3::
 	text "Don't"
-	line "fight us ROCKETs!"
+	line "fight us Rockets!"
 	prompt
 
 _PokemonTower7AfterBattleText3::
