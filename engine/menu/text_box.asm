@@ -554,7 +554,7 @@ ENDC
 	next "Yes@"
 .YesNoMenu
 	db   "Yes"
-	next "no@"
+	next "No@"
 .NorthWestMenu
 	db   "North"
 	next "west@"
