@@ -108,7 +108,7 @@ ShimmerToggleText:
 .done
 	jp TextScriptEnd
 _TXTShimmerON:
-	text "A glass #BALL"
+	text "A glass Pokéball"
 	line "shimmers faintly."	
 	para "You sense that"
 	line "certain Pokémon"
@@ -117,7 +117,7 @@ _TXTShimmerON:
 	done
 	db "@"
 _TXTShimmerOFF:
-	text "A glass #BALL"
+	text "A glass Pokéball"
 	line "...just a nice"
 	cont "decoration."
 	para "You must have"
