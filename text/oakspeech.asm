@@ -20,7 +20,7 @@ _OakSpeechText2B::
 	cont "pets. Others use"
 	cont "them for fights."
 
-	para "Myself..."
+	para "As for me..."
 
 	para "I study #mon"
 	line "as a profession."
