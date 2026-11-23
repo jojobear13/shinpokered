@@ -246,11 +246,11 @@ JapaneseMainMenuText:
 
 BattleMenuText:
 	db   "Fight ",$E1,$E2
-	next "Item  run@"
+	next "Item  Run@"
 
 SafariZoneBattleMenuText:
 	db   "Ball×       Bait"
-	next "Throw rock  run@"
+	next "Throw rock  Run@"
 
 SwitchStatsCancelText:
 	db   "Switch"
