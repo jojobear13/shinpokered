@@ -11,7 +11,7 @@ _CopycatsHouse1FText2::
 
 	para "Her mimicry has"
 	line "earned her the"
-	cont "nickname copycat"
+	cont "nickname Copycat"
 	cont "around here!"
 	done
 

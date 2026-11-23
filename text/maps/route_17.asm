@@ -169,10 +169,9 @@ _Route17Text12::
 _Route17Text13::
 	text "Trainer Tips:"
 
-	para "Press the A or B"
-	line "Button to stay in"
-	cont "place while on a"
-	cont "slope."
+	para "Press A or B to"
+	line "stay in place"
+	cont "while on a slope."
 	done
 
 _Route17Text14::

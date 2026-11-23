@@ -126,7 +126,7 @@ FanClubBagFullText::
 	done
 
 _FanClubText6::
-	text "Our Chairman is"
+	text "Our chairman is"
 	line "very vocal about"
 	cont "#mon."
 	done

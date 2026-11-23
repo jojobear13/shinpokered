@@ -163,7 +163,7 @@ _ViridianCityText10::
 	para "The battle moves"
 	line "of #mon are"
 	cont "limited by their"
-	cont "power points, PP."
+	cont "Power Points, PP."
 
 	para "To replenish PP,"
 	line "rest your tired"
