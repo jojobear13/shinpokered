@@ -41,7 +41,7 @@ _ClauseBrother_SleepIntro::
 _ClauseBrother_SleepDesc::
 	text "With my stamp,"
 	line "only one #mon"
-	cont "slp per team is"
+	cont "Slp per team is"
 	cont "allowed during"
 	cont "trainer matches."
 	done
@@ -53,7 +53,7 @@ _ClauseBrother_FreezeIntro::
 _ClauseBrother_FreezeDesc::
 	text "With my stamp,"
 	line "only one #mon"
-	cont "frz per team is"
+	cont "Frz per team is"
 	cont "allowed during"
 	cont "trainer matches."
 	done
@@ -73,7 +73,7 @@ _ClauseBrother_TrapDesc::
 	done
 
 _ClauseBrother_HyperbeamIntro::
-	text "H.Beam clause bro"
+	text "Beam clause bro"
 	line "at your service."
 	prompt
 _ClauseBrother_HyperbeamDesc::
