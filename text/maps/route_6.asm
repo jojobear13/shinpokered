@@ -58,7 +58,7 @@ _Route6AfterBattleText4::
 	done
 
 _Route6BattleText5::
-	text "Me? Well, OK."
+	text "Me? Well, okay."
 	line "I'll play!"
 	done
 

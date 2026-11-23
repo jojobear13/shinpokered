@@ -34,7 +34,7 @@ _BillsHouseText_1e86f::
 
 	para "What do you say,"
 	line "chief? Please?"
-	cont "OK? All right!"
+	cont "Okay? All right!"
 	prompt
 
 _BillThankYouText::

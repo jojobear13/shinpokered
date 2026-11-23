@@ -10,7 +10,7 @@ _ViridianCityText1::
 	done
 
 _ViridianCityText_19122::
-	text "This #mon gym"
+	text "This #mon Gym"
 	line "is always closed."
 
 	para "I wonder who the"
@@ -30,7 +30,7 @@ _ViridianCityText_1914d::
 	done
 
 _ViridianCityText_19152::
-	text "Oh, OK then!"
+	text "Oh, okay then!"
 	done
 
 _ViridianCityText_19157::
@@ -173,7 +173,7 @@ _ViridianCityText10::
 
 _ViridianCityText13::
 	text "Viridian City"
-	line "#mon gym"
+	line "#mon Gym"
 	done
 
 _ViridianCityText14::

@@ -31,7 +31,7 @@ _BikeShopText_1d81f::
 
 	para "A Bike Voucher!"
 
-	para "OK! Here you go!"
+	para "Okay! Here you go!"
 	prompt
 
 _BikeShopText_1d824::

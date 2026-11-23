@@ -27,7 +27,7 @@ _MtMoon3Text_49f85::
 	done
 
 _MtMoon3Text_49f8a::
-	text "OK!"
+	text "Okay!"
 	line "I'll share!"
 	prompt
 

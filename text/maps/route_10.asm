@@ -65,7 +65,7 @@ _Route10AfterBattleText3::
 
 _Route10BattleText4::
 	text "I've been to a"
-	line "#mon gym a few"
+	line "#mon Gym a few"
 	cont "times. But, I"
 	cont "lost each time."
 	done

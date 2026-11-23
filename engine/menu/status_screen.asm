@@ -300,7 +300,7 @@ StatusText:
 	db "Status/@"
 
 OKText:
-	db "OK@"
+	db "Okay@"
 
 ; Draws a line starting from hl high b and wide c
 DrawLineBox:

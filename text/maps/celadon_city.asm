@@ -108,7 +108,7 @@ _CeladonCityText11::
 
 _CeladonCityText13::
 	text "Celadon City"
-	line "#mon gym"
+	line "#mon Gym"
 	cont "leader: Erika"
 
 	para "The Nature Loving"

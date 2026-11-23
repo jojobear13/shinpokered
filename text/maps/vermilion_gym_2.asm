@@ -83,7 +83,7 @@ _VermilionGymEndBattleText2::
 	prompt
 
 _VermilionGymAfterBattleText2::
-	text "OK, I'll talk!"
+	text "Okay, I'll talk!"
 
 	para "Lt.Surge said he"
 	line "hid door switches"

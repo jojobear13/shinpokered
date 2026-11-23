@@ -32,7 +32,7 @@ _SafariZoneEntranceText_75360::
 	done
 
 _SafariZoneEntranceText_75365::
-	text "OK! Please come"
+	text "Okay! Please come"
 	line "again!"
 	done
 

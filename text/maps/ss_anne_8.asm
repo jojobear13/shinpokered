@@ -47,7 +47,7 @@ _SSAnne8EndBattleText3::
 
 _SSAnne8AfterBattleText3::
 	text "Let me be your"
-	line "friend, OK?"
+	line "friend, okay?"
 
 	para "Then we can trade"
 	line "#mon!"

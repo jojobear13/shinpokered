@@ -92,7 +92,7 @@ _CeruleanCityText_196ee::
 	prompt
 
 _CeruleanCityText_196f3::
-	text "OK! I'll return"
+	text "Okay! I'll return"
 	line "the TM I stole!"
 	prompt
 
@@ -134,7 +134,7 @@ _CeruleanCityText6::
 	done
 
 _CeruleanCityText_19730::
-	text "OK! Slowbro!"
+	text "Okay! Slowbro!"
 	line "Use sonicboom!"
 	cont "Come on, Slowbro"
 	cont "pay attention!"
@@ -233,7 +233,7 @@ ENDC
 
 _CeruleanCityText17::
 	text "Cerulean City"
-	line "#mon gym"
+	line "#mon Gym"
 	cont "leader: Misty"
 
 	para "The Tomboyish"

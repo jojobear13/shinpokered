@@ -57,7 +57,7 @@ _RocketHideout1EndBattleText5::
 	prompt
 
 _RocketHideout1AfterBattleTxt5::
-	text "OK, I'll talk!"
+	text "Okay, I'll talk!"
 	line "Take the elevator"
 	cont "to see my boss!"
 	done

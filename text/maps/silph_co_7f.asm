@@ -31,7 +31,7 @@ _LaprasGuyText::
 	text "Team Rocket's"
 	line "boss went to the"
 	cont "boardroom! Is our"
-	cont "president OK?"
+	cont "president okay?"
 	done
 
 _LaprasGuySavedText::

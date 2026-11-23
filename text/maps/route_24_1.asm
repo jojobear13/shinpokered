@@ -44,7 +44,7 @@ _Route24Text_51526::
 	para "I'm telling you"
 	line "to join!"
 
-	para "OK, you need"
+	para "Okay, you need"
 	line "convincing!"
 
 	para "I'll make you an"

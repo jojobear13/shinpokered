@@ -90,7 +90,8 @@ _Route14AfterBattleText5::
 
 _Route14BattleText6::
 	text "I'm not into it,"
-	line "but OK! Let's go!"
+	line "but okay!"
+	cont "Let's go!"
 	done
 
 _Route14EndBattleText6::

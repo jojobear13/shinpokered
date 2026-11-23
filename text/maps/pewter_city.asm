@@ -103,7 +103,7 @@ _PewterCityText10::
 
 _PewterCityText11::
 	text "Pewter City"
-	line "#mon gym"
+	line "#mon Gym"
 	cont "leader: Brock"
 
 	para "The Rock Solid"

@@ -15,7 +15,7 @@ _Route24AfterBattleText1::
 	done
 
 _Route24BattleText2::
-	text "OK! I'm No. 5!"
+	text "Okay! I'm No. 5!"
 IF DEF(_JPTXT)	;joenote - dirty joke lost in translation
 	line "This time, I'll"
 	cont "be your partner."

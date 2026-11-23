@@ -54,7 +54,7 @@ _FuchsiaCityText17::
 
 _FuchsiaCityText18::
 	text "Fuchsia City"
-	line "#mon gym"
+	line "#mon Gym"
 	cont "leader: Koga"
 
 	para "The Poisonous"

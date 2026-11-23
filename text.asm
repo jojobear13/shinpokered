@@ -1522,7 +1522,7 @@ _EnoughText::
 	text "enough!@@"
 
 _OKExclamationText::
-	text "OK!@@"
+	text "Okay!@@"
 
 _GoodText::
 	text "good!@@"
@@ -1824,7 +1824,8 @@ _OnceReleasedText::
 	line "@"
 	TX_RAM wcf4b
 	text " is"
-	cont "gone forever. OK?"
+	cont "gone forever."
+	cont "Okay?"
 	done
 
 _MonWasReleasedText::
@@ -1896,7 +1897,7 @@ _WhereWouldYouLikeText::
 	done
 
 _PleaseWaitText::
-	text "OK, please wait"
+	text "Okay, please wait"
 	line "just a moment."
 	done
 
@@ -2476,7 +2477,7 @@ _PokemartTellBuyPriceText::
 	line "That will be"
 	cont "¥@"
 	TX_BCD hMoney, 3 | LEADING_ZEROES | LEFT_ALIGN
-	text ". OK?"
+	text ". Okay?"
 	done
 
 _PokemartBoughtItemText::
@@ -2612,7 +2613,7 @@ _ShallWeHealYourPokemonText::
 	done
 
 _NeedYourPokemonText::
-	text "OK. We'll need"
+	text "Okay. We'll need"
 	line "your #mon."
 	done
 
@@ -3045,7 +3046,7 @@ _ThrewAwayItemText::
 	prompt
 
 _IsItOKToTossItemText::
-	text "Is it OK to toss"
+	text "Is it okay to toss"
 	line "@"
 	TX_RAM wcf4b
 	text "?"

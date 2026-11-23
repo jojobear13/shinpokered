@@ -40,7 +40,7 @@ _SSAnne10BattleText3::
 	done
 
 _SSAnne10EndBattleText3::
-	text "OK, "
+	text "Okay, "
 	line "you're not bad."
 	prompt
 

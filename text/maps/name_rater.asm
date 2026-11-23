@@ -32,7 +32,7 @@ _NameRaterText_1dac2::
 	prompt
 
 _NameRaterText_1dac7::
-	text "OK! This #mon"
+	text "Okay! This #mon"
 	line "has been renamed"
 	cont "@"
 	TX_RAM wBuffer
