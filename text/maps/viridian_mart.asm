@@ -9,7 +9,7 @@ _ViridianMartText4::
 	done
 
 ViridianMartParcelQuestText::
-	text "You know prof."
+	text "You know Prof."
 	line "Oak, right?"
 
 	para "His order came in."

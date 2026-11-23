@@ -1883,7 +1883,7 @@ _ClosedOaksPCText::
 	line "Prof.Oak's PC.@@"
 
 _AccessedOaksPCText::
-	text "Accessed prof."
+	text "Accessed Prof."
 	line "Oak's PC."
 
 	para "Accessed #dex"
