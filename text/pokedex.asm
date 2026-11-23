@@ -1494,7 +1494,7 @@ _BellsproutDexEntry::
 
 _WeepinbellDexEntry::
 	text "It spits out"
-	next "poisonpowder to"
+	next "Poisonpowder to"
 	next "immobilize the"
 
 	page "enemy and then"

@@ -90,7 +90,7 @@ _CeladonMart3Text5::
 	text "You can identify"
 	line "#mon you got"
 	cont "in trades by"
-	cont "their ID Numbers!"
+	cont "their ID numbers!"
 	done
 
 _CeladonMart3Text6::
