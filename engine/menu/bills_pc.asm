@@ -404,7 +404,7 @@ BillsPCMenuText:
 	next "Deposit ",  $4a
 	next "Release ",  $4a
 	next "Change Box"
-	next "see ya!"
+	next "See 'ya!"
 	db "@"
 
 BoxNoPCText:
