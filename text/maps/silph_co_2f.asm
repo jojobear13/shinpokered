@@ -38,7 +38,7 @@ _SilphCo2BattleText1::
 _SilphCo2EndBattleText1::
 	text "How"
 	line "did you know I"
-	cont "was a rocket?"
+	cont "was a Rocket?"
 	prompt
 
 _SilphCo2AfterBattleText1::

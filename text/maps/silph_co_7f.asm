@@ -1,6 +1,6 @@
 _MeetLaprasGuyText::
 	text "Oh! Hi! You're"
-	line "not a rocket! You"
+	line "not a Rocket! You"
 	cont "came to save us?"
 	cont "Why, thank you!"
 
@@ -169,7 +169,7 @@ _SilphCo7Text_51ec3::
 _SilphCo7Text_51ec8::
 	text "Oh ho!"
 	line "So, you are ready"
-	cont "for boss rocket!"
+	cont "for boss Rocket!"
 	prompt
 
 _SilphCo7Text_51ecd::

@@ -68,7 +68,7 @@ _SaffronCityText12::
 	text "Pidgeot: Bi bibii!@@"
 
 _SaffronCityText13::
-	text "I saw rocket"
+	text "I saw Rocket"
 	line "boss escaping"
 	cont "Silph's building."
 	done

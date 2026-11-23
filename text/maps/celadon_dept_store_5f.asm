@@ -4,11 +4,10 @@ _CeladonMart5Text1::
 	cont "bought only here."
 
 	para "Use Calcium to"
-	line "increase special"
-	cont "abilities."
+	line "raise Special."
 
 	para "Use Carbos to"
-	line "increase speed."
+	line "increase Speed."
 	done
 
 _CeladonMart5Text2::
@@ -17,10 +16,10 @@ _CeladonMart5Text2::
 	cont "enhancers."
 
 	para "Protein increases"
-	line "attack power."
+	line "Attack."
 
 	para "Iron increases"
-	line "defense!"
+	line "Defense!"
 	done
 
 _CeladonMart5Text5::

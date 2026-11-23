@@ -24,7 +24,7 @@ _CeruleanHouse2Text_74e81::
 	done
 
 _CeruleanHouse2Text_74e96::
-	text "The attack of all"
+	text "The Attack of all"
 	line "#mon increases"
 	cont "a little bit."
 
@@ -46,7 +46,7 @@ _CeruleanHouse2Text_74e9b::
 	prompt
 
 _CeruleanHouse2Text_74ea0::	;joenote - updated with correct information
-	text "The defense of all"
+	text "The Defense of all"
 	line "#mon increases"
 	cont "a little bit."
 
@@ -68,7 +68,7 @@ _CeruleanHouse2Text_74ea5::
 	prompt
 
 _CeruleanHouse2Text_74eaa:: ;joenote - updated with correct information
-	text "The speed of all"
+	text "The Speed of all"
 	line "#mon increases"
 	cont "a little bit."
 
@@ -87,8 +87,8 @@ _CeruleanHouse2Text_74eaf::
 
 _CeruleanHouse2Text_74eb4::
 	text "Your #mon's"
-	line "special abilities"
-	cont "increase a bit."
+	line "Special increases"
+	cont "a bit."
 	prompt
 
 _CeruleanHouse2Text_74eb9::

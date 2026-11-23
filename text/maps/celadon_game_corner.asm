@@ -8,7 +8,7 @@ _CeladonGameCornerText1::
 	done
 
 _CeladonGameCornerText_48d22::
-	text "Welcome to rocket"
+	text "Welcome to Rocket"
 	line "Game Corner!"
 
 	para "Do you need some"

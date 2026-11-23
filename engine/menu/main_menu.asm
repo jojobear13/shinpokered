@@ -542,7 +542,7 @@ ContinueText:
 
 NewGameText:
 	db   "New Game"
-	next "Option@"
+	next "Options@"
 
 CableClubOptionsText:
 	db   "Trade Center"
