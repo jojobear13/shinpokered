@@ -547,7 +547,7 @@ NewGameText:
 CableClubOptionsText:
 	db   "Trade Center"
 	next "Colosseum"
-	next "cancel@"
+	next "Cancel@"
 
 DisplayContinueGameInfo:
 	xor a

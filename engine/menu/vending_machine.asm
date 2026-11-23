@@ -98,7 +98,7 @@ DrinkText:
 	db   "Fresh Water"
 	next "Soda Pop"
 	next "Lemonade"
-	next "cancel@"
+	next "Cancel@"
 
 DrinkPriceText:
 	db   "¥200"

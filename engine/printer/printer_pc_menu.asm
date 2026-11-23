@@ -141,14 +141,14 @@ PrinterPCMenuText:
 	next "print #mon"
 	next "print box"
 	next "print diploma"
-	next "cancel"
+	next "Cancel"
 	db "@"
 PrinterPCMenuText_noDiploma:
 	db   "Settings"
 	next "Print #dex"
 	next "print #mon"
 	next "print box"
-	next "cancel"
+	next "Cancel"
 	db "@"
 PrintBoxNoPCText:
 	db "Box No.@"
