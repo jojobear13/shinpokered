@@ -170,7 +170,7 @@ _CuboneDexEntry::
 
 _RhyhornDexEntry::
 	text "Its massive bones"
-	next "are 1000 times"
+	next "are 1,000 times"
 	next "harder than human"
 
 	page "bones. It can"
@@ -685,7 +685,7 @@ _NinetalesDexEntry::
 
 	page "its many tails"
 	next "could result in a"
-	next "1000-year curse"
+	next "1,000-year curse"
 	dex
 
 _PikachuDexEntry::
@@ -844,7 +844,7 @@ _FlareonDexEntry::
 	next "its body, its"
 
 	page "temperature could"
-	next "soar to over 1600"
+	next "soar to over 1,600"
 	next "degrees"
 	dex
 
@@ -853,7 +853,7 @@ _JolteonDexEntry::
 	next "negative ions in"
 	next "the atmosphere to"
 
-	page "blast out 10000-"
+	page "blast out 10,000-"
 	next "volt lightning"
 	next "bolts"
 	dex
