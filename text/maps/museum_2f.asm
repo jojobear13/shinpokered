@@ -43,7 +43,7 @@ _Museum2FText5::
 	done
 
 _Museum2FText6::
-	text "Space shuttle"
+	text "Space Shuttle"
 	line "Ho-Oh III"
 	done
 

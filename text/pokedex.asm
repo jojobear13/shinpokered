@@ -1058,8 +1058,8 @@ _GolduckDexEntry::
 	next "lake shores. It"
 
 	page "is often mistaken"
-	next "for the Japanese"
-	next "monster, Kappa"
+	next "for a creature"
+	next "called a kappa."
 	dex
 
 _HypnoDexEntry::

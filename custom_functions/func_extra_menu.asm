@@ -445,7 +445,7 @@ TextGamma:
 TextEnhancedGBC:
 	db " Enh. Color@"
 TextBack:
-	db " Back     Sel: Ost@"
+	db " Back  Select: OST@"
 
 TextAILevelCap:
 	db " Lvl Cap@"
