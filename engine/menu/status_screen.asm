@@ -404,8 +404,8 @@ PrintStat:
 StatsText:
 	db   "Attack"
 	next "Defense"
-	next "speed"
-	next "special@"
+	next "Speed"
+	next "Special@"
 
 StatusScreen2:
 	ld a, [hTilesetType]
