@@ -9,7 +9,7 @@ _ViridianHouseText1::
 	done
 
 _ViridianHouseText2::
-	text "My Daddy loves"
+	text "My daddy loves"
 	line "#mon too."
 	done
 
