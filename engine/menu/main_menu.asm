@@ -808,15 +808,15 @@ DisplayOptionMenu:
 
 TextSpeedOptionText:
 	db   "Text Speed"
-	next " Fast  medium slow@"
+	next " Fast  Medium Slow@"
 
 BattleAnimationOptionText:
 	db   "Battle Animation"
-	next " On       off@"
+	next " On       Off@"
 
 BattleStyleOptionText:
 	db   "Battle Style"
-	next " Shift    set@"
+	next " Shift    Set@"
 
 OptionMenuCancelText:
 	db "Cancel@"
