@@ -402,8 +402,8 @@ DisplayMonListMenu:
 BillsPCMenuText:
 	db   "Withdraw ", $4a
 	next "Deposit ",  $4a
-	next "release ",  $4a
-	next "change box"
+	next "Release ",  $4a
+	next "Change Box"
 	next "see ya!"
 	db "@"
 
