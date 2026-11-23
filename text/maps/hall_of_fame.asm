@@ -19,7 +19,7 @@ _HallofFameRoomText1::
 	para "<PLAYER>! You have"
 	line "endeavored hard"
 	cont "to become the new"
-	cont "league champion!"
+	cont "League Champion!"
 
 	para "Congratulations,"
 	line "<PLAYER>, you and"

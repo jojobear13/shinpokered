@@ -180,8 +180,8 @@ HoFDisplayMonInfo:
 
 HoFMonInfoText:
 	db   "Level/"
-	next "TYPE1/"
-	next "TYPE2/@"
+	next "Type1/"
+	next "Type2/@"
 
 HoFLoadPlayerPics:
 ;joenote - support female trainer sprites

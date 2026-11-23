@@ -101,7 +101,7 @@ _Route25AfterBattleText6::
 
 _Route25BattleText7::
 	text "I just got down"
-	line "from Mt.Moon,"
+	line "from Mt. Moon,"
 	cont "but I'm ready!"
 	done
 

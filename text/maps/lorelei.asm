@@ -3,7 +3,7 @@ _LoreleiBeforeBattleText::
 	line "#mon League!"
 
 	para "I am Lorelei of"
-	line "the elite four!"
+	line "the Elite Four!"
 
 	para "No one can best"
 	line "me when it comes"

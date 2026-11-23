@@ -5,7 +5,7 @@ _BillsHouseText_1e865::
 
 	para "Call me Bill!"
 	line "I'm a true blue"
-	cont "#MANIAC! Hey!"
+	cont "Pokémaniac! Hey!"
 	cont "What's with that"
 	cont "skeptical look?"
 

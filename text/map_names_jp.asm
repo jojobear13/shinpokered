@@ -74,7 +74,7 @@ Route25Name:
 ViridianForestName:
 	db "VIRIDIAN<LF>FOREST@"
 MountMoonName:
-	db "MT.MOON@"
+	db "MT. MOON@"
 RockTunnelName:
 	db "ROCK<LF>TUNNEL@"
 SeaCottageName:

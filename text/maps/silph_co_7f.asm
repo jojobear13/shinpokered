@@ -197,7 +197,7 @@ _SilphCo7Text_51ed2::
 	para "I'm going to the"
 	line "#mon League"
 	cont "to boot out the"
-	cont "elite four!"
+	cont "Elite Four!"
 
 	para "I'll become the"
 	line "world's most"

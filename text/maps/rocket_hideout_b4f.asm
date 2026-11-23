@@ -29,7 +29,7 @@ _RocketHideout4Text_45584::
 _RocketHideout4BattleText2::
 	text "I know you! You"
 	line "ruined our plans"
-	cont "at Mt.Moon!"
+	cont "at Mt. Moon!"
 	done
 
 _RocketHideout4EndBattleText2::

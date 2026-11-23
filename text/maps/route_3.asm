@@ -136,7 +136,7 @@ _Route3EndBattleText8::
 
 _Route3AfterBattleText8::
 	text "Route 4 is at the"
-	line "foot of Mt.Moon."
+	line "foot of Mt. Moon."
 	done
 
 _Route3Text10::

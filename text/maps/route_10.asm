@@ -1,6 +1,6 @@
 _Route10BattleText1::
 	text "Wow, are you a"
-	line "#MANIAC too?"
+	line "Pokémaniac too?"
 	cont "Want to see my"
 	cont "collection?"
 	done
@@ -77,7 +77,7 @@ _Route10EndBattleText4::
 
 _Route10AfterBattleText4::
 	text "I noticed some"
-	line "#maniacs"
+	line "Pokémaniacs"
 	cont "prowling around."
 	done
 

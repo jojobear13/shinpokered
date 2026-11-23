@@ -493,7 +493,7 @@ DisplayChangeBoxMenu:
 	ld [wMaxMenuItem], a
 	ld a, 1
 	ld [wTopMenuItemY], a
-	ld a, 12
+	ld a, 11
 	ld [wTopMenuItemX], a
 	xor a
 	ld [wMenuWatchMovingOutOfBounds], a
@@ -507,14 +507,14 @@ DisplayChangeBoxMenu:
 	call TextBoxBorder
 	ld hl, ChooseABoxText
 	call PrintText
-	coord hl, 11, 0
+	coord hl, 10, 0
 	ld b, 12
-	ld c, 7
+	ld c, 8
 	call TextBoxBorder
 	ld hl, hFlags_0xFFF6
 	set 2, [hl]
 	ld de, BoxNames
-	coord hl, 13, 1
+	coord hl, 12, 1
 	call PlaceString
 	ld hl, hFlags_0xFFF6
 	res 2, [hl]
@@ -562,16 +562,16 @@ ChooseABoxText:
 BoxNames:
 	db   "Box 1"
 	next "Box 2"
-	next "box 3"
-	next "box 4"
-	next "box 5"
-	next "box 6"
-	next "box 7"
-	next "box 8"
-	next "box 9"
-	next "BOX10"
-	next "BOX11"
-	next "BOX12@"
+	next "Box 3"
+	next "Box 4"
+	next "Box 5"
+	next "Box 6"
+	next "Box 7"
+	next "Box 8"
+	next "Box 9"
+	next "Box 10"
+	next "Box 11"
+	next "Box 12@"
 
 BoxNoText:
 	db "Box No.@"

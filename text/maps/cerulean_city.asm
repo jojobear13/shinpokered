@@ -43,7 +43,7 @@ _CeruleanCityText_19677::
 
 	para "After all, Bill's"
 	line "world famous as a"
-	cont "#MANIAC!"
+	cont "Pokémaniac!"
 
 	para "He invented the"
 	line "#mon Storage"
@@ -210,7 +210,7 @@ _CeruleanCityText12::
 _CeruleanCityText13::
 	text "Trainer Tips:"
 
-	para "Pressing B Button"
+	para "Pressing B"
 	line "during evolution"
 	cont "cancels the whole"
 	cont "process."

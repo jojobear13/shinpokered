@@ -1,6 +1,6 @@
 _FuchsiaCityText1::
 	text "Did you try the"
-	line "safari game? Some"
+	line "Safari Game? Some"
 	cont "#mon can only"
 	cont "be caught there."
 	done
@@ -11,7 +11,7 @@ _FuchsiaCityText2::
 	cont "the entrance."
 
 	para "Out back is the"
-	line "safari game for"
+	line "Safari Game for"
 	cont "catching #mon."
 	done
 
@@ -38,13 +38,13 @@ _FuchsiaCityText11::
 	done
 
 _FuchsiaCityText13::
-	text "Safari game"
+	text "Safari Game"
 	line "#mon-U-catch!"
 	done
 
 _FuchsiaCityText16::
 	text "Safari Zone"
-	line "warden's home"
+	line "Warden's Home"
 	done
 
 _FuchsiaCityText17::

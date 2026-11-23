@@ -20,7 +20,7 @@ _VictoryRoad2AfterBattleText1::
 _VictoryRoad2BattleText2::
 	text "Ah, so you wish"
 	line "to challenge the"
-	cont "elite four?"
+	cont "Elite Four?"
 	done
 
 _VictoryRoad2EndBattleText2::
@@ -53,7 +53,7 @@ _VictoryRoad2BattleText4::
 	text "If you can get"
 	line "through here, you"
 	cont "can go meet the"
-	cont "elite four!"
+	cont "Elite Four!"
 	done
 
 _VictoryRoad2EndBattleText4::

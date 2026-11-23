@@ -24,12 +24,12 @@ _Route4AfterBattleText1::
 	done
 
 _Route4Text5::
-	text "Mt.Moon"
+	text "Mt. Moon"
 	line "Tunnel Entrance"
 	done
 
 _Route4Text6::
 	text "Route 4"
-	line "Mt.Moon -"
+	line "Mt. Moon -"
 	cont "Cerulean City"
 	done

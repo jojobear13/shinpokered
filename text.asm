@@ -498,7 +498,7 @@ _CinnabarPokecenterGuyText::
 
 _SaffronCityPokecenterGuyText1::
 	text "It would be great"
-	line "if the elite four"
+	line "if the Elite Four"
 	cont "came and stomped"
 	cont "Team Rocket!"
 	done
@@ -778,7 +778,7 @@ _ViridianSchoolNotebookText4::
 	para "Do so to earn the"
 	line "right to face..."
 
-	para "The elite four of"
+	para "The Elite Four of"
 	line "#mon League!"
 	prompt
 

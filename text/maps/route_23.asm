@@ -33,6 +33,6 @@ _VictoryRoadGuardText_513a3::
 	done
 
 _Route23Text8::
-	text "Victory Road gate"
+	text "Victory Road Gate"
 	line "- #mon League"
 	done
