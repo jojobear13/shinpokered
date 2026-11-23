@@ -1088,7 +1088,7 @@ _MewtwoDexEntry::
 	next "years of horrific"
 
 	page "gene splicing and"
-	next "dna engineering"
+	next "DNA engineering"
 	next "experiments"
 	dex
 

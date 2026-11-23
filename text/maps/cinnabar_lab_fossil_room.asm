@@ -159,7 +159,7 @@ _Lab4Text_Book1B::
 	line "gene-spliced"
 	cont "clone of your 1st"
 	cont "spot #mon with"
-	cont "dna from your 2nd"
+	cont "DNA from your 2nd"
 	cont "spot #mon."
 
 	para "A Punnet Square"
@@ -198,14 +198,14 @@ _Lab4Text_Book2B::
 	cont "Gene-B Lo allele."
 
 	para "Respectively they"
-	line "affect attack," 
-	cont "defense, speed,"
-	cont "and special in"
+	line "affect Attack," 
+	cont "Defense, Speed,"
+	cont "and Special in"
 	cont "that order."
 	done
 
 _Lab4Text_Book3A::
-	text "Mixing #mon dna"
+	text "Mixing #mon DNA"
 	prompt
 _Lab4Text_Book3B::
 

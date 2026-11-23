@@ -71,7 +71,7 @@ _Museum1FText_5c28e::
 	text "Ssh! I think that"
 	line "this chunk of"
 	cont "amber contains"
-	cont "#mon dna!"
+	cont "#mon DNA!"
 
 	para "It would be great"
 	line "if #mon could"

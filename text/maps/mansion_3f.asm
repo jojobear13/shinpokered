@@ -40,7 +40,7 @@ _Mansion3Text5::
 	text "Diary: Feb. 6"
 	line "A new #mon"
 	cont "was gestated with"
-	cont "Mew's superb dna."
+	cont "Mew's superb DNA."
 
 	para "An enhanced new"
 	line "species: Mewtwo."
