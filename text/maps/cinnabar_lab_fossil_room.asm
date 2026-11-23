@@ -198,10 +198,9 @@ _Lab4Text_Book2B::
 	cont "Gene-B Lo allele."
 
 	para "Respectively they"
-	line "affect Attack," 
+	line "affect Attack,"
 	cont "Defense, Speed,"
-	cont "and Special in"
-	cont "that order."
+	cont "and Special."
 	done
 
 _Lab4Text_Book3A::

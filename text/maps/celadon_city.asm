@@ -67,7 +67,8 @@ _CeladonCityText6::
 
 	para "It evolved from"
 	line "Poliwhirl when I"
-	cont "used Water Stone!"
+	cont "used a Water"
+	cont "Stone!"
 	done
 
 _CeladonCityText7::
@@ -111,7 +112,7 @@ _CeladonCityText13::
 	line "#mon Gym"
 	cont "Leader: Erika"
 
-	para "The Nature Loving"
+	para "The Nature-Loving"
 	line "Princess!"
 	done
 

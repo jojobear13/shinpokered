@@ -1,7 +1,7 @@
 _SafariZoneRestHouse1Text1::
 	text "Sara: Where did"
-	line "my boy friend,"
-	cont "erik, go?"
+	line "my boyfriend,"
+	cont "Eric, go?"
 	done
 
 _SafariZoneRestHouse1Text2::
