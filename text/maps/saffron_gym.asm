@@ -217,7 +217,7 @@ _SaffronGymAfterBattleText6::
 
 _SaffronGymBattleText7::
 	text "Saffron #mon"
-	line "gym is famous for"
+	line "Gym is famous for"
 	cont "its psychics!"
 
 	para "You want to see"

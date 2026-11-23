@@ -773,7 +773,7 @@ _ViridianSchoolNotebookText4::
 	line "#mon trainers"
 	cont "is to beat the "
 	cont "top 8 #mon"
-	cont "gym leaders."
+	cont "Gym leaders."
 
 	para "Do so to earn the"
 	line "right to face..."
