@@ -1368,7 +1368,7 @@ _CriticalHitText::
 	prompt
 
 _OHKOText::
-	text "One-hit ko!"
+	text "One-hit KO!"
 	prompt
 
 _LoafingAroundText::

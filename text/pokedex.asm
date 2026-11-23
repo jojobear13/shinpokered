@@ -985,9 +985,9 @@ _DugtrioDexEntry::
 
 	page "earthquakes by"
 IF DEF(_METRIC)
-	next "burrowing 60 miles"
-ELSE
 	next "burrowing 100 km"
+ELSE
+	next "burrowing 60 miles"
 ENDC
 	next "underground"
 	dex
@@ -1189,7 +1189,7 @@ _MarowakDexEntry::
 
 	page "bone skillfully"
 	next "like a boomerang"
-	next "to ko targets"
+	next "to KO targets"
 	dex
 
 _HaunterDexEntry::
