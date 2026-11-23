@@ -1,9 +1,9 @@
 _SafariZoneWestText5::
-	text "Rest house"
+	text "Rest House"
 	done
 
 _SafariZoneWestText6::
-	text "Request notice"
+	text "Request Notice"
 
 	para "Please find the"
 	line "safari warden's"

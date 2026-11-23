@@ -132,7 +132,7 @@ _VermilionCityText12::
 	done
 
 _VermilionCityText13::
-	text "Vermilion harbor"
+	text "Vermilion Harbor"
 	done
 
 _VermilionPKMNText::

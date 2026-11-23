@@ -1,5 +1,5 @@
 _SafariZoneCenterText2::
-	text "Rest house"
+	text "Rest House"
 	done
 
 _SafariZoneCenterText3::

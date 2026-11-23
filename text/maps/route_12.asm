@@ -135,7 +135,7 @@ _Route12Text11::
 	done
 
 _Route12Text12::
-	text "Sport fishing area"
+	text "Sport Fishing Area"
 	done
 
 _Route12TextUsePokeflute::

@@ -1,5 +1,5 @@
 _SafariZoneEastText5::
-	text "Rest house"
+	text "Rest House"
 	done
 
 _SafariZoneEastText6::
