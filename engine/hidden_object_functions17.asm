@@ -174,7 +174,7 @@ LinkCableHelpText2:
 HowToLinkText:
 	db   "How To Link"
 	next "Colosseum"
-	next "trade center"
+	next "Trade Center"
 	next "stop reading@"
 
 LinkCableInfoTexts:

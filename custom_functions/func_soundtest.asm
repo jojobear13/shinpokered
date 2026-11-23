@@ -181,7 +181,7 @@ SoundTestTrackList:
 	dw Title_Music_UnusedSong, (MUSIC_UNUSED_SONG << 8) | Bank(Music_UnusedSong)
 
 Title_Music_PalletTown: db "Pallet Town@"
-Title_Music_Pokecenter: db "#Mon Center@"
+Title_Music_Pokecenter: db "#mon Center@"
 Title_Music_Gym: db "Gym@"
 Title_Music_Cities1: db "City 1@"
 Title_Music_Cities2: db "City 2@"

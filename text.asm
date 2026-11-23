@@ -862,7 +862,7 @@ _LinkCableInfoText2::
 	prompt
 
 _LinkCableInfoText3::
-	text "Trade center is"
+	text "Trade Center is"
 	line "used for trading"
 	cont "#mon."
 	prompt

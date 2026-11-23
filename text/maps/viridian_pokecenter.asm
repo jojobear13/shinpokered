@@ -8,7 +8,7 @@ _ViridianPokeCenterText2::
 
 _ViridianPokeCenterText3::
 	text "There's a #mon"
-	line "center in every"
+	line "Center in every"
 	cont "town ahead."
 
 	para "They don't charge"
