@@ -2756,8 +2756,13 @@ PrintEndBattleText::
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
 	push hl
+	ld a, [wBattleResult]
+	and a
+	ld hl, TrainerEndBattleDialogue
+	jr z, .printDialogue
 	callba SaveTrainerName
 	ld hl, TrainerEndBattleText
+.printDialogue
 	call PrintText
 	pop hl
 	pop af
@@ -2785,6 +2790,7 @@ GetSavedEndBattleTextPointer::
 
 TrainerEndBattleText::
 	TX_FAR _TrainerNameText
+TrainerEndBattleDialogue:
 	TX_ASM
 	call GetSavedEndBattleTextPointer
 	call TextCommandProcessor
