@@ -9,7 +9,7 @@ _CeladonGymText_48a5e::
 
 	para "My name is Erika."
 	line "I am the leader"
-	cont "of Celadon gym."
+	cont "of Celadon Gym."
 
 	para "I teach the art of"
 	line "flower arranging."
@@ -197,7 +197,7 @@ _CeladonGymAfterBattleText7::
 
 _CeladonGymBattleText8::
 	text "Welcome to"
-	line "Celadon gym!"
+	line "Celadon Gym!"
 
 	para "You better not"
 	line "underestimate"

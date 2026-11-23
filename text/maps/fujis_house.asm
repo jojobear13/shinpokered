@@ -1,18 +1,19 @@
 _LavenderHouse1Text_1d8d1::
-	text "That's odd, mr.Fuji"
-	line "isn't here."
+	text "That's odd,"
+	line "Mr. Fuji isn't"
+	cont "here."
 	cont "Where'd he go?"
 	done
 
 _LavenderHouse1Text_1d8d6::
-	text "Mr.Fuji had been"
+	text "Mr. Fuji had been"
 	line "praying alone for"
 	cont "Cubone's mother."
 	done
 
 _LavenderHouse1Text_1d8f4::
 	text "This is really"
-	line "mr.Fuji's house."
+	line "Mr. Fuji's house."
 
 	para "He's really kind!"
 
@@ -34,7 +35,7 @@ _LavenderHouse1Text4::
 	text "Nidorino: Gaoo!@@"
 
 _LavenderHouse1Text_1d94c::
-	text "Mr.Fuji: <PLAYER>."
+	text "Mr. Fuji: <PLAYER>."
 
 	para "Your #dex quest"
 	line "may fail without"
@@ -68,7 +69,7 @@ _FluteNoRoomText::
 	done
 
 _MrFujiAfterFluteText::
-	text "Mr.Fuji: Has my"
+	text "Mr. Fuji: Has my"
 	line "flute helped you?"
 	done
 
@@ -87,7 +88,7 @@ _LavenderHouse1Text6::
 ;;;;;;;;;;;;;;;;;;;;;;joenote - adding text for fuji battle
 _FujiText_challenge::
 	text "Do you challenge"
-	line "mr.Fuji to a"
+	line "Mr. Fuji to a"
 	cont "#mon battle?"
 	done
 

@@ -15,7 +15,7 @@ _PewterCityText2::
 
 	para "They're all like"
 	line "Bug Catchers,"
-	cont "but Pewter gym's"
+	cont "but Pewter Gym's"
 	cont "Brock is totally"
 	cont "into it!"
 	done
@@ -77,7 +77,7 @@ _PewterCityText14::
 	done
 
 _PewterCityText6::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Any #mon that"
 	line "takes part in"

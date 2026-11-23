@@ -172,8 +172,8 @@ Printer_GetMonStats:
 .Stats:
 	db   "Attack"
 	next "Defense"
-	next "speed"
-	next "special@"
+	next "Speed"
+	next "Special@"
 
 .Blank:
 	db "--------------@"

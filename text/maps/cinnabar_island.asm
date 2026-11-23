@@ -4,7 +4,7 @@ _CinnabarIslandText8::
 	done
 
 _CinnabarIslandText1::
-	text "Cinnabar gym's"
+	text "Cinnabar Gym's"
 	line "Blaine is an odd"
 	cont "man who has lived"
 	cont "here for decades."

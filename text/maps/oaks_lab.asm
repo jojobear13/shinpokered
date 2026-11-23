@@ -522,7 +522,7 @@ _OakVictorySpeech::
 	line "fun battling is."
 	cont "A splendid match!"
 
-	para "You know mr.Fuji?"
+	para "You know Mr. Fuji?"
 	line "He used to study"
 	cont "powerful #mon."
 

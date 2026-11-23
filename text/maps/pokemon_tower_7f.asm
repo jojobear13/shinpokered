@@ -1,5 +1,5 @@
 _TowerRescueFujiText::
-	text "Mr.Fuji: Heh? You"
+	text "Mr. Fuji: Heh? You"
 	line "came to save me?"
 
 	para "Thank you. But, I"

@@ -24,5 +24,5 @@ _CeladonMart5Text2::
 	done
 
 _CeladonMart5Text5::
-	text "5F: Drug store"
+	text "5F: Drug Store"
 	done

@@ -3,7 +3,7 @@ _SafariZoneNorthText3::
 	done
 
 _SafariZoneNorthText4::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "The secret house"
 	line "is still ahead!"
@@ -14,7 +14,7 @@ _SafariZoneNorthText5::
 	done
 
 _SafariZoneNorthText6::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "#mon hide in"
 	line "tall grass!"
@@ -25,7 +25,7 @@ _SafariZoneNorthText6::
 	done
 
 _SafariZoneNorthText7::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Win a free HM for"
 	line "finding the"

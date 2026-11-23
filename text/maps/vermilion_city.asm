@@ -117,7 +117,7 @@ _VermilionCityText8::
 	done
 
 _VermilionCityText11::
-	text "#mon Fan club"
+	text "#mon Fan Club"
 	line "All #mon fans"
 	cont "welcome!"
 	done

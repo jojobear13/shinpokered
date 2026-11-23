@@ -85,7 +85,7 @@ _CeladonCityText9::
 	done
 
 _CeladonCityText10::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "X Accuracy boosts"
 	line "the accuracy of"
@@ -126,7 +126,7 @@ _CeladonCityText15::
 	done
 
 _CeladonCityText16::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 ;joenote - this description is totally wrong about guard spec
 ;	para "GUARD SPEC."

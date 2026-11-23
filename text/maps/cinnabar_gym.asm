@@ -3,7 +3,7 @@ _BlaineBattleText::
 
 	para "I am Blaine! I"
 	line "am the leader of"
-	cont "Cinnabar gym!"
+	cont "Cinnabar Gym!"
 
 	para "My fiery #mon"
 	line "will incinerate"

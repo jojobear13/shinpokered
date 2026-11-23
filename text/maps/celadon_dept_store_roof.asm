@@ -111,8 +111,8 @@ _CeladonMartRoofText4::
 	done
 
 _CeladonMartRoofText6::
-	text "Rooftop square:"
-	line "vending machines"
+	text "Rooftop Square:"
+	line "Vending Machines"
 	done
 
 _VendingMachineText1::

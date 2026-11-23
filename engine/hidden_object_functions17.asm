@@ -172,10 +172,10 @@ LinkCableHelpText2:
 	db "@"
 
 HowToLinkText:
-	db   "How To Link"
+	db   "How to Link"
 	next "Colosseum"
 	next "Trade Center"
-	next "stop reading@"
+	next "Stop Reading@"
 
 LinkCableInfoTexts:
 	dw LinkCableInfoText1

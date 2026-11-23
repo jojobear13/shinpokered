@@ -10,22 +10,22 @@ _CeladonMart1Text1::
 
 _CeladonMart1Text2::
 	text "1F: Service"
-	line "    counter"
+	line "    Counter"
 
-	para "2F: Trainer'S"
-	line "    market"
+	para "2F: Trainer's"
+	line "    Market"
 
-	para "3F: TV game shop"
+	para "3F: TV Game Shop"
 
-	para "4F: Wiseman gifts"
+	para "4F: Wiseman Gifts"
 
-	para "5F: Drug store"
+	para "5F: Drug Store"
 
-	para "Rooftop square:"
-	line "vending machines"
+	para "Rooftop Square:"
+	line "Vending Machines"
 	done
 
 _CeladonMart1Text3::
 	text "1F: Service"
-	line "    counter"
+	line "    Counter"
 	done

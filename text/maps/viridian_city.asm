@@ -18,7 +18,7 @@ _ViridianCityText_19122::
 	done
 
 _ViridianCityText_19127::
-	text "Viridian gym's"
+	text "Viridian Gym's"
 	line "leader returned!"
 	done
 
@@ -146,7 +146,7 @@ _ViridianCityText8::
 	done
 
 _ViridianCityText9::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Catch #mon"
 	line "and expand your"
@@ -158,7 +158,7 @@ _ViridianCityText9::
 	done
 
 _ViridianCityText10::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "The battle moves"
 	line "of #mon are"

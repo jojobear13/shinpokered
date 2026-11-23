@@ -194,7 +194,7 @@ _ViridianGymAfterBattleText7::
 	done
 
 _ViridianGymBattleText8::
-	text "Viridian gym was"
+	text "Viridian Gym was"
 	line "closed for a long"
 	cont "time, but now our"
 	cont "leader is back!"

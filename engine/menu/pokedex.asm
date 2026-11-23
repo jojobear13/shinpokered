@@ -672,7 +672,7 @@ IF DEF (_METRIC)
 	next "Wt   ???kg@"
 ELSE
 	db   "Ht  ?",$60,"??",$61
-	next "wt   ???lb@"
+	next "Wt   ???lb@"
 ENDC
 ; XXX does anything point to this?
 PokeText:

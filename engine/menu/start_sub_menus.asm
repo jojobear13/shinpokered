@@ -680,7 +680,7 @@ TrainerInfo_FarCopyData:
 TrainerInfo_NameMoneyTimeText:
 	db   "Name/"
 	next "Money/"
-	next "time/@"
+	next "Time/@"
 
 ; $76 is a circle tile
 TrainerInfo_BadgesText:

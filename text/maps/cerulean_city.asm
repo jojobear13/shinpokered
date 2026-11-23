@@ -208,7 +208,7 @@ _CeruleanCityText12::
 	done
 
 _CeruleanCityText13::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Pressing B Button"
 	line "during evolution"

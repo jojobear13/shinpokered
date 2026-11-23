@@ -34,7 +34,7 @@ TrainerNames:
 	db "Bruno@"
 	db "Brock@"
 	db "Misty@"
-	db "Lt.Surge@"
+	db "Lt. Surge@"
 	db "Erika@"
 	db "Koga@"
 	db "Blaine@"

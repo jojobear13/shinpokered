@@ -72,7 +72,7 @@ _ViridianForestText8::
 	done
 
 _ViridianForestText9::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "If you want to"
 	line "avoid battles,"
@@ -87,7 +87,7 @@ _ViridianForestText10::
 	done
 
 _ViridianForestText11::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Contact Prof.Oak"
 	line "via PC to get"
@@ -96,7 +96,7 @@ _ViridianForestText11::
 	done
 
 _ViridianForestText12::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "No stealing of"
 	line "#mon from"
@@ -106,7 +106,7 @@ _ViridianForestText12::
 	done
 
 _ViridianForestText13::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Weaken #mon"
 	line "before attempting"

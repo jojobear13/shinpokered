@@ -140,7 +140,7 @@ PrinterPCMenuText:
 	next "Print #dex"
 	next "Print #mon"
 	next "Print Box"
-	next "print diploma"
+	next "Print Diploma"
 	next "Cancel"
 	db "@"
 PrinterPCMenuText_noDiploma:
@@ -254,10 +254,10 @@ PCPrintSettings:
 PrinterPCSettingsText:
 	db   "Lightest"
 	next "Lighter"
-	next "normal"
-	next "darker"
-	next "darkest"
-	next "back"
+	next "Normal"
+	next "Darker"
+	next "Darkest"
+	next "Back"
 	db "@"
 PrinterPCSettingsTextSingle00:
 	db "Lightest@"

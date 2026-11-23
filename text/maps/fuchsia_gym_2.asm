@@ -200,7 +200,7 @@ _FuchsiaGymText_7564e::
 	text "Yo! Champ in"
 	line "making!"
 
-	para "Fuchsia gym is"
+	para "Fuchsia Gym is"
 	line "riddled with"
 	cont "invisible walls!"
 

@@ -16,7 +16,7 @@ _SafariZoneWestText6::
 	done
 
 _SafariZoneWestText7::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Zone Exploration"
 	line "Campaign!"
@@ -27,5 +27,5 @@ _SafariZoneWestText7::
 
 _SafariZoneWestText8::
 	text "Area 3"
-	line "east: Center area"
+	line "East: Center Area"
 	done

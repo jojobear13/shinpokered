@@ -834,7 +834,7 @@ _KabutopsFossilText::
 	done
 
 _LinkCableHelpText1::
-	text "Trainer tips"
+	text "Trainer Tips:"
 
 	para "Using a Game Link"
 	line "Cable"

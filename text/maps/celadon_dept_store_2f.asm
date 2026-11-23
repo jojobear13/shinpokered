@@ -17,6 +17,6 @@ _CeladonMart2Text5::
 	text "Top Grade Items"
 	line "for Trainers!"
 
-	para "2F: Trainer'S"
-	line "    market"
+	para "2F: Trainer's"
+	line "    Market"
 	done

@@ -118,7 +118,7 @@ _CeladonMart3Text13::
 	done
 
 _CeladonMart3Text14::
-	text "3F: TV game shop"
+	text "3F: TV Game Shop"
 	done
 
 _CeladonMart3Text15::
