@@ -12,7 +12,7 @@ _SafariZoneWestText6::
 	cont "here somewhere."
 
 	para "Reward offered!"
-	line "Contact: warden"
+	line "Contact: Warden"
 	done
 
 _SafariZoneWestText7::

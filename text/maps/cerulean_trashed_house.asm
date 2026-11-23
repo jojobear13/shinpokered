@@ -20,7 +20,7 @@ _CeruleanTrashedText_1d6b0::
 
 	para "I decided to teach"
 	line "Diglett how to"
-	cont "dig without a TM!"
+	cont "Dig without a TM!"
 	done
 
 _CeruleanHouseTrashedText2::

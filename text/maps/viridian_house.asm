@@ -65,7 +65,7 @@ _ClauseBrother_TrapIntro::
 _ClauseBrother_TrapDesc::
 	text "With my stamp,"
 	line "trapping moves"
-	cont "like wrap will"
+	cont "like Wrap will"
 	cont "start going 2nd"
 	cont "if trying to use"
 	cont "them more than 2x"

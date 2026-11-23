@@ -640,7 +640,7 @@ GBPrinter_UpdateStatusMessage:
 .Error2:
 	db   " Printer Error 2"
 	next ""
-	next "Game Link cable is"
+	next "Game Link Cable is"
 	next "not connected.@"
 .Error3:
 	db   " Printer Error 3"
