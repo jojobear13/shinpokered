@@ -97,8 +97,8 @@ _PewterCityText7::
 	done
 
 _PewterCityText10::
-	text "Pewter museum"
-	line "of science"
+	text "Pewter Museum"
+	line "of Science"
 	done
 
 _PewterCityText11::
