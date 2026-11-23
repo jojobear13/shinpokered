@@ -75,7 +75,7 @@ ItemNames:
 	db "Silph Scope@"
 	db "Poké Flute@"
 	db "Lift Key@"
-	db "Exp.Share@"
+	db "EXP Share@"
 	db "Old Rod@"
 	db "Good Rod@"
 	db "Super Rod@"

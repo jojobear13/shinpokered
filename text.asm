@@ -1438,7 +1438,7 @@ _GainedText::
 ;	cont "@@"
 ;joenote - making this less annoying
 _WithExpAllText::
-	text "Exp.Share gives"
+	text "EXP Share gives"
 	line "the team"
 	cont "@@"
 
