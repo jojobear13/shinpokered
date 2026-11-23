@@ -1414,7 +1414,7 @@ _SubstituteBrokeText::
 
 _BuildingRageText::
 	text "<USER>'s"
-	line "rage is building!"
+	line "Rage is building!"
 	prompt
 
 _MirrorMoveFailedText::

@@ -54,7 +54,7 @@ _CeladonGymText9::
 
 	para "It also allows"
 	line "#mon to use"
-	cont "strength in and"
+	cont "Strength in and"
 	cont "out of battle."
 
 	para "Please also take"
