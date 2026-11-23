@@ -41,7 +41,7 @@ _BikeShopText_1d824::
 ;joenote - add hotkey info
 	cont "for a Bicycle."
 	para "Hold A and press"
-	line "select to get on"
+	line "Select to get on"
 	cont "or off quickly.@@"
 
 

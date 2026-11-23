@@ -41,7 +41,7 @@ _WardenThankYouText::
 	cont "your trouble."
 
 ;joenote - add hotkey info
-	para "Press select when"
+	para "Press Select when"
 	line "facing a boulder"
 	cont "to activate it."	
 	prompt

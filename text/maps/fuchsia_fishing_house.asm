@@ -19,7 +19,7 @@ _FuchsiaHouse3Text_561c2::
 
 ;joenote - add hotkey info
 	para "Hold A and press"
-	line "select to use the"
+	line "Select to use the"
 	cont "rod quickly.@@"
 
 	para "<PLAYER> received"

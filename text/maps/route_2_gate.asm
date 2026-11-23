@@ -4,7 +4,7 @@ _Route2GateText_5d616::
 	cont "darkest dungeons."
 	
 ;joenote - add hotkey info
-	para "Press select when"
+	para "Press Select when"
 	line "you are in a dark"
 	cont "area to use it."	
 	done

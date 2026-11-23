@@ -14,7 +14,7 @@ _SecretHouseText_4a350::
 	line "You have won!"
 
 ;joenote - add hotkey info
-	para "Press select when"
+	para "Press Select when"
 	line "you are facing a"
 	cont "shore to use it."	
 	prompt

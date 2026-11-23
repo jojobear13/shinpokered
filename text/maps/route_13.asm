@@ -167,7 +167,7 @@ _Route13Text11::
 _Route13Text12::
 	text "Trainer tips"
 
-	para "Use select to"
+	para "Use Select to"
 	line "switch items in"
 	cont "the item window!"
 	done

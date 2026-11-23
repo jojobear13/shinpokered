@@ -30,7 +30,7 @@ _ReceivingHM01Text::
 	cont "any time!"
 	
 ;joenote - add hotkey info
-	para "Press select when"
+	para "Press Select when"
 	line "facing grass or a"
 	cont "bush to use it."	
 	prompt

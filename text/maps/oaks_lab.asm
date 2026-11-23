@@ -347,7 +347,7 @@ _OaksLabText26::
 	para "And you can auto-"
 	line "sort an item menu"
 	cont "by simply holding"
-	cont "select while you"
+	cont "Select while you"
 	cont "press Start."
 	done
 

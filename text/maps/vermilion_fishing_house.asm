@@ -18,7 +18,7 @@ _VermilionHouse2Text_560b6::
 
 ;joenote - add hotkey info
 	para "Hold A and press"
-	line "select to use the"
+	line "Select to use the"
 	cont "rod quickly.@@"
 
 	para "<PLAYER> received"
