@@ -9116,7 +9116,7 @@ StatsTextStrings:
 	db "Defense@"
 	db "Speed@"
 	db "Special@"
-	db "Accuracy@"
+	db "accuracy@"
 	db "Evade@"
 
 BideEffect:
