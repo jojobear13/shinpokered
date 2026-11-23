@@ -65,7 +65,7 @@ _Route15EndBattleText4::
 
 _Route15AfterBattleText4::
 	text "Did you know moves"
-	line "like earthquake"
+	line "like Earthquake"
 	cont "don't have any"
 	cont "effect on birds?"
 	done

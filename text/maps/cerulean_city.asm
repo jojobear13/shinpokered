@@ -135,7 +135,7 @@ _CeruleanCityText6::
 
 _CeruleanCityText_19730::
 	text "Okay! Slowbro!"
-	line "Use sonicboom!"
+	line "Use Sonicboom!"
 	cont "Come on, Slowbro"
 	cont "pay attention!"
 	done
@@ -147,7 +147,7 @@ _CeruleanCityText_19735::
 	done
 
 _CeruleanCityText_1973a::
-	text "Slowbro, withdraw!"
+	text "Slowbro, Withdraw!"
 	line "No! That's wrong!"
 
 	para "It's so hard to"

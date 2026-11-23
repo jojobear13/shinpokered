@@ -47,7 +47,7 @@ _Route8AfterBattleText3::
 	done
 
 _Route8BattleText4::
-	text "I like nidoran, so"
+	text "I like Nidoran, so"
 	line "I collect them!"
 	done
 
