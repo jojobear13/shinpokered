@@ -175,5 +175,5 @@ _Route13Text12::
 _Route13Text13::
 	text "Route 13"
 	line "North to Silence"
-	cont "bridge"
+	cont "Bridge"
 	done
