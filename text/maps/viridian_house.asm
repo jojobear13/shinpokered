@@ -19,7 +19,7 @@ _ViridianHouseText_1d5b1::
 
 _ViridianHouseText4::
 	text "Spearow"
-	line "Name: speary"
+	line "Name: Speary"
 	done
 
 ;joenote - adding clause brothers
