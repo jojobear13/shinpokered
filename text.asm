@@ -1788,7 +1788,7 @@ _CantDepositLastMonText::
 	prompt
 
 _BoxFullText::
-	text "Oops! This Box is"
+	text "Oops! This box is"
 	line "full of #mon."
 	prompt
 
