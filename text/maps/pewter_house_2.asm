@@ -14,7 +14,7 @@ _PewterHouse2Text1::
 	cont "in the forest."
 	
 	para "The #mon struck"
-	line "the leaf-fy trees"
+	line "the leafy trees"
 	cont "so much that it"
 	cont "grew extra arms!"
 	done
