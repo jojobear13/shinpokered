@@ -48,7 +48,7 @@ _SilphCo9AfterBattleText2::
 
 _SilphCo9BattleText3::
 	text "I am one of the 4"
-	line "rocket brothers!"
+	line "Rocket Brothers!"
 	done
 
 _SilphCo9EndBattleText3::

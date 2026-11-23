@@ -348,7 +348,7 @@ MagikarpSalesmanText_FlyingPikachu:
 	text "Man: Ever see a"
 	line "flying Pikachu?"
 	para "I'll teach yours"
-	line "the move fly for"
+	line "the move Fly for"
 	cont "a measly ¥2000!"
 	cont "What do you say?"
 	done
@@ -372,7 +372,7 @@ MagikarpSalesmanText_FlyingPikachu:
 	cont "like so. And..."
 	cont "Done!"
 	para "Your Pikachu has"
-	line "learned fly!"
+	line "learned Fly!"
 	done
 	db "@"
 

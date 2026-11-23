@@ -17,7 +17,7 @@ _ReceivedTM36Text::
 
 _TM36ExplanationText::
 	text "TM36 is"
-	line "selfdestruct!"
+	line "Selfdestruct!"
 
 	para "It's powerful, but"
 	line "the #mon that"

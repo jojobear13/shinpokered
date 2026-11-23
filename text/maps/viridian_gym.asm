@@ -66,7 +66,7 @@ _ReceivedTM27Text::
 
 _TM27ExplanationText::
 	db $0
-	para "TM27 is fissure!"
+	para "TM27 is Fissure!"
 	line "It will take out"
 	cont "#mon with just"
 	cont "one hit!"

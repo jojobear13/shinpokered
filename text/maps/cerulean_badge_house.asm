@@ -29,7 +29,7 @@ _CeruleanHouse2Text_74e96::
 	cont "a little bit."
 
 	para "It also lets you"
-	line "use flash any"
+	line "use Flash any"
 	cont "time you desire."
 	prompt
 
@@ -41,7 +41,7 @@ _CeruleanHouse2Text_74e9b::
 	line "become unruly!"
 
 	para "It also lets you"
-	line "use cut outside"
+	line "use Cut outside"
 	cont "of battle."
 	prompt
 
@@ -51,7 +51,7 @@ _CeruleanHouse2Text_74ea0::	;joenote - updated with correct information
 	cont "a little bit."
 
 	para "It also lets you"
-	line "use fly outside"
+	line "use Fly outside"
 	cont "of battle."
 	prompt
 
@@ -63,7 +63,7 @@ _CeruleanHouse2Text_74ea5::
 	line "become unruly!"
 
 	para "It also lets you"
-	line "use strength out-"
+	line "use Strength out-"
 	cont "side of battle."
 	prompt
 
@@ -73,7 +73,7 @@ _CeruleanHouse2Text_74eaa:: ;joenote - updated with correct information
 	cont "a little bit."
 
 	para "It also lets you"
-	line "use surf outside"
+	line "use Surf outside"
 	cont "of battle."
 	prompt
 

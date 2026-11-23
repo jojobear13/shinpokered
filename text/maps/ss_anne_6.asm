@@ -162,5 +162,5 @@ _SSAnne6Text_GymGuy_pikachu::
 	
 	para "In recongnition,"
 	line "I've made it able"
-	cont "to learn surf!"
+	cont "to learn Surf!"
 	prompt

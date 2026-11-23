@@ -50,13 +50,13 @@ _SSAnneRivalWonText::
 
 _SSAnneRivalCaptainText::
 	text "<RIVAL>: I heard"
-	line "there was a cut"
+	line "there was a Cut"
 	cont "master on board."
 
 	para "But, he was just a"
 	line "seasick, old man!"
 
-	para "But, cut itself is"
+	para "But, Cut itself is"
 	line "really useful!"
 
 	para "You should go see"

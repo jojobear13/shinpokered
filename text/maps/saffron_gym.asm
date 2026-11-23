@@ -60,7 +60,7 @@ ReceivedTM46Text::
 
 _TM46ExplanationText::
 	db $0
-	para "TM46 is psywave!"
+	para "TM46 is Psywave!"
 	line "It uses powerful"
 	cont "psychic waves to"
 	cont "inflict damage!"

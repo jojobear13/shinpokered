@@ -404,7 +404,7 @@ _OaksLabText_44201::
 _OaksLabText_44206::
 	text "You're on the"
 	line "right track! "
-	cont "Get a flash HM"
+	cont "Get a Flash HM"
 	cont "from my aide!"
 	done
 

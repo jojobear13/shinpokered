@@ -47,7 +47,7 @@ _ReceivedTM41Text::
 
 _TM41ExplanationText::
 	text "TM41 teaches"
-	line "softboiled!"
+	line "Softboiled!"
 
 	para "Only one #mon"
 	line "can use it!"
@@ -138,7 +138,7 @@ _CeladonCityText16::
 	line "protects #mon"
 	cont "from stat-down"
 	cont "attacks such as"
-	cont "leer and growl!"
+	cont "Leer and Growl!"
 
 	para "Get your items at"
 	line "Celadon Dept."

@@ -36,7 +36,7 @@ _TM34ExplanationText::
 	cont "carefully!"
 
 	para "TM34 contains"
-	line "bide!"
+	line "Bide!"
 
 	para "Your #mon will"
 	line "absorb damage in"
@@ -71,7 +71,7 @@ _PewterGymText_5c4c1::
 	cont "more powerful!"
 
 	para "The technique"
-	line "flash can now be"
+	line "Flash can now be"
 	cont "used any time!"
 	prompt
 

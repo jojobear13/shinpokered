@@ -14,7 +14,7 @@ _ReceivedTM18Text::
 	text "!@@"
 
 _TM18ExplanationText::
-	text "TM18 is counter!"
+	text "TM18 is Counter!"
 	line "Not like the one"
 	cont "I'm leaning on,"
 	cont "mind you!"

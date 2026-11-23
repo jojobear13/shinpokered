@@ -3,5 +3,5 @@ _SSAnne3Text1::
 	line "sword master!"
 
 	para "He even teaches"
-	line "cut to #mon!"
+	line "Cut to #mon!"
 	done

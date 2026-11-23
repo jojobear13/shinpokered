@@ -16,7 +16,7 @@ _ReceivingHM01Text::
 	cont "feel much better!"
 
 	para "You want to see"
-	line "my cut technique?"
+	line "my Cut technique?"
 
 	para "I could show you"
 	line "if I wasn't ill..."

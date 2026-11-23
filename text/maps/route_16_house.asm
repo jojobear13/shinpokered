@@ -13,7 +13,7 @@ _ReceivedHM02Text::
 	line "HM02!@@"
 
 _HM02ExplanationText::
-	text "HM02 is fly."
+	text "HM02 is Fly."
 	line "It will take you"
 	cont "back to any town."
 

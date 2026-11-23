@@ -26,7 +26,7 @@ _ReceivedHM03Text::
 	text "!@@"
 
 _HM03ExplanationText::
-	text "HM03 is surf!"
+	text "HM03 is Surf!"
 
 	para "#mon will be"
 	line "able to ferry you"

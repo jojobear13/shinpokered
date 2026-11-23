@@ -57,7 +57,7 @@ _SilphCo6Text_1a2ab::
 
 _SilphCo6BattleText2::
 	text "I am one of the 4"
-	line "rocket brothers!"
+	line "Rocket Brothers!"
 	done
 
 _SilphCo6EndBattleText2::

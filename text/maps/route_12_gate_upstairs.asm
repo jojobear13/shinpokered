@@ -14,7 +14,7 @@ _ReceivedTM39Text::
 
 _TM39ExplanationText::
 	text "TM39 is a move"
-	line "called swift."
+	line "called Swift."
 
 	para "It's very accurate,"
 	line "so use it during"

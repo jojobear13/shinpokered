@@ -35,7 +35,7 @@ _ReceivedTM31Text::
 _TM31ExplanationText1::
 	db $0
 	para "TM31 contains my"
-	line "favorite, mimic!"
+	line "favorite, Mimic!"
 
 	para "Use it on a good"
 	line "#mon!@@"

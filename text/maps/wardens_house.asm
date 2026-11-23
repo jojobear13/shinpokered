@@ -54,7 +54,7 @@ _ReceivedHM04Text::
 
 _HM04ExplanationText::
 	text "Warden: HM04"
-	line "teaches strength!"
+	line "teaches Strength!"
 
 	para "It lets #mon"
 	line "move boulders"
@@ -69,7 +69,7 @@ _HM04ExplanationText::
 	line "win an HM!"
 
 	para "I hear it's the"
-	line "rare surf HM."
+	line "rare Surf HM."
 	done
 
 _HM04NoRoomText::

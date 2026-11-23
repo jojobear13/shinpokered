@@ -19,7 +19,7 @@ _CeruleanGymText_5c7be::
 
 _CeruleanGymText_5c7c3::
 	text "TM11 teaches"
-	line "bubblebeam!"
+	line "Bubblebeam!"
 
 	para "Use it on an"
 	line "aquatic #mon!"
@@ -34,7 +34,7 @@ _CeruleanGymText_5c7c8::
 	line "even outsiders!"
 
 	para "There's more, you"
-	line "can now use cut"
+	line "can now use Cut"
 	cont "any time!"
 
 	para "You can cut down"

@@ -1,6 +1,6 @@
 _KogaExplainToxicText::
 	text "When afflicted by"
-	line "toxic, #mon"
+	line "Toxic, #mon"
 	cont "suffer more and"
 	cont "more as battle"
 	cont "progresses!"
@@ -17,7 +17,7 @@ _FuchsiaGymText9::
 	cont "increases!"
 
 	para "It also lets you"
-	line "surf outside of"
+	line "Surf outside of"
 	cont "battle!"
 
 	para "Ah! Take this"
@@ -33,7 +33,7 @@ _ReceivedTM06Text::
 _TM06ExplanationText::
 	db $0
 	para "TM06 contains"
-	line "toxic!"
+	line "Toxic!"
 
 	para "It is a secret"
 	line "technique over"

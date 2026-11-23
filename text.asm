@@ -629,8 +629,8 @@ _BillsHouseMonitorText::
 
 _BillsHouseInitiatedText::
 	text "<PLAYER> initiated"
-	line "teleporter's Cell"
-	cont "Separator!@@"
+	line "the Cell"
+	cont "Separation System!@@"
 
 _BillsHousePokemonListText1::
 	text "Bill's favorite"
@@ -2677,7 +2677,7 @@ _CableClubNPCMakingPreparationsText::
 _UsedStrengthText::
 	TX_RAM wcd6d
 	text " used"
-	line "strength.@@"
+	line "Strength.@@"
 
 _CanMoveBouldersText::
 	TX_RAM wcd6d
@@ -2708,13 +2708,13 @@ _WarpToLastPokemonCenterText::
 _CannotUseTeleportNowText::
 	TX_RAM wcd6d
 	text " can't"
-	line "use teleport now."
+	line "use Teleport now."
 	prompt
 
 _CannotFlyHereText::
 	TX_RAM wcd6d
 	text " can't"
-	line "fly here."
+	line "Fly here."
 	prompt
 
 _NotHealthyEnoughText::
@@ -3211,7 +3211,7 @@ _NothingToCutText::
 _UsedCutText::
 	TX_RAM wcd6d
 	text " hacked"
-	line "away with cut!"
+	line "away with Cut!"
 	prompt
 
 ;joenote - for field move slot
