@@ -32,8 +32,8 @@ _PalletTownText3::
 	done
 
 _PalletTownText4::
-	text "Oak #mon"
-	line "research lab"
+	text "Oak Pokémon"
+	line "Research Lab"
 	done
 
 _PalletTownText5::
