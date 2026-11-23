@@ -81,7 +81,7 @@ _ClauseBrother_HyperbeamDesc::
 	line "the powerful move"
 	cont "Hyper Beam need"
 	cont "not recharge if"
-	cont "it knocks-out the"
+	cont "it knocks out the"
 	cont "opposing #mon!"
 	done
 

@@ -128,7 +128,7 @@ _TXTMist_Stone:
 	para "An object shines"
 	line "a little ways in."
 	
-	para "You recieved the"
+	para "You received the"
 	line "Mist Stone!@@"
 	db "@"
 	

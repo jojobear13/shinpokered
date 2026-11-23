@@ -162,7 +162,7 @@ _Lab4Text_Book1B::
 	cont "DNA from your 2nd"
 	cont "spot #mon."
 
-	para "A Punnet Square"
+	para "A Punnett Square"
 	line "analysis is done"
 	cont "on each gene,"
 	cont "and a predicted"
@@ -209,7 +209,7 @@ _Lab4Text_Book3A::
 	prompt
 _Lab4Text_Book3B::
 
-	text "Punnet Squares"
+	text "Punnett Squares"
 	line "mix two A genes"
 	cont "or two B genes."
 

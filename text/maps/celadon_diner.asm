@@ -61,7 +61,7 @@ _CeladonDinerText_491b7::
 ;joenote - add text for catch-up exp boost
 _CeladonDiner_EXPCatchUpON::
 	text "This spicy ketchup"
-	line "helps me catch-up"
+	line "helps me catch up"
 	cont "with my studies."
 	
 	para "It can also make"
