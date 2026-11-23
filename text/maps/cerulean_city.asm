@@ -234,7 +234,7 @@ ENDC
 _CeruleanCityText17::
 	text "Cerulean City"
 	line "#mon Gym"
-	cont "leader: Misty"
+	cont "Leader: Misty"
 
 	para "The Tomboyish"
 	line "Mermaid!"

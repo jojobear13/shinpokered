@@ -36,7 +36,7 @@ _CinnabarIslandText6::
 _CinnabarIslandText7::
 	text "Cinnabar Island"
 	line "#mon Gym"
-	cont "leader: Blaine"
+	cont "Leader: Blaine"
 
 	para "The Hot-Headed"
 	line "Quiz Master!"
