@@ -22,7 +22,7 @@ _LanceBeforeBattleText::
 	para "Well, are you"
 	line "ready to lose?"
 
-	para "Your league"
+	para "Your League"
 	line "challenge ends"
 	cont "with me, <PLAYER>!"
 	done
@@ -32,7 +32,7 @@ _LanceEndBattleText::
 
 	para "I hate to admit"
 	line "it, but you are a"
-	cont "#mon master!"
+	cont "#mon Master!"
 	prompt
 
 _LanceAfterBattleText::

@@ -59,7 +59,7 @@ MirrorTrainerNotReady:
 	
 	para "I'll be ready"
 	line "after the #mon"
-	cont "league finals are"
+	cont "League finals are"
 	cont "over."
 	done
 	db "@"

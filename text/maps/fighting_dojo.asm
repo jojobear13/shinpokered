@@ -53,7 +53,7 @@ _FightingDojoEndBattleText1::
 
 _FightingDojoAfterBattleText1::
 	text "You wait 'til you"
-	line "see our Master!"
+	line "see our master!"
 
 	para "I'm a small fry"
 	line "compared to him!"
@@ -70,7 +70,7 @@ _FightingDojoEndBattleText2::
 	prompt
 
 _FightingDojoAfterBattleText2::
-	text "Our Master is a"
+	text "Our master is a"
 	line "pro fighter!"
 	done
 

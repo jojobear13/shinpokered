@@ -571,7 +571,7 @@ _CinnabarQuizQuestionsText1::
 _CinnabarQuizQuestionsText2::
 	text "There are 9"
 	line "certified #mon"
-	cont "league badges?"
+	cont "League badges?"
 	done
 
 _CinnabarQuizQuestionsText3::
@@ -1755,10 +1755,10 @@ _TossHowManyText::
 
 _AccessedHoFPCText::
 	text "Accessed #mon"
-	line "league's site."
+	line "League's site."
 
-	para "Accessed the hall"
-	line "of fame List."
+	para "Accessed the Hall"
+	line "of Fame list."
 	prompt
 
 _SwitchOnText::

@@ -129,7 +129,7 @@ _FuchsiaGymAfterBattleText4::
 _FuchsiaGymBattleText5::
 	text "I also study the"
 	line "way of the ninja"
-	cont "with master Koga!"
+	cont "with Master Koga!"
 
 	para "Ninja have a long"
 	line "history of using"

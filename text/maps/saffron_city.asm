@@ -36,8 +36,8 @@ _SaffronCityText7::
 	done
 
 _SaffronCityText8::
-	text "You beat team"
-	line "rocket all alone?"
+	text "You beat Team"
+	line "Rocket all alone?"
 	cont "That's amazing!"
 	done
 

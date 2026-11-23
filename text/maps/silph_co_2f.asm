@@ -43,8 +43,8 @@ _SilphCo2EndBattleText1::
 
 _SilphCo2AfterBattleText1::
 	text "I work for both"
-	line "Silph and team"
-	cont "rocket!"
+	line "Silph and Team"
+	cont "Rocket!"
 	done
 
 _SilphCo2BattleText2::

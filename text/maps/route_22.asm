@@ -19,7 +19,7 @@ _Route22RivalBeforeBattleText1::
 
 _Route22RivalAfterBattleText1::
 	text "I heard #mon"
-	line "league has many"
+	line "League has many"
 	cont "tough trainers!"
 
 	para "I have to figure"

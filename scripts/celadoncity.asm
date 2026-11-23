@@ -115,8 +115,8 @@ CeladonCityText8_alternate:
 	cont "guy at the dept."
 	cont "Store on the sly."
 	
-	para "Who needs team"
-	line "rocket for money?"
+	para "Who needs Team"
+	line "Rocket for money?"
 	done
 	db "@"
 

@@ -3,8 +3,8 @@ _ViridianGymText_74ace::
 	line "my hideout!"
 
 	para "I planned to"
-	line "resurrect team"
-	cont "rocket here!"
+	line "resurrect Team"
+	cont "Rocket here!"
 
 	para "But, you have"
 	line "caught me again!"
@@ -53,11 +53,11 @@ _ViridianGymText12::
 
 	para "With it, you can"
 	line "enter the #mon"
-	cont "league!"
+	cont "League!"
 
 	para "It is my gift for"
 	line "your #mon"
-	cont "league challenge!"
+	cont "League challenge!"
 	done
 
 _ReceivedTM27Text::

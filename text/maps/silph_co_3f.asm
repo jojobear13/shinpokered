@@ -26,8 +26,8 @@ _SilphCo3AfterBattleText1::
 	done
 
 _SilphCo3BattleText2::
-	text "I support team"
-	line "rocket more than"
+	text "I support Team"
+	line "Rocket more than"
 	cont "I support Silph!"
 	done
 

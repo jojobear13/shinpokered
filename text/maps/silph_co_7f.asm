@@ -155,8 +155,8 @@ _SilphCo7Text_51ec3::
 	cont "turn up if I"
 	cont "waited here!"
 
-	para "I guess team"
-	line "rocket slowed you"
+	para "I guess Team"
+	line "Rocket slowed you"
 	cont "down! Not that I"
 	cont "care!"
 

@@ -80,8 +80,8 @@ _CeladonCityText8::
 	done
 
 _CeladonCityText9::
-	text "Keep out of team"
-	line "rocket's way!"
+	text "Keep out of Team"
+	line "Rocket's way!"
 	done
 
 _CeladonCityText10::

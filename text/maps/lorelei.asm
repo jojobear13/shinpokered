@@ -33,7 +33,7 @@ _LoreleiAfterBattleText::
 
 	para "You only got a"
 	line "taste of #mon"
-	cont "league power!"
+	cont "League power!"
 	done
 
 _LoreleiDontRunAwayText::
