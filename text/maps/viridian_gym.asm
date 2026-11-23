@@ -24,7 +24,7 @@ _ViridianGymText_74ad3::
 	cont "intense fight!"
 	cont "You have won!"
 	cont "As proof, here is"
-	cont "the Earthbadge!@@"
+	cont "the Earth Badge!@@"
 
 _ViridianGymText_74ad9::
 	text "Having lost to"
@@ -43,7 +43,7 @@ _ViridianGymText_74ad9::
 	cont "Farewell!@@"
 
 _ViridianGymText12::
-	text "The Earthbadge"
+	text "The Earth Badge"
 	line "makes #mon of"
 	cont "any level obey!"
 

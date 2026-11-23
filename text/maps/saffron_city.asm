@@ -96,7 +96,7 @@ _SaffronCityText16::
 	done
 
 _SaffronCityText17::
-	text "Fighting dojo"
+	text "Fighting Dojo"
 	done
 
 _SaffronCityText18::
@@ -134,12 +134,12 @@ _SaffronCityText21::
 
 _SaffronCityText22::
 	text "Silph Co."
-	line "Office building"
+	line "Office Building"
 	done
 
 _SaffronCityText24::
-	text "Mr.Psychic's"
-	line "house"
+	text "Mr. Psychic's"
+	line "House"
 	done
 
 _SaffronCityText25::

@@ -13,7 +13,7 @@ _Route16GateUpstairsText_4983b::
 	text "Looked into the"
 	line "binoculars."
 
-	para "It's Celadon dept."
+	para "It's Celadon Dept."
 	line "Store!"
 	done
 

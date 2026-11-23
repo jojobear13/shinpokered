@@ -27,7 +27,7 @@ _SaffronGymText_5d167::
 	cont "to win!"
 
 	para "You earned the"
-	line "Marshbadge!@@"
+	line "Marsh Badge!@@"
 
 _SaffronGymText_5d16e::
 	text "Everyone has"
@@ -37,7 +37,7 @@ _SaffronGymText_5d16e::
 	done
 
 _SaffronGymText_5d173::
-	text "The Marshbadge"
+	text "The Marsh Badge"
 	line "makes #mon up"
 	cont "to L70 obey you!"
 
@@ -208,7 +208,7 @@ _SaffronGymAfterBattleText6::
 	line "2 #mon gyms in"
 	cont "Saffron."
 
-	para "The fighting dojo"
+	para "The Fighting Dojo"
 	line "next door lost"
 	cont "its gym status"
 	cont "when we went and"

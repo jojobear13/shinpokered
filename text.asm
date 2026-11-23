@@ -793,7 +793,7 @@ _WhatGoesAroundComesAroundText::
 	done
 
 _FightingDojoText::
-	text "Fighting dojo"
+	text "Fighting Dojo"
 	done
 
 _IndigoPlateauHQText::
@@ -847,8 +847,8 @@ _LinkCableHelpText2::
 
 _LinkCableInfoText1::
 	text "When you have"
-	line "linked your game"
-	cont "boy with another"
+	line "linked your Game"
+	cont "Boy with another"
 	cont "Game Boy, talk to"
 	cont "the attendant on"
 	cont "the right in any"

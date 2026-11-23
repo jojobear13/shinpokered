@@ -9,7 +9,7 @@ _CeladonGameCornerText1::
 
 _CeladonGameCornerText_48d22::
 	text "Welcome to rocket"
-	line "game corner!"
+	line "Game Corner!"
 
 	para "Do you need some"
 	line "game coins?"

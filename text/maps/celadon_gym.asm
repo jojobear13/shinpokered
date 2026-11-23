@@ -33,7 +33,7 @@ _CeladonGymText_48a63::
 	line "strong."
 
 	para "I must confer you"
-	line "the Rainbowbadge."
+	line "the Rainbow Badge."
 	prompt
 
 _CeladonGymText_48a68::
@@ -48,7 +48,7 @@ _CeladonGymText_48a68::
 	done
 
 _CeladonGymText9::
-	text "The Rainbowbadge"
+	text "The Rainbow Badge"
 	line "will make #mon"
 	cont "up to L50 obey."
 

@@ -227,7 +227,7 @@ ELSE
 _CeruleanCityText16::
 	text "Grass and caves"
 	line "handled easily!"
-	cont "Bike shop"
+	cont "Bike Shop"
 	done
 ENDC
 

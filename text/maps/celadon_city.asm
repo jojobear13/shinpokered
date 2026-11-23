@@ -14,7 +14,7 @@ _CeladonCityText2::
 	done
 
 _CeladonCityText3::
-	text "The game corner"
+	text "The Game Corner"
 	line "is bad for our"
 	cont "city's image!"
 	done
@@ -96,7 +96,7 @@ _CeladonCityText10::
 	cont "critical hits!"
 
 	para "Get your items at"
-	line "Celadon dept."
+	line "Celadon Dept."
 	cont "Store!"
 	done
 
@@ -122,7 +122,7 @@ _CeladonCityText14::
 _CeladonCityText15::
 	text "Find what you"
 	line "need at Celadon"
-	cont "dept. Store!"
+	cont "Dept. Store!"
 	done
 
 _CeladonCityText16::
@@ -141,18 +141,18 @@ _CeladonCityText16::
 	cont "leer and growl!"
 
 	para "Get your items at"
-	line "Celadon dept."
+	line "Celadon Dept."
 	cont "Store!"
 	done
 
 _CeladonCityText17::
 	text "Coins exchanged"
 	line "for prizes!"
-	cont "Prize exchange"
+	cont "Prize Exchange"
 	done
 
 _CeladonCityText18::
-	text "Rocket game corner"
+	text "Rocket Game Corner"
 	line "The playground"
 	cont "for grown-ups!"
 	done

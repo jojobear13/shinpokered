@@ -9112,10 +9112,10 @@ PrintStatText:
 	jp CopyData
 
 StatsTextStrings:
-	db "attack@"
-	db "defense@"
-	db "speed@"
-	db "special@"
+	db "Attack@"
+	db "Defense@"
+	db "Speed@"
+	db "Special@"
 	db "accuracy@"
 	db "evade@"
 

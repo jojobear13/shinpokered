@@ -141,5 +141,5 @@ _Route3AfterBattleText8::
 
 _Route3Text10::
 	text "Route 3"
-	line "Mt.Moon ahead"
+	line "Mt. Moon Ahead"
 	done

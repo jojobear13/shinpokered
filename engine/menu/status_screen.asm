@@ -585,7 +585,7 @@ CalcExpToLevelUp:
 
 StatusScreenExpText:
 	db   "EXP Points"
-	next "Level up@"
+	next "Level Up@"
 
 StatusScreen_ClearName:
 	ld bc, 10

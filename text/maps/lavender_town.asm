@@ -35,7 +35,7 @@ _LavenderTownText2::
 	done
 
 _LavenderTownText3::
-	text "ghosts appeared"
+	text "Ghosts appeared"
 	line "in #mon Tower."
 
 	para "I think they're"
@@ -60,8 +60,8 @@ _LavenderTownText5::
 	done
 
 _LavenderTownText8::
-	text "Lavender volunteer"
-	line "#mon house"
+	text "Lavender Volunteer"
+	line "#mon House"
 	done
 
 _LavenderTownText9::
