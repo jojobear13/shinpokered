@@ -2,8 +2,8 @@ _LanceBeforeBattleText::
 	text "Ah! I heard about"
 	line "you <PLAYER>!"
 
-	para "I lead the elite"
-	line "four! You can"
+	para "I lead the Elite"
+	line "Four! You can"
 	cont "call me Lance the"
 	cont "dragon trainer!"
 
@@ -43,7 +43,7 @@ _LanceAfterBattleText::
 
 	para "You are now the"
 	line "#mon League"
-	cont "champion!"
+	cont "Champion!"
 
 	para "...Or, you would"
 	line "have been, but"
@@ -55,9 +55,9 @@ _LanceAfterBattleText::
 	cont "His name is..."
 
 	para "<RIVAL>!"
-	line "He beat the elite"
-	cont "four before you!"
+	line "He beat the Elite"
+	cont "Four before you!"
 
 	para "He is the real"
 	line "#mon League"
-	cont "champion!@@"
+	cont "Champion!@@"

@@ -1068,8 +1068,8 @@ _HypnoDexEntry::
 	next "will use a mix of"
 
 	page "Psi moves such as"
-	next "hypnosis and"
-	next "confusion"
+	next "Hypnosis and"
+	next "Confusion"
 	dex
 
 _GolbatDexEntry::

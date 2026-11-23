@@ -15,8 +15,8 @@ _IndigoPlateauLobbyText2::
 
 _IndigoPlateauLobbyText3::
 	text "From here on, you"
-	line "face the elite"
-	cont "four one by one!"
+	line "face the Elite"
+	cont "Four one by one!"
 
 	para "If you win, a"
 	line "door opens to the"

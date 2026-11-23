@@ -90,7 +90,7 @@ _GaryText_76120::
 	line "Congratulations!"
 	cont "You're the new"
 	cont "#mon League"
-	cont "champion!"
+	cont "Champion!"
 
 	para "You've grown up so"
 	line "much since you"

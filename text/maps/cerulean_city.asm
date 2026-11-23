@@ -190,12 +190,12 @@ _CeruleanCityText9::
 
 _CeruleanCityText10::
 	text "This is Cerulean"
-	line "cave! Horribly"
+	line "Cave! Horribly"
 	cont "strong #mon"
 	cont "live in there!"
 
 	para "The #mon League"
-	line "champion is the"
+	line "Champion is the"
 	cont "only person who"
 	cont "is allowed in!"
 	done
