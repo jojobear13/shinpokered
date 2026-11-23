@@ -123,7 +123,7 @@ _SaffronCityText20::
 _SaffronCityText21::
 	text "Trainer tips"
 
-	para "New Great Ball"
+	para "New Greatball"
 	line "offers improved"
 	cont "capture rates."
 

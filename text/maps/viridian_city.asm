@@ -1,5 +1,5 @@
 _ViridianCityText1::
-	text "Those # Balls"
+	text "Those Pokéballs"
 	line "at your waist!"
 	cont "You have #mon!"
 

@@ -423,14 +423,14 @@ PokedexMenuItemsText:
 	db   "Data"
 	next "Cry"
 	next "area"
-	next "quit@"
+	next "Quit@"
 
 ;adding GB_PRINTER
 PokedexMenuItemsTextPRINT:
 	db   "Data"
 	next "Prnt"
 	next "area"
-	next "quit@"
+	next "Quit@"
 	
 ; tests if a pokemon's bit is set in the seen or owned pokemon bit fields
 ; INPUT:

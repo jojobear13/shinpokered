@@ -154,7 +154,7 @@ _SSAnne6Text_GymGuy_win::
 	line "do it!"
 	
 	para "<PLAYER> won a"
-	line "Master Ball!@@"
+	line "Masterball!@@"
 	
 _SSAnne6Text_GymGuy_pikachu::
 	text "Your Pikachu is"

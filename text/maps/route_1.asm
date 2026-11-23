@@ -20,7 +20,7 @@ _Route1Text_1cae8::
 
 _Route1Text_1caee::
 	text "We also carry"
-	line "# Balls for"
+	line "Pokéballs for"
 	cont "catching #mon!"
 	done
 

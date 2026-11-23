@@ -110,7 +110,7 @@ CeladonCityText8_continue:
 CeladonCityText8_alternate:
 	text "I got an -in- at"
 	line "Silph Co. for the"
-	cont "Master Ball tech,"
+	cont "Masterball tech,"
 	cont "and I supply to a"
 	cont "guy at the dept."
 	cont "Store on the sly."

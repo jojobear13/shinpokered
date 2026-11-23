@@ -1,12 +1,12 @@
 ItemNames:
-	db "Master Ball@"
-	db "Ultra Ball@"
-	db "Great Ball@"
-	db "Poké Ball@"
+	db "Masterball@"
+	db "Ultraball@"
+	db "Greatball@"
+	db "Pokéball@"
 	db "Town Map@"
 	db "Bicycle@"
 	db "Surfboard@"	;joenote - give the surfboard it's fan name instead of ?????
-	db "Safari Ball@"
+	db "Safariball@"
 	db "Pokédex@"
 	db "Moon Stone@"
 	db "Tox Heal@"

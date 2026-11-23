@@ -53,7 +53,7 @@ _VoltorbDexEntry::
 	next "power plants."
 	next "Easily mistaken"
 
-	page "for a # Ball,"
+	page "for a Pokéball,"
 	next "they have zapped"
 	next "many people"
 	dex

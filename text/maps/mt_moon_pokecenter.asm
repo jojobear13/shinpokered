@@ -1,5 +1,5 @@
 _MtMoonPokecenterText1::
-	text "I've 6 # Balls"
+	text "I've 6 Pokéballs"
 	line "set in my belt."
 
 	para "At most, you can"

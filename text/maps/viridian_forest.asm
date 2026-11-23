@@ -64,7 +64,7 @@ _ViridianFrstAfterBattleText3::
 
 _ViridianForestText8::
 	text "I ran out of"
-	line "Poké Balls to"
+	line "Pokéballs to"
 	cont "catch #mon!"
 
 	para "You should carry"

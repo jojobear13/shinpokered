@@ -220,7 +220,7 @@ TextBoxTextAndCoordTable:
 BuySellQuitText:
 	db   "Buy"
 	next "Sell"
-	next "quit@@"
+	next "Quit@@"
 
 UseTossText:
 	db   "Use"

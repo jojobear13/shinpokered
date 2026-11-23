@@ -186,7 +186,7 @@ _Route17Text15::
 
 	para "Don't throw the"
 	line "game. Throw a"
-	cont "Poké Ball instead!"
+	cont "Pokéball instead!"
 	done
 
 _Route17Text16::

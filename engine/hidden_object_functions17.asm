@@ -291,12 +291,12 @@ ViridianSchoolBlackboardText2:
 StatusAilmentText1:
 	db   " Slp"
 	next " Psn"
-	next " par@"
+	next " Par@"
 
 StatusAilmentText2:
 	db   " Brn"
 	next " Frz"
-	next " quit@@"
+	next " Quit@@"
 
 ViridianBlackboardStatusPointers:
 	dw ViridianBlackboardSleepText

@@ -727,7 +727,7 @@ _ViridianSchoolNotebookText1::
 
 	para "First page..."
 
-	para "# Balls are"
+	para "Pokéballs are"
 	line "used to catch"
 	cont "#mon."
 
@@ -773,7 +773,7 @@ _ViridianSchoolNotebookText4::
 	line "#mon trainers"
 	cont "is to beat the "
 	cont "top 8 #mon"
-	cont "Gym Leaders."
+	cont "gym leaders."
 
 	para "Do so to earn the"
 	line "right to face..."

@@ -31,8 +31,8 @@ _SilphCo10Text_6231c::
 	cont "anywhere!"
 
 	para "It's our secret"
-	line "prototype Master"
-	cont "Ball!"
+	line "Masterball"
+	cont "prototype!"
 
 	para "It will catch any"
 	line "#mon without"

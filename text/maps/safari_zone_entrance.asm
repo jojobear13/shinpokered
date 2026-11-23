@@ -17,18 +17,18 @@ SafariZoneEntranceText_9e747::
 	line "please!"
 
 	para "We only use a"
-	line "special # Ball"
+	line "special Pokéball"
 	cont "here."
 
 	para "<PLAYER> received"
-	line "30 Safari Balls!@@"
+	line "30 Safariballs!@@"
 
 _SafariZoneEntranceText_75360::
 	db $0
 	para "We'll call you on"
 	line "the PA when you"
 	cont "run out of time"
-	cont "or Safari Balls!"
+	cont "or Safariballs!"
 	done
 
 _SafariZoneEntranceText_75365::
@@ -46,7 +46,7 @@ SafariZoneEntranceText_9e814::
 
 _SafariZoneEntranceText_753bb::
 	text "Please return any"
-	line "Safari Balls you"
+	line "Safariballs you"
 	cont "have left."
 	done
 
@@ -72,13 +72,13 @@ _SafariZoneEntranceText_753eb::
 	para "Each zone has"
 	line "different kinds"
 	cont "of #mon. Use"
-	cont "Safari Balls to"
+	cont "Safariballs to"
 	cont "catch them!"
 
 	para "When you run out"
-	line "of time or safari"
-	cont "Balls, it's game"
-	cont "over for you!"
+	line "of time or"
+	cont "Safariballs, it's"
+	cont "game over!"
 
 	para "Before you go,"
 	line "open an unused"
