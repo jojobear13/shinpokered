@@ -20,7 +20,7 @@ _TowerRescueFujiText::
 
 	para "Follow me to my"
 	line "home, #mon"
-	cont "house at the foot"
+	cont "House at the foot"
 	cont "of this tower."
 	done
 

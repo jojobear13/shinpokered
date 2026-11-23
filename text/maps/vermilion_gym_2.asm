@@ -13,7 +13,7 @@ _VermilionGymText_5cb72::
 _VermilionGymText_5cb77::
 	text "The Thunder Badge"
 	line "cranks up your"
-	cont "#mon's defense!"	;joenote - changed SPEED to DEFENSE in order to fix a typo
+	cont "#mon's Defense!"	;joenote - changed SPEED to DEFENSE in order to fix a typo
 
 	para "It also lets your"
 	line "#mon fly any"
