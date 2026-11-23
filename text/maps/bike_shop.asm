@@ -39,7 +39,7 @@ _BikeShopText_1d824::
 	line "the Bike Voucher"
 ;	cont "for a BICYCLE.@@"
 ;joenote - add hotkey info
-	cont "for a bicycle."
+	cont "for a Bicycle."
 	para "Hold A and press"
 	line "select to get on"
 	cont "or off quickly.@@"
@@ -52,7 +52,7 @@ _BikeShopComeAgainText::
 
 _BikeShopText_1d82f::
 	text "How do you like"
-	line "your new bicycle?"
+	line "your new Bicycle?"
 
 	para "You can take it"
 	line "on Cycling Road"

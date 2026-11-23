@@ -41,8 +41,8 @@ _LaprasGuySavedText::
 
 _SilphCo7Text_51e00::
 	text "Team Rocket was"
-	line "after the master"
-	cont "ball which will"
+	line "after the Master"
+	cont "Ball which will"
 	cont "catch any #mon!"
 	done
 

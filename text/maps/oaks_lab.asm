@@ -133,7 +133,7 @@ _OaksLabGivePokeballsText2::
 	cont "it's fair game."
 
 	para "Just throw a #"
-	line "ball at it and"
+	line "Ball at it and"
 	cont "try to catch it!"
 
 	para "This won't always"

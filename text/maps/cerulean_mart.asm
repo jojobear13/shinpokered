@@ -1,5 +1,5 @@
 _CeruleanMartText2::
-	text "Use repel to keep"
+	text "Use Repel to keep"
 	line "bugs and weak"
 	cont "#mon away."
 

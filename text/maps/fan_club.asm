@@ -91,14 +91,14 @@ ReceivedBikeVoucherText::
 ExplainBikeVoucherText::
 	text ""
 	para "Exchange that for"
-	line "a bicycle!"
+	line "a Bicycle!"
 
 	para "Don't worry, my"
 	line "Fearow will fly"
 	cont "me anywhere!"
 
 	para "So, I don't need a"
-	line "bicycle!"
+	line "Bicycle!"
 
 	para "I hope you like"
 	line "cycling!"

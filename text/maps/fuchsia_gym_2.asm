@@ -11,7 +11,7 @@ _KogaExplainToxicText::
 
 _FuchsiaGymText9::
 	text "Now that you have"
-	line "the soulbadge,"
+	line "the Soulbadge,"
 	cont "the speed of"	;joenote - changed DEFENSE to SPEED in order to fix a typo
 	cont "your #mon"
 	cont "increases!"

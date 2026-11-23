@@ -522,7 +522,7 @@ _BookcaseText::
 
 _NewBicycleText::
 	text "A shiny new"
-	line "bicycle!"
+	line "Bicycle!"
 	done
 
 _PushStartText::
@@ -2249,7 +2249,7 @@ _TooWeakSubstituteText::
 	prompt
 
 _CoinsScatteredText::
-	text "Coins scattered"
+	text "coins scattered"
 	line "everywhere!"
 	prompt
 
@@ -2879,7 +2879,7 @@ _ThrewRockText::
 
 _PlayedFluteNoEffectText::
 	text "Played the #"
-	line "flute."
+	line "Flute."
 
 	para "Now, that's a"
 	line "catchy tune!"
@@ -2892,10 +2892,10 @@ _FluteWokeUpText::
 
 _PlayedFluteHadEffectText::
 	text "<PLAYER> played the"
-	line "# flute.@@"
+	line "# Flute.@@"
 
 _CoinCaseNumCoinsText::
-	text "Coins"
+	text "coins"
 	line "@"
 	TX_BCD wPlayerCoins, 2 | LEADING_ZEROES | LEFT_ALIGN
 	text " "

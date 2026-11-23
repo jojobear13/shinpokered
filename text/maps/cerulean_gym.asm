@@ -26,7 +26,7 @@ _CeruleanGymText_5c7c3::
 	done
 
 _CeruleanGymText_5c7c8::
-	text "The cascadebadge"
+	text "The Cascadebadge"
 	line "makes all #mon"
 	cont "up to L30 obey!"
 
@@ -61,7 +61,7 @@ _CeruleanGymText_5c7d8::
 	para "All right!"
 
 	para "You can have the"
-	line "cascadebadge to"
+	line "Cascadebadge to"
 	cont "show you beat me!@@"
 
 _CeruleanGymBattleText1::

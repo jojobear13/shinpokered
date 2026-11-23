@@ -27,7 +27,7 @@ _SaffronGymText_5d167::
 	cont "to win!"
 
 	para "You earned the"
-	line "marshbadge!@@"
+	line "Marshbadge!@@"
 
 _SaffronGymText_5d16e::
 	text "Everyone has"
@@ -37,7 +37,7 @@ _SaffronGymText_5d16e::
 	done
 
 _SaffronGymText_5d173::
-	text "The marshbadge"
+	text "The Marshbadge"
 	line "makes #mon up"
 	cont "to L70 obey you!"
 

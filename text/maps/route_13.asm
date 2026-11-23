@@ -64,7 +64,7 @@ _Route13AfterBattleText5::
 	done
 
 _Route13BattleText6::
-	text "I found carbos in"
+	text "I found Carbos in"
 	line "a cave once."
 	done
 

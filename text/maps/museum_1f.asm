@@ -94,8 +94,8 @@ _ReceivedOldAmberText::
 	line "Old Amber!@@"
 
 _Museum1FText_5c299::
-	text "Ssh! Get the old"
-	line "amber checked!"
+	text "Ssh! Get the Old"
+	line "Amber checked!"
 	done
 
 _Museum1FText_5c29e::

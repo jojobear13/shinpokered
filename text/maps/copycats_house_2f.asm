@@ -17,7 +17,7 @@ _CopycatsHouse2FText_5ccd4::
 
 _TM31PreReceiveText::
 	text "Oh wow!"
-	line "A # doll!"
+	line "A # Doll!"
 
 	para "For me?"
 	line "Thank you!"

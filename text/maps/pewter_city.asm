@@ -57,7 +57,7 @@ _PewterCityText_1942c::
 	done
 
 _PewterCityText_19431::
-	text "I'm spraying repel"
+	text "I'm spraying Repel"
 	line "to keep #mon"
 	cont "out of my garden!"
 	done

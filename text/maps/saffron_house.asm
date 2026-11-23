@@ -13,7 +13,7 @@ _SaffronHouse1Text2::
 _SaffronHouse1Text3::
 	text "The copycat is"
 	line "cute! I'm getting"
-	cont "her a # doll!"
+	cont "her a # Doll!"
 	done
 
 _SaffronHouse1Text4::

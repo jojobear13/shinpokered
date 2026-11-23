@@ -121,5 +121,5 @@ _Route16Text9::
 
 _Route16TextUsePokeflute::
 	text "Play the #"
-	line "flute?"
+	line "Flute?"
 	done

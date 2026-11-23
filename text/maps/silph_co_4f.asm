@@ -37,8 +37,8 @@ _SilphCo4EndBattleText3::
 _SilphCo4AfterBattleText3::
 	text "The doors are"
 	line "electronically"
-	cont "locked! A card"
-	cont "key opens them!"
+	cont "locked! A Card"
+	cont "Key opens them!"
 	done
 
 _SilphCo4BattleText4::

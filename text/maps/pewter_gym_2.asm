@@ -55,10 +55,10 @@ _PewterGymText_5c4bc::
 
 	para "As proof of your"
 	line "victory, here's"
-	cont "the boulderbadge!"
+	cont "the Boulderbadge!"
 
 	para "<PLAYER> received"
-	line "the boulderbadge!@@"
+	line "the Boulderbadge!@@"
 
 _PewterGymText_5c4c1::
 	db $0

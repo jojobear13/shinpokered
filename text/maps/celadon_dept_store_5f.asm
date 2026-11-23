@@ -3,11 +3,11 @@ _CeladonMart5Text1::
 	line "enhancers can be"
 	cont "bought only here."
 
-	para "Use calcium to"
+	para "Use Calcium to"
 	line "increase special"
 	cont "abilities."
 
-	para "Use carbos to"
+	para "Use Carbos to"
 	line "increase speed."
 	done
 

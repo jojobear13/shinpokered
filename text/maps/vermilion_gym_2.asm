@@ -11,7 +11,7 @@ _VermilionGymText_5cb72::
 	done
 
 _VermilionGymText_5cb77::
-	text "The thunderbadge"
+	text "The Thunderbadge"
 	line "cranks up your"
 	cont "#mon's defense!"	;joenote - changed SPEED to DEFENSE in order to fix a typo
 
@@ -50,7 +50,7 @@ _ReceivedThunderbadgeText::
 	line "deal, kid!"
 
 	para "Fine then, take"
-	line "the thunderbadge!"
+	line "the Thunderbadge!"
 	prompt
 
 _VermilionGymBattleText1::

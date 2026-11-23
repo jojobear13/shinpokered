@@ -6,7 +6,7 @@ _LavenderMartText2::
 	cont "single battle."
 
 	para "X Attack, X"
-	line "defend, X Speed"
+	line "Defend, X Speed"
 	cont "and X Special are"
 	cont "what I'm after."
 
@@ -15,13 +15,13 @@ _LavenderMartText2::
 	done
 
 _LavenderMartReviveText::
-	text "You know revive?"
+	text "You know Revive?"
 	line "It revives any"
 	cont "fainted #mon!"
 	done
 
 _LavenderMartNuggetText::
-	text "I found a nugget"
+	text "I found a Nugget"
 	line "in the mountains."
 
 	para "I thought it was"

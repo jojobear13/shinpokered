@@ -54,7 +54,7 @@ _ReceivedFluteText::
 _FluteExplanationText::
 	db $0
 	para "Upon hearing #"
-	line "flute, sleeping"
+	line "Flute, sleeping"
 	cont "#mon will"
 	cont "spring awake."
 
