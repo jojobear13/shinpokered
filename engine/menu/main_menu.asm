@@ -637,7 +637,7 @@ SaveScreenInfoText:
 	db   "Player"
 	next "Badges    "
 	next "#dex    "
-	next "time@"
+	next "Time@"
 
 DisplayOptionMenu:
 	call GBPalNormal	;joenote - fixes rock tunnel darkness affecting option menu
