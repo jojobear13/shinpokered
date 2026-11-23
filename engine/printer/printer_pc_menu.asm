@@ -138,16 +138,16 @@ LoopPrinterPC:
 PrinterPCMenuText:
 	db   "Settings"
 	next "Print #dex"
-	next "print #mon"
-	next "print box"
+	next "Print #mon"
+	next "Print Box"
 	next "print diploma"
 	next "Cancel"
 	db "@"
 PrinterPCMenuText_noDiploma:
 	db   "Settings"
 	next "Print #dex"
-	next "print #mon"
-	next "print box"
+	next "Print #mon"
+	next "Print Box"
 	next "Cancel"
 	db "@"
 PrintBoxNoPCText:
