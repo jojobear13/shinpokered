@@ -1124,8 +1124,8 @@ _MukDexEntry::
 
 _KinglerDexEntry::
 	text "The large pincer"
-	next "has 10000 hp of"
-	next "crushing power."
+	next "can crush with"
+	next "10,000 horsepower."
 
 	page "However, its huge"
 	next "size makes it"
