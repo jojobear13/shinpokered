@@ -5,7 +5,7 @@ _SafariZoneCenterText2::
 _SafariZoneCenterText3::
 	text "Trainer Tips:"
 
-	para "Press the Start"
-	line "Button to check"
+	para "Press Start"
+	line "to check"
 	cont "remaining time!"
 	done

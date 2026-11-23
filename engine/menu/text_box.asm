@@ -250,7 +250,7 @@ BattleMenuText:
 
 SafariZoneBattleMenuText:
 	db   "Ball×       Bait"
-	next "Throw rock  Run@"
+	next "Throw Rock  Run@"
 
 SwitchStatsCancelText:
 	db   "Switch"
