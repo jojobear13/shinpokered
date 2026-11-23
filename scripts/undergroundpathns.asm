@@ -79,6 +79,6 @@ MirrorTrainerPre:
 	db "@"
 MirrorTrainerPost:
 	text "Ah-Ha!"
-	line "Well-played."
+	line "Well played."
 	prompt
 	db "@"
