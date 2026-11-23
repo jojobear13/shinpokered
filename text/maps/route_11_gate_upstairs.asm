@@ -34,7 +34,7 @@ _Route11GateUpstairsText_494d5::
 
 	para "The only way to"
 	line "get from Cerulean"
-	cont "city to Lavender"
+	cont "City to Lavender"
 	cont "is by way of the"
 	cont "Rock Tunnel."
 	done

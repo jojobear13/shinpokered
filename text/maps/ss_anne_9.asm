@@ -31,8 +31,8 @@ _SSAnne9Text_61c1f::
 
 _SSAnne9Text_61c2e::
 	text "Me and my Daddy"
-	line "think the safari"
-	cont "zone is awesome!"
+	line "think the Safari"
+	cont "Zone is awesome!"
 	done
 
 _SSAnne9Text_61c3d::

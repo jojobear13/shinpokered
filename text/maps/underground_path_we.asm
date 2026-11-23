@@ -3,7 +3,7 @@
 _RandTrainerNotReady::
 	text "I'm gonna sneak"
 	line "into the Cerulean"
-	cont "cave while every-"
+	cont "Cave while every-"
 	cont "one is occupied"
 	cont "with the #mon"
 	cont "League finals."
@@ -16,7 +16,7 @@ _RandTrainerNotReady::
 _RandTrainerIntro::
 	text "I barely made it"
 	line "out of Cerulean"
-	cont "cave alive, but"
+	cont "Cave alive, but"
 	cont "I swiped these"
 	cont "weird Ditto that"
 	cont "mimic anything."

@@ -94,7 +94,7 @@ _Route25EndBattleText6::
 	prompt
 
 _Route25AfterBattleText6::
-	text "You came from mt."
+	text "You came from Mt."
 	line "Moon? May I have"
 	cont "a Clefairy?"
 	done

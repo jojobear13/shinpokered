@@ -31,8 +31,8 @@ _Route9AfterBattleText2::
 	done
 
 _Route9BattleText3::
-	text "I'm taking rock"
-	line "tunnel to go to"
+	text "I'm taking Rock"
+	line "Tunnel to go to"
 	cont "Lavender..."
 	done
 

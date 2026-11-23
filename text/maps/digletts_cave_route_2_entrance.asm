@@ -1,6 +1,6 @@
 _DiglettsCaveRoute2Text1::
-	text "I went to rock"
-	line "tunnel, but it's"
+	text "I went to Rock"
+	line "Tunnel, but it's"
 	cont "dark and scary."
 
 	para "If a #mon's"

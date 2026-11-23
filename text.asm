@@ -3236,7 +3236,7 @@ _RomHackVersionText::
 	cont "of this game."
 	
 	para "Warp to Pallet"
-	line "town for safety?"
+	line "Town for safety?"
 	done
 
 _RematchTrainerText::

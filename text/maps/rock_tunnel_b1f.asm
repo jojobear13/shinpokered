@@ -27,7 +27,7 @@ _RockTunnel1EndBattleText2::
 
 _RockTunnel1AfterBattleText2::
 	text "That sleeping"
-	line "#mon on route"
+	line "#mon on Route"
 	cont "12 forced me to"
 	cont "take this detour."
 	done

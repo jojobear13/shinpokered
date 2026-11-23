@@ -4,8 +4,8 @@ _HallofFameRoomText1::
 	cont "<PLAYER>!"
 
 	para "This floor is the"
-	line "#mon hall of"
-	cont "fame!"
+	line "#mon Hall of"
+	cont "Fame!"
 
 	para "#mon League"
 	line "champions are"

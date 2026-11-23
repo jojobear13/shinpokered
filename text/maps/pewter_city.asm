@@ -27,7 +27,7 @@ _PewterCityText_193f1::
 
 _PewterCityText_193f6::
 	text "Weren't those"
-	line "fossils from mt."
+	line "fossils from Mt."
 	cont "Moon amazing?"
 	done
 
@@ -90,7 +90,7 @@ _PewterCityText7::
 
 	para "Thieves have been"
 	line "stealing #mon"
-	cont "fossils at mt."
+	cont "fossils at Mt."
 	cont "Moon! Please call"
 	cont "Pewter police"
 	cont "with any info!"

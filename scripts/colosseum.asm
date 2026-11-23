@@ -102,8 +102,8 @@ _TXTTrap:
 	db "@"
 
 _TXTHBeam:
-	text "Activate hyper"
-	line "beam clause?"
+	text "Activate Hyper"
+	line "Beam clause?"
 	done
 	db "@"
 
