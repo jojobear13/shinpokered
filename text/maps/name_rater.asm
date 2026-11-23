@@ -1,7 +1,7 @@
 _NameRaterText_1dab3::
 	text "Hello, hello!"
 	line "I am the official"
-	cont "name rater!"
+	cont "Name Rater!"
 
 	para "Want me to rate"
 	line "the nicknames of"

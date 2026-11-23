@@ -6,7 +6,7 @@ _SafariZoneWestText6::
 	text "Request Notice"
 
 	para "Please find the"
-	line "safari warden's"
+	line "Safari Warden's"
 	cont "lost Gold Teeth."
 	cont "They're around"
 	cont "here somewhere."
