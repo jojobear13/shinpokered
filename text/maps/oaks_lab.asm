@@ -341,14 +341,14 @@ _OaksLabText26::
 	line "that you can swap"
 	cont "between extra bag"	
 	cont "space by pressing"
-	cont "start in the item"
+	cont "Start in the item"
 	cont "menu."
 
 	para "And you can auto-"
 	line "sort an item menu"
 	cont "by simply holding"
 	cont "select while you"
-	cont "press start."
+	cont "press Start."
 	done
 
 _OaksLabText27::

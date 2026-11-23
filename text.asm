@@ -526,7 +526,7 @@ _NewBicycleText::
 	done
 
 _PushStartText::
-	text "Push start to"
+	text "Push Start to"
 	line "open the menu!"
 	done
 
