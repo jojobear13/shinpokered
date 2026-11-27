@@ -1233,6 +1233,11 @@ AIMoveChoiceModification4:	;this unused routine now handles intelligent trainer 
 	ld a, [wPlayerMovePower]	;get the power of the player's move
 	cp $2	;regular damaging moves have power > 1
 	jr c, .skipSwitchEffectiveEnd	;skip out if the move is not a normal damaging move
+	
+	ld a, [wBattleMonStatus]
+	and 1 << FRZ ; is player 'mon frozen?
+	jr nz, .skipSwitchEffectiveEnd	;skip out if the player 'mon is frozen since there is no direct threat
+	
 	push hl
 	push bc
 	push de
